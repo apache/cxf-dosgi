@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.apache.cxf</groupId>
+    <artifactId>cxf-dosgi-ri-systests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Distributed OSGI RI System Tests</name>
+
+    <parent>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-dosgi-ri-parent</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <relativePath>../parent/pom.xml</relativePath>  
+    </parent>
+
+    <properties>
+        <topDirectoryLocation>..</topDirectoryLocation>
+        <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
+        <servicemix.kernel.version>1.0.0</servicemix.kernel.version>
+        <servicemix.depends.plugin.version>1.0.0-rc1</servicemix.depends.plugin.version>
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse.osgi</groupId>
+            <artifactId>org.eclipse.osgi</artifactId>
+            <version>3.5m4</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/${topDirectoryLocation}/systests/equinox_libs/3.5m4/org.eclipse.osgi_3.5.0.v20081201-1815.jar</systemPath>
+        </dependency>
+
+        <!--
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.main</artifactId>
+            <version>1.1.0-cxf_dosgi-SNAPSHOT</version>
+            <scope>test</scope>
+            <exclusions>
+               <exclusion>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>org.apache.felix.shell</artifactId>
+               </exclusion>
+               <exclusion>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>org.apache.felix.shell.tui</artifactId>
+               </exclusion>
+               <exclusion>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>org.apache.felix.bundlerepository</artifactId>
+               </exclusion>
+             </exclusions>
+           </dependency> -->
+
+
+     </dependencies> 
+
+    <modules>
+        <module>common</module>
+        <module>multi_bundle_distro</module>
+        <module>single_bundle_distro</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+              <groupId>org.apache.servicemix.kernel.testing</groupId>
+              <artifactId>depends-maven-plugin</artifactId>
+              <version>${servicemix.depends.plugin.version}</version>
+              <executions>
+                <execution>
+                  <id>generate-depends-file</id>
+                  <goals>
+                     <goal>generate-depends-file</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <forkMode>pertest</forkMode>
+                    <systemProperties>
+                        <property>
+                            <name>org.springframework.osgi.test.framework</name>
+                            <value>${osgi.test.platform}</value>
+                        </property>
+
+                        <property>
+                                <name>org.apache.cxf.spring.validation.mode</name>
+                                <value>VALIDATION_NONE</value>
+                        </property>
+                        
+                        <property>
+                             <name>org.apache.cxf.nofastinfoset</name>
+                             <value>true</value>
+                        </property>
+<!--
+                        <property>
+                            <name>felix.config.properties</name>
+                            <value>file:${basedir}/../etc/felix.config.properties</value>
+                        </property>
+-->
+<!--
+                        <property>
+                            <name>-Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize</name>
+                            <value></value>
+                        </property>
+-->
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build> 
+   
+
+</project>
