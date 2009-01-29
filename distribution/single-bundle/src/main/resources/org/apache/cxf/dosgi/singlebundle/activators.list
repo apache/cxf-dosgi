@@ -1,0 +1,4 @@
+org.ops4j.pax.web.service.internal.Activator
+org.apache.cxf.dosgi.discovery.local.Activator
+org.apache.cxf.dosgi.dsw.Activator
+org.springframework.osgi.extender.internal.activator.ContextLoaderListener
