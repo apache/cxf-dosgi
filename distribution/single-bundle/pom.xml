@@ -218,6 +218,10 @@
             <Include-Resource>
               @cxf-bundle-minimal-${cxf.version}.jar!/META-INF/spring.*,
               @cxf-bundle-minimal-${cxf.version}.jar!/META-INF/cxf/*,
+              @cxf-bundle-minimal-${cxf.version}.jar!/META-INF/DEPENDENCIES,
+              @cxf-bundle-minimal-${cxf.version}.jar!/META-INF/LICENSE,
+              @cxf-bundle-minimal-${cxf.version}.jar!/META-INF/NOTICE,
+              @cxf-bundle-minimal-${cxf.version}.jar!/META-INF/NOTICE.jdom,
               {maven-resources}
             </Include-Resource>
             <Import-Package>
