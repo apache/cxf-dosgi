@@ -13,7 +13,12 @@
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation Parent</name>
-
+    <inceptionYear>2008</inceptionYear>
+    
+    <organization>
+      <name>Apache Software Foundation</name>
+      <url>http://cxf.apache.org/</url>
+    </organization>
 
     <properties>
         <cxf.version>2.2-SNAPSHOT</cxf.version>
@@ -105,6 +110,38 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>1.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf</groupId>
+                        <artifactId>cxf-buildtools</artifactId>
+                        <version>${cxf.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <resourceBundles>
+                                <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+                            </resourceBundles>
+                            <supplementalModels>
+                                <supplementalModel>notice-supplements.xml</supplementalModel>
+                            </supplementalModels>
+                            <properties>
+                                <projectName>Apache CXF Distributed OSGi DSW Reference Implementation</projectName>
+                            </properties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <repositories>

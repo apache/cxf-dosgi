@@ -27,5 +27,9 @@
       <directory>target/distribution_bundles</directory>
       <outputDirectory>bundles</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>target/maven-shared-archive-resources/META-INF</directory>
+      <outputDirectory>.</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>
