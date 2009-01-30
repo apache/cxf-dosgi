@@ -31,5 +31,12 @@
       <directory>target/maven-shared-archive-resources/META-INF</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>src/main/resources/META-INF</directory>
+      <includes>
+        <include>NOTICE.jdom</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>

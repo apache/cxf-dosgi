@@ -1,5 +1,6 @@
 This product contains interfaces and specifications Copyright The OSGi Alliance.
 
+
 This product also includes schemas and specification developed by:
       - the W3C consortium (http://www.w3c.org)
       (http://www.w3.org/XML/1998/namespace)
@@ -16,13 +17,15 @@ This product also includes WS-* schemas developed by International
 
 
 This product contains includes JDOM:
- Copyright (C) 2000-2004 Jason Hunter & Brett McLaughlin.
- All rights reserved.
+  Copyright (C) 2000-2004 Jason Hunter & Brett McLaughlin.
+  All rights reserved.
+  See the NOTICE.jdom file for additional information
 
 
 The product contains code (StaxBuilder.java) that is
   Copyright (C) 2000-2004 Jason Hunter & Brett McLaughlin.
   All rights reserved.
+  See the NOTICE.jdom file for additional information
 
 
 Java classes (source and binary) under org.apache.cxf.jaxws.javaee
