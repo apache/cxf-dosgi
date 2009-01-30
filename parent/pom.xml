@@ -109,16 +109,15 @@
 
     <repositories>
         <repository>
-            <id>java.net</id>
-            <name>java.net Maven Repository</name>
-            <url>https://maven-repository.dev.java.net/nonav/repository</url>
-            <layout>legacy</layout>
-        </repository>
-
-        <repository>
             <id>apache.snapshots</id>
             <name>Apache Maven Snapshot Repository</name>
             <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
 
         <!-- I21 repository -->
@@ -134,49 +133,91 @@
             </snapshots>
         </repository>
 
+        <repository>  
+            <id>com.springsource.repository.bundles.release</id>  
+            <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>           
+            <url>http://repository.springsource.com/maven/bundles/release</url> 
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository> 
 
         <repository>  
-         <id>com.springsource.repository.bundles.release</id>  
-         <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>           <url>http://repository.springsource.com/maven/bundles/release</url> 
-        </repository> 
-        <repository>  
-           <id>com.springsource.repository.bundles.external</id>  
-           <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>                         <url>http://repository.springsource.com/maven/bundles/external</url> 
+            <id>com.springsource.repository.bundles.external</id>  
+            <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>                         
+            <url>http://repository.springsource.com/maven/bundles/external</url> 
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
 
-       <repository>
-           <id>central</id>
-           <name>Default maven repo</name>
-           <url>http://repo1.maven.org/maven2</url>
-       </repository>
+        <repository>
+            <id>central</id>
+            <name>Default maven repo</name>
+            <url>http://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 
-       <!-- ServiceMix repo -->
-       <repository>
-           <id>servicemix</id>
-           <name>ServiceMix Repository</name>
-           <url>http://svn.apache.org/repos/asf/servicemix/m2-repo</url>
-       </repository>
+        <!-- ServiceMix repo -->
+        <repository>
+            <id>servicemix</id>
+            <name>ServiceMix Repository</name>
+            <url>http://svn.apache.org/repos/asf/servicemix/m2-repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 
-       <!-- OPS4j repository -->
-       <repository>
-           <id>ops4j</id>
-           <name>OPS4j repo</name>
-           <url>http://repository.ops4j.org/maven2</url>
-       </repository>
+        <!-- OPS4j repository -->
+        <repository>
+            <id>ops4j</id>
+            <name>OPS4j repo</name>
+            <url>http://repository.ops4j.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 
-       <repository>
-           <id>repository.opensaml</id>
-           <name>Open SAML repository</name>
-           <url>http://ws.zones.apache.org/repository2</url>
-       </repository>
+        <repository>
+            <id>repository.opensaml</id>
+            <name>Open SAML repository</name>
+            <url>http://ws.zones.apache.org/repository2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 
-       <repository>
-         <id>spring-osgified-artifacts</id>
-         <snapshots><enabled>true</enabled></snapshots>
-         <name>Springframework Maven OSGified Artifacts Repository</name>
-         <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
-       </repository> 
-
+        <repository>
+            <id>spring-osgified-artifacts</id>
+            <name>Springframework Maven OSGified Artifacts Repository</name>
+            <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository> 
     </repositories>
 
     <pluginRepositories>
