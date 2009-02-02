@@ -19,17 +19,90 @@
 -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
-    <artifactId>dosgi</artifactId>
+    <artifactId>cxf-dosgi-ri</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation</name>  
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/dosgi/trunk</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/dosgi/trunk</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>jira</system>
+        <url>https://issues.apache.org/jira/browse/CXF</url>
+    </issueManagement>
+
+    <prerequisites>
+        <maven>2.0.9</maven>
+    </prerequisites>
 
     <properties>
         <jetty.version>6.1.9</jetty.version>
         <woodstox.bundle.version>3.2.7_1</woodstox.bundle.version> 
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>apache.releases</id>
+            <name>Apache Release Distribution Repository</name>
+            <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
+        </repository>
+        <snapshotRepository>
+            <id>apache.snapshots</id>
+            <name>Apache Development Snapshot Repository</name>
+            <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <inceptionYear>2008</inceptionYear>
+    <mailingLists>
+        <mailingList>
+            <name>Apache CXF User List</name>
+            <subscribe>users-subscribe@cxf.apache.org</subscribe>
+            <unsubscribe>users-unsubscribe@cxf.apache.org</unsubscribe>
+            <post>users@cxf.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/cxf-users</archive>
+        </mailingList>
+        <mailingList>
+            <name>Apache CXF Developer List</name>
+            <subscribe>dev-subscribe@cxf.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@cxf.apache.org</unsubscribe>
+            <post>dev@cxf.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/cxf-dev</archive>
+        </mailingList>
+        <mailingList>
+            <name>Apache CXF Commits List</name>
+            <subscribe>commits-subscribe@cxf.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@cxf.apache.org</unsubscribe>
+            <post>commits@cxf.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/cxf-commits</archive>
+        </mailingList>
+        <mailingList>
+            <name>Apache CXF Issues List</name>
+            <subscribe>issues-subscribe@cxf.apache.org</subscribe>
+            <unsubscribe>issues-unsubscribe@cxf.apache.org</unsubscribe>
+            <post>issues@cxf.apache.org</post>
+            <archive>http://mail-archives.apache.org/mod_mbox/cxf-issues</archive>
+        </mailingList>
+    </mailingLists>
+    
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <organization>
+        <name>The Apache Software Foundation</name>
+        <url>http://www.apache.org/</url>
+    </organization>
+    
     <modules>
         <module>parent</module>
         <module>felix</module>

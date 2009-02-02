@@ -2,7 +2,7 @@
 
     <parent>
        <groupId>org.apache.cxf</groupId>
-       <artifactId>dosgi</artifactId>
+       <artifactId>cxf-dosgi-ri</artifactId>
        <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -13,13 +13,7 @@
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation Parent</name>
-    <inceptionYear>2008</inceptionYear>
     
-    <organization>
-      <name>Apache Software Foundation</name>
-      <url>http://cxf.apache.org/</url>
-    </organization>
-
     <properties>
         <cxf.version>2.2-SNAPSHOT</cxf.version>
         <felix.version>1.4.1</felix.version>
