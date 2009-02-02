@@ -25,18 +25,22 @@
   <fileSets>
     <fileSet>
       <directory>target/distribution_bundles</directory>
-      <outputDirectory>bundles</outputDirectory>
+      <outputDirectory>dosgi_bundles</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/distribution_configs</directory>
+      <outputDirectory>conf</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/maven-shared-archive-resources/META-INF</directory>
-      <outputDirectory>.</outputDirectory>
+      <outputDirectory></outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/resources/META-INF</directory>
       <includes>
         <include>NOTICE.jdom</include>
       </includes>
-      <outputDirectory>.</outputDirectory>
+      <outputDirectory></outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

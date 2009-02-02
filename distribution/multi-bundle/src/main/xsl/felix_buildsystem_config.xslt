@@ -3,13 +3,10 @@
   <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
   <xsl:param name="TargetDir"/>
   <xsl:template match="/">
-org.osgi.framework.startlevel=<xsl:value-of select="count(//bundles/felix_deps) + count(//bundles/bundle) + 1"/>
-    <xsl:for-each select="//bundles/felix_deps">
-      <xsl:variable name="i" select="position() + 1"/>
-felix.auto.start.<xsl:value-of select="$i"/>=file:/<xsl:value-of select="$TargetDir"/><xsl:value-of select="text()"/>
-    </xsl:for-each>
+org.osgi.framework.startlevel=<xsl:value-of select="count(//bundles/felix_deps) + count(//bundles/bundle) + 2"/>
+felix.auto.start.2=http://www.apache.org/dist/felix/org.osgi.compendium-1.2.0.jar
     <xsl:for-each select="//bundles/bundle">
-      <xsl:variable name="i" select="position() + count(//bundles/felix_deps) + 1"/>
+      <xsl:variable name="i" select="position() + count(//bundles/felix_deps) + 2"/>
 felix.auto.start.<xsl:value-of select="$i"/>=file:/<xsl:value-of select="$TargetDir"/><xsl:value-of select="text()"/>
     </xsl:for-each>
   </xsl:template>

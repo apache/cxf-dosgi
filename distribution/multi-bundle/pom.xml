@@ -272,7 +272,7 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
-            <phase>package</phase>
+            <phase>compile</phase>
             <configuration>
               <tasks>
                 <path id="current.dir.path">
@@ -282,15 +282,25 @@
                 
                 <xslt processor="trax" 
                   in="src/main/resources/distro_bundles.xml" 
+                  out="target/distribution_configs/felix.config.properties.append"
+                  style="src/main/xsl/felix_distro_config.xslt" />
+                
+                <xslt processor="trax" 
+                  in="src/main/resources/distro_bundles.xml" 
                   out="target/felix.config.properties.append"
-                  style="src/main/xsl/felix_config.xslt">
+                  style="src/main/xsl/felix_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/"/>
                 </xslt>
                 
                 <xslt processor="trax" 
                   in="src/main/resources/distro_bundles.xml" 
+                  out="target/distribution_configs/equinox.config.ini.append"
+                  style="src/main/xsl/equinox_distro_config.xslt" />
+                
+                <xslt processor="trax" 
+                  in="src/main/resources/distro_bundles.xml" 
                   out="target/equinox.config.ini.append"
-                  style="src/main/xsl/equinox_config.xslt">
+                  style="src/main/xsl/equinox_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/"/>
                 </xslt>
               </tasks>
