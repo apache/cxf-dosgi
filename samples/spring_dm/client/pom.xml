@@ -18,21 +18,21 @@
   under the License.
 -->
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.cxf</groupId>
+  <groupId>org.apache.cxf.dosgi</groupId>
   <artifactId>cxf-dosgi-ri-samples-spring-dm-client</artifactId>
   <packaging>bundle</packaging>
   <name>Distributed OSGI Spring-DM Sample Client Bundle</name>
   <version>1.0-SNAPSHOT</version>
 
   <parent>
-    <groupId>org.apache.cxf</groupId>
+    <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-bundles-spring-dm-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.cxf</groupId>
+      <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-samples-spring-dm-interface</artifactId>
       <version>${project.version}</version>
     </dependency>

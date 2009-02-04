@@ -44,8 +44,8 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
     @Override
     protected String[] getTestBundlesNames() {
         return new String [] {
-            getBundle("org.apache.cxf", "cxf-dosgi-ri-systests-common"),
-            getBundle("org.apache.cxf", "cxf-dosgi-ri-samples-greeter-interface")};
+            getBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-systests-common"),
+            getBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-samples-greeter-interface")};
     }
     
     @Override
@@ -93,7 +93,7 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
             Thread.sleep(2000);
             
             // now install dsw
-            installBundle("org.apache.cxf", "cxf-dosgi-ri-dsw-cxf", null, "jar");
+            installBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-dsw-cxf", null, "jar");
             verifyGreeterResponse();
         } finally {
             if (tracker != null) {

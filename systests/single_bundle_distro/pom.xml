@@ -19,14 +19,14 @@
   -->
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.cxf</groupId>
+  <groupId>org.apache.cxf.dosgi</groupId>
   <artifactId>cxf-dosgi-ri-systests-singlebundle-distro</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Distributed OSGI RI System Test using Single Bundle Distro</name>
 
   <parent>
-    <groupId>org.apache.cxf</groupId>
+    <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-systests</artifactId>
     <version>1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>  
@@ -38,7 +38,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.cxf</groupId>
+      <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-systests-common</artifactId>
       <version>${project.version}</version>
       <exclusions>
@@ -74,7 +74,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.cxf</groupId>
+      <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-singlebundle-distribution</artifactId>
       <version>${project.version}</version>
       <exclusions>
