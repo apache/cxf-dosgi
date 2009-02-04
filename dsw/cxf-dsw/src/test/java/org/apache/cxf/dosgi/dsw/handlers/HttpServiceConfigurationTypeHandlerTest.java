@@ -1,11 +1,9 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -29,70 +27,66 @@ import org.osgi.service.http.HttpService;
 
 public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
     public void testServer() throws Exception {
-        Properties savedProps = new Properties();
-        savedProps.putAll(System.getProperties());
-        try {
-            System.setProperty("org.osgi.service.http.port", "327");
-            
-            BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
-            HttpService httpService = EasyMock.createNiceMock(HttpService.class);
-            // expect that the cxf servlet is registered
-            EasyMock.replay(httpService);
-            
-            ServiceReference httpSvcSR = EasyMock.createNiceMock(ServiceReference.class);
-            EasyMock.replay(httpSvcSR);
-            EasyMock.expect(dswContext.getService(httpSvcSR)).andReturn(httpService).anyTimes();
-            EasyMock.replay(dswContext);
-            
-            final ServerFactoryBean sfb = createMockServerFactoryBean();
-            
-            DistributionProviderImpl dp = new DistributionProviderImpl(dswContext);
-            Map<String, Object> handlerProps = new HashMap<String, Object>();
-            HttpServiceConfigurationTypeHandler h = 
-                new HttpServiceConfigurationTypeHandler(dswContext, dp, handlerProps) {
-                    @Override
-                    ServerFactoryBean createServerFactoryBean() {
-                        return sfb;
-                    }
-    
-                    @Override
-                    String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                            List<AbstractFeature> features, AbstractEndpointFactory factory, 
-                            ServiceEndpointDescription sd) {
-                        return new String [] {"a.b.c"};
-                    }            
-            };
-            h.httpServiceReferences.add(httpSvcSR);
-            
-            Runnable myService = new Runnable() {
-                public void run() {
-                    System.out.println("blah");
+        BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.expect(dswContext.getProperty("org.osgi.service.http.port")).
+            andReturn("1327").anyTimes();
+        HttpService httpService = EasyMock.createNiceMock(HttpService.class);
+        // expect that the cxf servlet is registered
+        EasyMock.replay(httpService);
+        
+        ServiceReference httpSvcSR = EasyMock.createNiceMock(ServiceReference.class);
+        EasyMock.replay(httpSvcSR);
+        EasyMock.expect(dswContext.getService(httpSvcSR)).andReturn(httpService).anyTimes();
+        EasyMock.replay(dswContext);
+        
+        final ServerFactoryBean sfb = createMockServerFactoryBean();
+        
+        DistributionProviderImpl dp = new DistributionProviderImpl(dswContext);
+        Map<String, Object> handlerProps = new HashMap<String, Object>();
+        HttpServiceConfigurationTypeHandler h = 
+            new HttpServiceConfigurationTypeHandler(dswContext, dp, handlerProps) {
+                @Override
+                ServerFactoryBean createServerFactoryBean() {
+                    return sfb;
+                }
+
+                @Override
+                String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
+                        List<AbstractFeature> features, AbstractEndpointFactory factory, 
+                        ServiceEndpointDescription sd) {
+                    return new String [] {"a.b.c"};
                 }            
-            };
-                    
-            ServiceReference sr = EasyMock.createNiceMock(ServiceReference.class);
-            BundleContext callingContext = EasyMock.createNiceMock(BundleContext.class);
-            EasyMock.replay(sr);
-            EasyMock.replay(callingContext);
-    
-            Map<String, Object> props = new HashMap<String, Object>();
-            props.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/myRunnable");
-            ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
-            
-            assertEquals("Precondition failed", 0, dp.getExposedServices().size());
-            h.createServer(sr, dswContext, callingContext, sd, Runnable.class, myService);
-            assertEquals(1, dp.getExposedServices().size());
-            assertSame(sr, dp.getExposedServices().iterator().next());
-            
-            String hostName = InetAddress.getLocalHost().getHostName();
-            Map<String, String> expected = new HashMap<String, String>();
-            expected.put("osgi.remote.configuration.type", "pojo");
-            expected.put("osgi.remote.configuration.pojo.address", "http://" + hostName + ":327/myRunnable");
-            expected.put("osgi.intents", "a.b.c");
-            assertEquals(expected, dp.getExposedProperties(sr));
-        } finally {
-            System.setProperties(savedProps);
-        }
+        };
+        h.httpServiceReferences.add(httpSvcSR);
+        
+        Runnable myService = new Runnable() {
+            public void run() {
+                System.out.println("blah");
+            }            
+        };
+                
+        ServiceReference sr = EasyMock.createNiceMock(ServiceReference.class);
+        BundleContext callingContext = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.replay(sr);
+        EasyMock.replay(callingContext);
+
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/myRunnable");
+        ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
+        
+        assertEquals("Precondition failed", 0, dp.getExposedServices().size());
+        assertEquals("Precondition failed", "", sfb.getAddress());
+        h.createServer(sr, dswContext, callingContext, sd, Runnable.class, myService);
+        assertEquals("The address should be set to '/'. The Servlet context dictates the actual location.", "/", sfb.getAddress());
+        assertEquals(1, dp.getExposedServices().size());
+        assertSame(sr, dp.getExposedServices().iterator().next());
+        
+        String hostName = InetAddress.getLocalHost().getHostName();
+        Map<String, String> expected = new HashMap<String, String>();
+        expected.put("osgi.remote.configuration.type", "pojo");
+        expected.put("osgi.remote.configuration.pojo.address", "http://" + hostName + ":1327/myRunnable");
+        expected.put("osgi.intents", "a.b.c");
+        assertEquals(expected, dp.getExposedProperties(sr));
     } 
     
     public void testServerUsingDefaultAddress() throws Exception {
@@ -148,76 +142,72 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         String hostname = InetAddress.getLocalHost().getHostName();
         Map<String, String> expected = new HashMap<String, String>();
         expected.put("osgi.remote.configuration.type", "pojo");
-        expected.put("osgi.remote.configuration.pojo.address", "http://" + hostname + ":80/java/lang/Runnable");
+        expected.put("osgi.remote.configuration.pojo.address", "http://" + hostname + ":8080/java/lang/Runnable");
         assertEquals(expected, dp.getExposedProperties(sr));
     }
 
     public void testServerConfiguredUsingHttps() throws Exception {
-        Properties savedProps = new Properties();
-        savedProps.putAll(System.getProperties());
-        try {
-            System.setProperty("org.osgi.service.http.secure.enabled", "true");
-            System.setProperty("org.osgi.service.http.port.secure", "8443");
-            
-            BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
-            HttpService httpService = EasyMock.createNiceMock(HttpService.class);
-            // expect that the cxf servlet is registered
-            EasyMock.replay(httpService);
-            
-            ServiceReference httpSvcSR = EasyMock.createNiceMock(ServiceReference.class);
-            EasyMock.replay(httpSvcSR);
-            EasyMock.expect(dswContext.getService(httpSvcSR)).andReturn(httpService).anyTimes();
-            EasyMock.replay(dswContext);
-            
-            final ServerFactoryBean sfb = createMockServerFactoryBean();
-            
-            DistributionProviderImpl dp = new DistributionProviderImpl(dswContext);
-            Map<String, Object> handlerProps = new HashMap<String, Object>();
-            HttpServiceConfigurationTypeHandler h = 
-                new HttpServiceConfigurationTypeHandler(dswContext, dp, handlerProps) {
-                    @Override
-                    ServerFactoryBean createServerFactoryBean() {
-                        return sfb;
-                    }
-    
-                    @Override
-                    String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                            List<AbstractFeature> features, AbstractEndpointFactory factory, 
-                            ServiceEndpointDescription sd) {
-                        return new String [] {};
-                    }            
-            };
-            h.httpServiceReferences.add(httpSvcSR);
-            
-            Runnable myService = new Runnable() {
-                public void run() {
-                    System.out.println("blah");
+        BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.expect(dswContext.getProperty("org.osgi.service.http.secure.enabled")).
+            andReturn("true").anyTimes();
+        EasyMock.expect(dswContext.getProperty("org.osgi.service.http.port.secure")).
+            andReturn("8432").anyTimes();
+        
+        HttpService httpService = EasyMock.createNiceMock(HttpService.class);
+        // expect that the cxf servlet is registered
+        EasyMock.replay(httpService);
+        
+        ServiceReference httpSvcSR = EasyMock.createNiceMock(ServiceReference.class);
+        EasyMock.replay(httpSvcSR);
+        EasyMock.expect(dswContext.getService(httpSvcSR)).andReturn(httpService).anyTimes();
+        EasyMock.replay(dswContext);
+        
+        final ServerFactoryBean sfb = createMockServerFactoryBean();
+        
+        DistributionProviderImpl dp = new DistributionProviderImpl(dswContext);
+        Map<String, Object> handlerProps = new HashMap<String, Object>();
+        HttpServiceConfigurationTypeHandler h = 
+            new HttpServiceConfigurationTypeHandler(dswContext, dp, handlerProps) {
+                @Override
+                ServerFactoryBean createServerFactoryBean() {
+                    return sfb;
+                }
+
+                @Override
+                String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
+                        List<AbstractFeature> features, AbstractEndpointFactory factory, 
+                        ServiceEndpointDescription sd) {
+                    return new String [] {};
                 }            
-            };
-                    
-            ServiceReference sr = EasyMock.createNiceMock(ServiceReference.class);
-            BundleContext callingContext = EasyMock.createNiceMock(BundleContext.class);
-            EasyMock.replay(sr);
-            EasyMock.replay(callingContext);
-    
-            Map<String, Object> props = new HashMap<String, Object>();
-            props.put(Constants.CONFIG_TYPE_PROPERTY, Constants.POJO_CONFIG_TYPE);
-            props.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/myRunnable");
-            ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
-            
-            assertEquals("Precondition failed", 0, dp.getExposedServices().size());
-            h.createServer(sr, dswContext, callingContext, sd, Runnable.class, myService);
-            assertEquals(1, dp.getExposedServices().size());
-            assertSame(sr, dp.getExposedServices().iterator().next());
-            
-            String hostName = InetAddress.getLocalHost().getHostName();
-            Map<String, String> expected = new HashMap<String, String>();
-            expected.put("osgi.remote.configuration.type", "pojo");
-            expected.put("osgi.remote.configuration.pojo.address", "https://" + hostName + ":8443/myRunnable");
-            assertEquals(expected, dp.getExposedProperties(sr));
-        } finally {
-            System.setProperties(savedProps);
-        }
+        };
+        h.httpServiceReferences.add(httpSvcSR);
+        
+        Runnable myService = new Runnable() {
+            public void run() {
+                System.out.println("blah");
+            }            
+        };
+                
+        ServiceReference sr = EasyMock.createNiceMock(ServiceReference.class);
+        BundleContext callingContext = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.replay(sr);
+        EasyMock.replay(callingContext);
+
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(Constants.CONFIG_TYPE_PROPERTY, Constants.POJO_CONFIG_TYPE);
+        props.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/myRunnable");
+        ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
+        
+        assertEquals("Precondition failed", 0, dp.getExposedServices().size());
+        h.createServer(sr, dswContext, callingContext, sd, Runnable.class, myService);
+        assertEquals(1, dp.getExposedServices().size());
+        assertSame(sr, dp.getExposedServices().iterator().next());
+        
+        String hostName = InetAddress.getLocalHost().getHostName();
+        Map<String, String> expected = new HashMap<String, String>();
+        expected.put("osgi.remote.configuration.type", "pojo");
+        expected.put("osgi.remote.configuration.pojo.address", "https://" + hostName + ":8432/myRunnable");
+        assertEquals(expected, dp.getExposedProperties(sr));
     } 
 
     private ServerFactoryBean createMockServerFactoryBean() {
@@ -238,12 +228,12 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
                 serverURI.append(EasyMock.getCurrentArguments()[0]);
                 return null;
             }            
-        });
+        }).anyTimes();
         EasyMock.expect(sfb.getAddress()).andAnswer(new IAnswer<String>() {
             public String answer() throws Throwable {
                 return serverURI.toString();
             }            
-        });
+        }).anyTimes();
         EasyMock.replay(sfb);
         return sfb;
     }

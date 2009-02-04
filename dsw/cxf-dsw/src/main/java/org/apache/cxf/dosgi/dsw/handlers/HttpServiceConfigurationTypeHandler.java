@@ -96,11 +96,11 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         }        
         Bus bus = cxf.getBus();
         
-        String address = constructAddress(contextRoot);
+        String address = constructAddress(dswContext, contextRoot);
         ServerFactoryBean factory = createServerFactoryBean();
         factory.setBus(bus);
         factory.setServiceClass(iClass);
-        factory.setAddress(address);
+        factory.setAddress("/");
         factory.getServiceFactory().setDataBinding(new AegisDatabinding());
         factory.setServiceBean(serviceBean);
 
@@ -127,17 +127,17 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         return publicationProperties;
     }    
 
-    private String constructAddress(String contextRoot) {
+    private String constructAddress(BundleContext ctx, String contextRoot) {
         String port = null;
         boolean https = false;
-        if ("true".equalsIgnoreCase(System.getProperty("org.osgi.service.http.secure.enabled"))) {
+        if ("true".equalsIgnoreCase(ctx.getProperty("org.osgi.service.http.secure.enabled"))) {
             https = true;
-            port = System.getProperty("org.osgi.service.http.port.secure");            
+            port = ctx.getProperty("org.osgi.service.http.port.secure");            
         } else {
-            port = System.getProperty("org.osgi.service.http.port");            
+            port = ctx.getProperty("org.osgi.service.http.port");            
         }
         if (port == null) {
-            port = "80";
+            port = "8080";
         }
         
         String hostName = null;

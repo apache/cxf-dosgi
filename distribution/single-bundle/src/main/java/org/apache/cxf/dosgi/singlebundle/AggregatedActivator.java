@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.singlebundle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,11 +32,76 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class AggregatedActivator implements BundleActivator {
-    private static final String ACTIVATOR_RESOURCE = "activators.list";
+    static final String HTTP_PORT_PROPERTY = "org.osgi.service.http.port";
+    static final String HTTPS_PORT_PROPERTY = "org.osgi.service.http.port.secure";
+    static final String HTTPS_ENABLED_PROPERTY = "org.osgi.service.http.secure.enabled";
+    static final String ACTIVATOR_RESOURCE = "activators.list";
+
+    static String DEFAULT_HTTP_PORT = "8080";
     
     private List<BundleActivator> activators = new ArrayList<BundleActivator>(); 
 
     public void start(BundleContext ctx) throws Exception {
+        setHttpServicePort(ctx);
+        startEmbeddedActivators(ctx);
+    }
+
+    public void stop(BundleContext ctx) throws Exception {
+        stopEmbeddedActivators(ctx);
+    }
+
+    void setHttpServicePort(BundleContext ctx) {
+        boolean https = false;
+        String port;
+        if ("true".equalsIgnoreCase(ctx.getProperty(HTTPS_ENABLED_PROPERTY))) {
+            https = true;
+            port = ctx.getProperty(HTTPS_PORT_PROPERTY);            
+        } else {
+            port = ctx.getProperty(HTTP_PORT_PROPERTY);            
+        }
+        
+        if (port == null || port.length() == 0) {
+            port = tryPortFree(DEFAULT_HTTP_PORT);
+            if (port == null) {
+                System.out.print("Port " + DEFAULT_HTTP_PORT + " is not available. ");
+                port = tryPortFree("0");
+            }
+            System.out.println("Setting HttpService port to: " + port);
+            
+            String prop = https ? HTTPS_PORT_PROPERTY : HTTP_PORT_PROPERTY;
+            System.setProperty(prop, port);
+        } else {
+            if (tryPortFree(port) == null) {
+                System.out.println("The system is configured to use HttpService port " 
+                    + port + ". However this port is already in use.");
+            } else {
+                System.out.println("HttpService using port: " + port);
+            }
+        }
+    }
+    
+    private String tryPortFree(String port) {
+        int p = Integer.parseInt(port);
+        
+        ServerSocket s = null;
+        try {
+             s = new ServerSocket(p);
+             return "" + s.getLocalPort(); 
+        } catch (IOException e) {
+            return null;
+        } finally {
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+        }
+        
+    }
+
+    void startEmbeddedActivators(BundleContext ctx) throws Exception {
         SPIActivator sba = new SPIActivator();
         sba.start(ctx);
         activators.add(sba);
@@ -55,11 +121,11 @@ public class AggregatedActivator implements BundleActivator {
         }
     }
 
-    public void stop(BundleContext ctx) throws Exception {
+    void stopEmbeddedActivators(BundleContext ctx) throws Exception {
         for (BundleActivator ba : activators) {
             ba.stop(ctx);
         }
-   }
+    }
     
     Collection<String> getActivators() throws IOException {
         List<String> bundleActivators = new ArrayList<String>();
