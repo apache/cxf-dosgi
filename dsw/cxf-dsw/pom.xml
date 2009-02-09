@@ -37,7 +37,7 @@
         <bundle.import.package>*</bundle.import.package>
         <bundle.export.package>
           org.apache.cxf.dosgi.*;version="${pom.version}",
-          org.osgi.service.distribution;version="4.2.0";-split-package:=merge-first,
+          org.osgi.service.distribution;version="1.0";-split-package:=merge-first,
           org.osgi.service.discovery;version="1.0";-split-package:=merge-first 
         </bundle.export.package>
     </properties>

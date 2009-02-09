@@ -93,7 +93,8 @@ public class AggregatedActivatorTest extends TestCase {
         try {
             try {
                 // now lets block the default port
-                s = new ServerSocket(8080);
+                s = new ServerSocket(Integer.parseInt(
+                        AggregatedActivator.DEFAULT_HTTP_PORT));
             } catch (Exception e) {
                 // if someone else already has it, thats fine too
             }

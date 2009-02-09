@@ -226,6 +226,7 @@
               {maven-resources}
             </Include-Resource>
             <Import-Package>
+              javax.servlet.*;version="[2.3.0,2.6.0)",
               org.osgi.*
             </Import-Package>
             <Export-Package>
@@ -234,15 +235,22 @@
             <Embed-Dependency>*;scope=compile;inline=false</Embed-Dependency>
             <Embed-Directory>lib</Embed-Directory>
             <_exportcontents>
-              org.jdom.*;version="1.0.0",
               javax.xml.ws.*;version="2.1.0",
+              javax.servlet.*;version="2.5.0",
               org.apache.cxf.dosgi.*;version="${pom.version}",
               org.apache.cxf.*;version="${cxf.version}",
-              org.osgi.service.distribution;version="4.2.0",
-              org.osgi.service.discovery;version="4.2.0",
+              org.jdom.*;version="1.0.0",
+              org.osgi.service.distribution;version="1.0.0",
+              org.osgi.service.discovery;version="1.0.0",
               !*
             </_exportcontents> 
             <DynamicImport-Package>*</DynamicImport-Package>
+            <_removeheaders>
+              Ignore-Package,
+              Include-Resource,
+              Private-Package,
+              Embed-Dependency
+            </_removeheaders>
           </instructions>
         </configuration>
       </plugin> 
