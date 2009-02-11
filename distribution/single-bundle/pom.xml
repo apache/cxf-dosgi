@@ -302,6 +302,7 @@
 
                 <!-- config.properties file for Felix -->
                 <echo file="target/felix.config.properties.append">
+org.ops4j.pax.web.session.timeout=30
 org.osgi.framework.startlevel=2
 felix.auto.start.2=
                 </echo>
@@ -310,6 +311,8 @@ felix.auto.start.2=
 
                 <!-- config.ini file for Equinox -->
                 <echo file="target/equinox.config.ini.append">
+org.ops4j.pax.web.session.timeout=30
+
 osgi.bundles=org.eclipse.osgi.services@start, 
                 </echo>
                 <echo message="${bundle}@start" file="target/equinox.config.ini.append" append="true"/>
