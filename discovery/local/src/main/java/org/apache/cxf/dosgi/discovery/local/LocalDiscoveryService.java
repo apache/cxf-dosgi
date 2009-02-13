@@ -490,6 +490,8 @@ public class LocalDiscoveryService implements Discovery {
     }
     
     public void shutdown() {
+        trackerTracker.close();
+        
         synchronized (this) {
             isShutdown = true;
         }    
