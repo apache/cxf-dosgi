@@ -19,7 +19,7 @@
 package org.apache.cxf.dosgi.dsw;
 
 public class Constants {
-    public static final String INTENTS_PROPERTY = "osgi.intents";
+    public static final String INTENTS_PROPERTY = "service.intents";
     
     public static final String REMOTE_PROPERTY_PREFIX = "osgi.remote";
     

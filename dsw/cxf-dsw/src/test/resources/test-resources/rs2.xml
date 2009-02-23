@@ -22,7 +22,7 @@
 <service-descriptions xmlns="http://www.osgi.org/xmlns/sd/v1.0.0">
   <service-description>
     <provide interface="org.example.Service" />
-    <property name="osgi.intents">confidentiality.message integrity</property>
+    <property name="service.intents">confidentiality.message integrity</property>
     <property name="osgi.remote.interfaces">*</property>
   </service-description>
 </service-descriptions>
