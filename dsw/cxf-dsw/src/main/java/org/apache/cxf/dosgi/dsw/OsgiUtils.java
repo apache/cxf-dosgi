@@ -67,7 +67,8 @@ public final class OsgiUtils {
     private static final String PROVIDE_INTERFACE_NAME_ATTRIBUTE = "interface";
 
     private static final String PROPERTY_ELEMENT = "property";
-    private static final String PROPERTY_KEY_ATTRIBUTE = "name";
+    private static final String PROPERTY_NAME_ATTRIBUTE = "name";
+    private static final String PROPERTY_VALUE_ATTRIBUTE = "value";
     private static final String PROPERTY_INTERFACE_ATTRIBUTE = "interface";
 
     private static final String INTERFACE_WILDCARD = "*";
@@ -329,13 +330,18 @@ public final class OsgiUtils {
         Map<String, Object> props = new HashMap<String, Object>();
         
         for (Element p : elements) {
-            String key = p.getAttributeValue(PROPERTY_KEY_ATTRIBUTE);
+            String key = p.getAttributeValue(PROPERTY_NAME_ATTRIBUTE);
+            String value = p.getAttributeValue(PROPERTY_VALUE_ATTRIBUTE);
+            if (value == null) {
+                value = p.getTextTrim();
+            }
+            
             String iface = p.getAttributeValue(PROPERTY_INTERFACE_ATTRIBUTE);
             if (key != null) {
                 props.put(iface == null || iface.length() == 0
                           ? key
                           : key + INTERFACE_SEPARATOR + iface,
-                          p.getTextTrim());
+                          value);
             }
         }
         

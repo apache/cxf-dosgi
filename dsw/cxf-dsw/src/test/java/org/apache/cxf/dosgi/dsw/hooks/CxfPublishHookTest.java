@@ -68,6 +68,13 @@ public class CxfPublishHookTest extends Assert {
     }
 
     @Test
+    public void testPublishSingleInterfaceAltFormat() throws Exception {
+        String[] serviceNames = new String[]{TestService.class.getName()};
+        String[] addresses = new String[]{"http://localhost:9000/hello"};
+        doTestPublishHook("alt-remote-services.xml", serviceNames, addresses);
+    }
+
+    @Test
     public void testPublishMultiInterface() throws Exception {
         String[] serviceNames = new String[]{TestService.class.getName(), 
                                              AdditionalInterface.class.getName()};
