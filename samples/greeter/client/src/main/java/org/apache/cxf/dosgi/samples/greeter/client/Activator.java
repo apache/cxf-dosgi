@@ -65,6 +65,7 @@ public class Activator implements BundleActivator {
 
     private void greeterUI(final BundleContext bc, final GreeterService greeter) {
         while (true) {
+            System.out.println("*** Opening greeter client dialog ***");
             String name = JOptionPane.showInputDialog("Enter name:");
             if (name == null) {
                 break;
