@@ -412,12 +412,5 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
         }
         return null;
     }
-
-    @SuppressWarnings("unchecked")
-    public void updateProperties(Dictionary props) {
-        // TODO can we get rid of the Config Admin stuff in here? 
-        // It doesn't seem to do anything with it...
-        // TODO Auto-generated method stub        
-    }
 }
     

@@ -19,56 +19,33 @@
 package org.apache.cxf.dosgi.discovery.local;
 
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.discovery.Discovery;
 
 
-
-public class Activator implements BundleActivator, ManagedService {
-
+public class Activator implements BundleActivator {
     private static final Logger LOG = Logger.getLogger(Activator.class.getName());
-    
-    private static final String CONFIG_SERVICE_PID = "discovery";
-    private LocalDiscoveryService discoveryService;
-    
-    public void start(BundleContext context) {
 
-        LOG.info("Registering ManagedService for LocalDiscoveryService bundle with service PID "
-                 + CONFIG_SERVICE_PID);
-        context.registerService(ManagedService.class.getName(), 
-                                this, getDefaults());
-        
+    private LocalDiscoveryService discoveryService;
+    private ServiceRegistration discoveryServiceReg;
+    
+    public void start(BundleContext context) {        
         LOG.info("Registering LocalDiscoveryService service object");
         discoveryService = new LocalDiscoveryService(context);
         
-        context.registerService(
+        discoveryServiceReg = context.registerService(
                 Discovery.class.getName(), 
                 discoveryService,
-                new Hashtable());
+                new Hashtable<String, Object>());
     }
 
     public void stop(BundleContext context) {
+        discoveryServiceReg.unregister();
         discoveryService.shutdown();
-    }
-
-    private Dictionary<String, String> getDefaults() {
-        Dictionary<String, String> defaults = new Hashtable<String, String>();
-        defaults.put(Constants.SERVICE_PID, CONFIG_SERVICE_PID);        
-        return defaults;
-    } 
-    
-    public void updated(Dictionary props) throws ConfigurationException {
-        if (props != null 
-            && CONFIG_SERVICE_PID.equals(props.get(Constants.SERVICE_PID))) {
-            discoveryService.updateProperties(props);
-        }
     }
 }
