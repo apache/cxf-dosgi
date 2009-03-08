@@ -79,7 +79,7 @@ public final class LocalDiscoveryUtils {
     }
     
     @SuppressWarnings("unchecked")
-    public static List<Element> getAllDescriptionElements(Bundle b) {
+    static List<Element> getAllDescriptionElements(Bundle b) {
         Object directory = null;
         
         Dictionary headers = b.getHeaders();
