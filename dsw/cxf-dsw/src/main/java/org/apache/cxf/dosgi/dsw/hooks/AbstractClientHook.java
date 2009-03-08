@@ -66,9 +66,6 @@ public class AbstractClientHook extends AbstractHook {
                                              String filter) {
         
         lookupDiscoveryService(interfaceName, filter);
-//        if (!lookupCurrentBundle(requestingContext, interfaceName, filter)) {
-//            lookupDiscoveryService(interfaceName, filter);
-//        }
     }
     
     protected void processServiceDescription(ServiceEndpointDescription sd,
@@ -127,31 +124,6 @@ public class AbstractClientHook extends AbstractHook {
         return props;
     }
 
-    /*
-    protected synchronized boolean lookupCurrentBundle(BundleContext context, 
-                                                       String interfaceName, 
-                                                       String filter) {     
-        // if bundle has remote-services.xml attached then those metadata 
-        // take precedence
-        List<ServiceEndpointDescription> sds = 
-           new ArrayList<ServiceEndpointDescription>();
-
-        // REVISIT: temporary disable, re-enable before merge!!!
-        if (checkBundle()) {
-            sds.addAll(OsgiUtils.getRemoteReferences(context.getBundle(), 
-                                                     new String[]{interfaceName}, 
-                                                     Collections.EMPTY_MAP, 
-                                                     false));
-
-            for (ServiceEndpointDescription found : sds) {
-                processServiceDescription(found,
-                                          context,
-                                          interfaceName); 
-            }
-        }
-        return sds.size() > 0;
-    } */
-
     protected synchronized void lookupDiscoveryService(String interfaceName, String filterValue) {
 
         if (interfaceName != null) {
@@ -169,6 +141,7 @@ public class AbstractClientHook extends AbstractHook {
         trackerRegistration.setProperties(trackerProperties);
     }
 
+    @SuppressWarnings("unchecked")
     private void append(Dictionary properties, String key, String additional) {
         Collection existing = (Collection)properties.get(key);
         if (existing == null) {
