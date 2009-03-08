@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.discovery.local;
 
 
 import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE;
+import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_FILTERS;
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES;
 
@@ -31,10 +32,14 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -45,26 +50,25 @@ import org.osgi.service.discovery.Discovery;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.util.tracker.ServiceTracker;
 
-@SuppressWarnings("unchecked")
-public class LocalDiscoveryService implements Discovery {
+public class LocalDiscoveryService implements Discovery, BundleListener {
     
     private static final Logger LOG = Logger.getLogger(LocalDiscoveryService.class.getName());
         
     // this is effectively a set which allows for multiple service descriptions with the
     // same interface name but different properties and takes care of itself with respect to concurrency 
-    private ConcurrentHashMap<ServiceEndpointDescription, ServiceEndpointDescription> servicesInfo = 
-        new ConcurrentHashMap<ServiceEndpointDescription, ServiceEndpointDescription>();
-    private Map<String, List<DiscoveredServiceTracker>> interfacesToTrackers = 
+    ConcurrentHashMap<ServiceEndpointDescription, Bundle> servicesInfo = 
+        new ConcurrentHashMap<ServiceEndpointDescription, Bundle>();
+    Map<String, List<DiscoveredServiceTracker>> interfacesToTrackers = 
         new HashMap<String, List<DiscoveredServiceTracker>>();
-    private Map<String, List<DiscoveredServiceTracker>> filtersToTrackers = 
+    Map<String, List<DiscoveredServiceTracker>> filtersToTrackers = 
         new HashMap<String, List<DiscoveredServiceTracker>>();
-    private Map<DiscoveredServiceTracker, Collection> trackersToInterfaces = 
-        new HashMap<DiscoveredServiceTracker, Collection>();
-    private Map<DiscoveredServiceTracker, Collection> trackersToFilters = 
-        new HashMap<DiscoveredServiceTracker, Collection>();
+    Map<DiscoveredServiceTracker, Collection<String>> trackersToInterfaces = 
+        new HashMap<DiscoveredServiceTracker, Collection<String>>();
+    Map<DiscoveredServiceTracker, Collection<String>> trackersToFilters = 
+        new HashMap<DiscoveredServiceTracker, Collection<String>>();
     private BundleContext bc;
         
-    private ServiceTracker trackerTracker;
+    ServiceTracker trackerTracker;
     
     public LocalDiscoveryService(BundleContext bc) {
         this.bc = bc;
@@ -94,9 +98,62 @@ public class LocalDiscoveryService implements Discovery {
             };
 
         trackerTracker.open();
+        
+        bc.addBundleListener(this);
+        // look at currently registered bundles.
+        processExistingBundles();
     }
 
-    public void updateProperties(Dictionary props) {
+    public void bundleChanged(BundleEvent be) {
+        LOG.info("bundle changed: " + be.getBundle().getSymbolicName());
+        switch (be.getType()) {
+        case BundleEvent.STARTED:
+            findDeclaredRemoteServices(be.getBundle());
+            break;
+        case BundleEvent.STOPPING:
+            removeServicesDeclaredInBundle(be.getBundle());
+            break;
+        }
+    }
+    
+    private void processExistingBundles() {
+        Bundle[] bundles = bc.getBundles();
+        if (bundles == null) {
+            return;
+        }
+        
+        for (Bundle b : bundles) {
+            if (b.getState() == Bundle.ACTIVE) {
+                findDeclaredRemoteServices(b);
+            }
+        }
+    }
+
+
+    private void findDeclaredRemoteServices(Bundle b) {
+        List<ServiceEndpointDescription> refs = LocalDiscoveryUtils.getAllRemoteReferences(b);
+        for(ServiceEndpointDescription sed : refs) {
+            servicesInfo.put(sed, b);
+            addedServiceDescription(sed);
+        }        
+    }    
+
+    private void removeServicesDeclaredInBundle(Bundle bundle) {
+        for(Iterator<Map.Entry<ServiceEndpointDescription, Bundle>> i = servicesInfo.entrySet().iterator(); i.hasNext(); ) {
+            Entry<ServiceEndpointDescription, Bundle> entry = i.next();
+            if (entry.getValue().equals(bundle)) {
+                removedServiceDescription(entry.getKey());
+                i.remove();
+            }            
+        }
+    }
+
+    private void addedServiceDescription(ServiceEndpointDescription sd) {
+        triggerCallbacks(sd, AVAILABLE);
+    }
+
+    private void removedServiceDescription(ServiceEndpointDescription sd) {
+        triggerCallbacks(sd, UNAVAILABLE);
     }
 
     private synchronized void cacheTracker(ServiceReference reference, 
@@ -104,13 +161,13 @@ public class LocalDiscoveryService implements Discovery {
         if (service instanceof DiscoveredServiceTracker) {
             DiscoveredServiceTracker tracker = 
                 (DiscoveredServiceTracker)service;
-            Collection interfaces =            
+            Collection<String> interfaces =            
                 addTracker(reference, 
                            tracker, 
                            PROP_KEY_MATCH_CRITERIA_INTERFACES, 
                            interfacesToTrackers,
                            trackersToInterfaces);
-            Collection filters = 
+            Collection<String> filters = 
                 addTracker(reference,
                            tracker, 
                            PROP_KEY_MATCH_CRITERIA_FILTERS, 
@@ -128,20 +185,20 @@ public class LocalDiscoveryService implements Discovery {
             DiscoveredServiceTracker tracker = 
                 (DiscoveredServiceTracker)service;
             LOG.info("updating tracker: " + tracker);
-            Collection oldInterfaces = removeTracker(tracker, 
+            Collection<String> oldInterfaces = removeTracker(tracker, 
                                                      interfacesToTrackers,
                                                      trackersToInterfaces);
-            Collection oldFilters = removeTracker(tracker, 
+            Collection<String> oldFilters = removeTracker(tracker, 
                                                   filtersToTrackers,
                                                   trackersToFilters);
 
-            Collection newInterfaces = 
+            Collection<String> newInterfaces = 
                 addTracker(reference, 
                            tracker, 
                            PROP_KEY_MATCH_CRITERIA_INTERFACES, 
                            interfacesToTrackers,
                            trackersToInterfaces);
-            Collection newFilters = 
+            Collection<String> newFilters = 
                 addTracker(reference,
                            tracker, 
                            PROP_KEY_MATCH_CRITERIA_FILTERS, 
@@ -164,20 +221,21 @@ public class LocalDiscoveryService implements Discovery {
         }
     }
 
-    private Collection addTracker(
+    @SuppressWarnings("unchecked")
+    private Collection<String> addTracker(
                       ServiceReference reference, 
                       DiscoveredServiceTracker tracker,
                       String property,
                       Map<String, List<DiscoveredServiceTracker>> forwardMap,
-                      Map<DiscoveredServiceTracker, Collection> reverseMap) {
-        Collection collection = 
-            (Collection)reference.getProperty(property);
+                      Map<DiscoveredServiceTracker, Collection<String>> reverseMap) {
+        Collection<String> collection = 
+            (Collection<String>) reference.getProperty(property);
         LOG.info("adding tracker: " + tracker + " collection: " + collection + " registered against prop: " + property);
         if (nonEmpty(collection)) {
             reverseMap.put(tracker, collection);
-            Iterator i = collection.iterator();
+            Iterator<String> i = collection.iterator();
             while (i.hasNext()) {
-                String element = (String)i.next();
+                String element = i.next();
                 if (forwardMap.containsKey(element)) {
                     forwardMap.get(element).add(tracker);
                 } else {
@@ -191,16 +249,16 @@ public class LocalDiscoveryService implements Discovery {
         return collection;
     }
 
-    private Collection removeTracker(
+    private Collection<String> removeTracker(
                       DiscoveredServiceTracker tracker,
                       Map<String, List<DiscoveredServiceTracker>> forwardMap,
-                      Map<DiscoveredServiceTracker, Collection> reverseMap) {
-        Collection collection = reverseMap.get(tracker);
+                      Map<DiscoveredServiceTracker, Collection<String>> reverseMap) {
+        Collection<String> collection = reverseMap.get(tracker);
         if (nonEmpty(collection)) {
             reverseMap.remove(tracker);
-            Iterator i = collection.iterator();
+            Iterator<String> i = collection.iterator();
             while (i.hasNext()) {
-                String element = (String)i.next();
+                String element = i.next();
                 if (forwardMap.containsKey(element)) {
                     forwardMap.get(element).remove(tracker);
                 }
@@ -208,20 +266,20 @@ public class LocalDiscoveryService implements Discovery {
         }
         return collection;
     }
-
-    private void triggerCallbacks(Collection oldInterest, 
-                                  Collection newInterest, 
+    
+    private void triggerCallbacks(Collection<String> oldInterest, 
+                                  Collection<String> newInterest, 
                                   DiscoveredServiceTracker tracker,
                                   boolean isFilter) {
         // compute delta between old & new interfaces/filters and
         // trigger callbacks for any entries in servicesInfo that
         // match any *additional* interface/filters  
-        Collection deltaInterest = new ArrayList();
+        Collection<String> deltaInterest = new ArrayList<String>();
         if (nonEmpty(newInterest)) {
             if (isEmpty(oldInterest)) {
                 deltaInterest.addAll(newInterest);
             } else {
-                Iterator i = newInterest.iterator();
+                Iterator<String> i = newInterest.iterator();
                 while (i.hasNext()) {
                     String next = (String)i.next();
                     if (!oldInterest.contains(next)) {
@@ -236,25 +294,44 @@ public class LocalDiscoveryService implements Discovery {
         } else {
             LOG.info("nothing to search for matches to trigger callbacks with delta: " + deltaInterest);
         }
-        Iterator i = deltaInterest.iterator();
+        Iterator<String> i = deltaInterest.iterator();
         while (i.hasNext()) {
-            String next = (String)i.next();
-            for (ServiceEndpointDescription sd : servicesInfo.values()) {
-                LOG.info("check if next: " + next + (isFilter ? " matches " : " contained by ") +  sd.getProvidedInterfaces());
-                if ((isFilter && filterMatches(next, sd))
-                    || sd.getProvidedInterfaces().contains(next)) {
-                    tracker.serviceChanged(new TrackerNotification(sd, 
-                                                                   AVAILABLE));
-                }
+            String next = i.next();
+            for (ServiceEndpointDescription sd : servicesInfo.keySet()) {
+                triggerCallbacks(tracker, next, isFilter, sd, AVAILABLE);
+            }
+        }        
+    }    
+
+    private void triggerCallbacks(ServiceEndpointDescription sd, int type) {
+        for (Map.Entry<DiscoveredServiceTracker, Collection<String>> entry : trackersToInterfaces.entrySet()) {
+            for (String match : entry.getValue()) {
+                triggerCallbacks(entry.getKey(), match, false, sd, type);
+            }
+        }
+        for (Map.Entry<DiscoveredServiceTracker, Collection<String>> entry : trackersToFilters.entrySet()) {
+            for (String match : entry.getValue()) {
+                triggerCallbacks(entry.getKey(), match, true, sd, type);
             }
         }
     }
 
-    private static boolean nonEmpty(Collection c) {
+    private void triggerCallbacks(DiscoveredServiceTracker tracker,
+                                  String match, boolean isFilter, 
+                                  ServiceEndpointDescription sd,
+                                  int notificationType) {
+        LOG.info("check if string: " + match + (isFilter ? " matches " : " contained by ") +  sd.getProvidedInterfaces());
+        if ((isFilter && filterMatches(match, sd))
+                || sd.getProvidedInterfaces().contains(match)) {
+            tracker.serviceChanged(new TrackerNotification(sd, notificationType));
+        }
+    }    
+
+    private static boolean nonEmpty(Collection<?> c) {
         return c != null && c.size() > 0;
     }
 
-    private static boolean isEmpty(Collection c) {
+    private static boolean isEmpty(Collection<?> c) {
         return c == null || c.size() == 0;
     }
 
@@ -279,6 +356,7 @@ public class LocalDiscoveryService implements Discovery {
     }
                 
     public void shutdown() {
+        bc.removeBundleListener(this);
         trackerTracker.close();
     }
         
@@ -318,20 +396,28 @@ public class LocalDiscoveryService implements Discovery {
         return d;
     }
     
+    @SuppressWarnings("unchecked")
     private static String[] getProvidedInterfaces(ServiceEndpointDescription sd, String interfaceName) {
         
-        Collection interfaceNames = sd.getProvidedInterfaces();
+        Collection<String> interfaceNames = sd.getProvidedInterfaces();
         if (interfaceName == null) {
             return null;
         }
         
-        Iterator iNames = interfaceNames.iterator();
+        Iterator<String> iNames = interfaceNames.iterator();
         while (iNames.hasNext()) {
             if (iNames.next().equals(interfaceName)) {
                 return new String[]{interfaceName};
             }
         }
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void updateProperties(Dictionary props) {
+        // TODO can we get rid of the Config Admin stuff in here? 
+        // It doesn't seem to do anything with it...
+        // TODO Auto-generated method stub        
     }
 }
     

@@ -18,34 +18,30 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.handlers.ClientServiceFactory;
-import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.discovery.DiscoveredServiceTracker;
-import org.osgi.service.discovery.DiscoveredServiceNotification;
-
 import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE;
 import static org.osgi.service.discovery.DiscoveredServiceNotification.MODIFIED;
 import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_FILTERS;
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.handlers.ClientServiceFactory;
+import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.discovery.DiscoveredServiceNotification;
+import org.osgi.service.discovery.DiscoveredServiceTracker;
+import org.osgi.service.discovery.ServiceEndpointDescription;
 
 
 public class AbstractClientHook extends AbstractHook {
@@ -69,9 +65,10 @@ public class AbstractClientHook extends AbstractHook {
                                              String interfaceName, 
                                              String filter) {
         
-        if (!lookupCurrentBundle(requestingContext, interfaceName, filter)) {
-            lookupDiscoveryService(interfaceName, filter);
-        }
+        lookupDiscoveryService(interfaceName, filter);
+//        if (!lookupCurrentBundle(requestingContext, interfaceName, filter)) {
+//            lookupDiscoveryService(interfaceName, filter);
+//        }
     }
     
     protected void processServiceDescription(ServiceEndpointDescription sd,
@@ -130,6 +127,7 @@ public class AbstractClientHook extends AbstractHook {
         return props;
     }
 
+    /*
     protected synchronized boolean lookupCurrentBundle(BundleContext context, 
                                                        String interfaceName, 
                                                        String filter) {     
@@ -152,9 +150,8 @@ public class AbstractClientHook extends AbstractHook {
             }
         }
         return sds.size() > 0;
-    }
+    } */
 
-    @SuppressWarnings("unchecked")
     protected synchronized void lookupDiscoveryService(String interfaceName, String filterValue) {
 
         if (interfaceName != null) {
