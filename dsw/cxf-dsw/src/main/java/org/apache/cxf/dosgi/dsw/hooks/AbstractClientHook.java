@@ -23,6 +23,7 @@ import static org.osgi.service.discovery.DiscoveredServiceNotification.MODIFIED;
 import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_FILTERS;
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES;
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_ID;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,6 +52,8 @@ public class AbstractClientHook extends AbstractHook {
     private DiscoveredServiceTracker tracker;
     private Dictionary trackerProperties = new Hashtable();
     private ServiceRegistration trackerRegistration;
+    private Map<String, ServiceEndpointDescription> discoveredServices =
+        new HashMap<String, ServiceEndpointDescription>();
 
     protected AbstractClientHook(BundleContext bc, CxfDistributionProvider dp) {
         super(bc, dp);
@@ -95,19 +98,13 @@ public class AbstractClientHook extends AbstractHook {
                     iClass = actualClass;
                     actualContext = requestingContext;
                 }
+
                 synchronized(this) {
-                    ServiceReference sref = actualContext.getServiceReference(interfaceName);
-                    if (sref == null || sref.getProperty(Constants.DSW_CLIENT_ID) == null) {
-                            
-                        // at least we won't register the factory for the same interface/filter
-                        // combination twice - ListenerHook.added() and 
-                        // ListenerHook.serviceReferencesRequested() may get called at the same time
-                            
+                    if (cacheEndpointId(sd)) {
                         actualContext.registerService(new String[]{interfaceName},
                                                       new ClientServiceFactory(actualContext, iClass, sd, handler),
                                                       new Hashtable<String, Object>(getProperties(sd)));
                     }
-                        
                 }
             }
         } catch (ClassNotFoundException ex) {
@@ -151,6 +148,31 @@ public class AbstractClientHook extends AbstractHook {
         existing.add(additional);
     }
 
+    private synchronized boolean cacheEndpointId(ServiceEndpointDescription notified) {
+        String endpointId = (String)notified.getProperty(PROP_KEY_ENDPOINT_ID);
+        if (endpointId != null) {
+            boolean duplicate = discoveredServices.containsKey(endpointId);
+            if (!duplicate) {
+                discoveredServices.put(endpointId, notified);
+                LOG.info("registering proxy for endpoint ID: " + endpointId);
+            } else {
+                LOG.warning("ignoring duplicate notification for endpoint ID: "
+                            + endpointId);  
+            }
+            return !duplicate;
+        } else {
+            LOG.warning("registering proxy with unknown duplicate status as endpoint ID unset");  
+            return true;
+        }
+    }
+
+    private synchronized void unCacheEndpointId(ServiceEndpointDescription notified) {
+        String endpointId = (String)notified.getProperty(PROP_KEY_ENDPOINT_ID);
+        if (endpointId != null) {
+            discoveredServices.remove(endpointId);
+        }
+    }
+
     private class DiscoveryCallback implements DiscoveredServiceTracker {
         public void serviceChanged(DiscoveredServiceNotification notification) {
             ServiceEndpointDescription notified =
@@ -158,7 +180,10 @@ public class AbstractClientHook extends AbstractHook {
             switch (notification.getType()) {
 
             case AVAILABLE:
-                LOG.info("Notified - AVAILABLE: " + notified.getProvidedInterfaces());
+               LOG.info("Notified - AVAILABLE: " 
+                         + notified.getProvidedInterfaces() 
+                         + " endpoint id: " 
+                         + notification.getServiceEndpointDescription().getProperty(PROP_KEY_ENDPOINT_ID));
                 // REVISIT: OSGi bug 1022 will allow the matching interface
                 // name to be gleaned from the notification, for now we just
                 // assume its the first interface exposed by the SED
@@ -170,7 +195,11 @@ public class AbstractClientHook extends AbstractHook {
                 break;
 
             case UNAVAILABLE:
-                LOG.info("Notified - UNAVAILABLE: " + notified.getProvidedInterfaces());
+                LOG.info("Notified - UNAVAILABLE: " + notified.getProvidedInterfaces()
+                         + notified.getProvidedInterfaces() 
+                         + " endpoint id: " 
+                         + notification.getServiceEndpointDescription().getProperty(PROP_KEY_ENDPOINT_ID));
+                unCacheEndpointId(notified);
                 // we don't currently use this notification, but we could do
                 // so to allow to drive transparent fail-over
                 break;
