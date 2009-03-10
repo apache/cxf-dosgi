@@ -26,4 +26,8 @@ public class ListenerHookServiceListenerTest extends AbstractListenerHookService
     protected File [] getDistributionBundles() throws Exception {
         return MultiBundleDistributionResolver.getDistribution();
     }
+
+    protected boolean usingIntegralDsw() {
+        return false;
+    }
 }

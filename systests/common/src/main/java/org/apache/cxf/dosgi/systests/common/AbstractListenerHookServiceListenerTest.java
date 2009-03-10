@@ -92,8 +92,10 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
             // sleep for a bit
             Thread.sleep(2000);
             
-            // now install dsw
-            installBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-dsw-cxf", null, "jar");
+            if (!usingIntegralDsw()) {
+                // now install dsw
+                installBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-dsw-cxf", null, "jar");
+	    }
             verifyGreeterResponse();
         } finally {
             if (tracker != null) {
@@ -107,6 +109,8 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
             
         }
     }
+
+    protected abstract boolean usingIntegralDsw();
     
     private Map<GreetingPhrase, String> useService(ServiceReference sref) {
         GreeterService hs = (GreeterService)bundleContext.getService(sref);
