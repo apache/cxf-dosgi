@@ -21,4 +21,11 @@
     <property name="osgi.remote.configuration.type" value="pojo" />
     <property name="osgi.remote.configuration.pojo.address" value="http://localhost:9090/greeter" />
   </service-description>
+  <service-description>
+    <provide interface="org.apache.cxf.dosgi.samples.greeter.GreeterService" />
+    <property name="osgi.remote.interfaces" value="*" />
+    <property name="osgi.remote.requires.intents" value="SOAP HTTP" />
+    <property name="osgi.remote.configuration.type" value="pojo" />
+    <property name="osgi.remote.configuration.pojo.address" value="http://localhost:9089/greeter" />
+  </service-description>
 </service-descriptions>

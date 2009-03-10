@@ -39,7 +39,13 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.springframework.core.io.Resource;
 
 public abstract class AbstractListenerHookServiceListenerTest extends AbstractDosgiSystemTest  {       
-    private FutureTask<Map<GreetingPhrase, String>> task;
+
+    private final static String ADDRESS1 = "http://localhost:9090/greeter";
+    private final static String ADDRESS2 = "http://localhost:9089/greeter";
+    private FutureTask<Map<GreetingPhrase, String>> task1;
+    private Object mutex1 = new Object(); 
+    private FutureTask<Map<GreetingPhrase, String>> task2;
+    private Object mutex2 = new Object(); 
 
     @Override
     protected String[] getTestBundlesNames() {
@@ -66,12 +72,15 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
 
         Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
 
-        Server server = null;
+        Server server1 = null;
+        Server server2 = null;
         ServiceTracker tracker = null;
         try {
-            server = startServer("http://localhost:9090/greeter", 
-                                 GreeterService.class, new GreeterServiceImpl());
+            server1 = startServer(ADDRESS1, 
+                                  GreeterService.class, new GreeterServiceImpl());
             
+            server2 = startServer(ADDRESS2, 
+                                  GreeterService.class, new GreeterServiceImpl());
             tracker = new ServiceTracker(bundleContext, 
                                          GreeterService.class.getName(), null) {
                 @Override
@@ -84,7 +93,17 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
                             return useService(reference);
                         }});
                     future.run();
-                    setFuture(future);
+                    synchronized (mutex1) {
+                        synchronized (mutex2) {
+                            if (task1 == null) {
+                                task1 = future;
+                                mutex1.notify();
+                            } else if (task2 == null) {
+                                task2 = future;
+                                mutex2.notify();
+                            }
+                        }
+                    }
                     return result;
                 }
             };
@@ -92,26 +111,62 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
             // sleep for a bit
             Thread.sleep(2000);
             
-            if (!usingIntegralDsw()) {
-                // now install dsw
-                installBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-dsw-cxf", null, "jar");
-	    }
-            verifyGreeterResponse();
+            installDswIfNeeded();
+
+            verifyGreeterResponse(task1, mutex1);
+            verifyGreeterResponse(task2, mutex2);
         } finally {
             if (tracker != null) {
                 tracker.close();
             }
             
-            if (server != null) {
-                server.getDestination().shutdown();
-                server.stop();
+            if (server1 != null) {
+                server1.getDestination().shutdown();
+                server1.stop();
+            }
+
+            if (server2 != null) {
+                server2.getDestination().shutdown();
+                server2.stop();
             }
             
         }
     }
 
+    public void testMultiServiceProxification() throws Exception {
+
+        Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
+
+        installDswIfNeeded();
+
+        // sleep for a bit
+        Thread.sleep(2000);
+
+        ServiceReference[] srefs =
+            bundleContext.getAllServiceReferences(GreeterService.class.getName(), null);
+        assertNotNull(srefs);
+        assertEquals(2, srefs.length);
+        String addr1 = (String) 
+            srefs[0].getProperty("osgi.remote.configuration.pojo.address");
+        String addr2 = (String)
+            srefs[1].getProperty("osgi.remote.configuration.pojo.address");
+        assertNotNull(addr1);
+        assertNotNull(addr2);
+        assertTrue("unexpected address property: " + addr1,
+                   ADDRESS1.equals(addr1) ^ ADDRESS2.equals(addr1));
+        assertTrue("unexpected address property: " + addr2,
+                   ADDRESS1.equals(addr2) ^ ADDRESS2.equals(addr2));
+    }
+
     protected abstract boolean usingIntegralDsw();
-    
+
+    private void installDswIfNeeded() throws Exception {
+        if (!usingIntegralDsw()) {
+            // now install dsw
+            installBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-dsw-cxf", null, "jar");
+        }
+    }
+
     private Map<GreetingPhrase, String> useService(ServiceReference sref) {
         GreeterService hs = (GreeterService)bundleContext.getService(sref);
         assertNotNull(hs);
@@ -123,25 +178,17 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
         return null; 
     }
     
-    private void verifyGreeterResponse() throws Exception {
+    private void verifyGreeterResponse(FutureTask<Map<GreetingPhrase, String>> task, Object mutex) throws Exception {
         Map<GreetingPhrase, String> greetings = null;
-        synchronized (this) {
+        synchronized (mutex) {
             while (task == null) {
-                wait(500);    
+                mutex.wait(500);    
             }
             greetings = task.get();
         }
         
         assertEquals("Fred", greetings.get(new GreetingPhrase("Hello")));
     }
-    
-    private void setFuture(FutureTask<Map<GreetingPhrase, String>> future) {
-        synchronized (this) {
-            task = future;
-            notify();
-        }
-    }
-        
     
     private class GreeterServiceImpl implements GreeterService {
 
