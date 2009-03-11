@@ -20,7 +20,7 @@
 
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.dosgi</groupId>
+    <groupId>org.apache.cxf.dosgi.systests</groupId>
     <artifactId>cxf-dosgi-ri-systests</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>

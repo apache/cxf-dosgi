@@ -39,8 +39,8 @@ public abstract class AbstractBasicPublishHookTest extends AbstractDosgiSystemTe
     @Override
     protected String[] getTestBundlesNames() {
         return new String [] {
-            getBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-systests-common"),
-            getBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-samples-greeter-interface")};
+            getBundle("org.apache.cxf.dosgi.systests", "cxf-dosgi-ri-systests-common"),
+            getBundle("org.apache.cxf.dosgi.samples", "cxf-dosgi-ri-samples-greeter-interface")};
     }
 
     public void testBasicInvocation() throws Exception {
@@ -62,7 +62,7 @@ public abstract class AbstractBasicPublishHookTest extends AbstractDosgiSystemTe
         
         ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
-        installBundle("org.apache.cxf.dosgi", "cxf-dosgi-ri-samples-greeter-impl", null, "jar");
+        installBundle("org.apache.cxf.dosgi.samples", "cxf-dosgi-ri-samples-greeter-impl", null, "jar");
         
         // TODO : get this address using a DistributionProvider interface
         String address = "http://localhost:9090/greeter";

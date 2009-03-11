@@ -20,7 +20,7 @@
 -->
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.dosgi</groupId>
+    <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-bundles-spring-dm-parent</artifactId>
     <packaging>pom</packaging>
     <name>Distributed OSGI Spring-DM Sample</name>
