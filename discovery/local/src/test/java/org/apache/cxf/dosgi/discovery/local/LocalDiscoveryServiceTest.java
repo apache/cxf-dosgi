@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -93,6 +94,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
         DiscoveredServiceNotification dsn = dst.notifications.iterator().next();
         assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
         assertEquals(sed1, dsn.getServiceEndpointDescription());
+        verifyNotification(dsn, 0, 1, "org.example.SomeService");
         
         // add a new bundle that also contains a someservice 
         // we should get notified again...
@@ -118,6 +120,8 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals(DiscoveredServiceNotification.AVAILABLE, 
                 dst.notifications.get(1).getType());
         assertEquals(sed3, dst.notifications.get(1).getServiceEndpointDescription());
+        verifyNotification(dst.notifications.get(1), 0, 1, "org.example.SomeService");
+
         ArrayList<DiscoveredServiceNotification> copiedNotifications = 
                 new ArrayList<DiscoveredServiceNotification>(dst.notifications);
         
@@ -152,6 +156,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals(DiscoveredServiceNotification.UNAVAILABLE, 
                 dst.notifications.get(2).getType());
         assertEquals(sed1, dst.notifications.get(2).getServiceEndpointDescription());
+        verifyNotification(dst.notifications.get(2), 0, 1, "org.example.SomeService");
 
         // now remove the tracker itself...
         assertEquals("Precondition failed", 1, lds.interfacesToTrackers.size());
@@ -225,6 +230,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
         DiscoveredServiceNotification dsn = dst.notifications.iterator().next();
         assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
         assertEquals(sed2, dsn.getServiceEndpointDescription());
+        verifyNotification(dsn, 1, 0, "(blah <= 5)");
         
         // add a new bundle that also contains a someservice 
         // we should get notified again...
@@ -253,6 +259,8 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals(DiscoveredServiceNotification.AVAILABLE, 
                 dst.notifications.get(1).getType());
         assertEquals(sed3, dst.notifications.get(1).getServiceEndpointDescription());
+        verifyNotification(dsn, 1, 0, "(blah <= 5)");
+        
         ArrayList<DiscoveredServiceNotification> copiedNotifications = 
                 new ArrayList<DiscoveredServiceNotification>(dst.notifications);
         
@@ -317,6 +325,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
         DiscoveredServiceNotification dsn = dst.notifications.iterator().next();
         assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
         assertEquals(sed1, dsn.getServiceEndpointDescription());
+        verifyNotification(dsn, 0, 1, "org.example.SomeService");
         
         EasyMock.reset(sr);
         EasyMock.expect(sr.getProperty("osgi.discovery.interest.interfaces")).
@@ -330,7 +339,8 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals(sed1, dsn0.getServiceEndpointDescription());
         DiscoveredServiceNotification dsn1 = dst.notifications.get(1);
         assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn1.getType());
-        assertEquals(sed2, dsn1.getServiceEndpointDescription());        
+        assertEquals(sed2, dsn1.getServiceEndpointDescription());
+        verifyNotification(dsn1, 0, 1, "SomeOtherService");        
     }
     
     public void testLocalDiscoveryServiceExistingBundles() {
@@ -412,6 +422,20 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals(2, bundleListenerRegs.size());
         assertEquals("addBundleListener", bundleListenerRegs.get(0));
         assertEquals("removeBundleListener", bundleListenerRegs.get(1));
+    }
+
+    private void verifyNotification(DiscoveredServiceNotification dsn,
+                               int filterCount,
+                               int interfaceCount,
+                               String expected) {
+        assertNotNull(dsn.getFilters());
+        assertNotNull(dsn.getInterfaces());
+        assertEquals(filterCount, dsn.getFilters().size());
+        assertEquals(interfaceCount, dsn.getInterfaces().size());
+        Iterator i = filterCount > 0 
+                     ? dsn.getFilters().iterator()
+                     : dsn.getInterfaces().iterator();
+        assertEquals(expected, i.next()); 
     }
 
     private static class TestDiscoveredServiceTracker implements DiscoveredServiceTracker {
