@@ -154,7 +154,7 @@ public final class ServiceHookUtils {
         props.put(PROP_KEY_SERVICE_PROPERTIES, getServiceProperties(sd));
         if (sd.getLocation() != null) {
             props.put(PROP_KEY_ENDPOINT_LOCATION, sd.getLocation());
-	}
+        }
         LOG.info("publication properties: " + props);
         return props;
     }

@@ -18,14 +18,18 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
+import org.apache.cxf.dosgi.dsw.service.ServiceEndpointDescriptionImpl;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Assert;
@@ -33,11 +37,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.hooks.service.ListenerHook;
 
+import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
+import org.osgi.service.discovery.ServiceEndpointDescription;
+
+import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE;
+import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
 
 public class CxfListenerHookTest extends Assert {
 
@@ -89,37 +100,122 @@ public class CxfListenerHookTest extends Assert {
         assertEquals(1, registeredRefs.size());        
     } */
     
-    //@Test
-    public void testListenerHook() throws Exception {
+    @Test
+    public void testTrackerPropertiesOnlyClassInFilterWithMatchingInterface() throws Exception {
+        String filter = "(objectClass=" + TestService.class.getName() + ")";
+        doTestTrackerPropertiesSet(filter,
+                                   "osgi.discovery.interest.interfaces",
+                                   TestService.class.getName(),
+                                   asList(TestService.class.getName()),
+                                   Collections.EMPTY_SET);
+    }
+
+    @Test
+    public void testTrackerPropertiesGenericFilterWithMatchingInterface() throws Exception {
+        String filter = "(&(objectClass=" + TestService.class.getName() 
+                        + ")(colour=blue))";
+        doTestTrackerPropertiesSet(filter,
+                                   "osgi.discovery.interest.filters",
+                                   replacePredicate(filter),
+                                   asList(TestService.class.getName()),
+                                   Collections.EMPTY_SET);
+    }
+
+    @Test
+    public void testTrackerPropertiesOnlyClassInFilterWithMatchingFilter() throws Exception {
+        String filter = "(objectClass=" + TestService.class.getName() + ")";
+        doTestTrackerPropertiesSet(filter,
+                                   "osgi.discovery.interest.interfaces",
+                                   TestService.class.getName(),
+                                   Collections.EMPTY_SET,
+                                   asList(replacePredicate(filter)));
+    }
+
+    @Test
+    public void testTrackerPropertiesGenericFilterWithMatchingFilter() throws Exception {
+        String filter = "(&(objectClass=" + TestService.class.getName() 
+                        + ")(colour=blue))";
+        doTestTrackerPropertiesSet(filter,
+                                   "osgi.discovery.interest.filters",
+				   replacePredicate(filter),
+                                   Collections.EMPTY_SET,
+                                   asList(replacePredicate(filter)));
+    }
+
+    @Test
+    public void testTrackerPropertiesOnlyClassInFilterWithMatchingBoth() throws Exception {
+        String filter = "(objectClass=" + TestService.class.getName() + ")";
+        doTestTrackerPropertiesSet(filter,
+                                   "osgi.discovery.interest.interfaces",
+                                   TestService.class.getName(),
+                                   asList(TestService.class.getName()),
+                                   asList(replacePredicate(filter)));
+    }
+
+    @Test
+    public void testTrackerPropertiesGenericFilterWithMatchingBoth() throws Exception {
+        String filter = "(&(objectClass=" + TestService.class.getName() 
+                        + ")(colour=blue))";
+        doTestTrackerPropertiesSet(filter,
+                                   "osgi.discovery.interest.filters",
+				   replacePredicate(filter),
+                                   Collections.EMPTY_SET,
+                                   asList(replacePredicate(filter)));
+    }
+
+    private void doTestTrackerPropertiesSet(final String filter,
+                                            String propKey,
+                                            String propValue,
+                                            Collection matchingInterfaces,
+                                            Collection matchingFilters) throws Exception {
         Bundle bundle = control.createMock(Bundle.class);
-        bundle.findEntries(EasyMock.eq("OSGI-INF/remote-service"), 
-            EasyMock.eq("*.xml"), EasyMock.anyBoolean());
-        EasyMock.expectLastCall().andReturn(Collections.enumeration(
-            Arrays.asList(getClass().getResource("/OSGI-INF/remote-service/remote-services.xml"))));
-        Dictionary<String, String> bundleHeaders = new Hashtable<String, String>();
+        Dictionary<String, String> bundleHeaders = 
+            new Hashtable<String, String>();
         bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_NAME, 
                           "Test Bundle");
         bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_VERSION, 
                           "1.0.0");
         bundle.getHeaders();
-        EasyMock.expectLastCall().andReturn(bundleHeaders).anyTimes();
+        EasyMock.expectLastCall().andReturn(bundleHeaders).times(2);
         final String serviceClass = TestService.class.getName();
         bundle.loadClass(serviceClass);
-        EasyMock.expectLastCall().andReturn(TestService.class).anyTimes();
-        final BundleContext requestingContext = control.createMock(BundleContext.class);
-        requestingContext.getBundle();
-        EasyMock.expectLastCall().andReturn(bundle).anyTimes();
+        EasyMock.expectLastCall().andReturn(TestService.class).times(2);
+        final BundleContext requestingContext = 
+            control.createMock(BundleContext.class);
         
         BundleTestContext dswContext = new BundleTestContext(bundle);
-	ServiceReference reference = control.createMock(ServiceReference.class);
-        dswContext.addServiceReference(serviceClass, reference);
+        ServiceRegistration serviceRegistration =
+            control.createMock(ServiceRegistration.class);
+        dswContext.addServiceRegistration(serviceClass, serviceRegistration);
+        serviceRegistration.unregister();
+        EasyMock.expectLastCall().times(1);
+        ServiceReference serviceReference = 
+            control.createMock(ServiceReference.class);
+        dswContext.addServiceReference(serviceClass, serviceReference);
 
         final String trackerClass = DiscoveredServiceTracker.class.getName();
-        ServiceRegistration registration =
+        ServiceRegistration trackerRegistration =
             control.createMock(ServiceRegistration.class);
-        dswContext.addServiceRegistration(trackerClass, registration);
-        registration.setProperties(EasyMock.isA(Dictionary.class));
+        dswContext.addServiceRegistration(trackerClass, trackerRegistration);
+        ServiceReference trackerReference = 
+            control.createMock(ServiceReference.class);
+        dswContext.addServiceReference(trackerClass, trackerReference);
+
+        List property = asList(propValue);
+        Dictionary properties = new Hashtable();
+        properties.put(propKey, property);
+        trackerRegistration.setProperties(properties);
         EasyMock.expectLastCall();
+
+        if (matchingInterfaces.size() == 0 && matchingFilters.size() > 0) {
+            Iterator filters = matchingFilters.iterator();
+            while (filters.hasNext()) {
+                Filter f = control.createMock(Filter.class);
+                dswContext.addFilter((String)filters.next(), f);
+                f.match(EasyMock.isA(Dictionary.class));
+                EasyMock.expectLastCall().andReturn(true);
+            }
+        } 
 
         control.replay();
      
@@ -131,24 +227,45 @@ public class CxfListenerHookTest extends Assert {
             }
 
             public String getFilter() {
-                return "(objectClass=" + serviceClass + ")";
+                return filter;
             }            
         };
         hook.added(Collections.singleton(info));
+
+        DiscoveredServiceTracker tracker = (DiscoveredServiceTracker)
+            dswContext.getService(trackerReference);
+        assertNotNull(tracker);
+
+        Collection interfaces = asList(serviceClass);
+
+        notifyAvailable(tracker, matchingInterfaces, matchingFilters, "1234");
+        notifyAvailable(tracker, matchingInterfaces, matchingFilters, "5678");
+        notifyAvailable(tracker, matchingInterfaces, matchingFilters, "1234");
         
+        notifyUnAvailable(tracker, "1234");
+        notifyUnAvailable(tracker, "5678");
+
+        notifyAvailable(tracker, matchingInterfaces, matchingFilters , "1234");
+
+        control.verify();
+
         Map<String, ServiceReference> registeredRefs = 
             dswContext.getRegisteredReferences();
         assertNotNull(registeredRefs);
-        assertEquals(1, registeredRefs.size());
+        assertEquals(2, registeredRefs.size());
         assertNotNull(registeredRefs.get(serviceClass));
-        assertSame(reference, registeredRefs.get(serviceClass));
+        assertSame(serviceReference, registeredRefs.get(serviceClass));
 
         Map<String, ServiceRegistration> registeredRegs = 
             dswContext.getRegisteredRegistrations();
         assertNotNull(registeredRegs);
-        assertEquals(1, registeredRegs.size());
+        assertEquals(2, registeredRegs.size());
         assertNotNull(registeredRegs.get(trackerClass));
-        assertSame(registration, registeredRegs.get(trackerClass));
+        assertSame(trackerRegistration, registeredRegs.get(trackerClass));
+
+        List<Object> registeredServices = dswContext.getRegisteredServices();
+        assertNotNull(registeredServices);
+        assertEquals(2, registeredServices.size());
     } 
 
     @Test
@@ -160,6 +277,76 @@ public class CxfListenerHookTest extends Assert {
         CxfListenerHook clh = new CxfListenerHook(bc, dp);
         assertSame(bc, clh.getContext());
         assertSame(dp, clh.getDistributionProvider());
+    }
+
+    private void notifyAvailable(DiscoveredServiceTracker tracker,
+                                 Collection interfaces,
+                                 Collection filters, 
+                                 String endpointId) {
+        Map<String, Object> props = new Hashtable<String, Object>();
+        props.put("osgi.remote.interfaces", "*");
+        props.put("osgi.remote.endpoint.id", endpointId);
+        tracker.serviceChanged(new Notification(AVAILABLE,
+                                                TestService.class.getName(),
+                                                interfaces,
+                                                filters, 
+                                                props));
+    }
+
+    private void notifyUnAvailable(DiscoveredServiceTracker tracker, 
+                                   String endpointId) {
+        Map<String, Object> props = new Hashtable<String, Object>();
+        props.put("osgi.remote.endpoint.id", endpointId);
+        tracker.serviceChanged(new Notification(UNAVAILABLE,
+                                                TestService.class.getName(),
+                                                Collections.EMPTY_SET,
+                                                Collections.EMPTY_SET,
+                                                props));
+    }
+
+    private List<String> asList(String s) {
+        List l = new ArrayList<String>();
+        l.add(s);
+        return l;
+    }
+
+    private String replacePredicate(String filter) {
+        return filter.replace("objectClass", "service.interface");
+    }
+
+    private class Notification implements DiscoveredServiceNotification {
+        private int type;
+        private ServiceEndpointDescription sed;
+        private Collection interfaces;
+        private Collection filters;
+
+        Notification(int type, 
+                     String interfaceName,
+                     Collection interfaces,
+                     Collection filters, 
+                     Map<String, Object> props) {
+            this.type = type;
+            this.sed = 
+                new ServiceEndpointDescriptionImpl(interfaceName, props);
+            this.interfaces = interfaces;
+            this.filters = filters;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public ServiceEndpointDescription getServiceEndpointDescription() {
+            return sed;
+        }
+
+        public Collection getInterfaces() {
+            return interfaces; 
+        }
+
+        public Collection getFilters() {
+            return filters; 
+        }
     }
 
 }

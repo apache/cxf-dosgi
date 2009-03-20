@@ -31,6 +31,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.hooks.service.ListenerHook;
 
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
+
 public class CxfListenerHook extends AbstractClientHook implements ListenerHook {
 
     private static final Logger LOG = Logger.getLogger(CxfListenerHook.class.getName());
@@ -40,6 +42,8 @@ public class CxfListenerHook extends AbstractClientHook implements ListenerHook 
         ".*\\(" + Constants.OBJECTCLASS + "=([a-zA-Z_0-9.]+)\\).*";
     private final static Pattern CLASS_NAME_PATTERN = 
         Pattern.compile(CLASS_NAME_EXPRESSION);
+    private final static String CLASS_NAME_BASE =
+        "(" + Constants.OBJECTCLASS + "=";
     private static final Set<String> SYSTEM_PACKAGES;
     
     static {
@@ -50,6 +54,7 @@ public class CxfListenerHook extends AbstractClientHook implements ListenerHook 
         SYSTEM_PACKAGES.add("ch.ethz.iks.slp");
         SYSTEM_PACKAGES.add("org.ungoverned.osgi.service");
         SYSTEM_PACKAGES.add("org.springframework.osgi.context.event.OsgiBundleApplicationContextListener");
+        SYSTEM_PACKAGES.add("java.net.ContentHandler");
     }
     
     public CxfListenerHook(BundleContext bc, CxfDistributionProvider dp) {
@@ -68,44 +73,48 @@ public class CxfListenerHook extends AbstractClientHook implements ListenerHook 
         for (Iterator/*<? extends ListenerHook.ListenerInfo>*/ it = listeners.iterator(); it.hasNext(); ) {
             ListenerHook.ListenerInfo listener = (ListenerHook.ListenerInfo) it.next();
             
-            if (listener.getFilter() == null
-                    || listener.getBundleContext() == getContext()) {
-                    continue;
-                }
-                String className = getClassNameFromFilter(listener.getFilter());
-                if (!isClassSupported(className)) {
-                    continue;
-                }
+            String className = getClassNameFromFilter(listener.getFilter());
+
+            if (!(listener.getFilter() == null
+                  || listener.getBundleContext() == getContext()
+                  || isClassExcluded(className))) {
                 
-                processClientDescriptions(listener.getBundleContext(), 
-                                          className, 
-                                          listener.getFilter());            
+                if (onlyClassNameInFilter(className, listener.getFilter())) {
+                    lookupDiscoveryService(className, null);
+                } else {
+                    String filter = listener.getFilter().replaceAll("objectClass",
+                                                                    PROP_KEY_SERVICE_INTERFACE_NAME);
+                    lookupDiscoveryService(null, filter);
+                }
+            }
         }
     }
     
     private String getClassNameFromFilter(String filter) {
-        if (filter == null) {
-            return null;
+        if (filter != null) {
+            Matcher matcher = CLASS_NAME_PATTERN.matcher(filter);
+            if (matcher.matches() && matcher.groupCount() >= 1) {
+                return matcher.group(1);
+            }
         }
-        Matcher matcher = CLASS_NAME_PATTERN.matcher(filter);
-        if (matcher.matches() && matcher.groupCount() >= 1) {
-            return matcher.group(1);
-        }
-        
         return null;
     }
+
+    private boolean onlyClassNameInFilter(String className, String filter) {
+        return (CLASS_NAME_BASE + className + ")").equals(filter);
+    }
     
-    private static boolean isClassSupported(String className) {
+    private static boolean isClassExcluded(String className) {
         if (className == null) {
-            return false;
+            return true;
         }
         
         for (String p : SYSTEM_PACKAGES) {
             if (className.startsWith(p)) {
                 LOG.fine("Lookup for " + className + " is ignored");
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 }

@@ -23,9 +23,11 @@ import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE
 import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_FILTERS;
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES;
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -317,13 +319,23 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
     }
 
     private void triggerCallbacks(DiscoveredServiceTracker tracker,
-                                  String match, boolean isFilter, 
+                                  String toMatch, 
+                                  boolean isFilter, 
                                   ServiceEndpointDescription sd,
-                                  int notificationType) {
-        LOG.info("check if string: " + match + (isFilter ? " matches " : " contained by ") +  sd.getProvidedInterfaces());
-        if ((isFilter && filterMatches(match, sd))
-                || sd.getProvidedInterfaces().contains(match)) {
-            tracker.serviceChanged(new TrackerNotification(sd, notificationType));
+                                  int type) {
+        LOG.info("check if string: " + toMatch + (isFilter ? " matches " : " contained by ") +  sd.getProvidedInterfaces());
+
+        TrackerNotification notification = 
+            isFilter
+            ? (filterMatches(toMatch, sd)
+               ? new TrackerNotification(sd, true, toMatch, type)
+               : null)
+            : (sd.getProvidedInterfaces().contains(toMatch)
+               ? new TrackerNotification(sd, false, toMatch, type)
+               : null);
+
+        if (notification != null) {
+            tracker.serviceChanged(notification);
         }
     }    
 
@@ -339,10 +351,25 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
         implements DiscoveredServiceNotification {
 
         private ServiceEndpointDescription sd;
+        private Collection interfaces;
+        private Collection filters;
         private int type;
 
-        TrackerNotification(ServiceEndpointDescription sd, int type) {
+        TrackerNotification(ServiceEndpointDescription sd, 
+                            boolean isFilter, 
+                            String match, 
+                            int type) {
             this.sd = sd;
+            if (isFilter) {
+                filters = new ArrayList();
+                filters.add(match);
+                interfaces = Collections.EMPTY_SET;
+            } else {
+                interfaces = new ArrayList();
+                interfaces.add(match);
+                filters = Collections.EMPTY_SET;
+            }
+
             this.type = type;
         }
 
@@ -352,6 +379,14 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
 
         public int getType() {
             return type;
+        }
+
+        public Collection getInterfaces() {
+            return interfaces; 
+        }
+
+        public Collection getFilters() {
+            return filters; 
         }
     }
                 
@@ -391,7 +426,7 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
         
         String[] interfaceNames = getProvidedInterfaces(sd, interfaceName);
         if (interfaceNames != null) {
-            d.put(Constants.OBJECTCLASS, interfaceNames);
+            d.put(PROP_KEY_SERVICE_INTERFACE_NAME, interfaceNames);
         }
         return d;
     }

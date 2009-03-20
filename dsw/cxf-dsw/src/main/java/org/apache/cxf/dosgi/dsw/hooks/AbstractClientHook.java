@@ -24,10 +24,13 @@ import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILAB
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_FILTERS;
 import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES;
 import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_ID;
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
+
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -38,6 +41,8 @@ import org.apache.cxf.dosgi.dsw.handlers.ClientServiceFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.discovery.DiscoveredServiceNotification;
@@ -52,8 +57,8 @@ public class AbstractClientHook extends AbstractHook {
     private DiscoveredServiceTracker tracker;
     private Dictionary trackerProperties = new Hashtable();
     private ServiceRegistration trackerRegistration;
-    private Map<String, ServiceEndpointDescription> discoveredServices =
-        new HashMap<String, ServiceEndpointDescription>();
+    private Map<String, ServiceRegistration> discoveredServices =
+        new HashMap<String, ServiceRegistration>();
 
     protected AbstractClientHook(BundleContext bc, CxfDistributionProvider dp) {
         super(bc, dp);
@@ -63,28 +68,40 @@ public class AbstractClientHook extends AbstractHook {
                                tracker,
                                trackerProperties);
     }
-    
-    protected void processClientDescriptions(BundleContext requestingContext, 
-                                             String interfaceName, 
-                                             String filter) {
         
-        lookupDiscoveryService(interfaceName, filter);
-    }
-    
-    protected void processServiceDescription(ServiceEndpointDescription sd,
-                                             BundleContext requestingContext, 
-                                             String interfaceName) {
+    protected void processNotification(DiscoveredServiceNotification notification,
+                                       BundleContext requestingContext) {
             
+        ServiceEndpointDescription sd = 
+            notification.getServiceEndpointDescription();
         if (sd.getProperty(Constants.REMOTE_INTERFACES_PROPERTY) == null) {
+            LOG.info("not proxifying service, enabling property unset: " 
+                     + Constants.REMOTE_INTERFACES_PROPERTY);
             return;
         }
             
         ConfigurationTypeHandler handler = 
             ServiceHookUtils.getHandler(getContext(), sd, getDistributionProvider(), getHandlerProperties());
         if (handler == null) {
+            LOG.info("not proxifying service, config type handler null");
             return;
         }
-            
+       
+        Collection<String> matchingInterfaces =
+            getMatchingInterfaces(notification, requestingContext);
+
+        for (String interfaceName : matchingInterfaces) {
+            proxifyMatchingInterface(interfaceName, sd, handler, requestingContext);
+        }
+
+    }
+    
+
+    private void proxifyMatchingInterface(String interfaceName,
+                                          ServiceEndpointDescription sd,
+                                          ConfigurationTypeHandler handler,
+                                          BundleContext requestingContext) {
+
         try {
             Class<?> iClass = getContext().getBundle().loadClass(interfaceName);
             if (iClass != null) {
@@ -99,19 +116,73 @@ public class AbstractClientHook extends AbstractHook {
                     actualContext = requestingContext;
                 }
 
-                synchronized(this) {
-                    if (cacheEndpointId(sd)) {
-                        actualContext.registerService(new String[]{interfaceName},
-                                                      new ClientServiceFactory(actualContext, iClass, sd, handler),
-                                                      new Hashtable<String, Object>(getProperties(sd)));
+                synchronized(discoveredServices) {
+                    if (unknownEndpointId(sd)) {
+                        ServiceRegistration proxyRegistration = 
+                            actualContext.registerService(interfaceName,
+                                                          new ClientServiceFactory(actualContext, iClass, sd, handler),
+                                                          new Hashtable<String, Object>(getProperties(sd)));
+                        cacheEndpointId(sd, proxyRegistration);
                     }
                 }
+            } else {
+                LOG.info("not proxifying service, cannot load interface class: "
+                + interfaceName);
             }
         } catch (ClassNotFoundException ex) {
             LOG.warning("No class can be found for " + interfaceName);
         }
     }
+
+    private Collection<String> getMatchingInterfaces(DiscoveredServiceNotification notification, BundleContext context) {
+      
+        Collection<String> matches = new ArrayList<String>();
+        Iterator interfaces = notification.getServiceEndpointDescription().getProvidedInterfaces().iterator();
+
+        while (interfaces.hasNext()) {
+            String currInterface = (String)interfaces.next();
+            boolean matched = false;
+            Iterator matchedInterfaces = 
+                notification.getInterfaces().iterator();
+            while (matchedInterfaces.hasNext() && !matched) {
+                matched = currInterface.equals(matchedInterfaces.next());
+                if (matched) {
+                    matches.add(currInterface);
+                }
+            }
+            Iterator matchedFilters =
+                notification.getFilters().iterator();
+            while (matchedFilters.hasNext() && !matched) {
+                String filterString = (String)matchedFilters.next();
+                try {
+                    Filter filter = context.createFilter(filterString);
+                    matched = 
+                        filter.match(getProperties(notification, currInterface));
+                } catch (InvalidSyntaxException ise) {
+                    LOG.warning("invalid filter syntax: " + filterString);
+                }
+                if (matched) {
+                    matches.add(currInterface);
+                }
+            }
+        }
+
+        return matches;
+    }
     
+    private Hashtable getProperties(DiscoveredServiceNotification notification,
+                                    String interfaceName) {
+        Hashtable ret = new Hashtable();
+        Map properties = notification.getServiceEndpointDescription().getProperties();
+        Iterator keys = notification.getServiceEndpointDescription().getPropertyKeys().iterator();
+        while (keys.hasNext()) {
+            String key = (String)keys.next();
+            ret.put(key, properties.get(key));
+        }
+        ret.put(PROP_KEY_SERVICE_INTERFACE_NAME, interfaceName);
+        return ret;
+    }
+
     @SuppressWarnings("unchecked")
     protected Map<String, Object> getProperties(ServiceEndpointDescription sd) {
         Map<String, Object> props = new HashMap<String, Object>();        
@@ -122,6 +193,8 @@ public class AbstractClientHook extends AbstractHook {
     }
 
     protected synchronized void lookupDiscoveryService(String interfaceName, String filterValue) {
+        LOG.info("lookup discovery service: interface: " + interfaceName
+                 + " filter: " + filterValue);
 
         if (interfaceName != null) {
             append(trackerProperties,
@@ -148,12 +221,14 @@ public class AbstractClientHook extends AbstractHook {
         existing.add(additional);
     }
 
-    private synchronized boolean cacheEndpointId(ServiceEndpointDescription notified) {
+    /**
+     * @pre called with discoveredServices mutex held
+     */
+    private boolean unknownEndpointId(ServiceEndpointDescription notified) {
         String endpointId = (String)notified.getProperty(PROP_KEY_ENDPOINT_ID);
         if (endpointId != null) {
             boolean duplicate = discoveredServices.containsKey(endpointId);
             if (!duplicate) {
-                discoveredServices.put(endpointId, notified);
                 LOG.info("registering proxy for endpoint ID: " + endpointId);
             } else {
                 LOG.warning("ignoring duplicate notification for endpoint ID: "
@@ -166,10 +241,31 @@ public class AbstractClientHook extends AbstractHook {
         }
     }
 
-    private synchronized void unCacheEndpointId(ServiceEndpointDescription notified) {
+    /**
+     * @pre called with discoveredServices mutex held
+     */
+    private void cacheEndpointId(ServiceEndpointDescription notified, ServiceRegistration registration) {
         String endpointId = (String)notified.getProperty(PROP_KEY_ENDPOINT_ID);
         if (endpointId != null) {
-            discoveredServices.remove(endpointId);
+            discoveredServices.put(endpointId, registration);
+            LOG.info("caching proxy registration for endpoint ID: " + endpointId);
+        } else {
+            LOG.warning("cannot cache proxy registration as endpoint ID unset");  
+        }
+    }
+
+    private void unCacheEndpointId(ServiceEndpointDescription notified) {
+        String endpointId = (String)notified.getProperty(PROP_KEY_ENDPOINT_ID);
+        ServiceRegistration proxyRegistration = null;
+        if (endpointId != null) {
+            synchronized (discoveredServices) {
+                proxyRegistration = discoveredServices.remove(endpointId);
+            }
+        }
+        if (proxyRegistration != null) {
+            LOG.info("unregistering proxy service for endpoint ID: "
+                     + endpointId);
+            proxyRegistration.unregister();
         }
     }
 
@@ -184,14 +280,7 @@ public class AbstractClientHook extends AbstractHook {
                          + notified.getProvidedInterfaces() 
                          + " endpoint id: " 
                          + notification.getServiceEndpointDescription().getProperty(PROP_KEY_ENDPOINT_ID));
-                // REVISIT: OSGi bug 1022 will allow the matching interface
-                // name to be gleaned from the notification, for now we just
-                // assume its the first interface exposed by the SED
-                String interfaceName =
-                    (String)notified.getProvidedInterfaces().toArray()[0];
-                processServiceDescription(notified,
-                                          getContext(),
-                                          interfaceName);
+                processNotification(notification, getContext());
                 break;
 
             case UNAVAILABLE:
@@ -200,8 +289,6 @@ public class AbstractClientHook extends AbstractHook {
                          + " endpoint id: " 
                          + notification.getServiceEndpointDescription().getProperty(PROP_KEY_ENDPOINT_ID));
                 unCacheEndpointId(notified);
-                // we don't currently use this notification, but we could do
-                // so to allow to drive transparent fail-over
                 break;
 
             case MODIFIED:

@@ -40,17 +40,21 @@ import org.osgi.framework.ServiceRegistration;
 public class BundleTestContext implements BundleContext {
 
     private Bundle bundle;
-    private Object serviceObject;
     private Map<String, ServiceReference> testReferences = new
         HashMap<String, ServiceReference>();
     private Map<String, ServiceRegistration> testRegistrations = new
         HashMap<String, ServiceRegistration>();
+    private Map<ServiceReference, Object> registeredServices = new
+        HashMap<ServiceReference, Object>();
+    private List<Object> registeredServiceList = new ArrayList<Object>();
     private Map<String, ServiceReference> registeredReferences = new
         HashMap<String, ServiceReference>();
     private Map<String, ServiceRegistration> registeredRegistrations = new
         HashMap<String, ServiceRegistration>();
     private Map<String, List<Dictionary>> registeredProperties = new
         HashMap<String, List<Dictionary>>();
+    private Map<String, Filter> filters = new HashMap<String, Filter>();
+
         
     public BundleTestContext(Bundle b) {
         bundle = b;
@@ -68,8 +72,8 @@ public class BundleTestContext implements BundleContext {
     public void addServiceListener(ServiceListener arg0, String arg1) throws InvalidSyntaxException {
     }
 
-    public Filter createFilter(String arg0) throws InvalidSyntaxException {
-        return null;
+    public Filter createFilter(String filterString) throws InvalidSyntaxException {
+        return filters.get(filterString);
     }
 
     public ServiceReference[] getAllServiceReferences(String arg0, String arg1) throws InvalidSyntaxException {
@@ -97,7 +101,7 @@ public class BundleTestContext implements BundleContext {
     }
 
     public Object getService(ServiceReference sref) {
-        return serviceObject;
+        return registeredServices.get(sref);
     }
 
     public ServiceReference getServiceReference(String name) {
@@ -120,17 +124,28 @@ public class BundleTestContext implements BundleContext {
     }
 
     public ServiceRegistration registerService(String[] names, Object service, Dictionary props) {
+
         for (String s : names) {
-            registeredReferences.put(s, testReferences.get(s));
+            registeredRegistrations.put(s, testRegistrations.get(s));
+            ServiceReference sref = testReferences.get(s);
+            registeredReferences.put(s, sref);
+            registeredServices.put(sref, service);
+            registeredServiceList.add(service);
+            cacheProperties(s, props);
         }
-        serviceObject = service;
-        return null;
+         
+        return testRegistrations.get(names[0]);
     }
 
     public ServiceRegistration registerService(String clz, Object obj, Dictionary props) {
-        registeredRegistrations.put(clz, testRegistrations.get(clz));
+        ServiceRegistration registration = testRegistrations.get(clz);
+        registeredRegistrations.put(clz, registration);
+        ServiceReference sref = testReferences.get(clz);
+        registeredReferences.put(clz, sref);
+        registeredServices.put(sref, obj);
+        registeredServiceList.add(obj);
         cacheProperties(clz, props);
-        return testRegistrations.get(clz);
+        return registration;
     }
 
     public void removeBundleListener(BundleListener arg0) {
@@ -154,6 +169,10 @@ public class BundleTestContext implements BundleContext {
     public void addServiceRegistration(String name, ServiceRegistration reg) {
         testRegistrations.put(name, reg);
     }
+
+    public void addFilter(String s, Filter filter) {
+        filters.put(s, filter);
+    }
     
     public Map<String, ServiceReference> getRegisteredReferences() {
         return registeredReferences;
@@ -161,6 +180,10 @@ public class BundleTestContext implements BundleContext {
 
     public Map<String, ServiceRegistration> getRegisteredRegistrations() {
         return registeredRegistrations;
+    }
+
+    public List<Object> getRegisteredServices() {
+        return registeredServiceList;
     }
 
     public Map<String, List<Dictionary>> getRegisteredProperties() {

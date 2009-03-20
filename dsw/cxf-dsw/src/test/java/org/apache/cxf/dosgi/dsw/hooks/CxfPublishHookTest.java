@@ -103,7 +103,7 @@ public class CxfPublishHookTest extends Assert {
         BundleContext requestingContext = control.createMock(BundleContext.class);
         bundle.getBundleContext();
         EasyMock.expectLastCall().andReturn(requestingContext).anyTimes();
-        
+       
         TestService serviceObject = new TestServiceImpl();
         Dictionary serviceProps = new Hashtable();
 
@@ -116,14 +116,30 @@ public class CxfPublishHookTest extends Assert {
         EasyMock.expectLastCall().andReturn(new String[]{}).anyTimes();
         
         BundleTestContext dswContext = new BundleTestContext(bundle);
+
+        ServiceRegistration[] serviceRegistrations = 
+            new ServiceRegistration[serviceNames.length];        
+
+        for (int i = 0; i < serviceNames.length ; i++) {
+            serviceRegistrations[i] =
+                control.createMock(ServiceRegistration.class);
+            dswContext.addServiceRegistration(serviceNames[i],
+                                              serviceRegistrations[i]);
+            dswContext.addServiceReference(serviceNames[i], sref);
+        }
         dswContext.registerService(serviceNames, serviceObject, serviceProps);
         
         Server server = control.createMock(Server.class);
 
         String publicationClass = ServicePublication.class.getName();
-        ServiceRegistration registration =
+        ServiceRegistration publicationRegistration =
             control.createMock(ServiceRegistration.class);
-        dswContext.addServiceRegistration(publicationClass, registration);
+        publicationRegistration.unregister();
+        EasyMock.expectLastCall().times(serviceNames.length);
+        dswContext.addServiceRegistration(publicationClass, publicationRegistration);
+        ServiceReference publicationReference = 
+            control.createMock(ServiceReference.class);
+        dswContext.addServiceReference(publicationClass, publicationReference);
         control.replay();
      
         TestPublishHook hook = new TestPublishHook(dswContext, 
@@ -156,14 +172,14 @@ public class CxfPublishHookTest extends Assert {
         Map<String, ServiceRegistration> registeredRegs = 
             dswContext.getRegisteredRegistrations();
         assertNotNull(registeredRegs);
-        assertEquals(1, registeredRegs.size());
+        assertEquals(serviceNames.length + 1, registeredRegs.size());
         assertNotNull(registeredRegs.get(publicationClass));
-        assertSame(registration, registeredRegs.get(publicationClass));
+        assertSame(publicationRegistration, registeredRegs.get(publicationClass));
 
         Map<String, List<Dictionary>> registeredProps = 
             dswContext.getRegisteredProperties();
         assertNotNull(registeredProps);
-        assertEquals(1, registeredProps.size());
+        assertEquals(serviceNames.length + 1, registeredProps.size());
         assertNotNull(registeredProps.get(publicationClass));
         List<Dictionary> propsList = registeredProps.get(publicationClass);
         assertEquals(serviceNames.length, propsList.size());
@@ -173,7 +189,11 @@ public class CxfPublishHookTest extends Assert {
             assertNotNull(interfaces);
             assertTrue(interfaces.contains(TestService.class.getName())
                        || interfaces.contains(AdditionalInterface.class.getName()));
-	}
+        }
+
+        hook.removeEndpoints();
+
+        control.verify();
     }
     
     @SuppressWarnings("unchecked")
@@ -210,8 +230,17 @@ public class CxfPublishHookTest extends Assert {
         EasyMock.expectLastCall().andReturn(serviceNames).anyTimes();
         sref.getPropertyKeys();                           
         EasyMock.expectLastCall().andReturn(new String[]{}).anyTimes();
-        
-        BundleContext dswContext = new BundleTestContext(bundle);
+              
+        BundleTestContext dswContext = new BundleTestContext(bundle);
+        ServiceRegistration[] serviceRegistrations = 
+            new ServiceRegistration[serviceNames.length];  
+        for (int i = 0; i < serviceNames.length ; i++) {
+            serviceRegistrations[i] =
+                control.createMock(ServiceRegistration.class);
+            dswContext.addServiceRegistration(serviceNames[i],
+                                              serviceRegistrations[i]);
+            dswContext.addServiceReference(serviceNames[i], sref);
+        }
         dswContext.registerService(serviceNames, serviceObject, serviceProps);
         
         final Server server = control.createMock(Server.class);        
@@ -230,7 +259,9 @@ public class CxfPublishHookTest extends Assert {
         hook.endpoints.put(sref, new ArrayList<EndpointInfo>()); 
         assertEquals("Precondition failed", 0, hook.getEndpoints().get(sref).size());        
         hook.publishEndpoint(sref);
-        assertEquals(0, hook.getEndpoints().get(sref).size());        
+        assertEquals(0, hook.getEndpoints().get(sref).size());
+        
+        control.verify();
     }
 
     private static class TestPublishHook extends CxfPublishHook {
@@ -266,7 +297,7 @@ public class CxfPublishHookTest extends Assert {
                     String address = (String)props.get(POJO_ADDRESS_PROPERTY);
                     if (address != null) {
                         props.put(PROP_KEY_ENDPOINT_LOCATION, address);
-		    }
+                    }
                     return server;
                 }
                 
