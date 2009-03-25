@@ -225,6 +225,7 @@
               org.osgi.*
             </Import-Package>
             <Export-Package>
+              '=META-INF.cxf',
               org.apache.cxf.dosgi.singlebundle;version="${pom.version}"
             </Export-Package>
             <Embed-Dependency>*;scope=compile;inline=false</Embed-Dependency>
@@ -240,6 +241,7 @@
               !*
             </_exportcontents> 
             <DynamicImport-Package>*</DynamicImport-Package>
+            <_failok>true</_failok>
             <_removeheaders>
               Ignore-Package,
               Include-Resource,

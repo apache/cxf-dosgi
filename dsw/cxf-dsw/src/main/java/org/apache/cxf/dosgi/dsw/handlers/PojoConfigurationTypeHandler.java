@@ -100,10 +100,13 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         factory.getServiceFactory().setDataBinding(new AegisDatabinding());
         factory.setServiceBean(serviceBean);
         
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             String [] intents = applyIntents(
                 dswContext, callingContext, factory.getFeatures(), factory, sd);
         
+            
+            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
             getDistributionProvider().addExposedService(serviceReference, registerPublication(server, intents));
             addAddressProperty(sd.getProperties(), address);
@@ -111,6 +114,8 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         } catch (IntentUnsatifiedException iue) {
             getDistributionProvider().intentsUnsatisfied(serviceReference);
             throw iue;
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
     }       
     
