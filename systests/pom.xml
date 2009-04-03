@@ -35,25 +35,16 @@
 
     <properties>
         <topDirectoryLocation>..</topDirectoryLocation>
-        <osgi.test.platform>org.springframework.osgi.test.platform.EquinoxPlatform</osgi.test.platform>
+        <osgi.test.platform>org.springframework.osgi.test.platform.FelixPlatform</osgi.test.platform>
         <servicemix.kernel.version>1.0.0</servicemix.kernel.version>
         <servicemix.depends.plugin.version>1.0.0-rc1</servicemix.depends.plugin.version>
     </properties>
     
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.osgi</groupId>
-            <artifactId>org.eclipse.osgi</artifactId>
-            <version>3.5m4</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/${topDirectoryLocation}/systests/equinox_libs/3.5m4/org.eclipse.osgi_3.5.0.v20081201-1815.jar</systemPath>
-        </dependency>
-
-        <!--
-        <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.main</artifactId>
-            <version>1.1.0-cxf_dosgi-SNAPSHOT</version>
+            <version>1.4.1</version>
             <scope>test</scope>
             <exclusions>
                <exclusion>
@@ -69,7 +60,7 @@
                  <artifactId>org.apache.felix.bundlerepository</artifactId>
                </exclusion>
              </exclusions>
-           </dependency> -->
+           </dependency>
 
 
      </dependencies> 
@@ -107,32 +98,22 @@
                         </property>
 
                         <property>
-                                <name>org.apache.cxf.spring.validation.mode</name>
-                                <value>VALIDATION_NONE</value>
+                            <name>felix.fragment.validation</name>
+                            <value>warning</value>
+                        </property>
+
+                        <property>
+                            <name>org.apache.cxf.spring.validation.mode</name>
+                            <value>VALIDATION_NONE</value>
                         </property>
                         
                         <property>
                              <name>org.apache.cxf.nofastinfoset</name>
                              <value>true</value>
                         </property>
-<!--
-                        <property>
-                            <name>felix.config.properties</name>
-                            <value>file:${basedir}/../etc/felix.config.properties</value>
-                        </property>
--->
-<!--
-                        <property>
-                            <name>-Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize</name>
-                            <value></value>
-                        </property>
--->
                     </systemProperties>
                 </configuration>
             </plugin>
-
         </plugins>
     </build> 
-   
-
 </project>
