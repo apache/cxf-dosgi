@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.jar.Manifest;
@@ -122,9 +123,21 @@ public abstract class AbstractDosgiSystemTest extends AbstractConfigurableBundle
 
     @Override
     protected String[] getTestFrameworkBundlesNames() {
-        List<String> names = new ArrayList<String>(Arrays.asList(super.getTestFrameworkBundlesNames()));
+        List<String> names = new ArrayList<String>(Arrays.asList(super.getTestFrameworkBundlesNames()));        
+        fixLog4J(names);        
         names.add(getBundle("org.apache.felix", "org.osgi.compendium"));
         return names.toArray(new String [names.size()]);
+    }
+
+    private void fixLog4J(List<String> names) {
+        for (Iterator<String> it = names.iterator(); it.hasNext(); ) {
+            if (it.next().equals("org.springframework.osgi,log4j.osgi,1.2.15-SNAPSHOT")) {
+                it.remove();
+                break;
+            }
+        }
+        // replace it with a better version
+        names.add("org.apache.log4j,com.springsource.org.apache.log4j,1.2.15");
     }
 
     @Override
