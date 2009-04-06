@@ -23,7 +23,7 @@
   <groupId>org.apache.cxf.dosgi</groupId>
   <artifactId>cxf-dosgi-ri-multibundle-distribution</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
   <name>Distributed OSGI Multi-Bundle Distribution</name>
   <url>http://cxf.apache.org</url>
 
@@ -198,8 +198,16 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>        
+  
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -276,24 +284,24 @@
                 <pathconvert targetos="unix" property="current.dir" refid="current.dir.path"/>
                 
                 <xslt processor="trax" 
-                  in="src/main/resources/distro_bundles.xml" 
+                  in="target/classes/distro_bundles.xml" 
                   out="target/distribution_configs/felix.config.properties.append"
                   style="src/main/xsl/felix_distro_config.xslt" />
                 
                 <xslt processor="trax" 
-                  in="src/main/resources/distro_bundles.xml" 
+                  in="target/classes/distro_bundles.xml" 
                   out="target/felix.config.properties.append"
                   style="src/main/xsl/felix_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/"/>
                 </xslt>
                 
                 <xslt processor="trax" 
-                  in="src/main/resources/distro_bundles.xml" 
+                  in="target/classes/distro_bundles.xml" 
                   out="target/distribution_configs/equinox.config.ini.append"
                   style="src/main/xsl/equinox_distro_config.xslt" />
                 
                 <xslt processor="trax" 
-                  in="src/main/resources/distro_bundles.xml" 
+                  in="target/classes/distro_bundles.xml" 
                   out="target/equinox.config.ini.append"
                   style="src/main/xsl/equinox_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/"/>
