@@ -35,7 +35,7 @@ class MultiBundleDistributionResolver {
     // Read the distribution from the distribution/multi-bundle module
     static File [] getDistribution() throws Exception {
         File distroRoot = new File(System.getProperty("basedir") + "/../../distribution/multi-bundle"); 
-        File distroFile = new File(distroRoot, "src/main/resources/distro_bundles.xml");
+        File distroFile = new File(distroRoot, "target/classes/distro_bundles.xml");
         
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
