@@ -20,7 +20,7 @@
   <service-description>
     <provide interface="org.apache.cxf.dosgi.samples.springdm.DinnerService" />
     <property name="osgi.remote.interfaces">*</property>
-    <property name="service.intents">SOAP HTTP</property>
+    <property name="deployment.intents">SOAP HTTP</property>
     <property name="osgi.remote.configuration.type">pojo</property>
     <property name="osgi.remote.configuration.pojo.address">http://localhost:9000/org/apache/cxf/dosgi/samples/springdm/DinnerService</property>
   </service-description>

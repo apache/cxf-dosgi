@@ -84,7 +84,7 @@ public interface DistributionProvider {
      * side.
      * E.g. a service is exposed remotely, the distribution software is configured
      * to add transactionality to the remote service. Because of this, on the 
-     * client-side proxy the property service.intents=”transactionality” is set. 
+     * client-side proxy the property deployment.intents=”transactionality” is set. 
      * However, these intents are *not* always set on the original
      * ServiceRegistration on the server-side since on the server side the service
      * object is a local pojo which doesn’t provide transactionality by itself.

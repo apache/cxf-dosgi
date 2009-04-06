@@ -141,7 +141,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Map<String, String> expected = new HashMap<String, String>();
         expected.put("osgi.remote.configuration.type", "pojo");
         expected.put("osgi.remote.configuration.pojo.address", "http://somehost:54321/java/lang/String");
-        expected.put("service.intents", "A B");
+        expected.put("deployment.intents", "A B");
         assertEquals(expected, dp.getExposedProperties(sr));
     }
     
