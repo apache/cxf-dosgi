@@ -70,12 +70,10 @@ public class DiscoveryServiceImpl implements Discovery, InitializingBean, Dispos
         zooKeeperTimeout = timeout;
     }
 
-    @Override
     public void setBundleContext(BundleContext bc) {
         bundleContext = bc;
     }
 
-    @Override
     public void afterPropertiesSet() throws Exception {
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put(Constants.SERVICE_PID, SERVICE_PID);
@@ -85,7 +83,6 @@ public class DiscoveryServiceImpl implements Discovery, InitializingBean, Dispos
         reg = bundleContext.registerService(Discovery.class.getName(), this, props);
     }
 
-    @Override
     public void destroy() throws Exception {
         reg.unregister();
     }    

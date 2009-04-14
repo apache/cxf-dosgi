@@ -60,7 +60,6 @@ public class DiscoveryServiceImplTest extends TestCase {
             andAnswer(new IAnswer<ServiceRegistration>(){        
 
             @SuppressWarnings("unchecked")
-            @Override
             public ServiceRegistration answer() throws Throwable {
                 Dictionary<String, Object> props = 
                     (Dictionary<String, Object>) EasyMock.getCurrentArguments()[2];
