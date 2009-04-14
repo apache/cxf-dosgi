@@ -19,9 +19,11 @@
         <felix.version>1.4.1</felix.version>
         <spring.version>2.5.6</spring.version>
         <spring.osgi.version>1.2.0</spring.osgi.version>
+        <zookeeper.version>3.0.0</zookeeper.version>
 
         <servicemix.specs.version>1.1.1</servicemix.specs.version>
 
+        <log4j.version>1.2.15</log4j.version>
         <jetty.version>6.1.9</jetty.version>
         <xmlschema.bundle.version>1.4.2_1</xmlschema.bundle.version> 
         <xmlresolver.bundle.version>1.2_1</xmlresolver.bundle.version>          
