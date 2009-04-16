@@ -18,6 +18,8 @@
   */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
+import java.io.IOException;
+
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
@@ -32,11 +34,10 @@ import org.springframework.osgi.context.BundleContextAware;
 public class DiscoveryBean implements BundleContextAware, InitializingBean, DisposableBean, Watcher {
     private BundleContext bundleContext;
     private DiscoveryServiceImpl discoveryService;
-    private ZooKeeper zooKeeper;
 
-    private FindInZooKeeperCustomizer finderCustomizer;
-    private ServiceTracker lookupTracker;
-    private ServiceTracker publicationTracker;
+    ServiceTracker lookupTracker;
+    ServiceTracker publicationTracker;
+    ZooKeeper zooKeeper;
         
     public void setBundleContext(BundleContext bc) {
         bundleContext = bc;
@@ -49,16 +50,19 @@ public class DiscoveryBean implements BundleContextAware, InitializingBean, Disp
     public void afterPropertiesSet() throws Exception {
         String hostPort = discoveryService.getZooKeeperHost() + ":" + 
                           discoveryService.getZooKeeperPort();
-        zooKeeper = new ZooKeeper(hostPort, discoveryService.getZooKeeperTimeout(), this);
+        zooKeeper = createZooKeeper(hostPort);
         
         publicationTracker = new ServiceTracker(bundleContext, ServicePublication.class.getName(), 
                 new PublishToZooKeeperCustomizer(bundleContext, zooKeeper));
         publicationTracker.open();
         
-        finderCustomizer = new FindInZooKeeperCustomizer(bundleContext, zooKeeper);
         lookupTracker = new ServiceTracker(bundleContext, DiscoveredServiceTracker.class.getName(),
-                finderCustomizer);
+                new FindInZooKeeperCustomizer(bundleContext, zooKeeper));
         lookupTracker.open();        
+    }
+
+    ZooKeeper createZooKeeper(String hostPort) throws IOException {
+        return new ZooKeeper(hostPort, discoveryService.getZooKeeperTimeout(), this);
     }
 
     public void destroy() throws Exception {

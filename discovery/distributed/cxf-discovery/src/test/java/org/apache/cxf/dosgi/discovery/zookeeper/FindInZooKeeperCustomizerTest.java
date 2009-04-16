@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.util.Collections;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
