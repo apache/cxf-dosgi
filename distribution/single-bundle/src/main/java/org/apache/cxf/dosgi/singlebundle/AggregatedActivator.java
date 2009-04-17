@@ -102,10 +102,6 @@ public class AggregatedActivator implements BundleActivator {
     }
 
     void startEmbeddedActivators(BundleContext ctx) throws Exception {
-        SPIActivator sba = new SPIActivator();
-        sba.start(ctx);
-        activators.add(sba);
-        
         for (String s : getActivators()) {
             try {
                 Class<?> clazz = getClass().getClassLoader().loadClass(s);

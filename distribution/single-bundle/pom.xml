@@ -160,11 +160,6 @@
        <version>${xmlsec.bundle.version}</version>
     </dependency>  
     <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId> 
-      <artifactId>org.apache.servicemix.bundles.wss4j</artifactId> 
-      <version>${wss4j.bundle.version}</version>
-    </dependency>
-    <dependency>
        <groupId>org.apache.servicemix.bundles</groupId> 
        <artifactId>org.apache.servicemix.bundles.jaxb-impl</artifactId> 
        <version>${jaxbimpl.bundle.version}</version> 
@@ -197,6 +192,11 @@
       <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>  
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
