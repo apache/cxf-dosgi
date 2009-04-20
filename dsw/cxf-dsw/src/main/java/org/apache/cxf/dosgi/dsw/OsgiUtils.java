@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.dsw;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -145,7 +146,7 @@ public final class OsgiUtils {
 
     public static ServiceEndpointDescription[] flattenServiceDescription(ServiceEndpointDescription sd) {
         ServiceEndpointDescription[] list = null;
-	int interfaceNameCount = sd.getProvidedInterfaces().size();
+        int interfaceNameCount = sd.getProvidedInterfaces().size();
         if (sd.getProvidedInterfaces() == null || interfaceNameCount <= 1) {
             list = new ServiceEndpointDescription[] {sd};
         } else {
@@ -277,7 +278,7 @@ public final class OsgiUtils {
     
     public static String[] getProvidedInterfaces(ServiceEndpointDescription sd, String interfaceName) {
         
-	int interfaceNameCount = sd.getProvidedInterfaces().size();
+        int interfaceNameCount = sd.getProvidedInterfaces().size();
         String[] interfaceNames = (String[])
             sd.getProvidedInterfaces().toArray(new String[interfaceNameCount]);
         if (interfaceName == null) {
@@ -467,26 +468,37 @@ public final class OsgiUtils {
 
     public static String[] getPublishableInterfaces(ServiceEndpointDescription sd,
                                                     ServiceReference sref) {
-        String publishProperty = 
-            (String)sd.getProperty(Constants.REMOTE_INTERFACES_PROPERTY);
+        Object publishProperty = 
+            sd.getProperty(Constants.REMOTE_INTERFACES_PROPERTY);
         String[] actualInterfaces = 
             (String[])sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS);
         String[] publishableInterfaces = null;
 
+
         if (actualInterfaces != null
             && actualInterfaces.length > 0
-            && publishProperty != null
-            && publishProperty.length() > 0) {
+            && publishProperty != null) {
 
             if (INTERFACE_WILDCARD.equals(publishProperty)) {
                 // wildcard indicates all interfaces should be published
                 //
                 publishableInterfaces = actualInterfaces;
             } else {
-                String[] requestedInterfaces = tokenize(publishProperty, ",");
+
+                String[] requestedInterfaces =
+                    publishProperty instanceof String
+                    ? tokenize((String)publishProperty, ",")
+                    : publishProperty instanceof String[]
+                      ? (String[])publishProperty
+                      : publishProperty instanceof Collection
+                      ? (String[])((Collection)publishProperty).toArray(
+                            new String[((Collection)publishProperty).size()])
+                         : null;
+
                 ArrayList<String> publishableList = new ArrayList<String>();
 
-                for (int i = 0; i < requestedInterfaces.length; i++) {
+                for (int i = 0; requestedInterfaces != null 
+                                && i < requestedInterfaces.length; i++) {
                     if (contains(actualInterfaces, requestedInterfaces[i])) {
                         publishableList.add(requestedInterfaces[i]);
                     } else {

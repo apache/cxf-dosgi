@@ -28,8 +28,32 @@ public class OsgiUtilsTest extends TestCase {
                                        new String[] {"foo", "bar", "snafu"});
     }
 
+    public void testGetPublishableInterfacesAllStringArray() throws Exception {
+        doTestGetPublishableInterfaces(new String[] {"foo", "bar", "snafu"},
+                                       new String[] {"snafu", "foo", "bar"},
+                                       new String[] {"foo", "bar", "snafu"});
+    }
+
+    public void testGetPublishableInterfacesAllCollection() throws Exception {
+        doTestGetPublishableInterfaces(Arrays.asList("foo", "bar", "snafu"),
+                                       new String[] {"snafu", "foo", "bar"},
+                                       new String[] {"foo", "bar", "snafu"});
+    }
+
     public void testGetPublishableInterfacesSubset() throws Exception {
         doTestGetPublishableInterfaces("foo,snafu",
+                                       new String[] {"snafu", "foo", "bar"},
+                                       new String[] {"foo", "snafu"});
+    }
+
+    public void testGetPublishableInterfacesSubsetStringArray() throws Exception {
+        doTestGetPublishableInterfaces(new String[] {"foo", "snafu"},
+                                       new String[] {"snafu", "foo", "bar"},
+                                       new String[] {"foo", "snafu"});
+    }
+
+    public void testGetPublishableInterfacesSubsetCollection() throws Exception {
+        doTestGetPublishableInterfaces(Arrays.asList("foo", "snafu"),
                                        new String[] {"snafu", "foo", "bar"},
                                        new String[] {"foo", "snafu"});
     }
@@ -40,8 +64,32 @@ public class OsgiUtilsTest extends TestCase {
                                        new String[] {"bar", "snafu"});
     }
 
+    public void testGetPublishableInterfacesSupersetStringArray() throws Exception {
+        doTestGetPublishableInterfaces(new String[] {"foo", "bar", "snafu"},
+                                       new String[] {"snafu", "bar"},
+                                       new String[] {"bar", "snafu"});
+    }
+
+    public void testGetPublishableInterfacesSupersetCollection() throws Exception {
+        doTestGetPublishableInterfaces(Arrays.asList("foo", "bar", "snafu"),
+                                       new String[] {"snafu", "bar"},
+                                       new String[] {"bar", "snafu"});
+    }
+
     public void testGetPublishableInterfacesNonexistant() throws Exception {
         doTestGetPublishableInterfaces("foo,bar,tofu",
+                                       new String[] {"snafu", "foo", "bar"},
+                                       new String[] {"foo", "bar"});
+    }
+
+    public void testGetPublishableInterfacesNonexistantStringArray() throws Exception {
+        doTestGetPublishableInterfaces(new String[] {"foo", "bar", "tofu"},
+                                       new String[] {"snafu", "foo", "bar"},
+                                       new String[] {"foo", "bar"});
+    }
+
+    public void testGetPublishableInterfacesNonexistantCollection() throws Exception {
+        doTestGetPublishableInterfaces(Arrays.asList("foo", "bar", "tofu"),
                                        new String[] {"snafu", "foo", "bar"},
                                        new String[] {"foo", "bar"});
     }
@@ -52,7 +100,7 @@ public class OsgiUtilsTest extends TestCase {
                                        new String[] {"snafu", "foo", "bar"});
     }
 
-    public void doTestGetPublishableInterfaces(String requested, 
+    public void doTestGetPublishableInterfaces(Object requested, 
                                                String[] actual, 
                                                String[] expected)
         throws Exception {
