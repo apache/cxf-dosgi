@@ -58,6 +58,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         LOG.info("Creating a " + sd.getProvidedInterfaces().toArray()[0]
                 + " client, endpoint address is " + address);
 
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             ClientProxyFactoryBean factory = createClientProxyFactoryBean();
             factory.setServiceClass(iClass);
@@ -70,11 +71,14 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
                          factory.getClientFactoryBean(), 
                          sd);
 
+            Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
             Object proxy = getProxy(factory.create(), iClass);
             getDistributionProvider().addRemoteService(serviceReference);
             return proxy;
         } catch (Exception e) {
             LOG.log(Level.WARNING, "proxy creation failed", e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
         return null;
     }
