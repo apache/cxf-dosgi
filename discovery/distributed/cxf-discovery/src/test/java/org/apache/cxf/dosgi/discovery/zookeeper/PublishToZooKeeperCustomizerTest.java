@@ -27,6 +27,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import junit.framework.TestCase;
 
@@ -38,22 +39,28 @@ import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.discovery.ServicePublication;
 
 public class PublishToZooKeeperCustomizerTest extends TestCase {
     public void testAddingService() throws Exception {
         Hashtable<String, Object> srProps = new Hashtable<String, Object>();
         srProps.put("osgi.remote.interfaces", "*");
         
-        final Properties expected = new Properties();
-        expected.put("osgi.remote.interfaces", "*");
-        ByteArrayOutputStream expectedBytes = new ByteArrayOutputStream();
-        expected.store(expectedBytes, "");
-
+        String location = "http://somehost.someorg:80/abc/def";
+        String eid = UUID.randomUUID().toString();
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sr.getProperty("service.interface")).andReturn(Arrays.asList("java.lang.String", "org.example.interface.AnInterface"));
-        EasyMock.expect(sr.getProperty("osgi.remote.endpoint.location")).andReturn("http://somehost.someorg:80/abc/def");
+        EasyMock.expect(sr.getProperty("osgi.remote.endpoint.location")).andReturn(location).atLeastOnce();
+        EasyMock.expect(sr.getProperty("osgi.remote.endpoint.id")).andReturn(eid).atLeastOnce();
         EasyMock.expect(sr.getProperty("service.properties")).andReturn(srProps).anyTimes();
         EasyMock.replay(sr);
+
+        final Properties expected = new Properties();
+        expected.put("osgi.remote.interfaces", "*");
+        expected.put("osgi.remote.endpoint.location", location);
+        expected.put("osgi.remote.endpoint.id", eid);
+        ByteArrayOutputStream expectedBytes = new ByteArrayOutputStream();
+        expected.store(expectedBytes, "");
 
         BundleContext bc = EasyMock.createMock(BundleContext.class);
         EasyMock.expect(bc.getService(sr)).andReturn("something");
@@ -131,13 +138,19 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
     }
 
     public void testGetData() throws Exception {
-        Map<String, Object> expected = new HashMap<String, Object>();
-        expected.put("osgi.remote.interfaces", "*");
-        expected.put("osgi.remote.configuration.type", "pojo");
-        expected.put("osgi.remote.configuration.pojo.address", "http://localhost:9090/ps");
+        Map<String, Object> initial = new HashMap<String, Object>();
+        initial.put("osgi.remote.interfaces", "*");
+        initial.put("osgi.remote.configuration.type", "pojo");
+        initial.put("osgi.remote.configuration.pojo.address", "http://localhost:9090/ps");
+        
+        String eid = UUID.randomUUID().toString();
+        HashMap<String, Object> expected = new HashMap<String, Object>(initial);
+        expected.put(ServicePublication.PROP_KEY_ENDPOINT_ID, eid);
                 
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-        EasyMock.expect(sr.getProperty("service.properties")).andReturn(expected);
+        EasyMock.expect(sr.getProperty("service.properties")).andReturn(initial);
+        EasyMock.expect(sr.getProperty(ServicePublication.PROP_KEY_ENDPOINT_ID)).andReturn(eid);
+        EasyMock.expect(sr.getProperty(ServicePublication.PROP_KEY_ENDPOINT_LOCATION)).andReturn(null);
         EasyMock.replay(sr);
         
         byte[] data = PublishToZooKeeperCustomizer.getData(sr);

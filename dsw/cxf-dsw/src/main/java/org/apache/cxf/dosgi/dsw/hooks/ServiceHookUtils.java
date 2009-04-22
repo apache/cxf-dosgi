@@ -18,34 +18,30 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
-import java.util.Collections;
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_ID;
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_LOCATION;
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_PROPERTIES;
+
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.apache.cxf.dosgi.dsw.ClassUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.OsgiService;
-import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.IntentUnsatifiedException;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.apache.cxf.endpoint.Server;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.discovery.ServicePublication;
-
-
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_PROPERTIES;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_LOCATION;
 
 public final class ServiceHookUtils {
     
@@ -148,10 +144,12 @@ public final class ServiceHookUtils {
         return props;
     }
 
+    @SuppressWarnings("unchecked")
     private static Dictionary getPublicationProperties(ServiceEndpointDescription sd) {
         Dictionary props = new Hashtable();
         props.put(PROP_KEY_SERVICE_INTERFACE_NAME, sd.getProvidedInterfaces());
         props.put(PROP_KEY_SERVICE_PROPERTIES, getServiceProperties(sd));
+        props.put(PROP_KEY_ENDPOINT_ID, UUID.randomUUID().toString());
         if (sd.getLocation() != null) {
             props.put(PROP_KEY_ENDPOINT_LOCATION, sd.getLocation());
         }

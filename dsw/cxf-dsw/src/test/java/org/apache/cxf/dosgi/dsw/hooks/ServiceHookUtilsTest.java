@@ -18,21 +18,29 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.dosgi.dsw.TestUtils;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.service.ServiceEndpointDescriptionImpl;
 import org.apache.cxf.endpoint.Server;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.discovery.ServiceEndpointDescription;
-
+import org.osgi.service.discovery.ServicePublication;
 
 public class ServiceHookUtilsTest extends TestCase {
     public void testCreateServer() {
@@ -72,18 +80,51 @@ public class ServiceHookUtilsTest extends TestCase {
         assertNull(ServiceHookUtils.createServer(handler, serviceReference, dswContext, callingContext, sd, service));        
     }
     
+    public void testPublish() throws Exception {        
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("foo", "bar");
+        props.put(ServicePublication.PROP_KEY_ENDPOINT_LOCATION, "http://localhost/xyz");
+        ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(String.class.getName(), props);
+        assertEquals(new URL("http://localhost/xyz"), sed.getLocation());
+        
+        final Dictionary<String, Object> expectedProps = new Hashtable<String, Object>();
+        expectedProps.put(ServicePublication.PROP_KEY_SERVICE_PROPERTIES, props);
+        expectedProps.put(ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME, Collections.singleton(String.class.getName()));
+        expectedProps.put(ServicePublication.PROP_KEY_ENDPOINT_LOCATION, new URL("http://localhost/xyz"));
+        
+        BundleContext bc = EasyMock.createMock(BundleContext.class);
+        EasyMock.expect(bc.registerService(
+            EasyMock.eq(ServicePublication.class.getName()),
+            EasyMock.anyObject(), 
+            (Dictionary<?, ?>) EasyMock.anyObject()))
+                .andAnswer(new IAnswer<ServiceRegistration>() {
+                    public ServiceRegistration answer() throws Throwable {
+                        assertTrue(EasyMock.getCurrentArguments()[1] instanceof ServicePublication);
+                        Dictionary<?, ?> actualProps = 
+                            (Dictionary<?, ?>) EasyMock.getCurrentArguments()[2];
+                        UUID uuid = UUID.fromString(actualProps.get(ServicePublication.PROP_KEY_ENDPOINT_ID).toString());
+                        expectedProps.put(ServicePublication.PROP_KEY_ENDPOINT_ID, uuid.toString());
+                        assertEquals(expectedProps, actualProps);
+                        return EasyMock.createMock(ServiceRegistration.class);
+                    }                
+                });
+        EasyMock.replay(bc);
+        
+        ServiceHookUtils.publish(bc, sed);
+        EasyMock.verify(bc);
+    }
+    
     private ServiceEndpointDescription mockServiceDescription(IMocksControl control, 
-                                                             String... interfaceNames) {
+                                                              String... interfaceNames) {
         List<String> iList = new ArrayList<String>();
         for (String iName : interfaceNames) {
-	    iList.add(iName);
-	}
+    	    iList.add(iName);
+    	}
         ServiceEndpointDescription sd = control.createMock(ServiceEndpointDescription.class);
         sd.getProvidedInterfaces();
         EasyMock.expectLastCall().andReturn(iList);
         return sd;
     }
-    
 }
 
 

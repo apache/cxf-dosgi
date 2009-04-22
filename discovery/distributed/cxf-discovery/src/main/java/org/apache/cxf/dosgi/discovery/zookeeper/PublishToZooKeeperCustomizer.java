@@ -36,6 +36,7 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.discovery.ServicePublication;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
@@ -111,13 +112,25 @@ public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
         Properties p = new Properties();
         
         Map<String, Object> serviceProps = (Map<String, Object>) sr.getProperty("service.properties");
-        for (Map.Entry<String, Object> prop : serviceProps.entrySet()) {
-            p.setProperty(prop.getKey(), prop.getValue().toString());
+        if (serviceProps != null) {
+            for (Map.Entry<String, Object> prop : serviceProps.entrySet()) {
+                p.setProperty(prop.getKey(), prop.getValue().toString());
+            }
         }
+        
+        copyProperty(ServicePublication.PROP_KEY_ENDPOINT_ID, sr, p);
+        copyProperty(ServicePublication.PROP_KEY_ENDPOINT_LOCATION, sr, p);
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         p.store(baos, "");
         return baos.toByteArray();
+    }
+
+    private static void copyProperty(String key, ServiceReference sr, Properties p) {
+        Object eID = sr.getProperty(key);
+        if (eID != null) {
+            p.setProperty(key, eID.toString());
+        }
     }
 
     static String getKey(String endpoint) throws UnknownHostException, URISyntaxException {
