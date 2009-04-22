@@ -21,6 +21,9 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -32,6 +35,7 @@ import java.util.UUID;
 import junit.framework.TestCase;
 
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.data.ACL;
@@ -40,6 +44,7 @@ import org.easymock.classextension.EasyMock;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServicePublication;
+import org.springframework.osgi.service.importer.support.ServiceReferenceEditor;
 
 public class PublishToZooKeeperCustomizerTest extends TestCase {
     public void testAddingService() throws Exception {
@@ -111,6 +116,57 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
         EasyMock.verify(sr);
         EasyMock.verify(bc);
         EasyMock.verify(zk);
+    }
+    
+    public void testRemovedService() throws Exception {
+        BundleContext bc = EasyMock.createMock(BundleContext.class);
+        EasyMock.replay(bc);
+        
+        String endpoint = "http://localhost:2991/123";
+        ServiceReference sr = EasyMock.createMock(ServiceReference.class);
+        EasyMock.expect(sr.getProperty("service.interface")).andReturn(Runnable.class.getName());
+        EasyMock.expect(sr.getProperty("osgi.remote.endpoint.location")).andReturn(endpoint);        
+        EasyMock.replay(sr);
+        
+        ZooKeeper zk = EasyMock.createMock(ZooKeeper.class);
+        zk.delete(Util.getZooKeeperPath(Runnable.class.getName()) + "/" +
+                PublishToZooKeeperCustomizer.getKey(endpoint), -1);
+        EasyMock.replay(zk);
+        
+        PublishToZooKeeperCustomizer pc = new PublishToZooKeeperCustomizer(null, zk);
+        pc.removedService(sr, null);
+        
+        EasyMock.verify(bc);
+        EasyMock.verify(sr);
+        EasyMock.verify(zk);
+    }
+    
+    public void testModifiedService() {
+        final List<Object> actual = new ArrayList<Object>();
+        PublishToZooKeeperCustomizer pc = new PublishToZooKeeperCustomizer(null, null) {
+            @Override
+            public Object addingService(ServiceReference sr) {
+                actual.add("add");
+                actual.add(sr);
+                return null;
+            }
+
+            @Override
+            public void removedService(ServiceReference sr, Object obj) {
+                actual.add("remove");
+                actual.add(sr);
+                actual.add(obj);
+            }            
+        };
+
+        ServiceReference sr = EasyMock.createMock(ServiceReference.class);
+        Object obj = new Object();
+        
+        assertEquals("Precondition failed", 0, actual.size());
+        pc.modifiedService(sr, obj);
+        
+        List<Object> expected = Arrays.asList("remove", sr, obj, "add", sr);
+        assertEquals(expected, actual);
     }
     
     public void testEnsurePath() throws Exception {

@@ -54,8 +54,7 @@ public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
         try {
             Object obj = bundleContext.getService(sr);
             Collection<String> interfaces = Util.getMultiValueProperty(sr.getProperty("service.interface"));
-            String endpoint = sr.getProperty("osgi.remote.endpoint.location").toString();
-            String endpointKey = getKey(endpoint);
+            String endpointKey = getKey(sr.getProperty("osgi.remote.endpoint.location").toString());
 
             for (String name : interfaces) {
                 String path = Util.getZooKeeperPath(name);
@@ -68,26 +67,30 @@ public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
             }
             return obj;
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Exception while processing a ServicePublication.", ex);
+            LOG.log(Level.SEVERE, "Exception while processing the addition of a ServicePublication.", ex);
             return null;
         }
     }
     
     public void modifiedService(ServiceReference sr, Object obj) {
-        // TODO Auto-generated method stub
-
+        removedService(sr, obj);
+        addingService(sr);
     }
 
     public void removedService(ServiceReference sr, Object obj) {
-//        Collection<String> interfaces = Util.getMultiValueProperty(sr.getProperty("service.interface"));
-//        String endpoint = sr.getProperty("osgi.remote.endpoint.location").toString();
-//        String endpointKey = getKey(endpoint);
-//        
-//        for (String name : interfaces) {
-//            
-//        }
-//        zookeeper.delete(fullPath, -1);
-
+        try {
+            Collection<String> interfaces = Util.getMultiValueProperty(sr.getProperty("service.interface"));
+            String endpointKey = getKey(sr.getProperty("osgi.remote.endpoint.location").toString());
+            
+            for (String name : interfaces) {
+                String path = Util.getZooKeeperPath(name);
+                String fullPath = path + '/' + endpointKey;
+                LOG.info("Removing ZooKeeper node: " + fullPath);
+                zookeeper.delete(fullPath, -1);                                
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Exception while processing the removal of a ServicePublication.", ex);
+        }
     }
 
     void ensurePath(String path) throws KeeperException, InterruptedException {

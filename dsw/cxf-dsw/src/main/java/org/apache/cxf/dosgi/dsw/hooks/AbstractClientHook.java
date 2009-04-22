@@ -75,7 +75,7 @@ public class AbstractClientHook extends AbstractHook {
         ServiceEndpointDescription sd = 
             notification.getServiceEndpointDescription();
         if (sd.getProperty(Constants.REMOTE_INTERFACES_PROPERTY) == null) {
-            LOG.info("not proxifying service, enabling property unset: " 
+            LOG.info("not proxifying service, enabling property not set: " 
                      + Constants.REMOTE_INTERFACES_PROPERTY);
             return;
         }
