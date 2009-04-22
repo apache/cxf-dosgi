@@ -40,7 +40,10 @@ public class DataMonitor implements StatCallback {
         listener = new DataMonitorListenerImpl(zk, intf, dst);
         zookeeper = zk;
         znode = Util.getZooKeeperPath(intf);
-        
+    }
+    
+    public void process() {
+        /* */ System.out.println("*** Kicking off a zookeeper.exists()");
         zookeeper.exists(znode, true, this, null);
     }
 
@@ -61,7 +64,7 @@ public class DataMonitor implements StatCallback {
             LOG.info("ZooKeeper reports: NoAuth on node: " + znode);
             return;
         default:
-            zookeeper.exists(znode, true, this, null);
+            process();
             return;
         }
         

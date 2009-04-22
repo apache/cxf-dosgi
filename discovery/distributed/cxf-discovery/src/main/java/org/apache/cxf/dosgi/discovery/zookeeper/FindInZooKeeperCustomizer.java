@@ -18,10 +18,14 @@
   */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -31,7 +35,8 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class FindInZooKeeperCustomizer implements ServiceTrackerCustomizer {
     private final BundleContext bundleContext;
     private final ZooKeeper zookeeper;
-    final Map<String, DataMonitor> watchers = new HashMap<String, DataMonitor>();
+    final Map<DiscoveredServiceTracker, List<DataMonitor>> watchers = 
+        new ConcurrentHashMap<DiscoveredServiceTracker, List<DataMonitor>>();
     
     public FindInZooKeeperCustomizer(BundleContext bc, ZooKeeper zk) {
         bundleContext = bc;
@@ -42,26 +47,44 @@ public class FindInZooKeeperCustomizer implements ServiceTrackerCustomizer {
         Object svcObj = bundleContext.getService(sr);
 
         if (svcObj instanceof DiscoveredServiceTracker) {
-            DiscoveredServiceTracker dst = (DiscoveredServiceTracker) svcObj;
-            Collection<String> interfaces = Util.getMultiValueProperty(
-                sr.getProperty(DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES));
-
-            for (String intf : interfaces) {
-                DataMonitor dm = new DataMonitor(zookeeper, intf, dst);
-                watchers.put(intf, dm);
-            }
+            addingService(sr, (DiscoveredServiceTracker) svcObj);
         }
         return svcObj;
     }
 
-    public void modifiedService(ServiceReference arg0, Object arg1) {
-        // TODO Auto-generated method stub
+    private void addingService(ServiceReference sr, DiscoveredServiceTracker dst) { 
+        removedService(sr, dst);
+        
+        Collection<String> interfaces = Util.getMultiValueProperty(
+            sr.getProperty(DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES));
 
+        List<DataMonitor> dmList = new ArrayList<DataMonitor>(interfaces.size());
+        for (String intf : interfaces) {
+            DataMonitor dm = new DataMonitor(zookeeper, intf, dst);
+            dmList.add(dm);
+            dm.process();
+        }
+        watchers.put(dst, Collections.unmodifiableList(dmList));        
+    }
+    
+    public void modifiedService(ServiceReference sr, Object svcObj) {
+        if (svcObj instanceof DiscoveredServiceTracker) {
+            addingService(sr, (DiscoveredServiceTracker) svcObj);
+        }
     }
 
-    public void removedService(ServiceReference arg0, Object arg1) {
-        // TODO Auto-generated method stub
-
+    public void removedService(ServiceReference sr, Object svcObj) {
+        List<DataMonitor> oldVal = watchers.remove(svcObj);
+        if (oldVal != null) {
+            // TODO unregister any listeners directly registered with ZooKeeper
+        }
     }
 
+    public void processGlobalEvent(WatchedEvent event) {
+        for (List<DataMonitor> dmList : watchers.values()) {
+            for (DataMonitor dm : dmList) {
+                dm.process();
+            }
+        }
+    }
 }

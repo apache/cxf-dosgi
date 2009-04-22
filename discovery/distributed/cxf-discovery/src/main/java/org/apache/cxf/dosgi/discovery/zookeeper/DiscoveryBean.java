@@ -35,6 +35,7 @@ public class DiscoveryBean implements BundleContextAware, InitializingBean, Disp
     private BundleContext bundleContext;
     private DiscoveryServiceImpl discoveryService;
 
+    FindInZooKeeperCustomizer finderCustomizer;
     ServiceTracker lookupTracker;
     ServiceTracker publicationTracker;
     ZooKeeper zooKeeper;
@@ -56,8 +57,9 @@ public class DiscoveryBean implements BundleContextAware, InitializingBean, Disp
                 new PublishToZooKeeperCustomizer(bundleContext, zooKeeper));
         publicationTracker.open();
         
+        finderCustomizer = new FindInZooKeeperCustomizer(bundleContext, zooKeeper);
         lookupTracker = new ServiceTracker(bundleContext, DiscoveredServiceTracker.class.getName(),
-                new FindInZooKeeperCustomizer(bundleContext, zooKeeper));
+                finderCustomizer);
         lookupTracker.open();        
     }
 
@@ -72,8 +74,6 @@ public class DiscoveryBean implements BundleContextAware, InitializingBean, Disp
     }
 
     public void process(WatchedEvent event) {
-        System.out.println("*** [Spring] process (dropped): " + event);
-        // TODO do we need this? The zookeeper examples do this, but I'm unsure why...
-        // finderCustomizer.process(event);
+        finderCustomizer.processGlobalEvent(event);
     }
 }

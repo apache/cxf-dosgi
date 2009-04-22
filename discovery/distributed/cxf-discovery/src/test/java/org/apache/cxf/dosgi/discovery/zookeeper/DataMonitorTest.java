@@ -154,6 +154,16 @@ public class DataMonitorTest extends TestCase {
     
     public void testDataMonitorNoExist() throws Exception {
         ZooKeeper zk = EasyMock.createMock(ZooKeeper.class);
+        EasyMock.replay(zk);
+
+        DataMonitor dm = new DataMonitor(zk, String.class.getName(), null);        
+        dm.processResult(Code.NoNode, null, null, null);
+
+        EasyMock.verify(zk);
+    }
+    
+    public void testProcess() {
+        ZooKeeper zk = EasyMock.createMock(ZooKeeper.class);
         zk.exists(
             EasyMock.eq(Util.getZooKeeperPath(String.class.getName())),
             EasyMock.eq(true),
@@ -163,19 +173,13 @@ public class DataMonitorTest extends TestCase {
         EasyMock.replay(zk);
 
         DataMonitor dm = new DataMonitor(zk, String.class.getName(), null);        
-        dm.processResult(Code.NoNode, null, null, null);
+        dm.process();
 
-        EasyMock.verify(zk);
+        EasyMock.verify(zk);        
     }
-    
+
     public void testDataMonitorDefault() {
         ZooKeeper zk = EasyMock.createMock(ZooKeeper.class);
-        zk.exists(
-            EasyMock.eq(Util.getZooKeeperPath(String.class.getName())),
-            EasyMock.eq(true),
-            (StatCallback) EasyMock.anyObject(), 
-            EasyMock.isNull());
-        EasyMock.expectLastCall();
         EasyMock.replay(zk);
 
         DataMonitor dm = new DataMonitor(zk, String.class.getName(), null);

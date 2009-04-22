@@ -19,6 +19,9 @@
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -97,5 +100,39 @@ public class DiscoveryBeanTest extends TestCase {
         EasyMock.expectLastCall().anyTimes();
         EasyMock.expect(bc.getServiceReferences(objectClass, null))
             .andReturn(new ServiceReference [0]).anyTimes();
+    }
+    
+    public void testProcessEvent() {
+        DiscoveryBean db = new DiscoveryBean();
+        
+        FindInZooKeeperCustomizer fc = new FindInZooKeeperCustomizer(null, null);
+        List<DataMonitor> l1 = new ArrayList<DataMonitor>();
+        DataMonitor dm1a = EasyMock.createMock(DataMonitor.class);
+        dm1a.process();
+        EasyMock.expectLastCall();
+        EasyMock.replay(dm1a);
+        DataMonitor dm1b = EasyMock.createMock(DataMonitor.class);
+        dm1b.process();
+        EasyMock.expectLastCall();
+        EasyMock.replay(dm1b);
+        l1.add(dm1a);
+        l1.add(dm1b);
+        
+        List<DataMonitor> l2 = new ArrayList<DataMonitor>();
+        DataMonitor dm2 = EasyMock.createMock(DataMonitor.class);
+        dm2.process();
+        EasyMock.expectLastCall();
+        EasyMock.replay(dm2);
+        l2.add(dm2);
+
+        fc.watchers.put(EasyMock.createMock(DiscoveredServiceTracker.class), l1);
+        fc.watchers.put(EasyMock.createMock(DiscoveredServiceTracker.class), l2);
+        
+        db.finderCustomizer = fc;
+        db.process(null);
+        
+        EasyMock.verify(dm1a);
+        EasyMock.verify(dm1b);
+        EasyMock.verify(dm2);
     }
 }

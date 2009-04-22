@@ -62,7 +62,7 @@ public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
                 LOG.info("Creating ZooKeeper node: " + fullPath);
 
                 ensurePath(path);
-                Object x = zookeeper.create(fullPath, getData(sr),
+                zookeeper.create(fullPath, getData(sr),
                         Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
             }
             return obj;
@@ -78,7 +78,14 @@ public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
     }
 
     public void removedService(ServiceReference sr, Object obj) {
-        // TODO Auto-generated method stub
+//        Collection<String> interfaces = Util.getMultiValueProperty(sr.getProperty("service.interface"));
+//        String endpoint = sr.getProperty("osgi.remote.endpoint.location").toString();
+//        String endpointKey = getKey(endpoint);
+//        
+//        for (String name : interfaces) {
+//            
+//        }
+//        zookeeper.delete(fullPath, -1);
 
     }
 
