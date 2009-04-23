@@ -107,7 +107,7 @@ public class OsgiUtilsTest extends TestCase {
         ServiceEndpointDescription sd =
             EasyMock.createMock(ServiceEndpointDescription.class);
         ServiceReference sref = EasyMock.createMock(ServiceReference.class);
-        EasyMock.expect(sd.getProperty(Constants.REMOTE_INTERFACES_PROPERTY)).andReturn(requested);
+        EasyMock.expect(sd.getProperty("osgi.remote.interfaces")).andReturn(requested);
         EasyMock.expect(sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS)).andReturn(actual);
         EasyMock.replay(sd);
         EasyMock.replay(sref);
@@ -126,7 +126,7 @@ public class OsgiUtilsTest extends TestCase {
     public void testGetRemoteReferencesFromRegistrationProperties() {
         final Map<String, Object> props = new HashMap<String, Object>();
         props.put(org.osgi.framework.Constants.OBJECTCLASS, new String [] {"myClass"});
-        props.put(Constants.REMOTE_INTERFACES_PROPERTY, "*");
+        props.put("osgi.remote.interfaces", "*");
         
         Bundle b = EasyMock.createNiceMock(Bundle.class);        
         EasyMock.replay(b);
@@ -146,7 +146,7 @@ public class OsgiUtilsTest extends TestCase {
         
         // Actual test starts here
         ServiceEndpointDescription sd = OsgiUtils.getRemoteReference(sr, true);
-        assertEquals("*", sd.getProperties().get(Constants.REMOTE_INTERFACES_PROPERTY));
+        assertEquals("*", sd.getProperties().get("osgi.remote.interfaces"));
         
         EasyMock.verify(sr);
     }

@@ -26,13 +26,12 @@ import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH
 import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_ID;
 import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
-import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -43,11 +42,11 @@ import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.distribution.DistributionConstants;
 
 
 public class AbstractClientHook extends AbstractHook {
@@ -74,9 +73,9 @@ public class AbstractClientHook extends AbstractHook {
             
         ServiceEndpointDescription sd = 
             notification.getServiceEndpointDescription();
-        if (sd.getProperty(Constants.REMOTE_INTERFACES_PROPERTY) == null) {
+        if (sd.getProperty(DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES) == null) {
             LOG.info("not proxifying service, enabling property not set: " 
-                     + Constants.REMOTE_INTERFACES_PROPERTY);
+                 + DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES);
             return;
         }
             
@@ -134,8 +133,7 @@ public class AbstractClientHook extends AbstractHook {
         }
     }
 
-    private Collection<String> getMatchingInterfaces(DiscoveredServiceNotification notification, BundleContext context) {
-      
+    private Collection<String> getMatchingInterfaces(DiscoveredServiceNotification notification, BundleContext context) {      
         Collection<String> matches = new ArrayList<String>();
         Iterator interfaces = notification.getServiceEndpointDescription().getProvidedInterfaces().iterator();
 
@@ -188,7 +186,7 @@ public class AbstractClientHook extends AbstractHook {
         Map<String, Object> props = new HashMap<String, Object>();        
         props.putAll(sd.getProperties());
         props.put(Constants.DSW_CLIENT_ID, getIdentificationProperty());
-        props.put(Constants.REMOTE_PROPERTY_PREFIX, "true");
+        props.put(DistributionConstants.PROP_KEY_REMOTE_SERVICE, "true");
         return props;
     }
 

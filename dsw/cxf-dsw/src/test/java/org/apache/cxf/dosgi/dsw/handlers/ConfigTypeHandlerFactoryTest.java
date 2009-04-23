@@ -54,7 +54,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
         
         Map<String, Object> sdProps = new HashMap<String, Object>();
-        sdProps.put(Constants.CONFIG_TYPE_PROPERTY, Constants.POJO_CONFIG_TYPE);
+        sdProps.put("osgi.remote.configuration.type", Constants.POJO_CONFIG_TYPE);
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(
                 Collections.singletonList("MyInterface"), sdProps);
 
@@ -89,7 +89,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
         
         Map<String, Object> sdProps = new HashMap<String, Object>();
-        sdProps.put(Constants.CONFIG_TYPE_PROPERTY, Constants.POJO_CONFIG_TYPE);
+        sdProps.put("osgi.remote.configuration.type", Constants.POJO_CONFIG_TYPE);
         sdProps.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/abc");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(
                 Collections.singletonList("MyInterface"), sdProps);
@@ -107,7 +107,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
         
         Map<String, Object> sdProps = new HashMap<String, Object>();
-        sdProps.put(Constants.CONFIG_TYPE_PROPERTY, Constants.POJO_CONFIG_TYPE);
+        sdProps.put("osgi.remote.configuration.type", Constants.POJO_CONFIG_TYPE);
         sdProps.put(Constants.POJO_ADDRESS_PROPERTY, "http://localhost:9876/abcd");
         sdProps.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/abc");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(
@@ -124,7 +124,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
         
         Map<String, Object> sdProps = new HashMap<String, Object>();
-        sdProps.put(Constants.CONFIG_TYPE_PROPERTY, Constants.WSDL_CONFIG_TYPE);
+        sdProps.put("osgi.remote.configuration.type", Constants.WSDL_CONFIG_TYPE);
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(
                 Collections.singletonList("MyInterface"), sdProps);
         
@@ -141,7 +141,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
         
         Map<String, Object> sdProps = new HashMap<String, Object>();
-        sdProps.put(Constants.CONFIG_TYPE_PROPERTY, "foobar");
+        sdProps.put("osgi.remote.configuration.type", "foobar");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(
                 Collections.singletonList("MyInterface"), sdProps);
         

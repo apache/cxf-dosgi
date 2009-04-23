@@ -46,6 +46,7 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.distribution.DistributionConstants;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 
@@ -90,7 +91,7 @@ public final class OsgiUtils {
         Map<String, Object> userProperties = new HashMap<String, Object>();
         for (String key : sref.getPropertyKeys()) {
             // we're after remote properties only
-            if (key.startsWith(Constants.REMOTE_PROPERTY_PREFIX)) {
+            if (key.startsWith(DistributionConstants.PROP_KEY_REMOTE_SERVICE)) {
                 userProperties.put(key, sref.getProperty(key));
             }
         }
@@ -154,9 +155,9 @@ public final class OsgiUtils {
                 sd.getProvidedInterfaces().toArray(new String[interfaceNameCount]);
             list = new ServiceEndpointDescription[iNames.length];
             for (int i = 0; i < iNames.length; i++) {
-                Map<String, Object> props =  
-                    excludeProperty(sd.getProperties(),  
-                                    Constants.REMOTE_INTERFACES_PROPERTY);
+                Map<String, Object> props = excludeProperty(sd.getProperties(),  
+                        DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES);
+                
                 String keys[] = props.keySet().toArray(new String[props.size()]);
                 for (int j = 0; j < keys.length; j++) {
                     int sep = keys[j].indexOf(INTERFACE_SEPARATOR);
@@ -264,7 +265,7 @@ public final class OsgiUtils {
         String interfaceName, Filter filter, boolean matchAll) {
         Dictionary props = new Hashtable();
         for (Object key : sd.getPropertyKeys()) {
-            if (matchAll || key.toString().startsWith(Constants.REMOTE_PROPERTY_PREFIX)) {
+            if (matchAll || key.toString().startsWith(DistributionConstants.PROP_KEY_REMOTE_SERVICE)) {
                 props.put(key, sd.getProperty(key.toString()));
             }
         }
@@ -469,7 +470,7 @@ public final class OsgiUtils {
     public static String[] getPublishableInterfaces(ServiceEndpointDescription sd,
                                                     ServiceReference sref) {
         Object publishProperty = 
-            sd.getProperty(Constants.REMOTE_INTERFACES_PROPERTY);
+            sd.getProperty(DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES);
         String[] actualInterfaces = 
             (String[])sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS);
         String[] publishableInterfaces = null;

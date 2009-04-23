@@ -161,8 +161,7 @@ public class CxfPublishHookTest extends Assert {
             Collection names = sd.getProvidedInterfaces();
             assertEquals(1, names.size());
             assertEquals(serviceNames[i], names.toArray()[0]);
-            String excludeProp = 
-                org.apache.cxf.dosgi.dsw.Constants.REMOTE_INTERFACES_PROPERTY;
+            String excludeProp = "osgi.remote.interfaces";
             assertNull(sd.getProperties().get(excludeProp));
             String addrProp = 
                 org.apache.cxf.dosgi.dsw.Constants.POJO_ADDRESS_PROPERTY;

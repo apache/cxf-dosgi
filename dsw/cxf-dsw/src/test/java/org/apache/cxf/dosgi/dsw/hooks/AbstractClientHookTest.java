@@ -46,6 +46,6 @@ public class AbstractClientHookTest extends TestCase {
             }            
         };
         Map<String, Object> props = ch.getProperties(sed);
-        assertTrue(Boolean.valueOf((String) props.get(Constants.REMOTE_PROPERTY_PREFIX)));
+        assertTrue(Boolean.valueOf((String) props.get("osgi.remote")));
     }
 }

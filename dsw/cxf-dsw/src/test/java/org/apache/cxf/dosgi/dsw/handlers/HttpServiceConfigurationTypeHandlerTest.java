@@ -194,7 +194,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         EasyMock.replay(callingContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.CONFIG_TYPE_PROPERTY, Constants.POJO_CONFIG_TYPE);
+        props.put("osgi.remote.configuration.type", Constants.POJO_CONFIG_TYPE);
         props.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/myRunnable");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
         

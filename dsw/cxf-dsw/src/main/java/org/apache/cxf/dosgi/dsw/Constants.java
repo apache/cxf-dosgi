@@ -19,36 +19,22 @@
 package org.apache.cxf.dosgi.dsw;
 
 public class Constants {
-    public static final String INTENTS_PROPERTY = "deployment.intents";
-    
-    public static final String REMOTE_PROPERTY_PREFIX = "osgi.remote";
-    
-    public static final String REMOTE_INTERFACES_PROPERTY = REMOTE_PROPERTY_PREFIX + ".interfaces";
-    public static final String REQUIRES_INTENTS_PROPERTY = REMOTE_PROPERTY_PREFIX + ".requires.intents";
-    public static final String CONFIGURATION_PROPERTY = ".configuration";
+    public static final String CONFIGURATION_PROPERTY = "osgi.remote.configuration";
 
-    public static final String CONFIG_TYPE_PROPERTY = 
-        REMOTE_PROPERTY_PREFIX + CONFIGURATION_PROPERTY + ".type";
-    
-    // TODO : these config type properties should better be enums ? 
-    
     // SCA
     public static final String SCA_CONFIG_TYPE = "sca";
-    public static final String SCA_CONFIG_PREFIX = 
-        REMOTE_PROPERTY_PREFIX + CONFIGURATION_PROPERTY + ".sca";
+    public static final String SCA_CONFIG_PREFIX = CONFIGURATION_PROPERTY + "." + SCA_CONFIG_TYPE; 
     public static final String SCA_REMOTE_BINDINGS = SCA_CONFIG_PREFIX + ".bindings";
     public static final String SCA_REMOTE_POLICIES = SCA_CONFIG_PREFIX + ".policies";
     
     // WSDL
     public static final String WSDL_CONFIG_TYPE = "wsdl";
-    public static final String WSDL_CONFIG_PREFIX = 
-        REMOTE_PROPERTY_PREFIX + CONFIGURATION_PROPERTY + "." + WSDL_CONFIG_TYPE;
+    public static final String WSDL_CONFIG_PREFIX = CONFIGURATION_PROPERTY + "." + WSDL_CONFIG_TYPE;
     public static final String SERVICE_NAMESPACE = WSDL_CONFIG_PREFIX + ".service.ns";
     
     // POJO
     public static final String POJO_CONFIG_TYPE = "pojo";
-    public static final String POJO_CONFIG_PREFIX = 
-        REMOTE_PROPERTY_PREFIX + CONFIGURATION_PROPERTY + "." + POJO_CONFIG_TYPE;
+    public static final String POJO_CONFIG_PREFIX = CONFIGURATION_PROPERTY + "." + POJO_CONFIG_TYPE;
     public static final String POJO_ADDRESS_PROPERTY = POJO_CONFIG_PREFIX + ".address";
     public static final String POJO_HTTP_SERVICE_CONTEXT = POJO_CONFIG_PREFIX + ".httpservice.context"; 
         

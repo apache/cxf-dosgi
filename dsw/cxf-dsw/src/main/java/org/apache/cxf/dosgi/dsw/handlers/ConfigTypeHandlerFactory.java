@@ -26,6 +26,7 @@ import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.distribution.DistributionConstants;
 
 public final class ConfigTypeHandlerFactory {
     
@@ -41,7 +42,7 @@ public final class ConfigTypeHandlerFactory {
     public ConfigurationTypeHandler getHandler(BundleContext dswBC, ServiceEndpointDescription sd, 
                                                CxfDistributionProvider dp,
                                                Map<String, Object> handlerProperties) {
-        String type = OsgiUtils.getProperty(sd, Constants.CONFIG_TYPE_PROPERTY);
+        String type = OsgiUtils.getProperty(sd, DistributionConstants.PROP_KEY_SERVICE_REMOTE_CONFIG_TYPE);
         if (type == null || Constants.POJO_CONFIG_TYPE.equalsIgnoreCase(type)) {
             if (type == null) {
                 LOG.info("Defaulting to pojo configuration type ");
@@ -49,8 +50,6 @@ public final class ConfigTypeHandlerFactory {
             
             if (OsgiUtils.getProperty(sd, Constants.POJO_HTTP_SERVICE_CONTEXT) != null) {
                 if (OsgiUtils.getProperty(sd, Constants.POJO_ADDRESS_PROPERTY) != null) {
-                    
-                    
                     return null;
                 }
                 

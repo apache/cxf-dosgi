@@ -40,6 +40,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.distribution.DistributionConstants;
 import org.osgi.service.distribution.DistributionProvider;
 
 public class Activator implements BundleActivator, ServiceListener, ManagedService {
@@ -123,7 +124,7 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
 
     private void checkExistingServices() throws InvalidSyntaxException {
         ServiceReference[] references = bc.getServiceReferences(null, 
-            "(" + org.apache.cxf.dosgi.dsw.Constants.REMOTE_INTERFACES_PROPERTY + "=*)");
+            "(" + DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES + "=*)");
         
         if (references != null) {
             for (ServiceReference sref : references) {

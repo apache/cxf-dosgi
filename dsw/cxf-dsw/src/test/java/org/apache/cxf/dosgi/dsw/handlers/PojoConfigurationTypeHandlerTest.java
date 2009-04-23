@@ -265,7 +265,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         };
         
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.REQUIRES_INTENTS_PROPERTY, "A");
+        props.put("osgi.remote.requires.intents", "A");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
 
         List<String> effectiveIntents = 
@@ -301,7 +301,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         };
         
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.REQUIRES_INTENTS_PROPERTY, "transactionality confidentiality.message");
+        props.put("osgi.remote.requires.intents", "transactionality confidentiality.message");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
 
         List<String> effectiveIntents = 
@@ -332,7 +332,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         };
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.REQUIRES_INTENTS_PROPERTY, "A B");
+        props.put("osgi.remote.requires.intents", "A B");
         ServiceEndpointDescription sd = 
             new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
 
@@ -375,7 +375,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         };
         
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.REQUIRES_INTENTS_PROPERTY, "A");
+        props.put("osgi.remote.requires.intents", "A");
         ServiceEndpointDescription sd = 
             new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
         
@@ -414,7 +414,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         };
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.REQUIRES_INTENTS_PROPERTY, "A");
+        props.put("osgi.remote.requires.intents", "A");
         ServiceEndpointDescription sd = 
             new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
         
@@ -453,7 +453,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         };
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.REQUIRES_INTENTS_PROPERTY, "A SOAP.1_2");
+        props.put("osgi.remote.requires.intents", "A SOAP.1_2");
         ServiceEndpointDescription sd = 
             new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
         
@@ -521,7 +521,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         DistributionProviderImpl dp = new DistributionProviderImpl(dswContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.REQUIRES_INTENTS_PROPERTY, requestedIntents);
+        props.put("osgi.remote.requires.intents", requestedIntents);
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
         
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, dp, handlerProps) {
@@ -570,7 +570,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         DistributionProviderImpl dp = new DistributionProviderImpl(dswContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.REQUIRES_INTENTS_PROPERTY, "B A");
+        props.put("osgi.remote.requires.intents", "B A");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
         
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, dp, handlerProps) {

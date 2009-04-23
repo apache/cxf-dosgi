@@ -18,6 +18,8 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_LOCATION;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,8 +44,7 @@ import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.discovery.ServiceEndpointDescription;
-
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_LOCATION;
+import org.osgi.service.distribution.DistributionConstants;
 
 public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
     private static final Logger LOG = Logger.getLogger(AbstractPojoConfigurationTypeHandler.class.getName());
@@ -69,11 +70,12 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     Map<String, String> registerPublication(Server server, String[] intents) {
         Map<String, String> publicationProperties = new HashMap<String, String>();
-        publicationProperties.put(Constants.CONFIG_TYPE_PROPERTY, Constants.POJO_CONFIG_TYPE);
+        publicationProperties.put(DistributionConstants.PROP_KEY_SERVICE_REMOTE_CONFIG_TYPE,
+                Constants.POJO_CONFIG_TYPE);
 
         String intentsValue = OsgiUtils.formatIntents(intents);
         if (intentsValue.length() > 0) {
-            publicationProperties.put(Constants.INTENTS_PROPERTY, intentsValue);
+            publicationProperties.put(DistributionConstants.PROP_KEY_DEPLOYMENT_INTENTS, intentsValue);
         }
         return publicationProperties;
     }
@@ -176,8 +178,9 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     }
 
     private static String[] getRequestedIntents(ServiceEndpointDescription sd) {
-        String property = 
-            OsgiUtils.getProperty(sd, Constants.REQUIRES_INTENTS_PROPERTY);
+        String property = OsgiUtils.getProperty(sd, 
+                DistributionConstants.PROP_KEY_SERVICE_REMOTE_REQUIRES_INTENTS);
+
         String[] intents = OsgiUtils.parseIntents(property);
         for (int i = 0; i < intents.length; i++) {
             LOG.fine("Intent asserted: " + intents[i]);
