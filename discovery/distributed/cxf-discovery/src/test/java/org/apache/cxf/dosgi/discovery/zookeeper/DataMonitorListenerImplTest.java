@@ -34,7 +34,7 @@ import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 
 public class DataMonitorListenerImplTest extends TestCase {
-    public void testExists() throws Exception {
+    public void testChange() throws Exception {
         final List<DiscoveredServiceNotification> dsnCallbacks = new ArrayList<DiscoveredServiceNotification>();
         DiscoveredServiceTracker dst = new DiscoveredServiceTracker() {
             public void serviceChanged(DiscoveredServiceNotification dsn) {
@@ -57,7 +57,7 @@ public class DataMonitorListenerImplTest extends TestCase {
         DataMonitorListenerImpl dml = new DataMonitorListenerImpl(zk, String.class.getName(), dst);
         
         assertEquals("Precondition failed", 0, dsnCallbacks.size());
-        dml.exists();
+        dml.change();
         assertEquals(1, dsnCallbacks.size());
         DiscoveredServiceNotification dsn = dsnCallbacks.iterator().next();
         assertEquals(Collections.singleton(String.class.getName()), dsn.getInterfaces());

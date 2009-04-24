@@ -18,68 +18,68 @@
   */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.AsyncCallback.StatCallback;
 import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.data.Stat;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 
-public class DataMonitor implements StatCallback {
-    private static final Logger LOG = Logger.getLogger(DataMonitor.class.getName());
+public class InterfaceMonitor implements Watcher, StatCallback {
+    private static final Logger LOG = Logger.getLogger(InterfaceMonitor.class.getName());
 
     DataMonitorListener listener;
     final String znode;
     final ZooKeeper zookeeper;
-    private byte [] prevData;
 
-    public DataMonitor(ZooKeeper zk, String intf, DiscoveredServiceTracker dst) {
+    public InterfaceMonitor(ZooKeeper zk, String intf, DiscoveredServiceTracker dst) {
         listener = new DataMonitorListenerImpl(zk, intf, dst);
         zookeeper = zk;
         znode = Util.getZooKeeperPath(intf);
     }
     
     public void process() {
-        /* */ System.out.println("*** Kicking off a zookeeper.exists()");
-        zookeeper.exists(znode, true, this, null);
+        LOG.finest("Kicking off a zookeeper.exists() on node: " + znode);
+        zookeeper.exists(znode, this, this, null);
     }
 
+    public void process(WatchedEvent event) {
+        LOG.finer("ZooKeeper watcher callback " + event);
+        processDelta();
+    }
+    
     public void processResult(int rc, String path, Object ctx, Stat stat) {
-        boolean exists;
+        LOG.finer("ZooKeeper callback on node: " + znode + " code: " + rc);
         
         switch (rc) {
         case Code.Ok:
-            exists = true;
             break;
         case Code.NoNode:
-            exists = false;
             break;
         case Code.SessionExpired:
-            LOG.info("ZooKeeper reports: SessionExpired on node: " + znode);
             return;
         case Code.NoAuth:
-            LOG.info("ZooKeeper reports: NoAuth on node: " + znode);
             return;
         default:
             process();
             return;
         }
         
-        byte [] b = null;
-        if (exists) {
-            try {
-                b = zookeeper.getData(znode, false, null);                
-            } catch (Exception ke) {
-                LOG.log(Level.SEVERE, "Error getting ZooKeeper data.", ke);
+        processDelta();
+    }
+
+    private void processDelta() {
+        try {
+            if (zookeeper.exists(znode, false) != null) {
+                listener.change();
+                zookeeper.getChildren(znode, this);
             }
-            
-            if (!Arrays.equals(prevData, b)) {
-                listener.exists();
-                prevData = b;
-            }
+        } catch (Exception ke) {
+            LOG.log(Level.SEVERE, "Error getting ZooKeeper data.", ke);
         }
     }
 }

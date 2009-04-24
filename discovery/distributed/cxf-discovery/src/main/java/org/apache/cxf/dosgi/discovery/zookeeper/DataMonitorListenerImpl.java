@@ -47,12 +47,16 @@ public class DataMonitorListenerImpl implements DataMonitorListener {
         discoveredServiceTracker = dst;
     }
     
-    public void exists() {
+    public void change() {
         try {
             LOG.info("Zookeeper callback on node: " + znode);
             List<String> children = zookeeper.getChildren(znode, false);
             
             for (String child : children) {
+//                ChildMonitor cl = new ChildMonitor();
+//                zookeeper.exists(znode + '/' + child, cl, cl, null);
+                
+                // move to child watcher?
                 byte[] data = zookeeper.getData(znode + '/' + child, false, null);
                 Properties p = new Properties();
                 p.load(new ByteArrayInputStream(data));

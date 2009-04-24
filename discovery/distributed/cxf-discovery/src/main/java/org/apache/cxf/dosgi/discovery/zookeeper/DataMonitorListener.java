@@ -19,5 +19,5 @@
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 interface DataMonitorListener {
-    void exists();
+    void change();
 }

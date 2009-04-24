@@ -35,8 +35,8 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class FindInZooKeeperCustomizer implements ServiceTrackerCustomizer {
     private final BundleContext bundleContext;
     private final ZooKeeper zookeeper;
-    final Map<DiscoveredServiceTracker, List<DataMonitor>> watchers = 
-        new ConcurrentHashMap<DiscoveredServiceTracker, List<DataMonitor>>();
+    final Map<DiscoveredServiceTracker, List<InterfaceMonitor>> watchers = 
+        new ConcurrentHashMap<DiscoveredServiceTracker, List<InterfaceMonitor>>();
     
     public FindInZooKeeperCustomizer(BundleContext bc, ZooKeeper zk) {
         bundleContext = bc;
@@ -58,9 +58,9 @@ public class FindInZooKeeperCustomizer implements ServiceTrackerCustomizer {
         Collection<String> interfaces = Util.getMultiValueProperty(
             sr.getProperty(DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES));
 
-        List<DataMonitor> dmList = new ArrayList<DataMonitor>(interfaces.size());
+        List<InterfaceMonitor> dmList = new ArrayList<InterfaceMonitor>(interfaces.size());
         for (String intf : interfaces) {
-            DataMonitor dm = new DataMonitor(zookeeper, intf, dst);
+            InterfaceMonitor dm = new InterfaceMonitor(zookeeper, intf, dst);
             dmList.add(dm);
             dm.process();
         }
@@ -74,15 +74,15 @@ public class FindInZooKeeperCustomizer implements ServiceTrackerCustomizer {
     }
 
     public void removedService(ServiceReference sr, Object svcObj) {
-        List<DataMonitor> oldVal = watchers.remove(svcObj);
+        List<InterfaceMonitor> oldVal = watchers.remove(svcObj);
         if (oldVal != null) {
             // TODO unregister any listeners directly registered with ZooKeeper
         }
     }
 
     public void processGlobalEvent(WatchedEvent event) {
-        for (List<DataMonitor> dmList : watchers.values()) {
-            for (DataMonitor dm : dmList) {
+        for (List<InterfaceMonitor> dmList : watchers.values()) {
+            for (InterfaceMonitor dm : dmList) {
                 dm.process();
             }
         }

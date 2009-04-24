@@ -106,20 +106,20 @@ public class DiscoveryBeanTest extends TestCase {
         DiscoveryBean db = new DiscoveryBean();
         
         FindInZooKeeperCustomizer fc = new FindInZooKeeperCustomizer(null, null);
-        List<DataMonitor> l1 = new ArrayList<DataMonitor>();
-        DataMonitor dm1a = EasyMock.createMock(DataMonitor.class);
+        List<InterfaceMonitor> l1 = new ArrayList<InterfaceMonitor>();
+        InterfaceMonitor dm1a = EasyMock.createMock(InterfaceMonitor.class);
         dm1a.process();
         EasyMock.expectLastCall();
         EasyMock.replay(dm1a);
-        DataMonitor dm1b = EasyMock.createMock(DataMonitor.class);
+        InterfaceMonitor dm1b = EasyMock.createMock(InterfaceMonitor.class);
         dm1b.process();
         EasyMock.expectLastCall();
         EasyMock.replay(dm1b);
         l1.add(dm1a);
         l1.add(dm1b);
         
-        List<DataMonitor> l2 = new ArrayList<DataMonitor>();
-        DataMonitor dm2 = EasyMock.createMock(DataMonitor.class);
+        List<InterfaceMonitor> l2 = new ArrayList<InterfaceMonitor>();
+        InterfaceMonitor dm2 = EasyMock.createMock(InterfaceMonitor.class);
         dm2.process();
         EasyMock.expectLastCall();
         EasyMock.replay(dm2);
