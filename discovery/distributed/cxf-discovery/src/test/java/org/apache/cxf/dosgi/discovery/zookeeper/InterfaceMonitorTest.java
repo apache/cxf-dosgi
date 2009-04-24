@@ -111,7 +111,7 @@ public class InterfaceMonitorTest extends TestCase {
         dm.processResult(Code.Ok, null, null, null);
         assertEquals("No changes, so should not get any new notifications", 0, notifications.size());
         
-        // Third time around, with different data
+        // Third time around, removal
         EasyMock.reset(zk);
         zk.exists(Util.getZooKeeperPath(String.class.getName()), false);
         EasyMock.expectLastCall().andReturn(EasyMock.createMock(Stat.class));
@@ -124,12 +124,12 @@ public class InterfaceMonitorTest extends TestCase {
         dm.processResult(Code.Ok, null, null, null);
         DiscoveredServiceNotification dsn = notifications.iterator().next();
         assertEquals(1, notifications.size());
-        assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
+        assertEquals(DiscoveredServiceNotification.UNAVAILABLE, dsn.getType());
         assertEquals(Collections.emptyList(), dsn.getFilters());
         assertEquals(Collections.singleton(String.class.getName()), dsn.getInterfaces());
         ServiceEndpointDescription sed = dsn.getServiceEndpointDescription();
         assertEquals(Collections.singleton(String.class.getName()), sed.getProvidedInterfaces());
-        assertEquals(s1Props, sed.getProperties());        
+        assertEquals(s2Props, sed.getProperties());        
     }
     
     public void testInterfaceMonitorNoExist() throws Exception {

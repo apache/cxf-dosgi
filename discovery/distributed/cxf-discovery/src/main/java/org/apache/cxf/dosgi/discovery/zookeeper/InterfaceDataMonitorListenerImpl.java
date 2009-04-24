@@ -39,6 +39,9 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
     final String znode;
     final String interFace;
     final DiscoveredServiceTracker discoveredServiceTracker;
+
+    // This map is *only* accessed in the change() method
+    private Map<String, Map<String, Object>> nodes = new HashMap<String, Map<String,Object>>();
     
     public InterfaceDataMonitorListenerImpl(ZooKeeper zk, String intf, DiscoveredServiceTracker dst) {
         zookeeper = zk;
@@ -47,21 +50,19 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
         discoveredServiceTracker = dst;
     }
     
-    public void change() {
+    public synchronized void change() {
+        Map<String, Map<String, Object>> newNodes = new HashMap<String, Map<String,Object>>();
+        Map<String, Map<String, Object>> prevNodes = nodes;
         try {
             LOG.info("Zookeeper callback on node: " + znode);
             List<String> children = zookeeper.getChildren(znode, false);
             
             for (String child : children) {
-//                ChildMonitor cl = new ChildMonitor();
-//                zookeeper.exists(znode + '/' + child, cl, cl, null);
-                
-                // move to child watcher?
                 byte[] data = zookeeper.getData(znode + '/' + child, false, null);
                 Properties p = new Properties();
                 p.load(new ByteArrayInputStream(data));
                 
-                Map<String, Object> p2 = new HashMap<String, Object>();
+                Map<String, Object> m = new HashMap<String, Object>();
                 for (Map.Entry<Object, Object> entry : p.entrySet()) {
                     /* TODO this is probably not necessary
                     if (Constants.SERVICE_ID.equals(entry.getKey()) ||
@@ -70,21 +71,34 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                         continue;
                     } */
                     
-                    p2.put(entry.getKey().toString(), entry.getValue());
+                    m.put(entry.getKey().toString(), entry.getValue());
                 }
                 
-                ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(Collections.singletonList(interFace), p2);
+                newNodes.put(child, m);
+                Map<String, Object> prevVal = prevNodes.remove(child);
+                if (prevVal == null) {
+                    // This guy is new
+                    ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(Collections.singletonList(interFace), m);
+                    DiscoveredServiceNotification dsn = new DiscoveredServiceNotificationImpl(Collections.emptyList(),
+                        Collections.singleton(interFace), DiscoveredServiceNotification.AVAILABLE, sed);
+                    discoveredServiceTracker.serviceChanged(dsn);                    
+                } else {
+                    // There's been a modification
+                }
+                
+            }
+
+            for (Map<String, Object> props : prevNodes.values()) {
+                // whatever's left in prevNodes now has been removed from Discovery
+                ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(Collections.singletonList(interFace), props);
                 DiscoveredServiceNotification dsn = new DiscoveredServiceNotificationImpl(Collections.emptyList(),
-                    Collections.singleton(interFace), DiscoveredServiceNotification.AVAILABLE, sed);
-                discoveredServiceTracker.serviceChanged(dsn);
+                        Collections.singleton(interFace), DiscoveredServiceNotification.UNAVAILABLE, sed);
+                discoveredServiceTracker.serviceChanged(dsn);                
             }
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Problem processing Zookeeper callback", e);
-        }                    
-    }
-
-    public void closing(int rc) {
-        System.out.println("*** closing " + rc);
-        // TODO do we need this callback?
+        } finally {
+            nodes = newNodes;
+        }
     }
 }
