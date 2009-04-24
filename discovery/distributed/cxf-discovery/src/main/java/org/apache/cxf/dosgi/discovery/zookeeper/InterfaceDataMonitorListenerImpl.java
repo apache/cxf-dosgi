@@ -32,15 +32,15 @@ import org.apache.zookeeper.ZooKeeper;
 import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 
-public class DataMonitorListenerImpl implements DataMonitorListener {
-    private static final Logger LOG = Logger.getLogger(DataMonitorListenerImpl.class.getName());
+public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
+    private static final Logger LOG = Logger.getLogger(InterfaceDataMonitorListenerImpl.class.getName());
 
     final ZooKeeper zookeeper;
     final String znode;
     final String interFace;
     final DiscoveredServiceTracker discoveredServiceTracker;
     
-    public DataMonitorListenerImpl(ZooKeeper zk, String intf, DiscoveredServiceTracker dst) {
+    public InterfaceDataMonitorListenerImpl(ZooKeeper zk, String intf, DiscoveredServiceTracker dst) {
         zookeeper = zk;
         znode = Util.getZooKeeperPath(intf);
         interFace = intf;

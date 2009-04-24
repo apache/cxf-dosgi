@@ -33,7 +33,7 @@ import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 
-public class DataMonitorListenerImplTest extends TestCase {
+public class InterfaceDataMonitorListenerImplTest extends TestCase {
     public void testChange() throws Exception {
         final List<DiscoveredServiceNotification> dsnCallbacks = new ArrayList<DiscoveredServiceNotification>();
         DiscoveredServiceTracker dst = new DiscoveredServiceTracker() {
@@ -54,7 +54,7 @@ public class DataMonitorListenerImplTest extends TestCase {
             andReturn(propBytes.toByteArray());
         EasyMock.replay(zk);
 
-        DataMonitorListenerImpl dml = new DataMonitorListenerImpl(zk, String.class.getName(), dst);
+        InterfaceDataMonitorListenerImpl dml = new InterfaceDataMonitorListenerImpl(zk, String.class.getName(), dst);
         
         assertEquals("Precondition failed", 0, dsnCallbacks.size());
         dml.change();

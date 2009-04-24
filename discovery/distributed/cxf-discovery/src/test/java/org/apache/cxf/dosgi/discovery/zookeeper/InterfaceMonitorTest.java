@@ -47,7 +47,7 @@ public class InterfaceMonitorTest extends TestCase {
         DiscoveredServiceTracker dst = EasyMock.createMock(DiscoveredServiceTracker.class);        
         
         InterfaceMonitor dm = new InterfaceMonitor(zk, String.class.getName(), dst);
-        DataMonitorListenerImpl listener = (DataMonitorListenerImpl) dm.listener;
+        InterfaceDataMonitorListenerImpl listener = (InterfaceDataMonitorListenerImpl) dm.listener;
         assertSame(zk, listener.zookeeper);
         assertEquals(Util.getZooKeeperPath(String.class.getName()), listener.znode);
         assertEquals(String.class.getName(), listener.interFace);

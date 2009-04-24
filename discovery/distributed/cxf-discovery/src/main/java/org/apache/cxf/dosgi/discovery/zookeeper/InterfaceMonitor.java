@@ -37,7 +37,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     final ZooKeeper zookeeper;
 
     public InterfaceMonitor(ZooKeeper zk, String intf, DiscoveredServiceTracker dst) {
-        listener = new DataMonitorListenerImpl(zk, intf, dst);
+        listener = new InterfaceDataMonitorListenerImpl(zk, intf, dst);
         zookeeper = zk;
         znode = Util.getZooKeeperPath(intf);
     }
