@@ -18,8 +18,10 @@
   */
 package org.apache.cxf.dosgi.discovery.local;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,8 +31,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.osgi.service.discovery.ServiceEndpointDescription;
-
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_LOCATION;
 
 public class ServiceEndpointDescriptionImpl implements ServiceEndpointDescription {
 
@@ -85,15 +85,15 @@ public class ServiceEndpointDescriptionImpl implements ServiceEndpointDescriptio
                && properties.equals(other.getProperties());
     }
 
-    public URL getLocation() {
-        Object value = properties.get(PROP_KEY_ENDPOINT_LOCATION);
+    public URI getLocation() {
+        Object value = properties.get(ENDPOINT_LOCATION);
         if (value == null) {
             return null;
         }
         
         try {
-            return new URL(value.toString());
-        } catch (MalformedURLException ex) {
+            return new URI(value.toString());
+        } catch (URISyntaxException ex) {
             LOG.warning("Service document URL is malformed : " + value.toString());
         }
         

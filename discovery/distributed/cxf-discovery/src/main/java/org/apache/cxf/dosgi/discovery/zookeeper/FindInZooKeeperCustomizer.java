@@ -56,7 +56,7 @@ public class FindInZooKeeperCustomizer implements ServiceTrackerCustomizer {
         removedService(sr, dst);
         
         Collection<String> interfaces = Util.getMultiValueProperty(
-            sr.getProperty(DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES));
+            sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA));
 
         List<InterfaceMonitor> dmList = new ArrayList<InterfaceMonitor>(interfaces.size());
         for (String intf : interfaces) {

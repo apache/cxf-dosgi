@@ -50,10 +50,10 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
         String location = "http://somehost.someorg:80/abc/def";
         String eid = UUID.randomUUID().toString();
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-        EasyMock.expect(sr.getProperty("service.interface")).andReturn(Arrays.asList("java.lang.String", "org.example.interface.AnInterface"));
-        EasyMock.expect(sr.getProperty("osgi.remote.endpoint.location")).andReturn(location).atLeastOnce();
-        EasyMock.expect(sr.getProperty("osgi.remote.endpoint.id")).andReturn(eid).atLeastOnce();
-        EasyMock.expect(sr.getProperty("service.properties")).andReturn(srProps).anyTimes();
+        EasyMock.expect(sr.getProperty(ServicePublication.SERVICE_INTERFACE_NAME)).andReturn(Arrays.asList("java.lang.String", "org.example.interface.AnInterface"));
+        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_LOCATION)).andReturn(location).atLeastOnce();
+        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_ID)).andReturn(eid).atLeastOnce();
+        EasyMock.expect(sr.getProperty(ServicePublication.SERVICE_PROPERTIES)).andReturn(srProps).anyTimes();
         EasyMock.replay(sr);
 
         final Properties expected = new Properties();
@@ -120,8 +120,8 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
         
         String endpoint = "http://localhost:2991/123";
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-        EasyMock.expect(sr.getProperty("service.interface")).andReturn(Runnable.class.getName());
-        EasyMock.expect(sr.getProperty("osgi.remote.endpoint.location")).andReturn(endpoint);        
+        EasyMock.expect(sr.getProperty(ServicePublication.SERVICE_INTERFACE_NAME)).andReturn(Runnable.class.getName());
+        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_LOCATION)).andReturn(endpoint);        
         EasyMock.replay(sr);
         
         ZooKeeper zk = EasyMock.createMock(ZooKeeper.class);
@@ -197,12 +197,12 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
         
         String eid = UUID.randomUUID().toString();
         HashMap<String, Object> expected = new HashMap<String, Object>(initial);
-        expected.put(ServicePublication.PROP_KEY_ENDPOINT_ID, eid);
+        expected.put(ServicePublication.ENDPOINT_ID, eid);
                 
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-        EasyMock.expect(sr.getProperty("service.properties")).andReturn(initial);
-        EasyMock.expect(sr.getProperty(ServicePublication.PROP_KEY_ENDPOINT_ID)).andReturn(eid);
-        EasyMock.expect(sr.getProperty(ServicePublication.PROP_KEY_ENDPOINT_LOCATION)).andReturn(null);
+        EasyMock.expect(sr.getProperty(ServicePublication.SERVICE_PROPERTIES)).andReturn(initial);
+        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_ID)).andReturn(eid);
+        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_LOCATION)).andReturn(null);
         EasyMock.replay(sr);
         
         byte[] data = PublishToZooKeeperCustomizer.getData(sr);

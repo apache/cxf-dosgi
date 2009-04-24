@@ -91,7 +91,7 @@ public final class OsgiUtils {
         Map<String, Object> userProperties = new HashMap<String, Object>();
         for (String key : sref.getPropertyKeys()) {
             // we're after remote properties only
-            if (key.startsWith(DistributionConstants.PROP_KEY_REMOTE_SERVICE)) {
+            if (key.startsWith(DistributionConstants.REMOTE)) {
                 userProperties.put(key, sref.getProperty(key));
             }
         }
@@ -156,7 +156,7 @@ public final class OsgiUtils {
             list = new ServiceEndpointDescription[iNames.length];
             for (int i = 0; i < iNames.length; i++) {
                 Map<String, Object> props = excludeProperty(sd.getProperties(),  
-                        DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES);
+                        DistributionConstants.REMOTE_INTERFACES);
                 
                 String keys[] = props.keySet().toArray(new String[props.size()]);
                 for (int j = 0; j < keys.length; j++) {
@@ -265,7 +265,7 @@ public final class OsgiUtils {
         String interfaceName, Filter filter, boolean matchAll) {
         Dictionary props = new Hashtable();
         for (Object key : sd.getPropertyKeys()) {
-            if (matchAll || key.toString().startsWith(DistributionConstants.PROP_KEY_REMOTE_SERVICE)) {
+            if (matchAll || key.toString().startsWith(DistributionConstants.REMOTE)) {
                 props.put(key, sd.getProperty(key.toString()));
             }
         }
@@ -470,7 +470,7 @@ public final class OsgiUtils {
     public static String[] getPublishableInterfaces(ServiceEndpointDescription sd,
                                                     ServiceReference sref) {
         Object publishProperty = 
-            sd.getProperty(DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES);
+            sd.getProperty(DistributionConstants.REMOTE_INTERFACES);
         String[] actualInterfaces = 
             (String[])sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS);
         String[] publishableInterfaces = null;

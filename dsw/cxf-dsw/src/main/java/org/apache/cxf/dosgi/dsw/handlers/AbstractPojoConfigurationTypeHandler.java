@@ -18,7 +18,7 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_LOCATION;
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,12 +70,12 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     Map<String, String> registerPublication(Server server, String[] intents) {
         Map<String, String> publicationProperties = new HashMap<String, String>();
-        publicationProperties.put(DistributionConstants.PROP_KEY_SERVICE_REMOTE_CONFIG_TYPE,
+        publicationProperties.put(DistributionConstants.REMOTE_CONFIGURATION_TYPE,
                 Constants.POJO_CONFIG_TYPE);
 
         String intentsValue = OsgiUtils.formatIntents(intents);
         if (intentsValue.length() > 0) {
-            publicationProperties.put(DistributionConstants.PROP_KEY_DEPLOYMENT_INTENTS, intentsValue);
+            publicationProperties.put(DistributionConstants.DEPLOYMENT_INTENTS, intentsValue);
         }
         return publicationProperties;
     }
@@ -179,7 +179,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     private static String[] getRequestedIntents(ServiceEndpointDescription sd) {
         String property = OsgiUtils.getProperty(sd, 
-                DistributionConstants.PROP_KEY_SERVICE_REMOTE_REQUIRES_INTENTS);
+                DistributionConstants.REMOTE_REQUIRES_INTENTS);
 
         String[] intents = OsgiUtils.parseIntents(property);
         for (int i = 0; i < intents.length; i++) {
@@ -212,7 +212,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     protected void addAddressProperty(Map props, String address) {
         if (props != null) {
-            props.put(PROP_KEY_ENDPOINT_LOCATION, address);
+            props.put(ENDPOINT_LOCATION, address);
         }
     }
 }

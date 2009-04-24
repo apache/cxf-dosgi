@@ -127,10 +127,10 @@ public class ActivatorTest extends TestCase{
         Dictionary serviceProps = services.get(dp);
         Set<String> expected = new HashSet<String>(Arrays.asList("A", "B"));
         assertEquals(expected, new HashSet<String>(Arrays.asList(
-            OsgiUtils.parseIntents((String) serviceProps.get(DistributionProvider.PROP_KEY_SUPPORTED_INTENTS)))));
-        assertNotNull(serviceProps.get(DistributionProvider.PROP_KEY_PRODUCT_NAME));
-        assertNotNull(serviceProps.get(DistributionProvider.PROP_KEY_PRODUCT_VERSION));
-        assertNotNull(serviceProps.get(DistributionProvider.PROP_KEY_VENDOR_NAME));
+            OsgiUtils.parseIntents((String) serviceProps.get(DistributionProvider.SUPPORTED_INTENTS)))));
+        assertNotNull(serviceProps.get(DistributionProvider.PRODUCT_NAME));
+        assertNotNull(serviceProps.get(DistributionProvider.PRODUCT_VERSION));
+        assertNotNull(serviceProps.get(DistributionProvider.VENDOR_NAME));
     }
     
     public void testPublishPreexistingServices() throws Exception {

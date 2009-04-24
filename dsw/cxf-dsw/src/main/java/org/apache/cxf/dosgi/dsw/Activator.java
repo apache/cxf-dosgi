@@ -77,13 +77,13 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
         DistributionProviderImpl dpService = new DistributionProviderImpl(bc);
         Hashtable<String, Object> props = new Hashtable<String, Object>();
         
-        props.put(DistributionProvider.PROP_KEY_PRODUCT_NAME, getHeader("Bundle-Name"));
-        props.put(DistributionProvider.PROP_KEY_PRODUCT_VERSION, getHeader("Bundle-Version"));
-        props.put(DistributionProvider.PROP_KEY_VENDOR_NAME, getHeader("Bundle-Vendor"));
+        props.put(DistributionProvider.PRODUCT_NAME, getHeader("Bundle-Name"));
+        props.put(DistributionProvider.PRODUCT_VERSION, getHeader("Bundle-Version"));
+        props.put(DistributionProvider.VENDOR_NAME, getHeader("Bundle-Vendor"));
                 
         String supportedIntents = OsgiUtils.formatIntents(
             getIntentMap().getIntents().keySet().toArray(new String [] {}));
-        props.put(DistributionProvider.PROP_KEY_SUPPORTED_INTENTS, supportedIntents);
+        props.put(DistributionProvider.SUPPORTED_INTENTS, supportedIntents);
         
         bc.registerService(DistributionProvider.class.getName(), dpService, props);
         return dpService;
@@ -124,7 +124,7 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
 
     private void checkExistingServices() throws InvalidSyntaxException {
         ServiceReference[] references = bc.getServiceReferences(null, 
-            "(" + DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES + "=*)");
+            "(" + DistributionConstants.REMOTE_INTERFACES + "=*)");
         
         if (references != null) {
             for (ServiceReference sref : references) {

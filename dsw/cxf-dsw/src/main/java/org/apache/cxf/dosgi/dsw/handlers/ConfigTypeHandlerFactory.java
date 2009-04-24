@@ -42,7 +42,7 @@ public final class ConfigTypeHandlerFactory {
     public ConfigurationTypeHandler getHandler(BundleContext dswBC, ServiceEndpointDescription sd, 
                                                CxfDistributionProvider dp,
                                                Map<String, Object> handlerProperties) {
-        String type = OsgiUtils.getProperty(sd, DistributionConstants.PROP_KEY_SERVICE_REMOTE_CONFIG_TYPE);
+        String type = OsgiUtils.getProperty(sd, DistributionConstants.REMOTE_CONFIGURATION_TYPE);
         if (type == null || Constants.POJO_CONFIG_TYPE.equalsIgnoreCase(type)) {
             if (type == null) {
                 LOG.info("Defaulting to pojo configuration type ");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2008). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2008, 2009). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.osgi.service.discovery;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
@@ -25,91 +25,105 @@ import java.util.Map;
  * considered as a wrapper around the property map of a published service and
  * its endpoint. It provides an API to conveniently access the most important
  * properties of the service.
+ * <p>
+ * <code>ServiceEndpointDescription</code> objects are immutable.
  * 
+ * @Immutable
  * @version $Revision$
  */
 public interface ServiceEndpointDescription {
 
 	/**
 	 * Returns the value of the property with key
-	 * {@link ServicePublication#PROP_KEY_SERVICE_INTERFACE_NAME}.
+	 * {@link ServicePublication#SERVICE_INTERFACE_NAME}.
 	 * 
-	 * @return service interface names provided by the advertised service
-	 *         (endpoint). The collection is never null or empty but contains at
+	 * @return <code>Collection (&lt;? extends String&gt;)</code> of service
+	 *         interface names provided by the advertised service endpoint. The
+	 *         collection is never <code>null</code> or empty but contains at
 	 *         least one service interface.
 	 */
 	Collection /* <? extends String> */getProvidedInterfaces();
 
 	/**
 	 * Returns non-Java endpoint interface name associated with the given
-	 * interface. Value of the property with key
-	 * {@link ServicePublication#PROP_KEY_ENDPOINT_INTERFACE_NAME} is used by
-	 * this operation.
+	 * interface.
+	 * <p>
+	 * Value of the property with key
+	 * {@link ServicePublication#ENDPOINT_INTERFACE_NAME} is used by this
+	 * operation.
 	 * 
-	 * @param interfaceName
-	 *            for which its non-Java endpoint interface name should be
-	 *            returned. 
-	 *            
-	 * @return non-Java endpoint interface name. Null, if it hasn't been
-	 *         provided.
+	 * @param interfaceName for which its non-Java endpoint interface name
+	 *        should be returned.
+	 * @return non-Java endpoint interface name, or <code>null</code> if it
+	 *         hasn't been provided or if given interface name is
+	 *         <code>null</code>.
 	 */
 	String getEndpointInterfaceName(String interfaceName);
 
 	/**
-	 * Returns version of the given interface. Value of the property with key
-	 * {@link ServicePublication#PROP_KEY_SERVICE_INTERFACE_VERSION} is used by
-	 * this operation.
+	 * Returns version of the given interface.
+	 * <p>
+	 * Value of the property with key
+	 * {@link ServicePublication#SERVICE_INTERFACE_VERSION} is used by this
+	 * operation.
 	 * 
-	 * @param interfaceName
-	 *            for which its version should be returned.
-	 * @return Version of given service interface. Null, if it hasn't been
-	 *         provided.
+	 * @param interfaceName for which its version should be returned.
+	 * @return Version of given service interface, or <code>null</code> if it
+	 *         hasn't been provided or if given interface name is
+	 *         <code>null</code>.
 	 */
 	String getVersion(String interfaceName);
 
 	/**
 	 * Returns the value of the property with key
-	 * {@link ServicePublication#PROP_KEY_ENDPOINT_LOCATION}.
+	 * {@link ServicePublication#ENDPOINT_LOCATION}.
 	 * 
-	 * @return The URL of the service location. Null, if it hasn't been
-	 *         provided.
+	 * @return The url of the service location, or <code>null</code> if it
+	 *         hasn't been provided.
 	 */
-	URL getLocation();
+	URI getLocation();
 
 	/**
 	 * Returns the value of the property with key
-	 * {@link ServicePublication#PROP_KEY_ENDPOINT_ID}.
+	 * {@link ServicePublication#ENDPOINT_ID}.
 	 * 
-	 * @return Unique id of service endpoint. Null, if it hasn't been provided.
+	 * @return Unique id of service endpoint, or <code>null</code> if it hasn't
+	 *         been provided.
 	 */
 	String getEndpointID();
 
 	/**
 	 * Getter method for the property value of a given key.
 	 * 
-	 * @param key
-	 *            Name of the property
-	 * @return The property value, null if none is found for the given key
+	 * @param key Name of the property
+	 * @return The property value, or <code>null</code> if none is found for the
+	 *         given key or if provided key is <code>null</code>.
 	 */
 	Object getProperty(String key);
 
 	/**
-	 * @return <code>java.util.Collection</code> of property names available in
-	 *         the ServiceEndpointDescription. The collection is never null or
-	 *         empty but contains at least basic properties like objectClass for
-	 *         the service interface. The collection represents a snapshot and
-	 *         as such is not going to be updated in case properties were added
-	 *         or removed at a later point of time.
+	 * Returns all names of service endpoint properties.
+	 * 
+	 * @return a <code>Collection (&lt;? extends String&gt;)</code> of property
+	 *         names available in the ServiceEndpointDescription. The collection
+	 *         is never <code>null</code> or empty but contains at least names
+	 *         of mandatory <code>ServicePublication</code> properties. Since
+	 *         <code>ServiceEndpointDescription</code> objects are immutable,
+	 *         the returned collection is also not going to be updated at a
+	 *         later point of time.
 	 */
 	Collection/* <? extends String> */getPropertyKeys();
 
 	/**
-	 * @return Returns all properties of the service as a
-	 *         <code>java.util.Map</code>. The map is never null or empty but
-	 *         contains at least basic properties like objectClass for the
-	 *         service interface. The collection represents a snapshot and as
-	 *         such is not going to be updated in case properties were added or
-	 *         removed at a later point of time.
+	 * Returns all service endpoint properties.
+	 * 
+	 * @return all properties of the service as a
+	 *         <code>Map (&lt;String, Object&gt;)</code>. The map is never
+	 *         <code>null</code> or empty but contains at least mandatory
+	 *         <code>ServicePublication</code> properties. Since
+	 *         <code>ServiceEndpointDescription</code> objects are immutable,
+	 *         the returned map is also not going to be updated at a later point
+	 *         of time.
 	 */
 	Map/* <String, Object> */getProperties();
 }

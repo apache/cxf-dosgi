@@ -18,10 +18,10 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_ID;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_LOCATION;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_PROPERTIES;
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_ID;
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
+import static org.osgi.service.discovery.ServicePublication.SERVICE_INTERFACE_NAME;
+import static org.osgi.service.discovery.ServicePublication.SERVICE_PROPERTIES;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -51,12 +51,13 @@ public final class ServiceHookUtils {
         
     }
     
-    public static ServiceRegistration publish(BundleContext bc, ServiceEndpointDescription sd) {
-        
-        ServiceRegistration publication = 
-            bc.registerService(ServicePublication.class.getName(),
-                               new ServicePublication() {},
-                               getPublicationProperties(sd));
+    public static ServiceRegistration publish(BundleContext bc, final ServiceReference sr, ServiceEndpointDescription sd) {
+        ServiceRegistration publication = bc.registerService(
+                ServicePublication.class.getName(), new ServicePublication() {
+                    public ServiceReference getReference() {
+                        return sr;
+                    }
+                }, getPublicationProperties(sd));
 
         if (publication != null) {
             LOG.info("Remote " + sd.getProvidedInterfaces().toArray()[0]
@@ -147,11 +148,11 @@ public final class ServiceHookUtils {
     @SuppressWarnings("unchecked")
     private static Dictionary getPublicationProperties(ServiceEndpointDescription sd) {
         Dictionary props = new Hashtable();
-        props.put(PROP_KEY_SERVICE_INTERFACE_NAME, sd.getProvidedInterfaces());
-        props.put(PROP_KEY_SERVICE_PROPERTIES, getServiceProperties(sd));
-        props.put(PROP_KEY_ENDPOINT_ID, UUID.randomUUID().toString());
+        props.put(SERVICE_INTERFACE_NAME, sd.getProvidedInterfaces());
+        props.put(SERVICE_PROPERTIES, getServiceProperties(sd));
+        props.put(ENDPOINT_ID, UUID.randomUUID().toString());
         if (sd.getLocation() != null) {
-            props.put(PROP_KEY_ENDPOINT_LOCATION, sd.getLocation());
+            props.put(ENDPOINT_LOCATION, sd.getLocation());
         }
         LOG.info("publication properties: " + props);
         return props;

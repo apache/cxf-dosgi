@@ -21,9 +21,8 @@ package org.apache.cxf.dosgi.discovery.local;
 
 import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE;
 import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
-import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_FILTERS;
-import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
+import static org.osgi.service.discovery.DiscoveredServiceTracker.FILTER_MATCH_CRITERIA;
+import static org.osgi.service.discovery.DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,7 +41,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -166,13 +164,13 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
             Collection<String> interfaces =            
                 addTracker(reference, 
                            tracker, 
-                           PROP_KEY_MATCH_CRITERIA_INTERFACES, 
+                           INTERFACE_MATCH_CRITERIA, 
                            interfacesToTrackers,
                            trackersToInterfaces);
             Collection<String> filters = 
                 addTracker(reference,
                            tracker, 
-                           PROP_KEY_MATCH_CRITERIA_FILTERS, 
+                           FILTER_MATCH_CRITERIA, 
                            filtersToTrackers,
                            trackersToFilters);
 
@@ -197,13 +195,13 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
             Collection<String> newInterfaces = 
                 addTracker(reference, 
                            tracker, 
-                           PROP_KEY_MATCH_CRITERIA_INTERFACES, 
+                           INTERFACE_MATCH_CRITERIA, 
                            interfacesToTrackers,
                            trackersToInterfaces);
             Collection<String> newFilters = 
                 addTracker(reference,
                            tracker, 
-                           PROP_KEY_MATCH_CRITERIA_FILTERS, 
+                           FILTER_MATCH_CRITERIA, 
                            filtersToTrackers,
                            trackersToFilters);
 
@@ -426,7 +424,7 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
         
         String[] interfaceNames = getProvidedInterfaces(sd, interfaceName);
         if (interfaceNames != null) {
-            d.put(PROP_KEY_SERVICE_INTERFACE_NAME, interfaceNames);
+            d.put(INTERFACE_MATCH_CRITERIA, interfaceNames);
         }
         return d;
     }

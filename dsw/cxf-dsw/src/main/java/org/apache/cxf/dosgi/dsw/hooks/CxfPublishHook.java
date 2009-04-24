@@ -80,7 +80,7 @@ public class CxfPublishHook extends AbstractHook {
             Server server = createServer(sref, flatList[i]);
             if (server != null) {
                 ServiceRegistration publication = 
-                    ServiceHookUtils.publish(getContext(), flatList[i]);
+                    ServiceHookUtils.publish(getContext(), sref, flatList[i]);
                 publications.put(sref, publication);
                 isPublished = publication != null;
             }

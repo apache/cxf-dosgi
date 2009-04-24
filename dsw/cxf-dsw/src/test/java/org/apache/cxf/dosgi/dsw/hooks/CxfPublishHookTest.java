@@ -46,10 +46,10 @@ import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.discovery.ServicePublication;
 
 import static org.apache.cxf.dosgi.dsw.Constants.POJO_ADDRESS_PROPERTY;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_LOCATION;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_PROPERTIES;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_LOCATION;
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
+import static org.osgi.service.discovery.ServicePublication.SERVICE_INTERFACE_NAME;
+import static org.osgi.service.discovery.ServicePublication.SERVICE_PROPERTIES;
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
 
 public class CxfPublishHookTest extends Assert {
 
@@ -184,7 +184,7 @@ public class CxfPublishHookTest extends Assert {
         assertEquals(serviceNames.length, propsList.size());
         for (Dictionary props : propsList) {
             Collection interfaces = 
-                (Collection)props.get(PROP_KEY_SERVICE_INTERFACE_NAME);
+                (Collection)props.get(SERVICE_INTERFACE_NAME);
             assertNotNull(interfaces);
             assertTrue(interfaces.contains(TestService.class.getName())
                        || interfaces.contains(AdditionalInterface.class.getName()));
@@ -295,7 +295,7 @@ public class CxfPublishHookTest extends Assert {
                     Map props = sd.getProperties();
                     String address = (String)props.get(POJO_ADDRESS_PROPERTY);
                     if (address != null) {
-                        props.put(PROP_KEY_ENDPOINT_LOCATION, address);
+                        props.put(ENDPOINT_LOCATION, address);
                     }
                     return server;
                 }

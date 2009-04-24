@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +66,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
         TestDiscoveredServiceTracker dst = new TestDiscoveredServiceTracker();
 
         EasyMock.expect(bc.getBundles()).andReturn(new Bundle[] {b0}).anyTimes();
-        EasyMock.expect(sr.getProperty("osgi.discovery.interest.interfaces")).
+        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
                 andReturn(Collections.singleton("org.example.SomeService")).anyTimes();
         
         EasyMock.expect(bc.getService(sr)).andReturn(dst).anyTimes();
@@ -190,7 +190,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
 
         EasyMock.expect(bc.getBundles()).andReturn(new Bundle[] {b0}).anyTimes();
         EasyMock.expect(bc.createFilter("(blah <= 5)")).andReturn(mockFilter).anyTimes();
-        EasyMock.expect(sr.getProperty("osgi.discovery.interest.filters")).
+        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.FILTER_MATCH_CRITERIA)).
                 andReturn(Collections.singleton("(blah <= 5)")).anyTimes();
         
         EasyMock.expect(bc.getService(sr)).andReturn(dst).anyTimes();
@@ -296,7 +296,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
         TestDiscoveredServiceTracker dst = new TestDiscoveredServiceTracker();
 
         ServiceReference sr = EasyMock.createNiceMock(ServiceReference.class);
-        EasyMock.expect(sr.getProperty("osgi.discovery.interest.interfaces")).
+        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
                 andReturn(Collections.singleton("org.example.SomeService")).anyTimes();
         EasyMock.replay(sr);
         
@@ -328,7 +328,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
         verifyNotification(dsn, 0, 1, "org.example.SomeService");
         
         EasyMock.reset(sr);
-        EasyMock.expect(sr.getProperty("osgi.discovery.interest.interfaces")).
+        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
                 andReturn(Arrays.asList("org.example.SomeService", "SomeOtherService")).anyTimes();
         EasyMock.replay(sr);
         
@@ -366,7 +366,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
         TestDiscoveredServiceTracker dst = new TestDiscoveredServiceTracker();
 
         EasyMock.expect(bc.getBundles()).andReturn(new Bundle[] {b0, b1}).anyTimes();
-        EasyMock.expect(sr.getProperty("osgi.discovery.interest.interfaces")).
+        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
                 andReturn(Collections.singleton("org.example.SomeService")).anyTimes();
         
         EasyMock.expect(bc.getService(sr)).andReturn(dst).anyTimes();
@@ -432,7 +432,7 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertNotNull(dsn.getInterfaces());
         assertEquals(filterCount, dsn.getFilters().size());
         assertEquals(interfaceCount, dsn.getInterfaces().size());
-        Iterator i = filterCount > 0 
+        Iterator<?> i = filterCount > 0 
                      ? dsn.getFilters().iterator()
                      : dsn.getInterfaces().iterator();
         assertEquals(expected, i.next()); 

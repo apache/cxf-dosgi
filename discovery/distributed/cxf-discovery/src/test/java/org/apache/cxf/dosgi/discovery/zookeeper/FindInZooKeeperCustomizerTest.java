@@ -44,7 +44,7 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
         };
         
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES)).
+        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
             andReturn(Collections.singleton(String.class.getName()));
         EasyMock.replay(sr);
         
@@ -56,7 +56,7 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
         };
         
         ServiceReference sr2 = EasyMock.createMock(ServiceReference.class);
-        EasyMock.expect(sr2.getProperty(DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES)).
+        EasyMock.expect(sr2.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
             andReturn(Arrays.asList(Integer.class.getName(), Comparable.class.getName()));
         EasyMock.replay(sr2);
         
@@ -113,7 +113,7 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
         EasyMock.replay(zk);
         
         EasyMock.reset(sr);
-        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES)).
+        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
             andReturn(Collections.singleton(List.class.getName()));
         EasyMock.replay(sr);
         

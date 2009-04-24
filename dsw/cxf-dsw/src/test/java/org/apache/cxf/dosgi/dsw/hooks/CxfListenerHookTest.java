@@ -18,8 +18,10 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
+import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE;
+import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -41,14 +43,10 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.hooks.service.ListenerHook;
-
 import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.ServiceEndpointDescription;
-
-import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE;
-import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
+import org.osgi.service.discovery.ServicePublication;
 
 public class CxfListenerHookTest extends Assert {
 
@@ -104,7 +102,7 @@ public class CxfListenerHookTest extends Assert {
     public void testTrackerPropertiesOnlyClassInFilterWithMatchingInterface() throws Exception {
         String filter = "(objectClass=" + TestService.class.getName() + ")";
         doTestTrackerPropertiesSet(filter,
-                                   "osgi.discovery.interest.interfaces",
+                                   "osgi.remote.discovery.interest.interfaces",
                                    TestService.class.getName(),
                                    asList(TestService.class.getName()),
                                    Collections.EMPTY_SET);
@@ -115,7 +113,7 @@ public class CxfListenerHookTest extends Assert {
         String filter = "(&(objectClass=" + TestService.class.getName() 
                         + ")(colour=blue))";
         doTestTrackerPropertiesSet(filter,
-                                   "osgi.discovery.interest.filters",
+                                   "osgi.remote.discovery.interest.filters",
                                    replacePredicate(filter),
                                    asList(TestService.class.getName()),
                                    Collections.EMPTY_SET);
@@ -125,7 +123,7 @@ public class CxfListenerHookTest extends Assert {
     public void testTrackerPropertiesOnlyClassInFilterWithMatchingFilter() throws Exception {
         String filter = "(objectClass=" + TestService.class.getName() + ")";
         doTestTrackerPropertiesSet(filter,
-                                   "osgi.discovery.interest.interfaces",
+                                   "osgi.remote.discovery.interest.interfaces",
                                    TestService.class.getName(),
                                    Collections.EMPTY_SET,
                                    asList(replacePredicate(filter)));
@@ -136,7 +134,7 @@ public class CxfListenerHookTest extends Assert {
         String filter = "(&(objectClass=" + TestService.class.getName() 
                         + ")(colour=blue))";
         doTestTrackerPropertiesSet(filter,
-                                   "osgi.discovery.interest.filters",
+                                   "osgi.remote.discovery.interest.filters",
 				   replacePredicate(filter),
                                    Collections.EMPTY_SET,
                                    asList(replacePredicate(filter)));
@@ -146,7 +144,7 @@ public class CxfListenerHookTest extends Assert {
     public void testTrackerPropertiesOnlyClassInFilterWithMatchingBoth() throws Exception {
         String filter = "(objectClass=" + TestService.class.getName() + ")";
         doTestTrackerPropertiesSet(filter,
-                                   "osgi.discovery.interest.interfaces",
+                                   "osgi.remote.discovery.interest.interfaces",
                                    TestService.class.getName(),
                                    asList(TestService.class.getName()),
                                    asList(replacePredicate(filter)));
@@ -157,7 +155,7 @@ public class CxfListenerHookTest extends Assert {
         String filter = "(&(objectClass=" + TestService.class.getName() 
                         + ")(colour=blue))";
         doTestTrackerPropertiesSet(filter,
-                                   "osgi.discovery.interest.filters",
+                                   "osgi.remote.discovery.interest.filters",
 				   replacePredicate(filter),
                                    Collections.EMPTY_SET,
                                    asList(replacePredicate(filter)));
@@ -311,7 +309,7 @@ public class CxfListenerHookTest extends Assert {
     }
 
     private String replacePredicate(String filter) {
-        return filter.replace("objectClass", "service.interface");
+        return filter.replace("objectClass", ServicePublication.SERVICE_INTERFACE_NAME);
     }
 
     private class Notification implements DiscoveredServiceNotification {

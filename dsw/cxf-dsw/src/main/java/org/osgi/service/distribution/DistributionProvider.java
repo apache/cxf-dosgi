@@ -1,7 +1,5 @@
 /*
- * $Date$
- *
- * Copyright (c) OSGi Alliance (2004, 2007). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2000, 2008). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,34 +25,46 @@ import org.osgi.framework.ServiceReference;
  * ServiceRegistry implementing this interface. The service is registered with
  * extra properties identified at the beginning of this interface to denote the
  * Distribution Provider product name, version, vendor and supported intents.
+ *
+ * @ThreadSafe
+ * @version $Revision$
  */
 public interface DistributionProvider {
     /**
      * Service Registration property for the name of the Distribution Provider
      * product.
+	 * <p>
+	 * The value of this property is of type String.
      */
-    static final String PROP_KEY_PRODUCT_NAME = 
+    static final String PRODUCT_NAME = 
                             "osgi.remote.distribution.product";
 
     /**
      * Service Registration property for the version of the Distribution
      * Provider product.
+	 * <p>
+	 * The value of this property is of type String.
      */
-    static final String PROP_KEY_PRODUCT_VERSION =
+    static final String PRODUCT_VERSION =
                             "osgi.remote.distribution.product.version";
 
     /**
      * Service Registration property for the Distribution Provider product
      * vendor name.
+	 * <p>
+	 * The value of this property is of type String.
      */
-    static final String PROP_KEY_VENDOR_NAME = 
+    static final String VENDOR_NAME = 
                             "osgi.remote.distribution.vendor";
 
-    /**
-     * Service Registration property that lists the intents supported by this
-     * DistributionProvider.
-     */
-    static final String PROP_KEY_SUPPORTED_INTENTS =
+	/**
+	 * Service Registration property that lists the intents supported by this
+	 * DistributionProvider.
+	 * <p>
+	 * The value of this property is of type String, String[] or Collection of
+	 * String.
+	 */
+    static final String SUPPORTED_INTENTS =
                             "osgi.remote.distribition.supported_intents";
 
     /**
@@ -73,26 +83,25 @@ public interface DistributionProvider {
      */
     Collection /*<? extends ServiceReference>*/ getExposedServices();
 
-    /**
-     * Provides access to extra properties set by the DistributionProvider on
-     * endpoints, as they will appear on client side proxies given an exposed
-     * ServiceReference. 
-     * These properties are not always available on the server-side
-     * ServiceReference of the exposed
-     * service but will be on the remote client side proxy to this service.
-     * This API provides access to these extra properties from the exposing
-     * side.
-     * E.g. a service is exposed remotely, the distribution software is configured
-     * to add transactionality to the remote service. Because of this, on the 
-     * client-side proxy the property deployment.intents=”transactionality” is set. 
-     * However, these intents are *not* always set on the original
-     * ServiceRegistration on the server-side since on the server side the service
-     * object is a local pojo which doesn’t provide transactionality by itself.
-     * This QoS is added by the distribution.
-     * This API provides access to these extra properties from the server-side.
-     * 
-     * @param sr A ServiceReference of an exposed service.
-     * @return The map of extra properties.
-     */
+	/**
+	 * Provides access to extra properties set by the DistributionProvider on
+	 * endpoints, as they will appear on client side proxies given an exposed
+	 * ServiceReference. These properties are not always available on the
+	 * server-side ServiceReference of the exposed service but will be on the
+	 * remote client side proxy to this service. This API provides access to
+	 * these extra properties from the exposing side. E.g. a service is exposed
+	 * remotely, the distribution software is configured to add transactionality
+	 * to the remote service. Because of this, on the client-side proxy the
+	 * property serviceosgi.intents="transactionality" is set. However, these
+	 * intents are <i>not</i> always set on the original ServiceRegistration on
+	 * the server-side since on the server side the service object is a local
+	 * pojo which doesn't provide transactionality by itself. This QoS is added
+	 * by the distribution. This API provides access to these extra properties
+	 * from the server-side.
+	 * 
+	 * @param sr A ServiceReference of an exposed service.
+	 * @return The map of extra properties.
+	 */
     Map /*<String, String>*/ getExposedProperties(ServiceReference sr);
 }
+

@@ -21,10 +21,10 @@ package org.apache.cxf.dosgi.dsw.hooks;
 import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE;
 import static org.osgi.service.discovery.DiscoveredServiceNotification.MODIFIED;
 import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
-import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_FILTERS;
-import static org.osgi.service.discovery.DiscoveredServiceTracker.PROP_KEY_MATCH_CRITERIA_INTERFACES;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_ENDPOINT_ID;
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
+import static org.osgi.service.discovery.DiscoveredServiceTracker.FILTER_MATCH_CRITERIA;
+import static org.osgi.service.discovery.DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA;
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_ID;
+import static org.osgi.service.discovery.ServicePublication.SERVICE_INTERFACE_NAME;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,9 +73,9 @@ public class AbstractClientHook extends AbstractHook {
             
         ServiceEndpointDescription sd = 
             notification.getServiceEndpointDescription();
-        if (sd.getProperty(DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES) == null) {
+        if (sd.getProperty(DistributionConstants.REMOTE_INTERFACES) == null) {
             LOG.info("not proxifying service, enabling property not set: " 
-                 + DistributionConstants.PROP_KEY_SERVICE_REMOTE_INTERFACES);
+                 + DistributionConstants.REMOTE_INTERFACES);
             return;
         }
             
@@ -177,7 +177,7 @@ public class AbstractClientHook extends AbstractHook {
             String key = (String)keys.next();
             ret.put(key, properties.get(key));
         }
-        ret.put(PROP_KEY_SERVICE_INTERFACE_NAME, interfaceName);
+        ret.put(SERVICE_INTERFACE_NAME, interfaceName);
         return ret;
     }
 
@@ -186,7 +186,7 @@ public class AbstractClientHook extends AbstractHook {
         Map<String, Object> props = new HashMap<String, Object>();        
         props.putAll(sd.getProperties());
         props.put(Constants.DSW_CLIENT_ID, getIdentificationProperty());
-        props.put(DistributionConstants.PROP_KEY_REMOTE_SERVICE, "true");
+        props.put(DistributionConstants.REMOTE, "true");
         return props;
     }
 
@@ -196,13 +196,13 @@ public class AbstractClientHook extends AbstractHook {
 
         if (interfaceName != null) {
             append(trackerProperties,
-                   PROP_KEY_MATCH_CRITERIA_INTERFACES,
+                   INTERFACE_MATCH_CRITERIA,
                    interfaceName); 
         }
 
         if (filterValue != null) {
             append(trackerProperties,
-                   PROP_KEY_MATCH_CRITERIA_FILTERS,
+                   FILTER_MATCH_CRITERIA,
                    filterValue); 
         }
 
@@ -223,7 +223,7 @@ public class AbstractClientHook extends AbstractHook {
      * @pre called with discoveredServices mutex held
      */
     private boolean unknownEndpointId(ServiceEndpointDescription notified) {
-        String endpointId = (String)notified.getProperty(PROP_KEY_ENDPOINT_ID);
+        String endpointId = (String)notified.getProperty(ENDPOINT_ID);
         if (endpointId != null) {
             boolean duplicate = discoveredServices.containsKey(endpointId);
             if (!duplicate) {
@@ -243,7 +243,7 @@ public class AbstractClientHook extends AbstractHook {
      * @pre called with discoveredServices mutex held
      */
     private void cacheEndpointId(ServiceEndpointDescription notified, ServiceRegistration registration) {
-        String endpointId = (String)notified.getProperty(PROP_KEY_ENDPOINT_ID);
+        String endpointId = (String)notified.getProperty(ENDPOINT_ID);
         if (endpointId != null) {
             discoveredServices.put(endpointId, registration);
             LOG.info("caching proxy registration for endpoint ID: " + endpointId);
@@ -253,7 +253,7 @@ public class AbstractClientHook extends AbstractHook {
     }
 
     private void unCacheEndpointId(ServiceEndpointDescription notified) {
-        String endpointId = (String)notified.getProperty(PROP_KEY_ENDPOINT_ID);
+        String endpointId = (String)notified.getProperty(ENDPOINT_ID);
         ServiceRegistration proxyRegistration = null;
         if (endpointId != null) {
             synchronized (discoveredServices) {
@@ -277,7 +277,7 @@ public class AbstractClientHook extends AbstractHook {
                LOG.info("Notified - AVAILABLE: " 
                          + notified.getProvidedInterfaces() 
                          + " endpoint id: " 
-                         + notification.getServiceEndpointDescription().getProperty(PROP_KEY_ENDPOINT_ID));
+                         + notification.getServiceEndpointDescription().getProperty(ENDPOINT_ID));
                 processNotification(notification, getContext());
                 break;
 
@@ -285,7 +285,7 @@ public class AbstractClientHook extends AbstractHook {
                 LOG.info("Notified - UNAVAILABLE: " + notified.getProvidedInterfaces()
                          + notified.getProvidedInterfaces() 
                          + " endpoint id: " 
-                         + notification.getServiceEndpointDescription().getProperty(PROP_KEY_ENDPOINT_ID));
+                         + notification.getServiceEndpointDescription().getProperty(ENDPOINT_ID));
                 unCacheEndpointId(notified);
                 break;
 

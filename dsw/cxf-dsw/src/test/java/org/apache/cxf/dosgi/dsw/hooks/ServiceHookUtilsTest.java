@@ -18,7 +18,7 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -83,14 +83,14 @@ public class ServiceHookUtilsTest extends TestCase {
     public void testPublish() throws Exception {        
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "bar");
-        props.put(ServicePublication.PROP_KEY_ENDPOINT_LOCATION, "http://localhost/xyz");
+        props.put(ServicePublication.ENDPOINT_LOCATION, "http://localhost/xyz");
         ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(String.class.getName(), props);
-        assertEquals(new URL("http://localhost/xyz"), sed.getLocation());
+        assertEquals(new URI("http://localhost/xyz"), sed.getLocation());
         
         final Dictionary<String, Object> expectedProps = new Hashtable<String, Object>();
-        expectedProps.put(ServicePublication.PROP_KEY_SERVICE_PROPERTIES, props);
-        expectedProps.put(ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME, Collections.singleton(String.class.getName()));
-        expectedProps.put(ServicePublication.PROP_KEY_ENDPOINT_LOCATION, new URL("http://localhost/xyz"));
+        expectedProps.put(ServicePublication.SERVICE_PROPERTIES, props);
+        expectedProps.put(ServicePublication.SERVICE_INTERFACE_NAME, Collections.singleton(String.class.getName()));
+        expectedProps.put(ServicePublication.ENDPOINT_LOCATION, new URI("http://localhost/xyz"));
         
         BundleContext bc = EasyMock.createMock(BundleContext.class);
         EasyMock.expect(bc.registerService(
@@ -102,15 +102,15 @@ public class ServiceHookUtilsTest extends TestCase {
                         assertTrue(EasyMock.getCurrentArguments()[1] instanceof ServicePublication);
                         Dictionary<?, ?> actualProps = 
                             (Dictionary<?, ?>) EasyMock.getCurrentArguments()[2];
-                        UUID uuid = UUID.fromString(actualProps.get(ServicePublication.PROP_KEY_ENDPOINT_ID).toString());
-                        expectedProps.put(ServicePublication.PROP_KEY_ENDPOINT_ID, uuid.toString());
+                        UUID uuid = UUID.fromString(actualProps.get(ServicePublication.ENDPOINT_ID).toString());
+                        expectedProps.put(ServicePublication.ENDPOINT_ID, uuid.toString());
                         assertEquals(expectedProps, actualProps);
                         return EasyMock.createMock(ServiceRegistration.class);
                     }                
                 });
         EasyMock.replay(bc);
         
-        ServiceHookUtils.publish(bc, sed);
+        ServiceHookUtils.publish(bc, null, sed);
         EasyMock.verify(bc);
     }
     

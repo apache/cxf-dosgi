@@ -31,7 +31,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.hooks.service.ListenerHook;
 
-import static org.osgi.service.discovery.ServicePublication.PROP_KEY_SERVICE_INTERFACE_NAME;
+import static org.osgi.service.discovery.ServicePublication.SERVICE_INTERFACE_NAME;
 
 public class CxfListenerHook extends AbstractClientHook implements ListenerHook {
 
@@ -83,7 +83,7 @@ public class CxfListenerHook extends AbstractClientHook implements ListenerHook 
                     lookupDiscoveryService(className, null);
                 } else {
                     String filter = listener.getFilter().replaceAll("objectClass",
-                                                                    PROP_KEY_SERVICE_INTERFACE_NAME);
+                                                                    SERVICE_INTERFACE_NAME);
                     lookupDiscoveryService(null, filter);
                 }
             }

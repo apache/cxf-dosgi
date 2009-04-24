@@ -53,8 +53,9 @@ public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
     public Object addingService(ServiceReference sr) {
         try {
             Object obj = bundleContext.getService(sr);
-            Collection<String> interfaces = Util.getMultiValueProperty(sr.getProperty("service.interface"));
-            String endpointKey = getKey(sr.getProperty("osgi.remote.endpoint.location").toString());
+            Collection<String> interfaces = Util.getMultiValueProperty(
+                    sr.getProperty(ServicePublication.SERVICE_INTERFACE_NAME));
+            String endpointKey = getKey(sr.getProperty(ServicePublication.ENDPOINT_LOCATION).toString());
 
             for (String name : interfaces) {
                 String path = Util.getZooKeeperPath(name);
@@ -79,8 +80,9 @@ public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
 
     public void removedService(ServiceReference sr, Object obj) {
         try {
-            Collection<String> interfaces = Util.getMultiValueProperty(sr.getProperty("service.interface"));
-            String endpointKey = getKey(sr.getProperty("osgi.remote.endpoint.location").toString());
+            Collection<String> interfaces = Util.getMultiValueProperty(
+                    sr.getProperty(ServicePublication.SERVICE_INTERFACE_NAME));
+            String endpointKey = getKey(sr.getProperty(ServicePublication.ENDPOINT_LOCATION).toString());
             
             for (String name : interfaces) {
                 String path = Util.getZooKeeperPath(name);
@@ -114,15 +116,15 @@ public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
     static byte[] getData(ServiceReference sr) throws IOException {
         Properties p = new Properties();
         
-        Map<String, Object> serviceProps = (Map<String, Object>) sr.getProperty("service.properties");
+        Map<String, Object> serviceProps = (Map<String, Object>) sr.getProperty(ServicePublication.SERVICE_PROPERTIES);
         if (serviceProps != null) {
             for (Map.Entry<String, Object> prop : serviceProps.entrySet()) {
                 p.setProperty(prop.getKey(), prop.getValue().toString());
             }
         }
         
-        copyProperty(ServicePublication.PROP_KEY_ENDPOINT_ID, sr, p);
-        copyProperty(ServicePublication.PROP_KEY_ENDPOINT_LOCATION, sr, p);
+        copyProperty(ServicePublication.ENDPOINT_ID, sr, p);
+        copyProperty(ServicePublication.ENDPOINT_LOCATION, sr, p);
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         p.store(baos, "");
