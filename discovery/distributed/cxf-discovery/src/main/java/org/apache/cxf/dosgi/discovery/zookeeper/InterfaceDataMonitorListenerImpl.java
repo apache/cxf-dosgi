@@ -63,14 +63,7 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                 p.load(new ByteArrayInputStream(data));
                 
                 Map<String, Object> m = new HashMap<String, Object>();
-                for (Map.Entry<Object, Object> entry : p.entrySet()) {
-                    /* TODO this is probably not necessary
-                    if (Constants.SERVICE_ID.equals(entry.getKey()) ||
-                        Constants.SERVICE_PID.equals(entry.getKey()) ||
-                        Constants.OBJECTCLASS.equals(entry.getKey())) {
-                        continue;
-                    } */
-                    
+                for (Map.Entry<Object, Object> entry : p.entrySet()) {                    
                     m.put(entry.getKey().toString(), entry.getValue());
                 }
                 
@@ -82,10 +75,13 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                     DiscoveredServiceNotification dsn = new DiscoveredServiceNotificationImpl(Collections.emptyList(),
                         Collections.singleton(interFace), DiscoveredServiceNotification.AVAILABLE, sed);
                     discoveredServiceTracker.serviceChanged(dsn);                    
-                } else {
+                } else if (!prevVal.equals(m)){
                     // There's been a modification
-                }
-                
+                    ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(Collections.singletonList(interFace), m);
+                    DiscoveredServiceNotification dsn = new DiscoveredServiceNotificationImpl(Collections.emptyList(),
+                        Collections.singleton(interFace), DiscoveredServiceNotification.MODIFIED, sed);
+                    discoveredServiceTracker.serviceChanged(dsn);                    
+                }                
             }
 
             for (Map<String, Object> props : prevNodes.values()) {
