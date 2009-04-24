@@ -102,18 +102,28 @@ public class AggregatedActivator implements BundleActivator {
     }
 
     void startEmbeddedActivators(BundleContext ctx) throws Exception {
-        for (String s : getActivators()) {
-            try {
-                Class<?> clazz = getClass().getClassLoader().loadClass(s);
-                Object o = clazz.newInstance();
-                if (o instanceof BundleActivator) {
-                    BundleActivator ba = (BundleActivator) o;
-                    activators.add(ba);
-                    ba.start(ctx);
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+            for (String s : getActivators()) {
+                try {
+                    Class<?> clazz = getClass().getClassLoader().loadClass(s);
+                    Object o = clazz.newInstance();
+                    if (o instanceof BundleActivator) {
+                        BundleActivator ba = (BundleActivator) o;
+                        activators.add(ba);
+                        ba.start(ctx);
+                    }
+                } catch (Throwable th) {
+                    th.printStackTrace();
                 }
-            } catch (Throwable th) {
-                th.printStackTrace();
             }
+
+            SPIActivator sba = new SPIActivator();
+            sba.start(ctx);
+            activators.add(sba);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
     }
 
@@ -123,10 +133,10 @@ public class AggregatedActivator implements BundleActivator {
         }
     }
     
-    Collection<String> getActivators() throws IOException {
+    static Collection<String> getActivators() throws IOException {
         List<String> bundleActivators = new ArrayList<String>();
         
-        URL url = getClass().getResource(ACTIVATOR_RESOURCE);
+        URL url = AggregatedActivator.class.getResource(ACTIVATOR_RESOURCE);
         if (url == null) {
             return Collections.emptyList();
         }
