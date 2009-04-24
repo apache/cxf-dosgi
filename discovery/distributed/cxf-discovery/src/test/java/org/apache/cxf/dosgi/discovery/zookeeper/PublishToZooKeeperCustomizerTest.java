@@ -21,8 +21,6 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,7 +33,6 @@ import java.util.UUID;
 import junit.framework.TestCase;
 
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.data.ACL;
@@ -44,7 +41,6 @@ import org.easymock.classextension.EasyMock;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServicePublication;
-import org.springframework.osgi.service.importer.support.ServiceReferenceEditor;
 
 public class PublishToZooKeeperCustomizerTest extends TestCase {
     public void testAddingService() throws Exception {
