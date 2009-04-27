@@ -2,9 +2,11 @@ package org.apache.cxf.dosgi.discovery.local;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,7 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.osgi.framework.Bundle;
 import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.discovery.ServicePublication;
 
 public class LocalDiscoveryUtilsTest extends TestCase {
     public void testNoRemoteServicesXMLFiles() {
@@ -94,14 +97,33 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         
         List<ServiceEndpointDescription> seds = LocalDiscoveryUtils.getAllRemoteReferences(b);
         assertEquals(2, seds.size());
+        Map<Collection<String>, String> eids = getEndpointIDs(seds);
         
         Map<String, Object> sed1Props = new HashMap<String, Object>();
         sed1Props.put("osgi.remote.requires.intents", "confidentiality");
+        sed1Props.put(ServicePublication.ENDPOINT_ID, eids.get(
+                Collections.singleton("SomeService")));       
         ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
                 Arrays.asList("SomeService"), sed1Props);
+
+        Map<String, Object> sed2Props = new HashMap<String, Object>();
+        sed2Props.put(ServicePublication.ENDPOINT_ID, eids.get(
+                new HashSet<String>(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"))));       
         ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("SomeOtherService", "WithSomeSecondInterface"));
+                Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), sed2Props);
         assertTrue(seds.contains(sed1));
         assertTrue(seds.contains(sed2));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<Collection<String>, String> getEndpointIDs(
+            List<ServiceEndpointDescription> seds) {
+        Map<Collection<String>, String> map = new HashMap<Collection<String>, String>();
+        
+        for (ServiceEndpointDescription sed : seds) {
+            map.put((Collection<String>) sed.getProvidedInterfaces(), sed.getEndpointID());
+        }
+        
+        return map;
     }
 }

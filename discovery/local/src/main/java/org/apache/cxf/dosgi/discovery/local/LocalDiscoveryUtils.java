@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +36,7 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.osgi.framework.Bundle;
 import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.discovery.ServicePublication;
 
 
 public final class LocalDiscoveryUtils {
@@ -60,6 +62,8 @@ public final class LocalDiscoveryUtils {
 
     private static final String INTERFACE_SEPARATOR = ":";
     
+    static boolean addEndpointID = true; // for testing
+    
     private LocalDiscoveryUtils() {
     }
     
@@ -72,6 +76,9 @@ public final class LocalDiscoveryUtils {
         for (Element ref : references) {
             List<String> iNames = getProvidedInterfaces(ref.getChildren(PROVIDE_INTERFACE_ELEMENT, ns));
             Map<String, Object> remoteProps = getProperties(ref.getChildren(PROPERTY_ELEMENT, ns));
+            if (addEndpointID) {
+                remoteProps.put(ServicePublication.ENDPOINT_ID, UUID.randomUUID().toString());
+            }
             srefs.add(new ServiceEndpointDescriptionImpl(iNames, remoteProps));
         }
         return srefs;

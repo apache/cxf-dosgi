@@ -21,14 +21,17 @@ package org.apache.cxf.dosgi.discovery.local;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -44,6 +47,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.discovery.ServicePublication;
 
 public class LocalDiscoveryServiceTest extends TestCase {
     public void testLocalDiscoveryServiceDSTInterface() {
@@ -77,12 +81,17 @@ public class LocalDiscoveryServiceTest extends TestCase {
         
         // it should be prepopulated with the info from bundle b0
         assertEquals(2, lds.servicesInfo.size());
+        Map<Collection<String>, String> eids = getEndpointIDs(lds.servicesInfo.keySet());
+
         Map<String, Object> sed1Props = new HashMap<String, Object>();
         sed1Props.put("osgi.remote.requires.intents", "confidentiality");
+        setEndpointID(eids, sed1Props, "org.example.SomeService");
         ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
                 Arrays.asList("org.example.SomeService"), sed1Props);
+        Map<String, Object> sed2Props = new HashMap<String, Object>();
+        setEndpointID(eids, sed2Props, "SomeOtherService", "WithSomeSecondInterface");       
         ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("SomeOtherService", "WithSomeSecondInterface"));
+                Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), sed2Props);
         assertTrue(lds.servicesInfo.containsKey(sed1));
         assertTrue(lds.servicesInfo.containsKey(sed2));
         
@@ -107,9 +116,12 @@ public class LocalDiscoveryServiceTest extends TestCase {
         // Call back on the LDS just like what would have happened with the BundleListener 
         BundleEvent be = new BundleEvent(BundleEvent.STARTED, b1);
         lds.bundleChanged(be);
+        Map<Collection<String>, String> eids2 = getEndpointIDs(lds.servicesInfo.keySet());
         
+        Map<String, Object> sed3Props = new HashMap<String, Object>();
+        setEndpointID(eids2, sed3Props, "org.example.SomeRelatedService", "org.example.SomeService");       
         ServiceEndpointDescription sed3 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService"));
+                Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService"), sed3Props);
         assertEquals(3, lds.servicesInfo.size());
         assertTrue(lds.servicesInfo.containsKey(sed1));
         assertTrue(lds.servicesInfo.containsKey(sed2));
@@ -167,219 +179,240 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals("Tracker should have been removed", 0, lds.interfacesToTrackers.values().iterator().next().size());
         assertEquals("Tracker should have been removed", 0, lds.trackersToInterfaces.size());
     }
+
+    private void setEndpointID(Map<Collection<String>, String> eids,
+            Map<String, Object> props, String ... interfaces) {
+        props.put(ServicePublication.ENDPOINT_ID, eids.get(
+                new HashSet<String>(Arrays.asList(interfaces))));
+    }
     
     public void testLocalDiscoveryServiceDSTFilter() throws Exception {
-        URL rsA = getClass().getResource("/rs_d.xml");
-        Enumeration<URL> rsAEnum = Collections.enumeration(Arrays.asList(rsA));
-        URL rsB = getClass().getResource("/rs_e.xml");
-        Enumeration<URL> rsBEnum = Collections.enumeration(Arrays.asList(rsB));
-        URL rsC = getClass().getResource("/rs_f.xml");
-        Enumeration<URL> rsCEnum = Collections.enumeration(Arrays.asList(rsC));
+        LocalDiscoveryUtils.addEndpointID = false;
         
-        // Set up some mock objects
-        IMocksControl control = EasyMock.createNiceControl();
-        Bundle b0 = control.createMock(Bundle.class);
-        EasyMock.expect(b0.getState()).andReturn(Bundle.ACTIVE).anyTimes();
-        EasyMock.expect(b0.findEntries("OSGI-INF/remote-service", "*.xml", false)).
-                andReturn(rsAEnum).anyTimes();
-        
-        BundleContext bc = control.createMock(BundleContext.class);
-        Filter mockFilter = control.createMock(Filter.class);
-        ServiceReference sr = control.createMock(ServiceReference.class);
-        TestDiscoveredServiceTracker dst = new TestDiscoveredServiceTracker();
-
-        EasyMock.expect(bc.getBundles()).andReturn(new Bundle[] {b0}).anyTimes();
-        EasyMock.expect(bc.createFilter("(blah <= 5)")).andReturn(mockFilter).anyTimes();
-        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.FILTER_MATCH_CRITERIA)).
-                andReturn(Collections.singleton("(blah <= 5)")).anyTimes();
-        
-        EasyMock.expect(bc.getService(sr)).andReturn(dst).anyTimes();
-        
-        // set up the mock filter behaviour
-        Dictionary<String, Object> d1 = new Hashtable<String, Object>();
-        d1.put("blah", "5");
-        EasyMock.expect(mockFilter.match(d1)).andReturn(true).anyTimes();
-        Dictionary<String, Object> d2 = new Hashtable<String, Object>();
-        d2.put("blah", "3");
-        d2.put("boo", "hello");
-        EasyMock.expect(mockFilter.match(d2)).andReturn(true).anyTimes();
-        
-        control.replay();
-
-        // create the local discovery service
-        LocalDiscoveryService lds = new LocalDiscoveryService(bc);
-        
-        // it should be prepopulated with the info from bundle b0
-        assertEquals(2, lds.servicesInfo.size());
-        Map<String, Object> sed1Props = new HashMap<String, Object>();
-        sed1Props.put("osgi.remote.requires.intents", "confidentiality");
-        ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("org.example.SomeService"), sed1Props);
-        Map<String, Object> sed2Props = new HashMap<String, Object>();
-        sed2Props.put("blah", "5");
-        ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), sed2Props);
-        assertTrue(lds.servicesInfo.containsKey(sed1));
-        assertTrue(lds.servicesInfo.containsKey(sed2));
-        
-        // should be pre-populated by now...
-        // register a tracker, it should get called back instantly with sed1
-        assertEquals("Precondition failed", 0, dst.notifications.size());
-        lds.trackerTracker.addingService(sr);
-        assertEquals(1, dst.notifications.size());
-        DiscoveredServiceNotification dsn = dst.notifications.iterator().next();
-        assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
-        assertEquals(sed2, dsn.getServiceEndpointDescription());
-        verifyNotification(dsn, 1, 0, "(blah <= 5)");
-        
-        // add a new bundle that also contains a someservice 
-        // we should get notified again...
-        Bundle b1 = EasyMock.createNiceMock(Bundle.class);
-        EasyMock.expect(b1.getState()).andReturn(Bundle.ACTIVE).anyTimes();
-        EasyMock.expect(b1.findEntries("OSGI-INF/remote-service", "*.xml", false)).
-                andReturn(rsBEnum).anyTimes();
-        EasyMock.replay(b1);
-
-        // Call back on the LDS just like what would have happened with the BundleListener 
-        BundleEvent be = new BundleEvent(BundleEvent.STARTED, b1);
-        lds.bundleChanged(be);
-        
-        Map<String, Object> sed3Props = new HashMap<String, Object>();
-        sed3Props.put("blah", "3");
-        sed3Props.put("boo", "hello");
-        ServiceEndpointDescription sed3 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService"), sed3Props);
-        assertEquals(3, lds.servicesInfo.size());
-        assertTrue(lds.servicesInfo.containsKey(sed1));
-        assertTrue(lds.servicesInfo.containsKey(sed2));
-        assertTrue(lds.servicesInfo.containsKey(sed3));
-        
-        assertEquals("We should have been notified of the new bundle", 
-                2, dst.notifications.size());
-        assertEquals(DiscoveredServiceNotification.AVAILABLE, 
-                dst.notifications.get(1).getType());
-        assertEquals(sed3, dst.notifications.get(1).getServiceEndpointDescription());
-        verifyNotification(dsn, 1, 0, "(blah <= 5)");
-        
-        ArrayList<DiscoveredServiceNotification> copiedNotifications = 
-                new ArrayList<DiscoveredServiceNotification>(dst.notifications);
-        
-        // add an unrelated bundle - no notification...
-        Bundle b2 = EasyMock.createNiceMock(Bundle.class);
-        EasyMock.expect(b2.getState()).andReturn(Bundle.ACTIVE).anyTimes();
-        EasyMock.expect(b2.findEntries("OSGI-INF/remote-service", "*.xml", false)).
-                andReturn(rsCEnum).anyTimes();
-        EasyMock.replay(b2);
-        
-        BundleEvent be2 = new BundleEvent(BundleEvent.STARTED, b1);
-        lds.bundleChanged(be2);
-        assertEquals("There should not have been any extra notification", 
-                copiedNotifications, dst.notifications);
-        
-        // assert that we get notified about the removal
+        try {
+            URL rsA = getClass().getResource("/rs_d.xml");
+            Enumeration<URL> rsAEnum = Collections.enumeration(Arrays.asList(rsA));
+            URL rsB = getClass().getResource("/rs_e.xml");
+            Enumeration<URL> rsBEnum = Collections.enumeration(Arrays.asList(rsB));
+            URL rsC = getClass().getResource("/rs_f.xml");
+            Enumeration<URL> rsCEnum = Collections.enumeration(Arrays.asList(rsC));
+            
+            // Set up some mock objects
+            IMocksControl control = EasyMock.createNiceControl();
+            Bundle b0 = control.createMock(Bundle.class);
+            EasyMock.expect(b0.getState()).andReturn(Bundle.ACTIVE).anyTimes();
+            EasyMock.expect(b0.findEntries("OSGI-INF/remote-service", "*.xml", false)).
+                    andReturn(rsAEnum).anyTimes();
+            
+            BundleContext bc = control.createMock(BundleContext.class);
+            Filter mockFilter = control.createMock(Filter.class);
+            ServiceReference sr = control.createMock(ServiceReference.class);
+            TestDiscoveredServiceTracker dst = new TestDiscoveredServiceTracker();
+    
+            EasyMock.expect(bc.getBundles()).andReturn(new Bundle[] {b0}).anyTimes();
+            EasyMock.expect(bc.createFilter("(blah <= 5)")).andReturn(mockFilter).anyTimes();
+            EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.FILTER_MATCH_CRITERIA)).
+                    andReturn(Collections.singleton("(blah <= 5)")).anyTimes();
+            
+            EasyMock.expect(bc.getService(sr)).andReturn(dst).anyTimes();
+            
+            // set up the mock filter behaviour
+            Dictionary<String, Object> d1 = new Hashtable<String, Object>();
+            d1.put("blah", "5");
+            EasyMock.expect(mockFilter.match(d1)).andReturn(true).anyTimes();
+            Dictionary<String, Object> d2 = new Hashtable<String, Object>();
+            d2.put("blah", "3");
+            d2.put("boo", "hello");
+            EasyMock.expect(mockFilter.match(d2)).andReturn(true).anyTimes();
+            
+            control.replay();
+    
+            // create the local discovery service
+            LocalDiscoveryService lds = new LocalDiscoveryService(bc);
+            
+            // it should be prepopulated with the info from bundle b0
+            assertEquals(2, lds.servicesInfo.size());
+    
+            Map<String, Object> sed1Props = new HashMap<String, Object>();
+            sed1Props.put("osgi.remote.requires.intents", "confidentiality");
+            ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
+                    Arrays.asList("org.example.SomeService"), sed1Props);
+            Map<String, Object> sed2Props = new HashMap<String, Object>();
+            sed2Props.put("blah", "5");
+            ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
+                    Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), sed2Props);
+            assertTrue(lds.servicesInfo.containsKey(sed1));
+            assertTrue(lds.servicesInfo.containsKey(sed2));
+            
+            // should be pre-populated by now...
+            // register a tracker, it should get called back instantly with sed1
+            assertEquals("Precondition failed", 0, dst.notifications.size());
+            lds.trackerTracker.addingService(sr);
+            assertEquals(1, dst.notifications.size());
+            DiscoveredServiceNotification dsn = dst.notifications.iterator().next();
+            assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
+            assertEquals(sed2, dsn.getServiceEndpointDescription());
+            verifyNotification(dsn, 1, 0, "(blah <= 5)");
+            
+            // add a new bundle that also contains a someservice 
+            // we should get notified again...
+            Bundle b1 = EasyMock.createNiceMock(Bundle.class);
+            EasyMock.expect(b1.getState()).andReturn(Bundle.ACTIVE).anyTimes();
+            EasyMock.expect(b1.findEntries("OSGI-INF/remote-service", "*.xml", false)).
+                    andReturn(rsBEnum).anyTimes();
+            EasyMock.replay(b1);
+    
+            // Call back on the LDS just like what would have happened with the BundleListener 
+            BundleEvent be = new BundleEvent(BundleEvent.STARTED, b1);
+            lds.bundleChanged(be);
+            
+            Map<String, Object> sed3Props = new HashMap<String, Object>();
+            sed3Props.put("blah", "3");
+            sed3Props.put("boo", "hello");
+            ServiceEndpointDescription sed3 = new ServiceEndpointDescriptionImpl(
+                    Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService"), sed3Props);
+            assertEquals(3, lds.servicesInfo.size());
+            assertTrue(lds.servicesInfo.containsKey(sed1));
+            assertTrue(lds.servicesInfo.containsKey(sed2));
+            assertTrue(lds.servicesInfo.containsKey(sed3));
+            
+            assertEquals("We should have been notified of the new bundle", 
+                    2, dst.notifications.size());
+            assertEquals(DiscoveredServiceNotification.AVAILABLE, 
+                    dst.notifications.get(1).getType());
+            assertEquals(sed3, dst.notifications.get(1).getServiceEndpointDescription());
+            verifyNotification(dsn, 1, 0, "(blah <= 5)");
+            
+            ArrayList<DiscoveredServiceNotification> copiedNotifications = 
+                    new ArrayList<DiscoveredServiceNotification>(dst.notifications);
+            
+            // add an unrelated bundle - no notification...
+            Bundle b2 = EasyMock.createNiceMock(Bundle.class);
+            EasyMock.expect(b2.getState()).andReturn(Bundle.ACTIVE).anyTimes();
+            EasyMock.expect(b2.findEntries("OSGI-INF/remote-service", "*.xml", false)).
+                    andReturn(rsCEnum).anyTimes();
+            EasyMock.replay(b2);
+            
+            BundleEvent be2 = new BundleEvent(BundleEvent.STARTED, b1);
+            lds.bundleChanged(be2);
+            assertEquals("There should not have been any extra notification", 
+                    copiedNotifications, dst.notifications);
+        } finally {
+            LocalDiscoveryUtils.addEndpointID = true;
+        }
     }
 
     public void testUpdateTracker() {
-        URL rsA = getClass().getResource("/rs_a.xml");
-        Enumeration<URL> rsAEnum = Collections.enumeration(Arrays.asList(rsA));
+        LocalDiscoveryUtils.addEndpointID = false;
         
-        // Set up some mock objects
-        IMocksControl control = EasyMock.createNiceControl();
-        Bundle b0 = control.createMock(Bundle.class);
-        EasyMock.expect(b0.getState()).andReturn(Bundle.ACTIVE).anyTimes();
-        EasyMock.expect(b0.findEntries("OSGI-INF/remote-service", "*.xml", false)).
-                andReturn(rsAEnum).anyTimes();
-        
-        BundleContext bc = control.createMock(BundleContext.class);
-        EasyMock.expect(bc.getBundles()).andReturn(new Bundle[] {b0}).anyTimes();
-
-        TestDiscoveredServiceTracker dst = new TestDiscoveredServiceTracker();
-
-        ServiceReference sr = EasyMock.createNiceMock(ServiceReference.class);
-        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
-                andReturn(Collections.singleton("org.example.SomeService")).anyTimes();
-        EasyMock.replay(sr);
-        
-        EasyMock.expect(bc.getService(sr)).andReturn(dst).anyTimes();
-        control.replay();
-
-        // create the local discovery service
-        LocalDiscoveryService lds = new LocalDiscoveryService(bc);
-        
-        // it should be prepopulated with the info from bundle b0
-        assertEquals(2, lds.servicesInfo.size());
-        Map<String, Object> sed1Props = new HashMap<String, Object>();
-        sed1Props.put("osgi.remote.requires.intents", "confidentiality");
-        ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("org.example.SomeService"), sed1Props);
-        ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("SomeOtherService", "WithSomeSecondInterface"));
-        assertTrue(lds.servicesInfo.containsKey(sed1));
-        assertTrue(lds.servicesInfo.containsKey(sed2));
-        
-        // should be prepopulated by now...
-        // register a tracker, it should get called back instantly with sed1
-        assertEquals("Precondition failed", 0, dst.notifications.size());
-        lds.trackerTracker.addingService(sr);
-        assertEquals(1, dst.notifications.size());
-        DiscoveredServiceNotification dsn = dst.notifications.iterator().next();
-        assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
-        assertEquals(sed1, dsn.getServiceEndpointDescription());
-        verifyNotification(dsn, 0, 1, "org.example.SomeService");
-        
-        EasyMock.reset(sr);
-        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
-                andReturn(Arrays.asList("org.example.SomeService", "SomeOtherService")).anyTimes();
-        EasyMock.replay(sr);
-        
-        lds.trackerTracker.modifiedService(sr, dst);
-        assertEquals(2, dst.notifications.size());
-        DiscoveredServiceNotification dsn0 = dst.notifications.get(0);
-        assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn0.getType());
-        assertEquals(sed1, dsn0.getServiceEndpointDescription());
-        DiscoveredServiceNotification dsn1 = dst.notifications.get(1);
-        assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn1.getType());
-        assertEquals(sed2, dsn1.getServiceEndpointDescription());
-        verifyNotification(dsn1, 0, 1, "SomeOtherService");        
+        try {
+            URL rsA = getClass().getResource("/rs_a.xml");
+            Enumeration<URL> rsAEnum = Collections.enumeration(Arrays.asList(rsA));
+            
+            // Set up some mock objects
+            IMocksControl control = EasyMock.createNiceControl();
+            Bundle b0 = control.createMock(Bundle.class);
+            EasyMock.expect(b0.getState()).andReturn(Bundle.ACTIVE).anyTimes();
+            EasyMock.expect(b0.findEntries("OSGI-INF/remote-service", "*.xml", false)).
+                    andReturn(rsAEnum).anyTimes();
+            
+            BundleContext bc = control.createMock(BundleContext.class);
+            EasyMock.expect(bc.getBundles()).andReturn(new Bundle[] {b0}).anyTimes();
+    
+            TestDiscoveredServiceTracker dst = new TestDiscoveredServiceTracker();
+    
+            ServiceReference sr = EasyMock.createNiceMock(ServiceReference.class);
+            EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
+                    andReturn(Collections.singleton("org.example.SomeService")).anyTimes();
+            EasyMock.replay(sr);
+            
+            EasyMock.expect(bc.getService(sr)).andReturn(dst).anyTimes();
+            control.replay();
+    
+            // create the local discovery service
+            LocalDiscoveryService lds = new LocalDiscoveryService(bc);
+            
+            // it should be prepopulated with the info from bundle b0
+            assertEquals(2, lds.servicesInfo.size());
+            Map<String, Object> sed1Props = new HashMap<String, Object>();
+            sed1Props.put("osgi.remote.requires.intents", "confidentiality");
+            ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
+                    Arrays.asList("org.example.SomeService"), sed1Props);
+            ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
+                    Arrays.asList("SomeOtherService", "WithSomeSecondInterface"));
+            assertTrue(lds.servicesInfo.containsKey(sed1));
+            assertTrue(lds.servicesInfo.containsKey(sed2));
+            
+            // should be prepopulated by now...
+            // register a tracker, it should get called back instantly with sed1
+            assertEquals("Precondition failed", 0, dst.notifications.size());
+            lds.trackerTracker.addingService(sr);
+            assertEquals(1, dst.notifications.size());
+            DiscoveredServiceNotification dsn = dst.notifications.iterator().next();
+            assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
+            assertEquals(sed1, dsn.getServiceEndpointDescription());
+            verifyNotification(dsn, 0, 1, "org.example.SomeService");
+            
+            EasyMock.reset(sr);
+            EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
+                    andReturn(Arrays.asList("org.example.SomeService", "SomeOtherService")).anyTimes();
+            EasyMock.replay(sr);
+            
+            lds.trackerTracker.modifiedService(sr, dst);
+            assertEquals(2, dst.notifications.size());
+            DiscoveredServiceNotification dsn0 = dst.notifications.get(0);
+            assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn0.getType());
+            assertEquals(sed1, dsn0.getServiceEndpointDescription());
+            DiscoveredServiceNotification dsn1 = dst.notifications.get(1);
+            assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn1.getType());
+            assertEquals(sed2, dsn1.getServiceEndpointDescription());
+            verifyNotification(dsn1, 0, 1, "SomeOtherService");
+        } finally {
+            LocalDiscoveryUtils.addEndpointID = true;
+        }
     }
     
     public void testLocalDiscoveryServiceExistingBundles() {
-        URL rsA = getClass().getResource("/rs_a.xml");
-        Enumeration<URL> rsAEnum = Collections.enumeration(Arrays.asList(rsA));
-        URL rsB = getClass().getResource("/rs_b.xml");
-        Enumeration<URL> rsBEnum = Collections.enumeration(Arrays.asList(rsB));
-        
-        // Set up some mock objects
-        IMocksControl control = EasyMock.createNiceControl();
-        Bundle b0 = control.createMock(Bundle.class);
-        EasyMock.expect(b0.getState()).andReturn(Bundle.INSTALLED).anyTimes();
-        EasyMock.expect(b0.findEntries("OSGI-INF/remote-service", "*.xml", false)).
-                andReturn(rsAEnum).anyTimes();
-
-        Bundle b1 = control.createMock(Bundle.class);
-        EasyMock.expect(b1.getState()).andReturn(Bundle.ACTIVE).anyTimes();
-        EasyMock.expect(b1.findEntries("OSGI-INF/remote-service", "*.xml", false)).
-                andReturn(rsBEnum).anyTimes();
-        
-        BundleContext bc = control.createMock(BundleContext.class);
-        ServiceReference sr = control.createMock(ServiceReference.class);
-        TestDiscoveredServiceTracker dst = new TestDiscoveredServiceTracker();
-
-        EasyMock.expect(bc.getBundles()).andReturn(new Bundle[] {b0, b1}).anyTimes();
-        EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
-                andReturn(Collections.singleton("org.example.SomeService")).anyTimes();
-        
-        EasyMock.expect(bc.getService(sr)).andReturn(dst).anyTimes();
-        control.replay();
-
-        // create the local discovery service
-        LocalDiscoveryService lds = new LocalDiscoveryService(bc);
-        
-        ServiceEndpointDescription sed3 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService"));
-        assertEquals(1, lds.servicesInfo.size());
-        assertEquals(sed3, lds.servicesInfo.keySet().iterator().next());
+        LocalDiscoveryUtils.addEndpointID = false;
+        try {
+            URL rsA = getClass().getResource("/rs_a.xml");
+            Enumeration<URL> rsAEnum = Collections.enumeration(Arrays.asList(rsA));
+            URL rsB = getClass().getResource("/rs_b.xml");
+            Enumeration<URL> rsBEnum = Collections.enumeration(Arrays.asList(rsB));
+            
+            // Set up some mock objects
+            IMocksControl control = EasyMock.createNiceControl();
+            Bundle b0 = control.createMock(Bundle.class);
+            EasyMock.expect(b0.getState()).andReturn(Bundle.INSTALLED).anyTimes();
+            EasyMock.expect(b0.findEntries("OSGI-INF/remote-service", "*.xml", false)).
+                    andReturn(rsAEnum).anyTimes();
     
+            Bundle b1 = control.createMock(Bundle.class);
+            EasyMock.expect(b1.getState()).andReturn(Bundle.ACTIVE).anyTimes();
+            EasyMock.expect(b1.findEntries("OSGI-INF/remote-service", "*.xml", false)).
+                    andReturn(rsBEnum).anyTimes();
+            
+            BundleContext bc = control.createMock(BundleContext.class);
+            ServiceReference sr = control.createMock(ServiceReference.class);
+            TestDiscoveredServiceTracker dst = new TestDiscoveredServiceTracker();
+    
+            EasyMock.expect(bc.getBundles()).andReturn(new Bundle[] {b0, b1}).anyTimes();
+            EasyMock.expect(sr.getProperty(DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA)).
+                    andReturn(Collections.singleton("org.example.SomeService")).anyTimes();
+            
+            EasyMock.expect(bc.getService(sr)).andReturn(dst).anyTimes();
+            control.replay();
+    
+            // create the local discovery service
+            LocalDiscoveryService lds = new LocalDiscoveryService(bc);
+            
+            ServiceEndpointDescription sed3 = new ServiceEndpointDescriptionImpl(
+                    Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService"));
+            assertEquals(1, lds.servicesInfo.size());
+            assertEquals(sed3, lds.servicesInfo.keySet().iterator().next());
+        } finally {
+            LocalDiscoveryUtils.addEndpointID = true;
+        }
     }
     
     public void testCombinationInterfaceAndFilter() {
@@ -438,11 +471,23 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals(expected, i.next()); 
     }
 
+    @SuppressWarnings("unchecked")
+    private Map<Collection<String>, String> getEndpointIDs(
+            Collection<ServiceEndpointDescription> seds) {
+        Map<Collection<String>, String> map = new HashMap<Collection<String>, String>();
+        
+        for (ServiceEndpointDescription sed : seds) {
+            map.put((Collection<String>) sed.getProvidedInterfaces(), sed.getEndpointID());
+        }
+        
+        return map;
+    }
+
     private static class TestDiscoveredServiceTracker implements DiscoveredServiceTracker {
         private List<DiscoveredServiceNotification> notifications = new ArrayList<DiscoveredServiceNotification>();
 
         public void serviceChanged(DiscoveredServiceNotification notification) {
             notifications.add(notification);
         }        
-    }
+    }    
 }

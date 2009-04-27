@@ -18,6 +18,7 @@
   */
 package org.apache.cxf.dosgi.discovery.local;
 
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_ID;
 import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
 
 import java.net.URI;
@@ -38,7 +39,7 @@ public class ServiceEndpointDescriptionImpl implements ServiceEndpointDescriptio
         Logger.getLogger(ServiceEndpointDescriptionImpl.class.getName());
     
     private Set<String> interfaceNames; 
-    private Map<String, Object> properties;
+    Map<String, Object> properties;
     
     @SuppressWarnings("unchecked")
     public ServiceEndpointDescriptionImpl(String interfaceName) {
@@ -113,6 +114,11 @@ public class ServiceEndpointDescriptionImpl implements ServiceEndpointDescriptio
     }
 
     public String getEndpointID() {
-        return null;
+        Object val = properties.get(ENDPOINT_ID);
+        if (val == null) {
+            return null;
+        } else {
+            return val.toString();
+        }
     }
 }
