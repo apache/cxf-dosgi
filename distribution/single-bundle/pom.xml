@@ -22,7 +22,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.cxf.dosgi</groupId>
   <artifactId>cxf-dosgi-ri-singlebundle-distribution</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>bundle</packaging>
   <name>Distributed OSGI Single-Bundle Distribution</name>
   <url>http://cxf.apache.org</url>
@@ -30,7 +30,7 @@
   <parent>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-distribution-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -285,17 +285,17 @@
             <configuration>
               <tasks>
                 <!-- removing this directory as it confuses Eclipse when importing the bundle as a plugin -->
-                <delete dir="target/classes"/>
+                <delete dir="target/classes" />
 
                 <fileset dir="target" id="single.bundle">
-                  <include name="*.jar"/>
+                  <include name="*.jar" />
                 </fileset>
-                <pathconvert pathsep="" property="bundle" refid="single.bundle"/>
+                <pathconvert pathsep="" property="bundle" refid="single.bundle" />
 
                 <fileset dir="target/deps" id="felix.dep.bundles">
-                  <include name="*.jar"/>
+                  <include name="*.jar" />
                 </fileset>
-                <pathconvert pathsep=" file:/" property="felix.deps" refid="felix.dep.bundles"/>
+                <pathconvert pathsep=" file:/" property="felix.deps" refid="felix.dep.bundles" />
 
                 <!-- config.properties file for Felix -->
                 <echo file="target/felix.config.properties.append">
@@ -303,8 +303,8 @@ org.ops4j.pax.web.session.timeout=30
 org.osgi.framework.startlevel=2
 felix.auto.start.2=
                 </echo>
-                <echo message="file:/${felix.deps} file:/${bundle}" file="target/felix.config.properties.append" append="true"/>
-                <replace file="target/felix.config.properties.append" token="\" value="/"/>
+                <echo message="file:/${felix.deps} file:/${bundle}" file="target/felix.config.properties.append" append="true" />
+                <replace file="target/felix.config.properties.append" token="\" value="/" />
 
                 <!-- config.ini file for Equinox -->
                 <echo file="target/equinox.config.ini.append">
@@ -312,8 +312,8 @@ org.ops4j.pax.web.session.timeout=30
 
 osgi.bundles=org.eclipse.osgi.services@start, 
                 </echo>
-                <echo message="${bundle}@start" file="target/equinox.config.ini.append" append="true"/>
-                <replace file="target/equinox.config.ini.append" token="\" value="/"/>
+                <echo message="${bundle}@start" file="target/equinox.config.ini.append" append="true" />
+                <replace file="target/equinox.config.ini.append" token="\" value="/" />
               </tasks>
             </configuration>
             <goals>
