@@ -18,8 +18,7 @@
  * under the License.
 -->
 <assembly>
-    <!-- id typically identifies the "type" (src vs bin etc) of the assembly -->
-    <id>src</id>
+    <id></id>
     <includeBaseDirectory>false</includeBaseDirectory>
     <formats>
         <format>tar.gz</format>
@@ -29,7 +28,7 @@
     <fileSets>
         <fileSet>
             <directory>../..</directory>
-            <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}-src</outputDirectory>
+            <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>

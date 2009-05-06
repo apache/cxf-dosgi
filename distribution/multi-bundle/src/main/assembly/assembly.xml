@@ -18,6 +18,7 @@
   under the License.
 -->
   <formats>
+    <format>tar.gz</format>
     <format>zip</format>
     <format>dir</format>
   </formats>
@@ -33,12 +34,22 @@
     </fileSet>
     <fileSet>
       <directory>target/maven-shared-archive-resources/META-INF</directory>
+      <excludes>
+          <exclude>DEPENDENCIES</exclude>
+      </excludes>
       <outputDirectory></outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/resources/META-INF</directory>
       <includes>
         <include>NOTICE.jdom</include>
+      </includes>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/release</directory>
+      <includes>
+        <include>README</include>
       </includes>
       <outputDirectory></outputDirectory>
     </fileSet>

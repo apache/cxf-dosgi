@@ -33,12 +33,6 @@ are generated from schema available here:
 (http://java.sun.com/xml/ns/javaee/javaee_5.xsd)
 
 
-This product also includes MTOSI wsdl and schemas developed by the
-TeleManagement Forum (http://www.tmforum.org/browse.aspx). The original
-MTOSI wsdl and schemas can be download from
-(http://sourceforge.net/projects/mtosi-ri)
-
-
 Portions of the included XmlSchema library are Copyright 2006 International Business Machines Corp.
 
 
