@@ -456,7 +456,65 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals("removeBundleListener", bundleListenerRegs.get(1));
     }
     
+    public void testAddTracker() {
+        String prop = DiscoveredServiceTracker.INTERFACE_MATCH_CRITERIA;
+
+        DiscoveredServiceTracker dst = EasyMock.createMock(DiscoveredServiceTracker.class);
+        EasyMock.replay(dst);
+        ServiceReference ref = EasyMock.createMock(ServiceReference.class);
+        List<String> interfaces = new ArrayList<String>(Arrays.asList("A", "B"));
+        EasyMock.expect(ref.getProperty(prop)).andReturn(interfaces);
+        EasyMock.replay(ref);
+        
+        Map<String, List<DiscoveredServiceTracker>> forwardMap = 
+            new HashMap<String, List<DiscoveredServiceTracker>>();
+        Map<DiscoveredServiceTracker, Collection<String>> reverseMap = 
+            new HashMap<DiscoveredServiceTracker, Collection<String>>();
+        
+        assertEquals("Precondition failed", 0, forwardMap.size());
+        assertEquals("Precondition failed", 0, reverseMap.size());
+        Collection<String> result = LocalDiscoveryService.addTracker(ref, dst, prop, 
+            forwardMap, reverseMap);
+        assertEquals(interfaces, result);
+        
+        assertEquals(interfaces, reverseMap.get(dst));
+        // check that the data in the reversemap is backed by a different array
+        reverseMap.get(dst).clear();
+        assertEquals("The data in the reverseMap should be backed by a different object, not the DST property",
+            Arrays.asList("A", "B"), interfaces);
+        
+        assertEquals(2, forwardMap.size());
+        assertEquals(Collections.singletonList(dst), forwardMap.get("A"));
+        assertEquals(Collections.singletonList(dst), forwardMap.get("B"));
+
+        EasyMock.verify(ref);
+    }
+    
     public void testRemoveTracker() {
+        DiscoveredServiceTracker dst = new DiscoveredServiceTracker(){
+            public void serviceChanged(DiscoveredServiceNotification notification) {
+            }
+        };
+        
+        Map<String, List<DiscoveredServiceTracker>> forwardMap = 
+            new HashMap<String, List<DiscoveredServiceTracker>>();
+        forwardMap.put("A", new ArrayList<DiscoveredServiceTracker>(Arrays.asList(dst)));
+
+        Map<DiscoveredServiceTracker, Collection<String>> reverseMap = 
+            new HashMap<DiscoveredServiceTracker, Collection<String>>();
+        reverseMap.put(dst, new ArrayList<String>(Arrays.asList("A", "B")));
+        
+        assertEquals("Precondition failed", 1, reverseMap.size());
+        assertEquals("Precondition failed", 1, forwardMap.get("A").size());
+        Collection<String> old = LocalDiscoveryService.removeTracker(dst, forwardMap, reverseMap);
+        assertEquals(1, old.size());
+        assertEquals("A", old.iterator().next());
+        
+        assertEquals(0, forwardMap.get("A").size());
+        assertEquals(0, reverseMap.size());
+    }
+
+    public void testRemoveTrackerNull() {
         DiscoveredServiceTracker dst = new DiscoveredServiceTracker(){
             public void serviceChanged(DiscoveredServiceNotification notification) {
             }
@@ -466,17 +524,10 @@ public class LocalDiscoveryServiceTest extends TestCase {
             new HashMap<String, List<DiscoveredServiceTracker>>();
         Map<DiscoveredServiceTracker, Collection<String>> reverseMap = 
             new HashMap<DiscoveredServiceTracker, Collection<String>>();
-        ArrayList<String> l = new ArrayList<String>(Arrays.asList("A", "B"));
-        reverseMap.put(dst, l);
-        List<DiscoveredServiceTracker> l2 = new ArrayList<DiscoveredServiceTracker>(Arrays.asList(dst));
-        forwardMap.put("A", l2);
-        Collection<String> old = LocalDiscoveryService.removeTracker(dst, forwardMap, reverseMap);
-        assertEquals(1, old.size());
-        assertEquals("A", old.iterator().next());
-        assertEquals("this list should not have been modified yet", 2, l.size());
-        assertEquals("This list should be emptu now", 0, l2.size());
+        
+        assertNull(LocalDiscoveryService.removeTracker(dst, forwardMap, reverseMap));
     }
-
+ 
     private void verifyNotification(DiscoveredServiceNotification dsn,
                                int filterCount,
                                int interfaceCount,

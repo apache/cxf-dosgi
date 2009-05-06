@@ -232,7 +232,7 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
             (Collection<String>) reference.getProperty(property);
         LOG.info("adding tracker: " + tracker + " collection: " + collection + " registered against prop: " + property);
         if (nonEmpty(collection)) {
-            reverseMap.put(tracker, collection);
+            reverseMap.put(tracker, new ArrayList<String>(collection));
             Iterator<String> i = collection.iterator();
             while (i.hasNext()) {
                 String element = i.next();
@@ -255,7 +255,6 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
                       Map<DiscoveredServiceTracker, Collection<String>> reverseMap) {
         Collection<String> collection = reverseMap.get(tracker);
         if (nonEmpty(collection)) {
-            collection = new ArrayList<String>(collection); // work on a copy 
             reverseMap.remove(tracker);
             Iterator<String> i = collection.iterator();
             while (i.hasNext()) {
