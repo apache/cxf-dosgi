@@ -54,5 +54,13 @@
                 <exclude>**/discovery/distributed/**/*</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>src/main/release</directory>
+            <includes>
+                <include>LICENSE</include>
+                <include>NOTICE</include>
+            </includes>
+            <outputDirectory></outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
