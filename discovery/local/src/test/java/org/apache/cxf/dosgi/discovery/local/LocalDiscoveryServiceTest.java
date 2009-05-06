@@ -31,7 +31,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -455,6 +454,27 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals(2, bundleListenerRegs.size());
         assertEquals("addBundleListener", bundleListenerRegs.get(0));
         assertEquals("removeBundleListener", bundleListenerRegs.get(1));
+    }
+    
+    public void testRemoveTracker() {
+        DiscoveredServiceTracker dst = new DiscoveredServiceTracker(){
+            public void serviceChanged(DiscoveredServiceNotification notification) {
+            }
+        };
+        
+        Map<String, List<DiscoveredServiceTracker>> forwardMap = 
+            new HashMap<String, List<DiscoveredServiceTracker>>();
+        Map<DiscoveredServiceTracker, Collection<String>> reverseMap = 
+            new HashMap<DiscoveredServiceTracker, Collection<String>>();
+        ArrayList<String> l = new ArrayList<String>(Arrays.asList("A", "B"));
+        reverseMap.put(dst, l);
+        List<DiscoveredServiceTracker> l2 = new ArrayList<DiscoveredServiceTracker>(Arrays.asList(dst));
+        forwardMap.put("A", l2);
+        Collection<String> old = LocalDiscoveryService.removeTracker(dst, forwardMap, reverseMap);
+        assertEquals(1, old.size());
+        assertEquals("A", old.iterator().next());
+        assertEquals("this list should not have been modified yet", 2, l.size());
+        assertEquals("This list should be emptu now", 0, l2.size());
     }
 
     private void verifyNotification(DiscoveredServiceNotification dsn,
