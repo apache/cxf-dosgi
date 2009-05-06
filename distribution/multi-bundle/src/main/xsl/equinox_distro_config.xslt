@@ -5,7 +5,7 @@
 org.ops4j.pax.web.session.timeout=30
 
 osgi.bundles=org.eclipse.osgi.services@start, \
-<xsl:for-each select="//bundles/bundle">../dosgi_bundles/<xsl:value-of select="substring-after(text(), 'cxf-dosgi-ri-multibundle-distribution-1.0-SNAPSHOT.dir/dosgi_bundles/')"/><xsl:value-of select="string('@start, ')"/></xsl:for-each>
+<xsl:for-each select="//bundles/bundle">../dosgi_bundles/<xsl:value-of select="substring-after(text(), '.dir/dosgi_bundles/')"/><xsl:value-of select="string('@start, ')"/></xsl:for-each>
   </xsl:template>
 </xsl:transform>
 
