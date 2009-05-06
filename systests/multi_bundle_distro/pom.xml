@@ -21,14 +21,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.cxf.dosgi.systests</groupId>
   <artifactId>cxf-dosgi-ri-systests-multibundle-distro</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Distributed OSGI RI System Test using Multi Bundle Distro</name>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.systests</groupId>
     <artifactId>cxf-dosgi-ri-systests</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>  
   </parent>
 
