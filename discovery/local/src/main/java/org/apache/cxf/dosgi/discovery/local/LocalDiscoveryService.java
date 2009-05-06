@@ -33,7 +33,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -49,7 +48,6 @@ import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.Discovery;
 import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.discovery.ServicePublication;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class LocalDiscoveryService implements Discovery, BundleListener {
@@ -224,7 +222,7 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
     }
 
     @SuppressWarnings("unchecked")
-    private Collection<String> addTracker(
+    static Collection<String> addTracker(
                       ServiceReference reference, 
                       DiscoveredServiceTracker tracker,
                       String property,
@@ -234,7 +232,7 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
             (Collection<String>) reference.getProperty(property);
         LOG.info("adding tracker: " + tracker + " collection: " + collection + " registered against prop: " + property);
         if (nonEmpty(collection)) {
-            reverseMap.put(tracker, collection);
+            reverseMap.put(tracker, new ArrayList<String>(collection));
             Iterator<String> i = collection.iterator();
             while (i.hasNext()) {
                 String element = i.next();
@@ -251,7 +249,7 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
         return collection;
     }
 
-    private Collection<String> removeTracker(
+    static Collection<String> removeTracker(
                       DiscoveredServiceTracker tracker,
                       Map<String, List<DiscoveredServiceTracker>> forwardMap,
                       Map<DiscoveredServiceTracker, Collection<String>> reverseMap) {
@@ -263,6 +261,10 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
                 String element = i.next();
                 if (forwardMap.containsKey(element)) {
                     forwardMap.get(element).remove(tracker);
+                } else {
+                    // if the element wasn't on the forwardmap, its a new element and 
+                    // shouldn't be returned as part of the collection of old ones
+                    i.remove();                    
                 }
             }
         }

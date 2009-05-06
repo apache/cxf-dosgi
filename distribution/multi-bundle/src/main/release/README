@@ -1,0 +1,52 @@
+Welcome to the Apache CXF Distributed OSGi DSW Reference Implementation
+=======================================================================
+
+
+The dOSGi subproject of Apache CXF provides the Reference Implementation
+of the Distribution Software (DSW) component of the Distributed OSGi
+Specification[1].
+
+
+This release is provided for your convenience in three different 
+distribution formats:
+
+1. Multi-bundle distro: cxf-dosgi-ri-multibundle-distribution-1.0.{tar.gaz|zip}
+
+Contains the dOSGi implementation and all 3rd party dependencies as 
+separate bundles within an archive.
+
+
+2. Single-bundle distro: cxf-dosgi-ri-singlebundle-distribution-1.0.jar
+
+Contains the dOSGi implementation and all 3rd party dependencies wrapped
+in a single OSGi bundle so as to allow direct installation in your favourite 
+OSGi container in one fell swoop.
+
+	
+3. Source distro: cxf-dosgi-ri-source-distribution-1.1-SNAPSHOT.{tar.gz|zip}
+
+Contains the entire source tree for dOSGi.
+
+
+The best starting point for using dOSGi is the Getting Started Guide[2].
+
+Also note the very detailed walk-through of the greeter demo[3].
+
+If you need more help, or want to provide any feedback, please feel free 
+to drop us a note on the CXF dev or users list[4].
+ 
+If you trip over any problems with dOSGi, don't hesitate to submit an issue
+to the CXF JIRA[5] with the component set to "Distributed-OSGi".
+
+
+Thanks for using dOSGi!
+
+Regards,
+The CXF dOSGi team.
+
+
+[1] See RFC 119 in http://www.osgi.org/download/osgi-4.2-early-draft3.pdf
+[2] http://cxf.apache.org/distributed-osgi.html#DistributedOSGi-GettingStarted
+[3] http://cxf.apache.org/distributed-osgi-greeter-demo-walkthrough.htm
+[4] http://cxf.apache.org/mailing-lists.html
+[5] https://issues.apache.org/jira/browse/CXF
