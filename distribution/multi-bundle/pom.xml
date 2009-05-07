@@ -277,13 +277,17 @@
                 </path>
                 <pathconvert targetos="unix" property="current.dir" refid="current.dir.path" />
                 
-                <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/distribution_configs/felix.config.properties.append" style="src/main/xsl/felix_distro_config.xslt" />
+                <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/distribution_configs/felix.config.properties.append" style="src/main/xsl/felix_distro_config.xslt">
+                    <param name="Version" expression="${dosgi.version}" />
+                </xslt>
                 
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/felix.config.properties.append" style="src/main/xsl/felix_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/" />
                 </xslt>
                 
-                <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/distribution_configs/equinox.config.ini.append" style="src/main/xsl/equinox_distro_config.xslt" />
+                <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/distribution_configs/equinox.config.ini.append" style="src/main/xsl/equinox_distro_config.xslt">
+                    <param name="Version" expression="${dosgi.version}" />
+                </xslt>
                 
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/equinox.config.ini.append" style="src/main/xsl/equinox_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/" />
