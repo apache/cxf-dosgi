@@ -48,7 +48,6 @@ import org.osgi.framework.ServiceReference;
  * mechanisms has to succeed.
  * 
  * @ThreadSafe
- * @version $Revision: 6845 $
  */
 public interface ServicePublication {
 
@@ -60,7 +59,7 @@ public interface ServicePublication {
 	 * Value of this property is of type
 	 * <code>Collection (&lt;? extends String&gt;)</code>.
 	 */
-	public static final String	SERVICE_INTERFACE_NAME		= "osgi.remote.interfaces";
+	public static final String	SERVICE_INTERFACE_NAME		= "osgi.remote.service.interfaces";
 
 	/**
 	 * Optional ServiceRegistration property which contains a collection of
@@ -74,7 +73,7 @@ public interface ServicePublication {
 	 * <code>Collection (&lt;? extends String&gt;)</code>, may be
 	 * <code>null</code> or empty.
 	 */
-	public static final String	SERVICE_INTERFACE_VERSION	= "osgi.remote.interfaces.version";
+	public static final String	SERVICE_INTERFACE_VERSION	= "osgi.remote.service.interfaces.version";
 
 	/**
 	 * Optional ServiceRegistration property which contains a collection of
