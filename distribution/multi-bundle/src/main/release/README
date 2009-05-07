@@ -14,7 +14,12 @@ distribution formats:
 
 Contains the dOSGi implementation and all 3rd party dependencies as 
 separate bundles within an archive. The current distribution is an
-instance of this type.
+instance of this type. The easiest way to get started is to explode
+this archive into your Felix or Equinox installation tree. Then
+append the contents of the felix.config.properties.append or
+equinox.config.ini.append snippets found in the conf directory to 
+your felix.config.properties or equinox.config.ini. This will cause
+all the required bundles to be loaded on start-up.
 
 
 2. Single-bundle distro: cxf-dosgi-ri-singlebundle-distribution-1.0.jar
