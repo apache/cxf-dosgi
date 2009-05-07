@@ -33,6 +33,7 @@
   </parent>
 
   <properties>
+    <dosgi.version>${pom.version}</dosgi.version>
     <topDirectoryLocation>../..</topDirectoryLocation>
   </properties>
 

@@ -26,32 +26,32 @@
   <fileSets>
     <fileSet>
       <directory>target/distribution_bundles</directory>
-      <outputDirectory>dosgi_bundles</outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}/dosgi_bundles</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/distribution_configs</directory>
-      <outputDirectory>conf</outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}/conf</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/maven-shared-archive-resources/META-INF</directory>
       <excludes>
           <exclude>DEPENDENCIES</exclude>
       </excludes>
-      <outputDirectory></outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/resources/META-INF</directory>
       <includes>
         <include>NOTICE.jdom</include>
       </includes>
-      <outputDirectory></outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/release</directory>
       <includes>
         <include>README</include>
       </includes>
-      <outputDirectory></outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

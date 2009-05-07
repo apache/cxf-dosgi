@@ -14,12 +14,7 @@ distribution formats:
 
 Contains the dOSGi implementation and all 3rd party dependencies as 
 separate bundles within an archive. The current distribution is an
-instance of this type. The easiest way to get started is to explode
-this archive into your Felix or Equinox installation tree. Then
-append the contents of the felix.config.properties.append or
-equinox.config.ini.append snippets found in the conf directory to 
-your felix.config.properties or equinox.config.ini. This will cause
-all the required bundles to be loaded on start-up.
+instance of this type.
 
 
 2. Single-bundle distro: cxf-dosgi-ri-singlebundle-distribution-1.0.jar
@@ -31,7 +26,11 @@ OSGi container in one fell swoop.
 	
 3. Source distro: cxf-dosgi-ri-source-distribution-1.1-SNAPSHOT.{tar.gz|zip}
 
-Contains the entire source tree for dOSGi.
+Contains the entire source tree for dOSGi. The current distribution is
+an instance of this type. It may be built by running "mvn install" from
+the top level directory. Ensure you have maven installed, version 2.0.9
+or higher is recommended. Also a JDK of version 1.5.0_13 or higher is
+required.
 
 
 The best starting point for using dOSGi is the Getting Started Guide[2].

@@ -59,8 +59,9 @@
             <includes>
                 <include>LICENSE</include>
                 <include>NOTICE</include>
+                <include>README</include>
             </includes>
-            <outputDirectory></outputDirectory>
+            <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
