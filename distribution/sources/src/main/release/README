@@ -26,7 +26,11 @@ OSGi container in one fell swoop.
 	
 3. Source distro: cxf-dosgi-ri-source-distribution-1.1-SNAPSHOT.{tar.gz|zip}
 
-Contains the entire source tree for dOSGi.
+Contains the entire source tree for dOSGi. The current distribution is
+an instance of this type. It may be built by running "mvn install" from
+the top level directory. Ensure you have maven installed, version 2.0.9
+or higher is recommended. Also a JDK of version 1.5.0_13 or higher is
+required.
 
 
 The best starting point for using dOSGi is the Getting Started Guide[2].

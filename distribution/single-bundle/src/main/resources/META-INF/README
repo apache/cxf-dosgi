@@ -13,15 +13,15 @@ distribution formats:
 1. Multi-bundle distro: cxf-dosgi-ri-multibundle-distribution-1.0.{tar.gaz|zip}
 
 Contains the dOSGi implementation and all 3rd party dependencies as 
-separate bundles within an archive. The current distribution is an
-instance of this type.
+separate bundles within an archive.
 
 
 2. Single-bundle distro: cxf-dosgi-ri-singlebundle-distribution-1.0.jar
 
 Contains the dOSGi implementation and all 3rd party dependencies wrapped
 in a single OSGi bundle so as to allow direct installation in your favourite 
-OSGi container in one fell swoop.
+OSGi container in one fell swoop. The current distribution is an instance
+of this type.
 
 	
 3. Source distro: cxf-dosgi-ri-source-distribution-1.1-SNAPSHOT.{tar.gz|zip}
