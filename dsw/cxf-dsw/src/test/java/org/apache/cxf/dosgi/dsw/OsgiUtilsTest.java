@@ -1,6 +1,7 @@
 package org.apache.cxf.dosgi.dsw;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -96,6 +97,12 @@ public class OsgiUtilsTest extends TestCase {
 
     public void testGetPublishableInterfacesWildcarded() throws Exception {
         doTestGetPublishableInterfaces("*",
+                                       new String[] {"snafu", "foo", "bar"},
+                                       new String[] {"snafu", "foo", "bar"});
+    }
+
+    public void testGetPublishableInterfacesWildcardedInArray() throws Exception {
+        doTestGetPublishableInterfaces(Arrays.asList("*"),
                                        new String[] {"snafu", "foo", "bar"},
                                        new String[] {"snafu", "foo", "bar"});
     }
@@ -236,5 +243,27 @@ public class OsgiUtilsTest extends TestCase {
         Namespace ns = Namespace.getNamespace("http://www.osgi.org/xmlns/sd/v1.0.0");
         assertEquals("SomeService", rsElements.get(0).getChild("provide", ns).getAttributeValue("interface"));
         assertEquals("SomeOtherService", rsElements.get(1).getChild("provide", ns).getAttributeValue("interface"));
+    }
+
+    public void testMultiValuePropertyAsString() {
+        assertEquals(Collections.singleton("hi"), 
+            OsgiUtils.getMultiValueProperty("hi"));            
+    }
+    
+    public void testMultiValuePropertyAsArray() {
+        assertEquals(Arrays.asList("a", "b"), 
+                OsgiUtils.getMultiValueProperty(new String [] {"a", "b"}));
+    }
+    
+    public void testMultiValuePropertyAsCollection() {
+        List<String> list = new ArrayList<String>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        assertEquals(list, OsgiUtils.getMultiValueProperty(list)); 
+    }
+    
+    public void testMultiValuePropertyNull() {
+        assertNull(OsgiUtils.getMultiValueProperty(null));            
     }
 }

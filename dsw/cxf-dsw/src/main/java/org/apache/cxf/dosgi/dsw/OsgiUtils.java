@@ -453,6 +453,21 @@ public final class OsgiUtils {
             || value instanceof String && Boolean.parseBoolean((String)value);
     }
     
+    @SuppressWarnings("unchecked")
+    public static Collection<String> getMultiValueProperty(Object property) {
+        if (property == null) {
+            return null;
+        }
+        
+        if (property instanceof Collection) {
+            return (Collection<String>) property;
+        } else if (property instanceof String []) {
+            return Arrays.asList((String []) property);
+        } else {
+            return Collections.singleton(property.toString());
+        }
+    }
+
     public static String getProperty(ServiceEndpointDescription sd, String name) { 
         return getProperty(sd, name, String.class, null); 
     }
@@ -469,8 +484,8 @@ public final class OsgiUtils {
 
     public static String[] getPublishableInterfaces(ServiceEndpointDescription sd,
                                                     ServiceReference sref) {
-        Object publishProperty = 
-            sd.getProperty(DistributionConstants.REMOTE_INTERFACES);
+        Collection<String> publishProperty = 
+            getMultiValueProperty(sd.getProperty(DistributionConstants.REMOTE_INTERFACES));
         String[] actualInterfaces = 
             (String[])sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS);
         String[] publishableInterfaces = null;
@@ -480,24 +495,22 @@ public final class OsgiUtils {
             && actualInterfaces.length > 0
             && publishProperty != null) {
 
-            if (INTERFACE_WILDCARD.equals(publishProperty)) {
+            if (publishProperty.size() == 1 
+                    && INTERFACE_WILDCARD.equals(publishProperty.iterator().next())) {                    
                 // wildcard indicates all interfaces should be published
                 //
                 publishableInterfaces = actualInterfaces;
             } else {
-
-                String[] requestedInterfaces =
-                    publishProperty instanceof String
-                    ? tokenize((String)publishProperty, ",")
-                    : publishProperty instanceof String[]
-                      ? (String[])publishProperty
-                      : publishProperty instanceof Collection
-                      ? (String[])((Collection)publishProperty).toArray(
-                            new String[((Collection)publishProperty).size()])
-                         : null;
+                String [] requestedInterfaces;
+                if (publishProperty.size() == 0) {
+                    requestedInterfaces = null;
+                } else if (publishProperty.size() == 1) {
+                    requestedInterfaces = tokenize(publishProperty.iterator().next(), ",");
+                } else {
+                    requestedInterfaces = publishProperty.toArray(new String[publishProperty.size()]);
+                }
 
                 ArrayList<String> publishableList = new ArrayList<String>();
-
                 for (int i = 0; requestedInterfaces != null 
                                 && i < requestedInterfaces.length; i++) {
                     if (contains(actualInterfaces, requestedInterfaces[i])) {
