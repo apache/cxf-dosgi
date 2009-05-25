@@ -21,29 +21,19 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.hooks.service.FindHook;
+import org.osgi.framework.hooks.service.ListenerHook;
+import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.distribution.DistributionProvider;
 
 public class ActivatorTest extends TestCase{
-    @SuppressWarnings("unchecked")
     private BundleContext getMockBundleContext() {
         IMocksControl control = EasyMock.createNiceControl();
         
         Bundle b = control.createMock(Bundle.class);
         Hashtable<String, String> ht = new Hashtable<String, String>();
-        EasyMock.expect(b.getHeaders()).andReturn(ht).anyTimes();
-        
-        final Map<Object, Dictionary> services = new HashMap<Object, Dictionary>();
+        EasyMock.expect(b.getHeaders()).andReturn(ht).anyTimes();        
         BundleContext bc = control.createMock(BundleContext.class);
-        EasyMock.expect(bc.registerService(
-            (String) EasyMock.anyObject(),
-            EasyMock.anyObject(), 
-            (Dictionary) EasyMock.anyObject())).andAnswer(new IAnswer<ServiceRegistration>() {
-                public ServiceRegistration answer() throws Throwable {
-                    services.put(EasyMock.getCurrentArguments()[1],
-                        (Dictionary) EasyMock.getCurrentArguments()[2]);
-                    return null;
-                }                
-            }).anyTimes();            
 
         EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
@@ -95,6 +85,16 @@ public class ActivatorTest extends TestCase{
                     return null;
                 }                
             }).anyTimes();            
+        EasyMock.expect(bc.registerService(
+            (String []) EasyMock.anyObject(),
+            EasyMock.anyObject(), 
+            (Dictionary) EasyMock.anyObject())).andAnswer(new IAnswer<ServiceRegistration>() {
+                public ServiceRegistration answer() throws Throwable {
+                    services.put(EasyMock.getCurrentArguments()[1],
+                        (Dictionary) EasyMock.getCurrentArguments()[2]);
+                    return null;
+                }                
+            }).anyTimes();            
 
         EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
@@ -116,7 +116,6 @@ public class ActivatorTest extends TestCase{
         assertEquals("Precondition failed", 0, services.size());
         a.start(bc);
         
-        assertEquals(4, services.size());
         CxfDistributionProvider dp = null;
         for (Object o : services.keySet()) {
             if (o instanceof CxfDistributionProvider) {
@@ -175,6 +174,63 @@ public class ActivatorTest extends TestCase{
         ServiceReference key = a.pHook.getEndpoints().keySet().iterator().next();
         assertSame(sref, key);
         
+    }
+    
+    public void testListenerHookRegistered() throws Exception {
+        testServiceRegistered(ListenerHook.class);
+    } 
+
+    public void testFindHookRegistered() throws Exception {
+        testServiceRegistered(FindHook.class);
+    } 
+    
+    public void testDiscoveredServiceTrackerRegistered() throws Exception {
+        testServiceRegistered(DiscoveredServiceTracker.class);
+    } 
+
+    private void testServiceRegistered(Class serviceClass) throws Exception {
+        IMocksControl control = EasyMock.createNiceControl();
+        
+        Bundle b = control.createMock(Bundle.class);
+        Hashtable<String, String> ht = new Hashtable<String, String>();
+        EasyMock.expect(b.getHeaders()).andReturn(ht).anyTimes();
+
+        final Map<Object, Dictionary> services = new HashMap<Object, Dictionary>();
+        BundleContext bc = control.createMock(BundleContext.class);
+        EasyMock.expect(bc.registerService(
+            (String) EasyMock.anyObject(),
+            EasyMock.anyObject(), 
+            (Dictionary) EasyMock.anyObject())).andAnswer(new IAnswer<ServiceRegistration>() {
+                public ServiceRegistration answer() throws Throwable {
+                    services.put(EasyMock.getCurrentArguments()[1],
+                        (Dictionary) EasyMock.getCurrentArguments()[2]);
+                    return null;
+                }                
+            }).anyTimes();            
+        EasyMock.expect(bc.registerService(
+            (String []) EasyMock.anyObject(),
+            EasyMock.anyObject(), 
+            (Dictionary) EasyMock.anyObject())).andAnswer(new IAnswer<ServiceRegistration>() {
+                public ServiceRegistration answer() throws Throwable {
+                    services.put(EasyMock.getCurrentArguments()[1],
+                        (Dictionary) EasyMock.getCurrentArguments()[2]);
+                    return null;
+                }                
+            }).anyTimes();            
+
+        EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
+        EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
+        control.replay();
+
+        Activator a = new Activator();
+        a.start(bc);
+        
+        for (Object svc : services.keySet()) {
+            if (serviceClass.isAssignableFrom(svc.getClass())) {
+                return;
+            }
+        }
+        fail("Should have a service registered of type: " + serviceClass);
     }
 
     private static class TestServiceImpl implements TestService {}    

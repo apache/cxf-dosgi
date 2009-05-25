@@ -18,6 +18,8 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
+import static org.osgi.service.discovery.ServicePublication.SERVICE_INTERFACE_NAME;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,13 +31,11 @@ import java.util.regex.Pattern;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.hooks.service.FindHook;
 import org.osgi.framework.hooks.service.ListenerHook;
 
-import static org.osgi.service.discovery.ServicePublication.SERVICE_INTERFACE_NAME;
-
-public class CxfListenerHook extends AbstractClientHook implements ListenerHook {
-
-    private static final Logger LOG = Logger.getLogger(CxfListenerHook.class.getName());
+public class CxfFindListenerHook extends AbstractClientHook implements ListenerHook, FindHook {
+    private static final Logger LOG = Logger.getLogger(CxfFindListenerHook.class.getName());
 
     
     private final static String CLASS_NAME_EXPRESSION =
@@ -57,7 +57,7 @@ public class CxfListenerHook extends AbstractClientHook implements ListenerHook 
         SYSTEM_PACKAGES.add("java.net.ContentHandler");
     }
     
-    public CxfListenerHook(BundleContext bc, CxfDistributionProvider dp) {
+    public CxfFindListenerHook(BundleContext bc, CxfDistributionProvider dp) {
         super(bc, dp);
     }
     
@@ -68,7 +68,7 @@ public class CxfListenerHook extends AbstractClientHook implements ListenerHook 
     public void removed(Collection /*<? extends ListenerHook.ListenerInfo>*/ listener) {
         // todo add this in - need to unregister the endpoints
     }
-
+    
     private void handleListeners(Collection/*<? extends ListenerHook.ListenerInfo>*/ listeners) {
         for (Iterator/*<? extends ListenerHook.ListenerInfo>*/ it = listeners.iterator(); it.hasNext(); ) {
             ListenerHook.ListenerInfo listener = (ListenerHook.ListenerInfo) it.next();
@@ -90,6 +90,11 @@ public class CxfListenerHook extends AbstractClientHook implements ListenerHook 
         }
     }
     
+    public void find(BundleContext context, String className, String filter, boolean allServices, 
+            Collection /* <? extends ServiceReference> */ references) {
+        lookupDiscoveryService(className, filter);
+    }
+
     private String getClassNameFromFilter(String filter) {
         if (filter != null) {
             Matcher matcher = CLASS_NAME_PATTERN.matcher(filter);

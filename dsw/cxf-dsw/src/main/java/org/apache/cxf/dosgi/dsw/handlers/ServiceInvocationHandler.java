@@ -42,7 +42,9 @@ public class ServiceInvocationHandler implements InvocationHandler {
     }
     
     public Object invoke(Object proxy, Method m, Object[] params) throws Throwable {
+        ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try {
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             return m.invoke(serviceObject, params); 
         } catch (Throwable ex) {
             Throwable theCause = ex.getCause() == null ? ex : ex.getCause();
@@ -58,6 +60,8 @@ public class ServiceInvocationHandler implements InvocationHandler {
                         
             throw new InvocationTargetException(
                     new ServiceException(REMOTE_EXCEPTION_TYPE, theCause));
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldCl);
         }
     }
 

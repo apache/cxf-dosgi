@@ -22,6 +22,7 @@ import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE
 import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -48,7 +49,7 @@ import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.discovery.ServicePublication;
 
-public class CxfListenerHookTest extends Assert {
+public class CxfFindListenerHookTest extends Assert {
 
     private IMocksControl control;
     
@@ -217,7 +218,7 @@ public class CxfListenerHookTest extends Assert {
 
         control.replay();
      
-        CxfListenerHook hook = new CxfListenerHook(dswContext, null);
+        CxfFindListenerHook hook = new CxfFindListenerHook(dswContext, null);
 
         ListenerHook.ListenerInfo info = new ListenerHook.ListenerInfo() {
             public BundleContext getBundleContext() {
@@ -226,6 +227,10 @@ public class CxfListenerHookTest extends Assert {
 
             public String getFilter() {
                 return filter;
+            }
+
+            public boolean isRemoved() {
+                return false;
             }            
         };
         hook.added(Collections.singleton(info));
@@ -272,11 +277,32 @@ public class CxfListenerHookTest extends Assert {
         CxfDistributionProvider dp = control.createMock(CxfDistributionProvider.class);
         control.replay();
         
-        CxfListenerHook clh = new CxfListenerHook(bc, dp);
+        CxfFindListenerHook clh = new CxfFindListenerHook(bc, dp);
         assertSame(bc, clh.getContext());
         assertSame(dp, clh.getDistributionProvider());
     }
 
+    @Test
+    public void testFindHook() {
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        
+        final List<String> lookupCalls = new ArrayList<String>();        
+        CxfFindListenerHook fh = new CxfFindListenerHook(bc, null) {
+            @Override
+            protected synchronized void lookupDiscoveryService(
+                    String interfaceName, String filterValue) {
+                lookupCalls.add(interfaceName);
+                lookupCalls.add(filterValue);
+            }            
+        };
+        
+        String clazz = "my.app.Class";
+        String filter = "&(A=B)(C=D)";
+        fh.find(null, clazz, filter, true, null);
+        
+        assertEquals(Arrays.asList(clazz, filter), lookupCalls);
+    }
+    
     private void notifyAvailable(DiscoveredServiceTracker tracker,
                                  Collection interfaces,
                                  Collection filters, 

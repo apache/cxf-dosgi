@@ -25,7 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.cxf.dosgi.dsw.hooks.CxfListenerHook;
+import org.apache.cxf.dosgi.dsw.hooks.CxfFindListenerHook;
 import org.apache.cxf.dosgi.dsw.hooks.CxfPublishHook;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
@@ -37,6 +37,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.hooks.service.FindHook;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -52,8 +53,8 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
                                new LinkedBlockingQueue<Runnable>());
 
     CxfDistributionProvider dpService;
+    CxfFindListenerHook lHook;
     CxfPublishHook pHook;
-    CxfListenerHook lHook;
     
     public void start(BundleContext context) throws Exception {
         // Disable the fast infoset as it's not compatible (yet) with OSGi
@@ -66,9 +67,10 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
         
         dpService = registerDistributionProviderService();
 
-        pHook = new CxfPublishHook(context, dpService);
-        lHook = new CxfListenerHook(context, dpService);
-        context.registerService(ListenerHook.class.getName(), lHook, new Hashtable());        
+        pHook = new CxfPublishHook(context, dpService);        
+        lHook = new CxfFindListenerHook(context, dpService);
+        context.registerService(new String [] {FindHook.class.getName(), ListenerHook.class.getName()}, lHook, new Hashtable());
+        
         context.addServiceListener(this);                 
         checkExistingServices();        
     }

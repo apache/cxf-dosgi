@@ -55,9 +55,9 @@ public class AbstractClientHook extends AbstractHook {
 
     private DiscoveredServiceTracker tracker;
     private Dictionary trackerProperties = new Hashtable();
-    private ServiceRegistration trackerRegistration;
     private Map<String, ServiceRegistration> discoveredServices =
         new HashMap<String, ServiceRegistration>();
+    ServiceRegistration trackerRegistration;
 
     protected AbstractClientHook(BundleContext bc, CxfDistributionProvider dp) {
         super(bc, dp);
@@ -194,29 +194,38 @@ public class AbstractClientHook extends AbstractHook {
         LOG.info("lookup discovery service: interface: " + interfaceName
                  + " filter: " + filterValue);
 
+        boolean change = false;
         if (interfaceName != null) {
-            append(trackerProperties,
+            change |= append(trackerProperties,
                    INTERFACE_MATCH_CRITERIA,
                    interfaceName); 
         }
 
         if (filterValue != null) {
-            append(trackerProperties,
+            change |= append(trackerProperties,
                    FILTER_MATCH_CRITERIA,
                    filterValue); 
         }
 
-        trackerRegistration.setProperties(trackerProperties);
+        if (change) {
+            trackerRegistration.setProperties(trackerProperties);
+        }
     }
 
     @SuppressWarnings("unchecked")
-    private void append(Dictionary properties, String key, String additional) {
+    private boolean append(Dictionary properties, String key, String additional) {
         Collection existing = (Collection)properties.get(key);
         if (existing == null) {
             existing = new ArrayList<String>();
             properties.put(key, existing);
         }
-        existing.add(additional);
+        
+        if (!existing.contains(additional)) {
+            existing.add(additional);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

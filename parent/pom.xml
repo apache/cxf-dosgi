@@ -19,7 +19,7 @@
          OSGi bundles. -->
     <properties>
         <cxf.version>2.2.1</cxf.version>
-        <felix.version>1.4.1</felix.version>
+        <felix.version>1.8.0</felix.version>
         <spring.version>2.5.6</spring.version>
         <spring.osgi.version>1.2.0</spring.osgi.version>
         <zookeeper.version>3.0.0</zookeeper.version>
