@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -19,24 +18,25 @@
   under the License.
 -->
 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
-    <artifactId>cxf-dosgi-ri-discovery</artifactId>
-    <packaging>pom</packaging>
-    <name>Distributed OSGI Discovery Service Modules</name>
+    <artifactId>cxf-dosgi-ri-discovery-distributed-parent</artifactId>
     <version>1.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>CXF Distributed OSGI Distributed Discovery Parent</name>
+    <url>http://cxf.apache.org</url>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-parent</artifactId>
       <version>1.1-SNAPSHOT</version>
-      <relativePath>../parent/pom.xml</relativePath>
+      <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
     <modules>
-      <module>local</module>
-      <module>distributed</module>
-    </modules>
-    
-
+      <module>zookeeper-wrapper</module>
+      <module>cxf-discovery</module>
+    </modules> 
 </project>
