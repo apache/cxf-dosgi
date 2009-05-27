@@ -538,6 +538,35 @@ public class LocalDiscoveryServiceTest extends TestCase {
         
         assertNull(LocalDiscoveryService.removeTracker(dst, forwardMap, reverseMap));
     }
+    
+    public void testTriggerCallbacksWithFilter() throws Exception {
+        String filter = "(|(osgi.remote.service.interfaces=org.acme.A)(osgi.remote.service.interfaces=org.acme.B))";
+
+        Filter mockFilter = EasyMock.createMock(Filter.class);
+        Dictionary<String, Object> map = new Hashtable<String, Object>();
+        map.put("osgi.remote.service.interfaces", Arrays.asList("org.acme.B"));
+        EasyMock.expect(mockFilter.match(map)).andReturn(true).anyTimes();
+        EasyMock.replay(mockFilter);
+
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.expect(bc.createFilter(filter)).andReturn(mockFilter).anyTimes();
+        EasyMock.replay(bc);
+        
+        final List<DiscoveredServiceNotification> notifications = 
+            new ArrayList<DiscoveredServiceNotification>();
+        DiscoveredServiceTracker dst = new DiscoveredServiceTracker(){        
+            public void serviceChanged(DiscoveredServiceNotification notification) {
+                notifications.add(notification);
+            }
+        };
+        
+        LocalDiscoveryService lds = new LocalDiscoveryService(bc);
+        ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl("org.acme.B");
+        
+        assertEquals("Precondition failed", 0, notifications.size());
+        lds.triggerCallbacks(dst, filter, true, sd, DiscoveredServiceNotification.AVAILABLE);
+        assertEquals(1, notifications.size());
+    }
  
     private void verifyNotification(DiscoveredServiceNotification dsn,
                                int filterCount,

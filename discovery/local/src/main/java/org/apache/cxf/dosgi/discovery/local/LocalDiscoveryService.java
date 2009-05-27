@@ -105,7 +105,7 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
     }
 
     public void bundleChanged(BundleEvent be) {
-        LOG.info("bundle changed: " + be.getBundle().getSymbolicName());
+        LOG.fine("bundle changed: " + be.getBundle().getSymbolicName());
         switch (be.getType()) {
         case BundleEvent.STARTED:
             findDeclaredRemoteServices(be.getBundle());
@@ -320,12 +320,12 @@ public class LocalDiscoveryService implements Discovery, BundleListener {
         }
     }
 
-    private void triggerCallbacks(DiscoveredServiceTracker tracker,
-                                  String toMatch, 
-                                  boolean isFilter, 
-                                  ServiceEndpointDescription sd,
-                                  int type) {
-        LOG.info("check if string: " + toMatch + (isFilter ? " matches " : " contained by ") +  sd.getProvidedInterfaces());
+    void triggerCallbacks(DiscoveredServiceTracker tracker,
+                          String toMatch, 
+                          boolean isFilter, 
+                          ServiceEndpointDescription sd,
+                          int type) {
+        LOG.fine("check if string: " + toMatch + (isFilter ? " matches " : " contained by ") +  sd.getProvidedInterfaces());
 
         TrackerNotification notification = 
             isFilter
