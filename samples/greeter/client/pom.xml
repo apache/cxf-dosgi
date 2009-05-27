@@ -52,6 +52,12 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
             <version>${felix.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.osgi.foundation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency> 
         <dependency>
            <groupId>junit</groupId>
