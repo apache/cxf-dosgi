@@ -76,6 +76,10 @@ public final class LocalDiscoveryUtils {
         for (Element ref : references) {
             List<String> iNames = getProvidedInterfaces(ref.getChildren(PROVIDE_INTERFACE_ELEMENT, ns));
             Map<String, Object> remoteProps = getProperties(ref.getChildren(PROPERTY_ELEMENT, ns));
+            
+            // this property is used by discovery for matching
+            remoteProps.put(ServicePublication.SERVICE_INTERFACE_NAME, iNames); 
+            
             if (addEndpointID) {
                 remoteProps.put(ServicePublication.ENDPOINT_ID, UUID.randomUUID().toString());
             }

@@ -82,15 +82,17 @@ public class LocalDiscoveryServiceTest extends TestCase {
         assertEquals(2, lds.servicesInfo.size());
         Map<Collection<String>, String> eids = getEndpointIDs(lds.servicesInfo.keySet());
 
+        List<String> intf1 = Arrays.asList("org.example.SomeService");
         Map<String, Object> sed1Props = new HashMap<String, Object>();
         sed1Props.put("osgi.remote.requires.intents", "confidentiality");
+        sed1Props.put(ServicePublication.SERVICE_INTERFACE_NAME, intf1);
         setEndpointID(eids, sed1Props, "org.example.SomeService");
-        ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("org.example.SomeService"), sed1Props);
+        ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(intf1, sed1Props);
+        List<String> intf2 = Arrays.asList("SomeOtherService", "WithSomeSecondInterface");
         Map<String, Object> sed2Props = new HashMap<String, Object>();
+        sed2Props.put(ServicePublication.SERVICE_INTERFACE_NAME, intf2);
         setEndpointID(eids, sed2Props, "SomeOtherService", "WithSomeSecondInterface");       
-        ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), sed2Props);
+        ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(intf2, sed2Props);
         assertTrue(lds.servicesInfo.containsKey(sed1));
         assertTrue(lds.servicesInfo.containsKey(sed2));
         
@@ -117,10 +119,11 @@ public class LocalDiscoveryServiceTest extends TestCase {
         lds.bundleChanged(be);
         Map<Collection<String>, String> eids2 = getEndpointIDs(lds.servicesInfo.keySet());
         
+        List<String> intf3 = Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService");
         Map<String, Object> sed3Props = new HashMap<String, Object>();
+        sed3Props.put(ServicePublication.SERVICE_INTERFACE_NAME, intf3);
         setEndpointID(eids2, sed3Props, "org.example.SomeRelatedService", "org.example.SomeService");       
-        ServiceEndpointDescription sed3 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService"), sed3Props);
+        ServiceEndpointDescription sed3 = new ServiceEndpointDescriptionImpl(intf3, sed3Props);
         assertEquals(3, lds.servicesInfo.size());
         assertTrue(lds.servicesInfo.containsKey(sed1));
         assertTrue(lds.servicesInfo.containsKey(sed2));
@@ -218,10 +221,14 @@ public class LocalDiscoveryServiceTest extends TestCase {
             // set up the mock filter behaviour
             Dictionary<String, Object> d1 = new Hashtable<String, Object>();
             d1.put("blah", "5");
+            d1.put("osgi.remote.service.interfaces", 
+                    Arrays.asList("SomeOtherService", "WithSomeSecondInterface"));
             EasyMock.expect(mockFilter.match(d1)).andReturn(true).anyTimes();
             Dictionary<String, Object> d2 = new Hashtable<String, Object>();
             d2.put("blah", "3");
             d2.put("boo", "hello");
+            d2.put("osgi.remote.service.interfaces", 
+                    Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService"));
             EasyMock.expect(mockFilter.match(d2)).andReturn(true).anyTimes();
             
             control.replay();
@@ -232,14 +239,16 @@ public class LocalDiscoveryServiceTest extends TestCase {
             // it should be prepopulated with the info from bundle b0
             assertEquals(2, lds.servicesInfo.size());
     
+            List<String> intf1 = Arrays.asList("org.example.SomeService");
             Map<String, Object> sed1Props = new HashMap<String, Object>();
             sed1Props.put("osgi.remote.requires.intents", "confidentiality");
-            ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
-                    Arrays.asList("org.example.SomeService"), sed1Props);
+            sed1Props.put(ServicePublication.SERVICE_INTERFACE_NAME, intf1);
+            ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(intf1, sed1Props);
+            List<String> intf2 = Arrays.asList("SomeOtherService", "WithSomeSecondInterface");
             Map<String, Object> sed2Props = new HashMap<String, Object>();
             sed2Props.put("blah", "5");
-            ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
-                    Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), sed2Props);
+            sed2Props.put(ServicePublication.SERVICE_INTERFACE_NAME, intf2);
+            ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(intf2, sed2Props);
             assertTrue(lds.servicesInfo.containsKey(sed1));
             assertTrue(lds.servicesInfo.containsKey(sed2));
             
@@ -265,11 +274,12 @@ public class LocalDiscoveryServiceTest extends TestCase {
             BundleEvent be = new BundleEvent(BundleEvent.STARTED, b1);
             lds.bundleChanged(be);
             
+            List<String> intf3 = Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService");
             Map<String, Object> sed3Props = new HashMap<String, Object>();
             sed3Props.put("blah", "3");
             sed3Props.put("boo", "hello");
-            ServiceEndpointDescription sed3 = new ServiceEndpointDescriptionImpl(
-                    Arrays.asList("org.example.SomeRelatedService", "org.example.SomeService"), sed3Props);
+            sed3Props.put(ServicePublication.SERVICE_INTERFACE_NAME, intf3);
+            ServiceEndpointDescription sed3 = new ServiceEndpointDescriptionImpl(intf3, sed3Props);
             assertEquals(3, lds.servicesInfo.size());
             assertTrue(lds.servicesInfo.containsKey(sed1));
             assertTrue(lds.servicesInfo.containsKey(sed2));
@@ -333,10 +343,11 @@ public class LocalDiscoveryServiceTest extends TestCase {
             
             // it should be prepopulated with the info from bundle b0
             assertEquals(2, lds.servicesInfo.size());
+            List<String> intf1 = Arrays.asList("org.example.SomeService");
             Map<String, Object> sed1Props = new HashMap<String, Object>();
+            sed1Props.put(ServicePublication.SERVICE_INTERFACE_NAME, intf1);
             sed1Props.put("osgi.remote.requires.intents", "confidentiality");
-            ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
-                    Arrays.asList("org.example.SomeService"), sed1Props);
+            ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(intf1, sed1Props);
             ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
                     Arrays.asList("SomeOtherService", "WithSomeSecondInterface"));
             assertTrue(lds.servicesInfo.containsKey(sed1));

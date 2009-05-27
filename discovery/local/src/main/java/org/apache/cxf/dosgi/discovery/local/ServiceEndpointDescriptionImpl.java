@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.discovery.ServicePublication;
 
 public class ServiceEndpointDescriptionImpl implements ServiceEndpointDescription {
 
@@ -41,14 +42,14 @@ public class ServiceEndpointDescriptionImpl implements ServiceEndpointDescriptio
     private Set<String> interfaceNames; 
     Map<String, Object> properties;
     
-    @SuppressWarnings("unchecked")
     public ServiceEndpointDescriptionImpl(String interfaceName) {
-        this(Collections.singletonList(interfaceName), Collections.EMPTY_MAP);
+        this(Collections.singletonList(interfaceName));
     }
     
-    @SuppressWarnings("unchecked")
     public ServiceEndpointDescriptionImpl(List<String> interfaceNames) {
-        this(interfaceNames, Collections.EMPTY_MAP);
+        this(interfaceNames, 
+            Collections.<String, Object>singletonMap(
+                ServicePublication.SERVICE_INTERFACE_NAME, interfaceNames));
     }
     
     public ServiceEndpointDescriptionImpl(List<String> interfaceNames,

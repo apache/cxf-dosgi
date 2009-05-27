@@ -99,18 +99,22 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals(2, seds.size());
         Map<Collection<String>, String> eids = getEndpointIDs(seds);
         
+        List<String> interfaces = Arrays.asList("SomeService");
         Map<String, Object> sed1Props = new HashMap<String, Object>();
         sed1Props.put("osgi.remote.requires.intents", "confidentiality");
         sed1Props.put(ServicePublication.ENDPOINT_ID, eids.get(
-                Collections.singleton("SomeService")));       
-        ServiceEndpointDescription sed1 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("SomeService"), sed1Props);
+                Collections.singleton("SomeService")));
+        sed1Props.put(ServicePublication.SERVICE_INTERFACE_NAME, interfaces);
+        ServiceEndpointDescription sed1 = 
+            new ServiceEndpointDescriptionImpl(interfaces, sed1Props);
 
+        List<String> interfaces2 = Arrays.asList("SomeOtherService", "WithSomeSecondInterface");
         Map<String, Object> sed2Props = new HashMap<String, Object>();
         sed2Props.put(ServicePublication.ENDPOINT_ID, eids.get(
-                new HashSet<String>(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"))));       
-        ServiceEndpointDescription sed2 = new ServiceEndpointDescriptionImpl(
-                Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), sed2Props);
+                new HashSet<String>(interfaces2)));
+        sed2Props.put(ServicePublication.SERVICE_INTERFACE_NAME, interfaces2);
+        ServiceEndpointDescription sed2 = 
+            new ServiceEndpointDescriptionImpl(interfaces2, sed2Props);
         assertTrue(seds.contains(sed1));
         assertTrue(seds.contains(sed2));
     }
