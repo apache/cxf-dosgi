@@ -31,6 +31,8 @@ public class Util {
             return (Collection<String>) property;
         } else if (property instanceof String []) {
             return Arrays.asList((String []) property);
+        } else if (property == null) {
+            return Collections.emptySet();
         } else {
             return Collections.singleton(property.toString());
         }
