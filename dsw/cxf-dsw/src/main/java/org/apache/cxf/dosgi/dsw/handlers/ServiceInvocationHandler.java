@@ -22,6 +22,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +31,13 @@ import java.util.Map;
 import org.osgi.framework.ServiceException;
 
 public class ServiceInvocationHandler implements InvocationHandler {
-
     private final static String REMOTE_EXCEPTION_TYPE = "REMOTE";
-    
+    private static final Collection<Method> OBJECT_METHODS = 
+        Arrays.asList(Object.class.getMethods());
+
     private Map<Method, List<Class<?>>> exceptionsMap
         = new HashMap<Method, List<Class<?>>>();
-    private Object serviceObject;    
+    private Object serviceObject;
     
     public ServiceInvocationHandler(Object serviceObject, Class<?> iType) {
         this.serviceObject = serviceObject;
@@ -42,8 +45,12 @@ public class ServiceInvocationHandler implements InvocationHandler {
     }
     
     public Object invoke(Object proxy, Method m, Object[] params) throws Throwable {
+        if (OBJECT_METHODS.contains(m)) {
+            return m.invoke(this, params);
+        }
+
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-        try {
+        try {            
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             return m.invoke(serviceObject, params); 
         } catch (Throwable ex) {

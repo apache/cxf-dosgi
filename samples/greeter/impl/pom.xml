@@ -40,24 +40,20 @@
     <dependencies>
         <dependency> 
             <groupId>org.apache.felix</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>1.2.0</version>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>${felix.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.osgi.foundation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency> 
         <dependency> 
             <groupId>org.apache.cxf.dosgi.samples</groupId>
             <artifactId>cxf-dosgi-ri-samples-greeter-interface</artifactId>
             <version>${project.version}</version>
         </dependency> 
-        <dependency>
-           <groupId>junit</groupId>
-           <artifactId>junit</artifactId>
-           <scope>test</scope>
-        </dependency>  
-        <dependency>
-           <groupId>org.easymock</groupId>
-           <artifactId>easymockclassextension</artifactId>
-           <scope>test</scope>
-         </dependency>
     </dependencies> 
 
     <build>
