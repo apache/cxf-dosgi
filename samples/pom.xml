@@ -20,5 +20,6 @@
       <module>greeter</module>
       <module>spring_dm</module>
       <module>ds</module>
+      <module>discovery</module>
     </modules> 
 </project>

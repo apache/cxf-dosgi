@@ -1,6 +1,7 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,16 +42,15 @@ public class ServiceInvocationHandlerTest extends TestCase {
             }            
         };
 
+        Object proxy = Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class [] {Runnable.class}, sih);                
+        
         assertEquals(true, 
-                sih.invoke(null, OBJECT_METHODS.get("equals"), new Object [] {sih}));
+                sih.invoke(null, OBJECT_METHODS.get("equals"), new Object [] {proxy}));
         assertEquals(System.identityHashCode(sih), 
                 sih.invoke(null, OBJECT_METHODS.get("hashCode"), new Object [] {}));
         assertEquals("somestring", 
                 sih.invoke(null, OBJECT_METHODS.get("toString"), new Object [] {}));
-        assertEquals(Arrays.asList("equals", "hashCode", "toString"), called);
-//        assertEquals("This one used to throw an exception", sih, sih);
-//        assertEquals(System.identityHashCode(sih), sih.hashCode());
-//        assertEquals("somestring", sih.toString());
-        
+        assertEquals(Arrays.asList("equals", "hashCode", "toString"), called);        
     }
 }

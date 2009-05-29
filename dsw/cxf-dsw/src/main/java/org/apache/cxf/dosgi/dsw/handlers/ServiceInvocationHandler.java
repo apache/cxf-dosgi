@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.dsw.handlers;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,6 +47,9 @@ public class ServiceInvocationHandler implements InvocationHandler {
     
     public Object invoke(Object proxy, Method m, Object[] params) throws Throwable {
         if (OBJECT_METHODS.contains(m)) {
+            if (m.getName().equals("equals")) {
+                params = new Object[] {Proxy.getInvocationHandler(params[0])};
+            }
             return m.invoke(this, params);
         }
 

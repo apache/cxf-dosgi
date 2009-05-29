@@ -238,7 +238,7 @@ public class AbstractClientHook extends AbstractHook {
             if (!duplicate) {
                 LOG.info("registering proxy for endpoint ID: " + endpointId);
             } else {
-                LOG.warning("ignoring duplicate notification for endpoint ID: "
+                LOG.info("ignoring duplicate notification for endpoint ID: "
                             + endpointId);  
             }
             return !duplicate;
