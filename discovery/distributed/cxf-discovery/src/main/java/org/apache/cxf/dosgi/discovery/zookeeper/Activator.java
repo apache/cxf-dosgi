@@ -2,6 +2,7 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.io.IOException;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,18 +47,28 @@ public class Activator implements BundleActivator, ManagedService {
             return;
         }
         
+        Dictionary effective = getCMDefaults();
+        // apply all values on top of the defaults
+        for (Enumeration e = configuration.keys(); e.hasMoreElements(); ) {
+            Object key = e.nextElement();
+            if (key != null) {
+                Object val = configuration.get(key);
+                effective.put(key, val);
+            }
+        }
+        
+        cmReg.setProperties(effective);
         synchronized (this) {
             try {
                 if (driver == null) {
-                    driver = createDriver(configuration);
+                    driver = createDriver(effective);
                 } else {
-                    driver.updateConfiguration(configuration);
+                    driver.updateConfiguration(effective);
                 }
             } catch (IOException e) {
                 LOG.log(Level.WARNING, "Could now create the ZooKeeper client", e);
             }
         }
-        cmReg.setProperties(configuration);
     }
 
     // Isolated for testing

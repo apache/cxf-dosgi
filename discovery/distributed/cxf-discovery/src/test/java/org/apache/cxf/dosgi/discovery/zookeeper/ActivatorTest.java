@@ -28,17 +28,14 @@ public class ActivatorTest extends TestCase {
         Activator a = new Activator();
         a.start(bc);
 
-        Dictionary<String, Object> expected = new Hashtable<String, Object>(); 
-        expected.put("zookeeper.timeout", "3000");
-        expected.put("zookeeper.port", "2181");
-        expected.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper");
+        Dictionary<String, Object> expected = getDefaultProperties();
         assertEquals(expected, propsAsDict(a.cmReg.getReference()));
         
         assertFalse("Precondition failed", ((TestServiceRegistration) a.cmReg).unregisterCalled);
         a.stop(bc);
         assertTrue(((TestServiceRegistration) a.cmReg).unregisterCalled);
     }
-    
+
     public void testConfigUpdate() throws Exception {
         final DiscoveryDriver mockDriver = EasyMock.createMock(DiscoveryDriver.class);
         
@@ -64,20 +61,27 @@ public class ActivatorTest extends TestCase {
         Dictionary<String, Object> d = new Hashtable<String, Object>();
         d.put("a", "b");
         a.updated(d);
-        assertEquals(Arrays.asList(d), configs);
+        
+        Dictionary<String, Object> expected = getDefaultProperties();
+        expected.put("a", "b");
+        assertEquals(Arrays.asList(expected), configs);
         assertTrue(((TestServiceRegistration) a.cmReg).setPropertiesCalled);
-        assertEquals(d, propsAsDict(a.cmReg.getReference()));
+        assertEquals(expected, propsAsDict(a.cmReg.getReference()));
         EasyMock.verify(mockDriver);
         
         Dictionary<String, Object> d2 = new Hashtable<String, Object>();
         d2.put("c", "d");
+        
+        Dictionary<String, Object> expected2 = getDefaultProperties();
+        expected2.put("c", "d");
 
         EasyMock.reset(mockDriver);
-        mockDriver.updateConfiguration(d2);
+        mockDriver.updateConfiguration(expected2);
         EasyMock.expectLastCall();
         EasyMock.replay(mockDriver);
         
         a.updated(d2);        
+        assertEquals(expected2, propsAsDict(a.cmReg.getReference()));
         EasyMock.verify(mockDriver);
         
         EasyMock.reset(mockDriver);
@@ -102,6 +106,14 @@ public class ActivatorTest extends TestCase {
             }).anyTimes();
         EasyMock.replay(bc);
         return bc;
+    }
+    
+    private Dictionary<String, Object> getDefaultProperties() {
+        Dictionary<String, Object> expected = new Hashtable<String, Object>(); 
+        expected.put("zookeeper.timeout", "3000");
+        expected.put("zookeeper.port", "2181");
+        expected.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper");
+        return expected;
     }
     
     public Dictionary<String, Object> propsAsDict(ServiceReference ref) {
