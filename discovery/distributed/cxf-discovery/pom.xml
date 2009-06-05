@@ -97,6 +97,8 @@
                         <Bundle-Name>CXF Zookeeper-based Discovery Service Bundle</Bundle-Name>
                         <Bundle-Description>This bundle contains an implementation of the Distributed OSGi Discovery Service using Zookeeper</Bundle-Description>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
+                        <Bundle-Activator>org.apache.cxf.dosgi.discovery.zookeeper.Activator</Bundle-Activator>
                         <Import-Package>
                             org.apache.zookeeper.*;version="[3.0.0,4.0.0)",
                             org.apache.cxf.dosgi.discovery.local;version=${pom.version},

@@ -20,6 +20,8 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -31,46 +33,34 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.ServicePublication;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class DiscoveryBeanTest extends TestCase {
-    public void testDiscoveryBean() throws Exception {
+public class DiscoveryDriverTest extends TestCase {
+    public void testDiscoveryDriver() throws Exception {
+        BundleContext bc = getDefaultBundleContext();
+        Dictionary<String, String> props = getDefaultProps();
+        
         final StringBuilder sb = new StringBuilder();
-        DiscoveryBean db = new DiscoveryBean() {
+        DiscoveryDriver dd = new DiscoveryDriver(bc, props) {
             @Override
-            ZooKeeper createZooKeeper(String hostPort) throws IOException {
-                sb.append(hostPort);
+            ZooKeeper createZooKeeper() throws IOException {
+                sb.append(zkHost + ":" + zkPort);
                 ZooKeeper zk = EasyMock.createMock(ZooKeeper.class);
                 EasyMock.replay(zk);
                 return zk;
-            }            
+            }           
         };
-        
-        DiscoveryServiceImpl ds = new DiscoveryServiceImpl();
-        ds.setZooKeeperHost("myhost.mymachine.mytld");
-        ds.setZooKeeperPort(1234);
-        db.setDiscoveryServiceBean(ds);
-        
-        BundleContext bc = EasyMock.createMock(BundleContext.class);
-        expectServiceTrackerCalls(bc, ServicePublication.class.getName());
-        expectServiceTrackerCalls(bc, DiscoveredServiceTracker.class.getName());
-        EasyMock.replay(bc);
-        db.setBundleContext(bc);
-        
-        assertNull("Precondition failed", db.lookupTracker);
-        assertNull("Precondition failed", db.publicationTracker);
-        db.afterPropertiesSet();
-        assertNotNull(db.lookupTracker);
-        assertNotNull(db.publicationTracker);
         EasyMock.verify(bc);
+        assertEquals("somehost:1910", sb.toString());
         
-        EasyMock.verify(db.zooKeeper);
-        EasyMock.reset(db.zooKeeper);
-        db.zooKeeper.close();
+        EasyMock.verify(dd.zooKeeper);
+        EasyMock.reset(dd.zooKeeper);
+        dd.zooKeeper.close();
         EasyMock.expectLastCall();
-        EasyMock.replay(db.zooKeeper);
+        EasyMock.replay(dd.zooKeeper);
         
         ServiceTracker st1 = EasyMock.createMock(ServiceTracker.class);
         st1.close();
@@ -81,10 +71,10 @@ public class DiscoveryBeanTest extends TestCase {
         EasyMock.expectLastCall();
         EasyMock.replay(st2);
         
-        db.lookupTracker = st1;
-        db.publicationTracker = st2;
+        dd.lookupTracker = st1;
+        dd.publicationTracker = st2;
         
-        db.destroy();        
+        dd.destroy();        
     }
 
     private void expectServiceTrackerCalls(BundleContext bc, String objectClass)
@@ -101,8 +91,13 @@ public class DiscoveryBeanTest extends TestCase {
             .andReturn(new ServiceReference [0]).anyTimes();
     }
     
-    public void testProcessEvent() {
-        DiscoveryBean db = new DiscoveryBean();
+    public void testProcessEvent() throws Exception {
+        DiscoveryDriver db = new DiscoveryDriver(getDefaultBundleContext(), getDefaultProps()) {
+            @Override
+            ZooKeeper createZooKeeper() throws IOException {
+                return null;
+            }            
+        };
         
         FindInZooKeeperCustomizer fc = new FindInZooKeeperCustomizer(null, null);
         List<InterfaceMonitor> l1 = new ArrayList<InterfaceMonitor>();
@@ -134,4 +129,21 @@ public class DiscoveryBeanTest extends TestCase {
         EasyMock.verify(dm1b);
         EasyMock.verify(dm2);
     }
+
+    private BundleContext getDefaultBundleContext() throws InvalidSyntaxException {
+        BundleContext bc = EasyMock.createMock(BundleContext.class);
+        expectServiceTrackerCalls(bc, ServicePublication.class.getName());
+        expectServiceTrackerCalls(bc, DiscoveredServiceTracker.class.getName());
+        EasyMock.replay(bc);
+        return bc;
+    }
+
+    private Dictionary<String, String> getDefaultProps() {
+        Dictionary<String, String> props = new Hashtable<String, String>();
+        props.put("zookeeper.host", "somehost");
+        props.put("zookeeper.port", "1910");
+        props.put("zookeeper.timeout", "1500");
+        return props;
+    }
+
 }
