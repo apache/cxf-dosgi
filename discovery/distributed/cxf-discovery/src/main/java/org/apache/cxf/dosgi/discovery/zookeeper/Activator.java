@@ -18,7 +18,7 @@ public class Activator implements BundleActivator, ManagedService {
     
     private BundleContext bundleContext;
     private DiscoveryDriver driver;
-    private ServiceRegistration cmReg;
+    ServiceRegistration cmReg;
 
     public void start(BundleContext bc) throws Exception {
         bundleContext = bc;        
@@ -27,8 +27,8 @@ public class Activator implements BundleActivator, ManagedService {
 
     private Dictionary getCMDefaults() {
         Dictionary props = new Hashtable();
-        props.put("timeout", "3000");
-        props.put("port", "2181");
+        props.put("zookeeper.timeout", "3000");
+        props.put("zookeeper.port", "2181");
         props.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper");
         return props;    
     }
@@ -49,7 +49,7 @@ public class Activator implements BundleActivator, ManagedService {
         synchronized (this) {
             try {
                 if (driver == null) {
-                    driver = new DiscoveryDriver(bundleContext, configuration);
+                    driver = createDriver(configuration);
                 } else {
                     driver.updateConfiguration(configuration);
                 }
@@ -60,5 +60,9 @@ public class Activator implements BundleActivator, ManagedService {
         cmReg.setProperties(configuration);
     }
 
-
+    // Isolated for testing
+    DiscoveryDriver createDriver(Dictionary configuration)
+            throws IOException, ConfigurationException {
+        return new DiscoveryDriver(bundleContext, configuration);
+    }
 }
