@@ -103,19 +103,19 @@
               javax.naming;resolution:=optional,
               javax.swing.*;resolution:=optional,
               javax.xml.*,
-              org.apache.cxf.dosgi.discovery.local;version=${pom.version},
               org.osgi.framework;version="[1.4.0,2.0.0)",
               org.osgi.service.cm;version="[1.2.0,2.0.0)",
-              org.osgi.service.discovery;version="[1.0.0,2.0.0)",
               org.osgi.service.packageadmin;version="[1.2.0,2.0.0)",
+              org.osgi.service.discovery;version="[1.0,2.0)",
               org.osgi.util.tracker;version="[1.3.0,2.0.0)",
               org.w3c.dom,
               org.xml.sax.*,
               !*
             </Import-Package> 
+            <!-- TODO move to _exportcontents -->
             <Export-Package>
-              !*
-            </Export-Package>
+              org.osgi.service.discovery;version="1.0"
+            </Export-Package> 
             <Private-Package>org.apache.cxf.dosgi.discovery.singlebundle</Private-Package>
             <Embed-Dependency>*;scope=compile;inline=false</Embed-Dependency>
             <Embed-Directory>lib</Embed-Directory>

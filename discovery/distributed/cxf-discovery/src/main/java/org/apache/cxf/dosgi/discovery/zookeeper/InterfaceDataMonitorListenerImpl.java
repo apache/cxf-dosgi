@@ -27,7 +27,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.cxf.dosgi.discovery.local.ServiceEndpointDescriptionImpl;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;

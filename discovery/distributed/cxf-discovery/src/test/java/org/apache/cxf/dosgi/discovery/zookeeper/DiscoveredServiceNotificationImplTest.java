@@ -25,7 +25,6 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.dosgi.discovery.local.ServiceEndpointDescriptionImpl;
 import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 
