@@ -4,7 +4,6 @@
   <xsl:param name="Version"/>
   <xsl:variable name = "Basename">.dir/apache-cxf-dosgi-ri-<xsl:value-of select="$Version"/>/dosgi_bundles/</xsl:variable>
   <xsl:template match="/">
-osgi.bundles= \
 <xsl:for-each select="//bundles/bundle">../apache-cxf-dosgi-ri-<xsl:value-of select="$Version"/>/dosgi_bundles/<xsl:value-of select="substring-after(text(), $Basename)"/><xsl:value-of select="string('@start, ')"/></xsl:for-each>
   </xsl:template>
 </xsl:transform>
