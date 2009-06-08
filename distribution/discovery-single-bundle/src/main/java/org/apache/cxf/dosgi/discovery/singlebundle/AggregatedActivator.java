@@ -82,7 +82,10 @@ public class AggregatedActivator implements BundleActivator {
         BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
         String line = null;
         while ((line = br.readLine()) != null) {
-            bundleActivators.add(line);
+            line = line.trim();
+            if (line.length() > 0) {
+                bundleActivators.add(line);
+            }
         }
         
         return bundleActivators;
