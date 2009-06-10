@@ -134,6 +134,11 @@
       <version>${servicemix.specs.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.servicemix.specs</groupId>
+      <artifactId>org.apache.servicemix.specs.jsr311-api-1.0</artifactId>
+      <version>${servicemix.specs.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.servicemix.bundles</groupId> 
       <artifactId>org.apache.servicemix.bundles.xmlschema</artifactId> 
       <version>${xmlschema.bundle.version}</version> 
