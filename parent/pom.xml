@@ -299,6 +299,18 @@
             <name>Springframework Maven SNAPSHOT Repository</name>
             <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
         </repository>
+        
+        <repository>
+            <id>apache-incubating</id>
+            <name>Apache Incubating Repository</name>
+            <url>http://people.apache.org/repo/m2-incubating-repository/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <pluginRepositories>
