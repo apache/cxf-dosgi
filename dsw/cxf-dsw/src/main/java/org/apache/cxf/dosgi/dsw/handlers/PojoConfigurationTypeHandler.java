@@ -126,14 +126,18 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     @Override
     Map<String, String> registerPublication(Server server, String[] intents) {
         Map<String, String> publicationProperties = super.registerPublication(server, intents);
-        publicationProperties.put(Constants.POJO_ADDRESS_PROPERTY, 
+        publicationProperties.put(Constants.WS_ADDRESS_PROPERTY, 
             server.getDestination().getAddress().getAddress().getValue());
 
         return publicationProperties;
     }
 
     private String getPojoAddress(ServiceEndpointDescription sd, Class<?> iClass) {
-        String address = OsgiUtils.getProperty(sd, Constants.POJO_ADDRESS_PROPERTY);
+        String address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);            
+        }
+        
         if (address == null) {
             address = getDefaultAddress(iClass);
             if (address != null) {

@@ -139,9 +139,9 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         assertSame(sr, dp.getExposedServices().iterator().next());
         
         Map<String, String> expected = new HashMap<String, String>();
-        expected.put("osgi.remote.configuration.type", "pojo");
-        expected.put("osgi.remote.configuration.pojo.address", "http://somehost:54321/java/lang/String");
-        expected.put("osgi.deployment.intents", "A B");
+        expected.put("service.exported.configs", "org.apache.cxf.ws");
+        expected.put("org.apache.cxf.ws.address", "http://somehost:54321/java/lang/String");
+        expected.put("service.intents", "A B");
         assertEquals(expected, dp.getExposedProperties(sr));
     }
     
@@ -172,7 +172,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.replay(callingContext);
         
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.POJO_ADDRESS_PROPERTY, "http://alternate_host:80/myString");
+        props.put(Constants.WS_ADDRESS_PROPERTY, "http://alternate_host:80/myString");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
         
         assertEquals("Precondition failed", 0, dp.getExposedServices().size());
@@ -181,8 +181,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         assertSame(sr, dp.getExposedServices().iterator().next());
         
         Map<String, String> expected = new HashMap<String, String>();
-        expected.put("osgi.remote.configuration.type", "pojo");
-        expected.put("osgi.remote.configuration.pojo.address", "http://alternate_host:80/myString");
+        expected.put("service.exported.configs", "org.apache.cxf.ws");
+        expected.put("org.apache.cxf.ws.address", "http://alternate_host:80/myString");
         assertEquals(expected, dp.getExposedProperties(sr));
     }    
 

@@ -18,6 +18,7 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -26,7 +27,6 @@ import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.distribution.DistributionConstants;
 
 public final class ConfigTypeHandlerFactory {
     
@@ -42,26 +42,29 @@ public final class ConfigTypeHandlerFactory {
     public ConfigurationTypeHandler getHandler(BundleContext dswBC, ServiceEndpointDescription sd, 
                                                CxfDistributionProvider dp,
                                                Map<String, Object> handlerProperties) {
-        String type = OsgiUtils.getProperty(sd, DistributionConstants.REMOTE_CONFIGURATION_TYPE);
-        if (type == null || Constants.POJO_CONFIG_TYPE.equalsIgnoreCase(type)) {
-            if (type == null) {
+        Collection<String> types = OsgiUtils.getMultiValueProperty(sd.getProperty(Constants.EXPORTED_CONFIGS));
+        if (types == null) {
+            types = OsgiUtils.getMultiValueProperty(sd.getProperty(Constants.EXPORTED_CONFIGS_OLD));
+        }
+        
+        if (types == null || 
+            types.contains(Constants.WS_CONFIG_TYPE) ||
+            types.contains(Constants.WS_CONFIG_TYPE_OLD)) {
+            if (types == null) {
                 LOG.info("Defaulting to pojo configuration type ");
             }
             
-            if (OsgiUtils.getProperty(sd, Constants.POJO_HTTP_SERVICE_CONTEXT) != null) {
-                if (OsgiUtils.getProperty(sd, Constants.POJO_ADDRESS_PROPERTY) != null) {
-                    return null;
-                }
-                
+            if ((OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT) != null) ||
+                (OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT_OLD) != null)) {
                 return new HttpServiceConfigurationTypeHandler(dswBC, dp, handlerProperties);                
             } else {
                 return new PojoConfigurationTypeHandler(dswBC, dp, handlerProperties);
             }
-        } else if (Constants.WSDL_CONFIG_TYPE.equalsIgnoreCase(type)) {
+        } else if (types.contains(Constants.WSDL_CONFIG_TYPE)) {
             return new WsdlConfigurationTypeHandler(dswBC, dp, handlerProperties);
         }
         
-        LOG.info("Configuration type " + type + " is not supported");
+        LOG.info("None of the configuration types in " + types + " is supported.");
         
         return null;
     }

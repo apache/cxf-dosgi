@@ -124,10 +124,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     
     private Map<String, String> registerPublication(Server server, String[] intents, String address) {
         Map<String, String> publicationProperties = super.registerPublication(server, intents);
-
-        
-        publicationProperties.put(Constants.POJO_ADDRESS_PROPERTY, address);
-
+        publicationProperties.put(Constants.WS_ADDRESS_PROPERTY, address);
         return publicationProperties;
     }    
 
@@ -165,7 +162,11 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     }
 
     private String getServletContextRoot(ServiceEndpointDescription sd, Class<?> iClass) {
-        String context = OsgiUtils.getProperty(sd, Constants.POJO_HTTP_SERVICE_CONTEXT);
+        String context = OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT);
+        if (context == null) {
+            context = OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT_OLD);                      
+        }
+        
         if (context == null) {
             context = "/" + iClass.getName().replace('.', '/');
             LOG.info("Using a default address : " + context);

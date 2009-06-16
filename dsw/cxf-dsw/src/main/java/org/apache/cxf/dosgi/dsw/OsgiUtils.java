@@ -90,10 +90,7 @@ public final class OsgiUtils {
         
         Map<String, Object> userProperties = new HashMap<String, Object>();
         for (String key : sref.getPropertyKeys()) {
-            // we're after remote properties only
-            if (key.startsWith(DistributionConstants.REMOTE)) {
-                userProperties.put(key, sref.getProperty(key));
-            }
+            userProperties.put(key, sref.getProperty(key));
         }
         List<ServiceEndpointDescription> srefs = getRemoteReferences(sref.getBundle(), 
                                                              names, 
@@ -121,10 +118,9 @@ public final class OsgiUtils {
                 continue;
             }
 
-            Map<String, Object> remoteProps = getProperties(ref.getChildren(PROPERTY_ELEMENT, ns));
-            remoteProps.putAll(userProperties);
-            srefs.add(new ServiceEndpointDescriptionImpl(iNames, remoteProps));
-            
+            Map<String, Object> remoteProps = new HashMap<String, Object>(userProperties); 
+            addProperties(remoteProps, ref.getChildren(PROPERTY_ELEMENT, ns));
+            srefs.add(new ServiceEndpointDescriptionImpl(iNames, remoteProps));            
         }
         return srefs;
         
@@ -155,8 +151,8 @@ public final class OsgiUtils {
                 sd.getProvidedInterfaces().toArray(new String[interfaceNameCount]);
             list = new ServiceEndpointDescription[iNames.length];
             for (int i = 0; i < iNames.length; i++) {
-                Map<String, Object> props = excludeProperty(sd.getProperties(),  
-                        DistributionConstants.REMOTE_INTERFACES);
+                Map<String, Object> props = excludeProperty(sd.getProperties(),
+                        Constants.EXPORTED_INTERFACES, Constants.EXPORTED_INTERFACES_OLD);
                 
                 String keys[] = props.keySet().toArray(new String[props.size()]);
                 for (int j = 0; j < keys.length; j++) {
@@ -180,10 +176,13 @@ public final class OsgiUtils {
     }
 
     private static Map<String, Object> excludeProperty(Map properties, 
-                                                       String exclude) {
+                                                       String ... excludes) {
+        Collection<String> exList = Arrays.asList(excludes);
+        
         Map<String, Object> pruned = new HashMap<String, Object>();
         for (Object key : properties.keySet()) {
-            if (key.equals(exclude)) {
+            if (exList.contains(key)) {
+                // exclude
             } else {
                 pruned.put((String)key, properties.get(key));
             }
@@ -245,6 +244,7 @@ public final class OsgiUtils {
         }
     }
     
+    /*
     // TODO : consider creating a new List rather than modifyiing the existing one
     public static void matchServiceDescriptions(List<ServiceEndpointDescription> sds,
                                                 String interfaceName,
@@ -275,7 +275,7 @@ public final class OsgiUtils {
                       interfaceNames);
         }
         return filter.match(props);
-    }
+    } */
     
     public static String[] getProvidedInterfaces(ServiceEndpointDescription sd, String interfaceName) {
         
@@ -330,7 +330,11 @@ public final class OsgiUtils {
     
     private static Map<String, Object> getProperties(List<Element> elements) {       
         Map<String, Object> props = new HashMap<String, Object>();
+        addProperties(props, elements);
+        return props;
+    }
         
+    private static void addProperties(Map<String, Object> props, List<Element> elements) {       
         for (Element p : elements) {
             String key = p.getAttributeValue(PROPERTY_NAME_ATTRIBUTE);
             String value = p.getAttributeValue(PROPERTY_VALUE_ATTRIBUTE);
@@ -346,8 +350,6 @@ public final class OsgiUtils {
                           value);
             }
         }
-        
-        return props;
     }
     
     private static List<String> getProvidedInterfaces(List<Element> elements) {
@@ -485,7 +487,11 @@ public final class OsgiUtils {
     public static String[] getPublishableInterfaces(ServiceEndpointDescription sd,
                                                     ServiceReference sref) {
         Collection<String> publishProperty = 
-            getMultiValueProperty(sd.getProperty(DistributionConstants.REMOTE_INTERFACES));
+            getMultiValueProperty(sd.getProperty(Constants.EXPORTED_INTERFACES));
+        if (publishProperty == null) {
+            publishProperty = getMultiValueProperty(sd.getProperty(Constants.EXPORTED_INTERFACES_OLD));
+        }
+        
         String[] actualInterfaces = 
             (String[])sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS);
         String[] publishableInterfaces = null;

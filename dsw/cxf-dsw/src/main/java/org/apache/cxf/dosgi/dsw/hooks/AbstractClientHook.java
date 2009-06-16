@@ -73,9 +73,8 @@ public class AbstractClientHook extends AbstractHook {
             
         ServiceEndpointDescription sd = 
             notification.getServiceEndpointDescription();
-        if (sd.getProperty(DistributionConstants.REMOTE_INTERFACES) == null) {
-            LOG.info("not proxifying service, enabling property not set: " 
-                 + DistributionConstants.REMOTE_INTERFACES);
+        if ((sd.getProperty(Constants.EXPORTED_INTERFACES) == null) &&
+            (sd.getProperty(Constants.EXPORTED_INTERFACES_OLD) == null)) {
             return;
         }
             
@@ -186,7 +185,7 @@ public class AbstractClientHook extends AbstractHook {
         Map<String, Object> props = new HashMap<String, Object>();        
         props.putAll(sd.getProperties());
         props.put(Constants.DSW_CLIENT_ID, getIdentificationProperty());
-        props.put(DistributionConstants.REMOTE, "true");
+        props.put(Constants.IMPORTED, "true");
         return props;
     }
 

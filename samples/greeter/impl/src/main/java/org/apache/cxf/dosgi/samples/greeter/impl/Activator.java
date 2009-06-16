@@ -34,9 +34,9 @@ public class Activator implements BundleActivator {
     public void start(BundleContext bc) throws Exception {
         Dictionary props = new Hashtable();
 
-        props.put("osgi.remote.interfaces", "*");
-        props.put("osgi.remote.configuration.type", "pojo");
-        props.put("osgi.remote.configuration.pojo.address", "http://localhost:9090/greeter");
+        props.put("service.exported.interfaces", "*");
+        props.put("service.exported.configs", "org.apache.cxf.ws");
+        props.put("org.apache.cxf.ws.address", "http://localhost:9090/greeter");
         
         registration = bc.registerService(GreeterService.class.getName(), 
                                           new GreeterServiceImpl(), props);

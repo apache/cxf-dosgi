@@ -42,7 +42,8 @@ public class DistributionConstants {
 	 * The value of this property is of type String, String[] or Collection of
 	 * String.
 	 */
-	public static final String	REMOTE_INTERFACES			= "osgi.remote.interfaces";
+	// This constant is going to go away
+	// public static final String	REMOTE_INTERFACES			= "osgi.remote.interfaces";
 
 	/**
 	 * This optional service registration property contains a list of intents
@@ -64,7 +65,7 @@ public class DistributionConstants {
 	 * The value of this property is of type String, String[] or Collection of
 	 * String.
 	 */
-	public static final String	REMOTE_CONFIGURATION_TYPE	= "osgi.remote.configuration.type";
+	// public static final String	REMOTE_CONFIGURATION_TYPE	= "osgi.remote.configuration.type";
 
 	/**
 	 * This optional service registration property contains a list of intents
@@ -87,7 +88,7 @@ public class DistributionConstants {
 	 * The value of this property is of type String, String[] or Collection of
 	 * String.
 	 */
-	public static final String	DEPLOYMENT_INTENTS			= "osgi.deployment.intents";
+	// public static final String	DEPLOYMENT_INTENTS			= "osgi.deployment.intents";
 
 	/**
 	 * This service registration property is set on client side service proxies
@@ -97,5 +98,5 @@ public class DistributionConstants {
 	 * The value of this property is undefined. The simple fact that the
 	 * property is set denotes that the service is running remotely.
 	 */
-	public static final String	REMOTE						= "osgi.remote";
+	// public static final String	REMOTE						= "osgi.remote";
 }

@@ -18,6 +18,10 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
+import static org.apache.cxf.dosgi.dsw.Constants.WS_ADDRESS_PROPERTY;
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
+import static org.osgi.service.discovery.ServicePublication.SERVICE_INTERFACE_NAME;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,9 +31,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.hooks.CxfPublishHook;
 import org.apache.cxf.endpoint.Server;
 import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
@@ -44,12 +46,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.discovery.ServicePublication;
-
-import static org.apache.cxf.dosgi.dsw.Constants.POJO_ADDRESS_PROPERTY;
-import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
-import static org.osgi.service.discovery.ServicePublication.SERVICE_INTERFACE_NAME;
-import static org.osgi.service.discovery.ServicePublication.SERVICE_PROPERTIES;
-import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
 
 public class CxfPublishHookTest extends Assert {
 
@@ -164,7 +160,7 @@ public class CxfPublishHookTest extends Assert {
             String excludeProp = "osgi.remote.interfaces";
             assertNull(sd.getProperties().get(excludeProp));
             String addrProp = 
-                org.apache.cxf.dosgi.dsw.Constants.POJO_ADDRESS_PROPERTY;
+                org.apache.cxf.dosgi.dsw.Constants.WS_ADDRESS_PROPERTY_OLD;
             assertEquals(addresses[i], sd.getProperties().get(addrProp));
         }        
 
@@ -293,7 +289,7 @@ public class CxfPublishHookTest extends Assert {
                     Assert.assertSame(serviceBean, serviceObject);
                     TestPublishHook.this.setCalled();
                     Map props = sd.getProperties();
-                    String address = (String)props.get(POJO_ADDRESS_PROPERTY);
+                    String address = (String)props.get(WS_ADDRESS_PROPERTY);
                     if (address != null) {
                         props.put(ENDPOINT_LOCATION, address);
                     }

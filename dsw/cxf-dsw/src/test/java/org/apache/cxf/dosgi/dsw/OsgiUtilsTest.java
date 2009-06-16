@@ -114,7 +114,8 @@ public class OsgiUtilsTest extends TestCase {
         ServiceEndpointDescription sd =
             EasyMock.createMock(ServiceEndpointDescription.class);
         ServiceReference sref = EasyMock.createMock(ServiceReference.class);
-        EasyMock.expect(sd.getProperty("osgi.remote.interfaces")).andReturn(requested);
+        EasyMock.expect(sd.getProperty("service.exported.interfaces")).andReturn(requested);
+        EasyMock.expect(sd.getProperty("osgi.remote.interfaces")).andReturn(null);
         EasyMock.expect(sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS)).andReturn(actual);
         EasyMock.replay(sd);
         EasyMock.replay(sref);

@@ -70,12 +70,11 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     Map<String, String> registerPublication(Server server, String[] intents) {
         Map<String, String> publicationProperties = new HashMap<String, String>();
-        publicationProperties.put(DistributionConstants.REMOTE_CONFIGURATION_TYPE,
-                Constants.POJO_CONFIG_TYPE);
+        publicationProperties.put(Constants.EXPORTED_CONFIGS, Constants.WS_CONFIG_TYPE);
 
         String intentsValue = OsgiUtils.formatIntents(intents);
         if (intentsValue.length() > 0) {
-            publicationProperties.put(DistributionConstants.DEPLOYMENT_INTENTS, intentsValue);
+            publicationProperties.put(Constants.INTENTS, intentsValue);
         }
         return publicationProperties;
     }

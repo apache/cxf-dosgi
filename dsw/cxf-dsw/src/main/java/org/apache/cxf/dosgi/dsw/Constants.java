@@ -19,25 +19,32 @@
 package org.apache.cxf.dosgi.dsw;
 
 public class Constants {
-    public static final String CONFIGURATION_PROPERTY = "osgi.remote.configuration";
+    // Constants from RFC 119, they should ultimately be picked up from an OSGi class.
+    public static final String EXPORTED_INTERFACES = "service.exported.interfaces";
+    public static final String EXPORTED_INTERFACES_OLD = "osgi.remote.interfaces"; // for BW compatibility
 
-    // SCA
-    public static final String SCA_CONFIG_TYPE = "sca";
-    public static final String SCA_CONFIG_PREFIX = CONFIGURATION_PROPERTY + "." + SCA_CONFIG_TYPE; 
-    public static final String SCA_REMOTE_BINDINGS = SCA_CONFIG_PREFIX + ".bindings";
-    public static final String SCA_REMOTE_POLICIES = SCA_CONFIG_PREFIX + ".policies";
+    public static final String EXPORTED_CONFIGS = "service.exported.configs";
+    public static final String EXPORTED_CONFIGS_OLD = "osgi.remote.configuration.type"; // for BW comp.
     
+    public static final String IMPORTED = "service.imported";    
+    public static final String INTENTS = "service.intents";
+        
     // WSDL
     public static final String WSDL_CONFIG_TYPE = "wsdl";
-    public static final String WSDL_CONFIG_PREFIX = CONFIGURATION_PROPERTY + "." + WSDL_CONFIG_TYPE;
+    public static final String WSDL_CONFIG_PREFIX = "osgi.remote.configuration" + "." + WSDL_CONFIG_TYPE;
     public static final String SERVICE_NAMESPACE = WSDL_CONFIG_PREFIX + ".service.ns";
     
-    // POJO
-    public static final String POJO_CONFIG_TYPE = "pojo";
-    public static final String POJO_CONFIG_PREFIX = CONFIGURATION_PROPERTY + "." + POJO_CONFIG_TYPE;
-    public static final String POJO_ADDRESS_PROPERTY = POJO_CONFIG_PREFIX + ".address";
-    public static final String POJO_HTTP_SERVICE_CONTEXT = POJO_CONFIG_PREFIX + ".httpservice.context"; 
-        
+    // WS
+    public static final String WS_CONFIG_TYPE = "org.apache.cxf.ws";
+    public static final String WS_ADDRESS_PROPERTY = WS_CONFIG_TYPE + ".address";
+    public static final String WS_HTTP_SERVICE_CONTEXT = WS_CONFIG_TYPE + ".httpservice.context";
+    
+    // POJO (old value for WS)
+    public static final String WS_CONFIG_TYPE_OLD = "pojo";
+    public static final String WS_CONFIG_OLD_PREFIX = "osgi.remote.configuration." + WS_CONFIG_TYPE_OLD;
+    public static final String WS_ADDRESS_PROPERTY_OLD = WS_CONFIG_OLD_PREFIX + ".address";
+    public static final String WS_HTTP_SERVICE_CONTEXT_OLD = WS_CONFIG_OLD_PREFIX + ".httpservice.context"; 
+
     // Common Configuration Properties
     public static final String CHECK_BUNDLE = "check.bundle";
     public static final String DEFAULT_PORT_CONFIG = "default.port";

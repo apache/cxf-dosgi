@@ -41,7 +41,6 @@ import org.osgi.framework.hooks.service.FindHook;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.distribution.DistributionConstants;
 import org.osgi.service.distribution.DistributionProvider;
 
 public class Activator implements BundleActivator, ServiceListener, ManagedService {
@@ -126,7 +125,8 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
 
     private void checkExistingServices() throws InvalidSyntaxException {
         ServiceReference[] references = bc.getServiceReferences(null, 
-            "(" + DistributionConstants.REMOTE_INTERFACES + "=*)");
+            "(|(" + org.apache.cxf.dosgi.dsw.Constants.EXPORTED_INTERFACES + "=*)" +
+    		"(" + org.apache.cxf.dosgi.dsw.Constants.EXPORTED_INTERFACES_OLD + "=*))");
         
         if (references != null) {
             for (ServiceReference sref : references) {

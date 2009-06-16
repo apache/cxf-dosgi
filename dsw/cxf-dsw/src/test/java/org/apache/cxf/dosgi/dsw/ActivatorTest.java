@@ -148,11 +148,12 @@ public class ActivatorTest extends TestCase{
         EasyMock.expect(sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS)).
             andReturn(new String [] {TestService.class.getName()}).anyTimes();
         EasyMock.expect(sref.getPropertyKeys()).
-            andReturn(new String [] {"osgi.remote.interfaces"}).anyTimes();
-        EasyMock.expect(sref.getProperty("osgi.remote.interfaces")).
+            andReturn(new String [] {"service.exported.interfaces"}).anyTimes();
+        EasyMock.expect(sref.getProperty("service.exported.interfaces")).
             andReturn("*").anyTimes();
 
-        EasyMock.expect(bc.getServiceReferences(null, "(osgi.remote.interfaces=*)")).
+        EasyMock.expect(bc.getServiceReferences(null, 
+            "(|(service.exported.interfaces=*)(osgi.remote.interfaces=*))")).
             andReturn(new ServiceReference[] {sref}).anyTimes();
         EasyMock.expect(bc.getService(sref)).andReturn(serviceObject).anyTimes();
 

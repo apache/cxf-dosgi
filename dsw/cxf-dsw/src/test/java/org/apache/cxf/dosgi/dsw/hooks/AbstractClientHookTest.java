@@ -50,7 +50,7 @@ public class AbstractClientHookTest extends TestCase {
             }            
         };
         Map<String, Object> props = ch.getProperties(sed);
-        assertTrue(Boolean.valueOf((String) props.get("osgi.remote")));
+        assertTrue(Boolean.valueOf((String) props.get("service.imported")));
     }
     
     public void testLookupDiscoveryServiceInterface() {

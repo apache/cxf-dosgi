@@ -54,7 +54,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
         
         Map<String, Object> sdProps = new HashMap<String, Object>();
-        sdProps.put("osgi.remote.configuration.type", Constants.POJO_CONFIG_TYPE);
+        sdProps.put("osgi.remote.configuration.type", Constants.WS_CONFIG_TYPE);
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(
                 Collections.singletonList("MyInterface"), sdProps);
 
@@ -72,7 +72,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         
         Map<String, Object> sdProps = new HashMap<String, Object>();
         // use default for this: sdProps.put(Constants.CONFIG_TYPE_PROPERTY, Constants.POJO_CONFIG_TYPE);
-        sdProps.put(Constants.POJO_ADDRESS_PROPERTY, "http://localhost:9876/abcd");
+        sdProps.put(Constants.WS_ADDRESS_PROPERTY, "http://localhost:9876/abcd");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(
                 Collections.singletonList("MyInterface"), sdProps);
 
@@ -89,8 +89,8 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
         
         Map<String, Object> sdProps = new HashMap<String, Object>();
-        sdProps.put("osgi.remote.configuration.type", Constants.POJO_CONFIG_TYPE);
-        sdProps.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/abc");
+        sdProps.put("osgi.remote.configuration.type", Constants.WS_CONFIG_TYPE);
+        sdProps.put(Constants.WS_HTTP_SERVICE_CONTEXT, "/abc");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(
                 Collections.singletonList("MyInterface"), sdProps);
         
@@ -98,23 +98,6 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         ConfigurationTypeHandler handler = f.getHandler(bc, sd, dp, new HashMap<String, Object>());
         assertTrue(handler instanceof HttpServiceConfigurationTypeHandler);
         assertSame(dp, ((HttpServiceConfigurationTypeHandler) handler).getDistributionProvider());                
-    }
-    
-    public void testGetPojoAddressHttpServicesConflictSituation() {
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        EasyMock.replay(bc);
-        
-        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
-        
-        Map<String, Object> sdProps = new HashMap<String, Object>();
-        sdProps.put("osgi.remote.configuration.type", Constants.POJO_CONFIG_TYPE);
-        sdProps.put(Constants.POJO_ADDRESS_PROPERTY, "http://localhost:9876/abcd");
-        sdProps.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/abc");
-        ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(
-                Collections.singletonList("MyInterface"), sdProps);
-        
-        assertNull("Should not get a handler as this is a conflict situation", 
-                f.getHandler(bc, sd, null, new HashMap<String, Object>()));
     }
     
     public void testGetWSDLHandler() {

@@ -71,7 +71,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         EasyMock.replay(callingContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/myRunnable");
+        props.put(Constants.WS_HTTP_SERVICE_CONTEXT, "/myRunnable");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
         
         assertEquals("Precondition failed", 0, dp.getExposedServices().size());
@@ -83,9 +83,9 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         String hostName = InetAddress.getLocalHost().getHostName();
         Map<String, String> expected = new HashMap<String, String>();
-        expected.put("osgi.remote.configuration.type", "pojo");
-        expected.put("osgi.remote.configuration.pojo.address", "http://" + hostName + ":1327/myRunnable");
-        expected.put("osgi.deployment.intents", "a.b.c");
+        expected.put("service.exported.configs", "org.apache.cxf.ws");
+        expected.put("org.apache.cxf.ws.address", "http://" + hostName + ":1327/myRunnable");
+        expected.put("service.intents", "a.b.c");
         assertEquals(expected, dp.getExposedProperties(sr));
     } 
     
@@ -141,8 +141,8 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         String hostname = InetAddress.getLocalHost().getHostName();
         Map<String, String> expected = new HashMap<String, String>();
-        expected.put("osgi.remote.configuration.type", "pojo");
-        expected.put("osgi.remote.configuration.pojo.address", "http://" + hostname + ":8080/java/lang/Runnable");
+        expected.put("service.exported.configs", "org.apache.cxf.ws");
+        expected.put("org.apache.cxf.ws.address", "http://" + hostname + ":8080/java/lang/Runnable");
         assertEquals(expected, dp.getExposedProperties(sr));
     }
 
@@ -194,8 +194,8 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         EasyMock.replay(callingContext);
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put("osgi.remote.configuration.type", Constants.POJO_CONFIG_TYPE);
-        props.put(Constants.POJO_HTTP_SERVICE_CONTEXT, "/myRunnable");
+        props.put("osgi.remote.configuration.type", Constants.WS_CONFIG_TYPE);
+        props.put(Constants.WS_HTTP_SERVICE_CONTEXT, "/myRunnable");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
         
         assertEquals("Precondition failed", 0, dp.getExposedServices().size());
@@ -205,8 +205,8 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         String hostName = InetAddress.getLocalHost().getHostName();
         Map<String, String> expected = new HashMap<String, String>();
-        expected.put("osgi.remote.configuration.type", "pojo");
-        expected.put("osgi.remote.configuration.pojo.address", "https://" + hostName + ":8432/myRunnable");
+        expected.put("service.exported.configs", "org.apache.cxf.ws");
+        expected.put("org.apache.cxf.ws.address", "https://" + hostName + ":8432/myRunnable");
         assertEquals(expected, dp.getExposedProperties(sr));
     } 
 
