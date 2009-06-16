@@ -44,7 +44,6 @@ import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.distribution.DistributionConstants;
 
 public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
     private static final Logger LOG = Logger.getLogger(AbstractPojoConfigurationTypeHandler.class.getName());
@@ -177,14 +176,20 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     }
 
     private static String[] getRequestedIntents(ServiceEndpointDescription sd) {
-        String property = OsgiUtils.getProperty(sd, 
-                DistributionConstants.REMOTE_REQUIRES_INTENTS);
-
-        String[] intents = OsgiUtils.parseIntents(property);
-        for (int i = 0; i < intents.length; i++) {
-            LOG.fine("Intent asserted: " + intents[i]);
-        } 
-        return intents;
+        Collection<String> intents = Arrays.asList(
+            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS)));        
+        Collection<String> extraIntents = Arrays.asList(
+            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_EXTRA)));
+        Collection<String> oldIntents = Arrays.asList(
+            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_OLD))); 
+        
+        Set<String> allIntents = new HashSet<String>(intents.size() + extraIntents.size() + oldIntents.size());
+        allIntents.addAll(intents);
+        allIntents.addAll(extraIntents);
+        allIntents.addAll(oldIntents);
+        
+        LOG.fine("Intents asserted: " + allIntents);
+        return allIntents.toArray(new String[allIntents.size()]);
     }
     
     private IntentMap mergeWithMaster(BundleContext dswContext, IntentMap intentMap) {

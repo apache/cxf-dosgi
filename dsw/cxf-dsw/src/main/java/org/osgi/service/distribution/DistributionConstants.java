@@ -54,7 +54,7 @@ public class DistributionConstants {
 	 * The value of this property is of type String, String[] or Collection of
 	 * String.
 	 */
-	public static final String	REMOTE_REQUIRES_INTENTS		= "osgi.remote.requires.intents";
+	// public static final String	REMOTE_REQUIRES_INTENTS		= "osgi.remote.requires.intents";
 
 	/**
 	 * This optional service registration property identifies the metadata type

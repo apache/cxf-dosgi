@@ -26,6 +26,10 @@ public class Constants {
     public static final String EXPORTED_CONFIGS = "service.exported.configs";
     public static final String EXPORTED_CONFIGS_OLD = "osgi.remote.configuration.type"; // for BW comp.
     
+    public static final String EXPORTED_INTENTS = "service.exported.intents";
+    public static final String EXPORTED_INTENTS_EXTRA = "service.exported.intents.extra";
+    public static final String EXPORTED_INTENTS_OLD = "osgi.remote.requires.intents";
+    
     public static final String IMPORTED = "service.imported";    
     public static final String INTENTS = "service.intents";
         
