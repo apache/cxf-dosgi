@@ -46,7 +46,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.distribution.DistributionConstants;
 
 
 public class AbstractClientHook extends AbstractHook {
@@ -119,7 +118,7 @@ public class AbstractClientHook extends AbstractHook {
                         ServiceRegistration proxyRegistration = 
                             actualContext.registerService(interfaceName,
                                                           new ClientServiceFactory(actualContext, iClass, sd, handler),
-                                                          new Hashtable<String, Object>(getProperties(sd)));
+                                                          new Hashtable<String, Object>(getProperties(sd, handler)));
                         cacheEndpointId(sd, proxyRegistration);
                     }
                 }
@@ -181,11 +180,20 @@ public class AbstractClientHook extends AbstractHook {
     }
 
     @SuppressWarnings("unchecked")
-    protected Map<String, Object> getProperties(ServiceEndpointDescription sd) {
+    protected Map<String, Object> getProperties(ServiceEndpointDescription sd, ConfigurationTypeHandler handler) {
         Map<String, Object> props = new HashMap<String, Object>();        
         props.putAll(sd.getProperties());
+        
+        for (Iterator<Map.Entry<String, Object>> i = props.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry<String, Object> e = i.next();
+            if (e.getKey().startsWith("service.exported")) {
+                i.remove();
+            }
+        }
+        
         props.put(Constants.DSW_CLIENT_ID, getIdentificationProperty());
         props.put(Constants.IMPORTED, "true");
+        props.put(Constants.IMPORTD_CONFIGS, handler.getType());
         return props;
     }
 

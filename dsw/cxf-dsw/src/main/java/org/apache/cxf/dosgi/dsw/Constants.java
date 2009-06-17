@@ -30,7 +30,9 @@ public class Constants {
     public static final String EXPORTED_INTENTS_EXTRA = "service.exported.intents.extra";
     public static final String EXPORTED_INTENTS_OLD = "osgi.remote.requires.intents";
     
-    public static final String IMPORTED = "service.imported";    
+    public static final String IMPORTED = "service.imported";
+    public static final String IMPORTD_CONFIGS = "service.imported.configs";
+    
     public static final String INTENTS = "service.intents";
         
     // WSDL

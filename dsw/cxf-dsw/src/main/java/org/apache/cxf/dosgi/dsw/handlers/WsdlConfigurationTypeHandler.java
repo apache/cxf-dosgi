@@ -36,7 +36,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 
 public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
-
+    private static final String CONFIGURATION_TYPE = "wsdl";
     private static final Logger LOG = Logger.getLogger(WsdlConfigurationTypeHandler.class.getName());
     
     public WsdlConfigurationTypeHandler(BundleContext dswBC,
@@ -45,6 +45,10 @@ public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
         super(dswBC, dp, handlerProps);
     }
     
+    public String getType() {
+        return CONFIGURATION_TYPE;
+    }
+
     public Object createProxy(ServiceReference serviceReference,
                               BundleContext dswContext,
                               BundleContext callingContext,

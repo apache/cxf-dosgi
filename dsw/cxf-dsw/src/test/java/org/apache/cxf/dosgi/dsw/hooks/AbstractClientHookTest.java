@@ -26,6 +26,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -41,7 +42,10 @@ public class AbstractClientHookTest extends TestCase {
         CxfDistributionProvider dp = control.createMock(CxfDistributionProvider.class);
         ServiceEndpointDescription sed = control.createMock(ServiceEndpointDescription.class);
         EasyMock.expect(sed.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
+        ConfigurationTypeHandler handler = control.createMock(ConfigurationTypeHandler.class);
+        EasyMock.expect(handler.getType()).andReturn("test").anyTimes();
         control.replay();
+                
         
         AbstractClientHook ch = new AbstractClientHook(bc, dp) {
             @Override
@@ -49,8 +53,9 @@ public class AbstractClientHookTest extends TestCase {
                 return "ID";
             }            
         };
-        Map<String, Object> props = ch.getProperties(sed);
+        Map<String, Object> props = ch.getProperties(sed, handler);
         assertTrue(Boolean.valueOf((String) props.get("service.imported")));
+        assertEquals("test", props.get("service.imported.configs"));
     }
     
     public void testLookupDiscoveryServiceInterface() {

@@ -45,7 +45,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     private static final Logger LOG = Logger.getLogger(HttpServiceConfigurationTypeHandler.class.getName());
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>(); 
-
+    
     protected HttpServiceConfigurationTypeHandler(BundleContext dswBC,
                                                   CxfDistributionProvider dp,
                                                   Map<String, Object> handlerProps) {

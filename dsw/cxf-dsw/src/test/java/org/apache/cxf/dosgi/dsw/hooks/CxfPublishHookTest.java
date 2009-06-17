@@ -276,6 +276,9 @@ public class CxfPublishHookTest extends Assert {
         protected ConfigurationTypeHandler getHandler(ServiceEndpointDescription sd,
                                                       Map<String, Object> props) {
             return new ConfigurationTypeHandler() {
+                public String getType() {
+                    return "test";
+                }
 
                 public Object createProxy(ServiceReference sr,
                                           BundleContext dswContext, BundleContext callingContext, 

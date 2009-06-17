@@ -48,6 +48,7 @@ import org.osgi.service.discovery.ServiceEndpointDescription;
 public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
     private static final Logger LOG = Logger.getLogger(AbstractPojoConfigurationTypeHandler.class.getName());
     private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
+    private static final String CONFIGURATION_TYPE = "org.apache.cxf.ws";
     
     private IntentMap masterMap;
     
@@ -173,6 +174,10 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     IntentMap getIntentMap(BundleContext callingContext) {
         return OsgiUtils.getIntentMap(callingContext);
+    }
+
+    public String getType() {
+        return CONFIGURATION_TYPE;
     }
 
     private static String[] getRequestedIntents(ServiceEndpointDescription sd) {

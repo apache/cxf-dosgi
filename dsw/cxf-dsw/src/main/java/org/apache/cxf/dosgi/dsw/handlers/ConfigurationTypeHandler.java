@@ -24,6 +24,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 
 public interface ConfigurationTypeHandler {
+    String getType();
+    
     Server createServer(ServiceReference serviceReference,
                         BundleContext dswContext,
                         BundleContext callingContext, 
