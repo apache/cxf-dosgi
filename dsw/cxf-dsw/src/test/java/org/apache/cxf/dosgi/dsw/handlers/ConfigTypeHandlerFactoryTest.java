@@ -47,6 +47,55 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         assertSame(dp, ((PojoConfigurationTypeHandler) handler).getDistributionProvider());
     }
     
+    
+    public void testGetJaxrsHandlerNoIntents() {
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.replay(bc);
+        
+        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(Constants.EXPORTED_CONFIGS, Constants.RS_CONFIG_TYPE);
+        
+        ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl("MyInterface", props);
+        CxfDistributionProvider dp = new DistributionProviderImpl(bc);
+        ConfigurationTypeHandler handler = f.getHandler(bc, sd, dp, new HashMap<String, Object>());
+        assertTrue(handler instanceof JaxRSPojoConfigurationTypeHandler);        
+        assertSame(dp, ((PojoConfigurationTypeHandler) handler).getDistributionProvider());
+    }
+    
+    public void testGetJaxrsHandlerHttpIntents() {
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.replay(bc);
+        
+        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(Constants.EXPORTED_CONFIGS, Constants.RS_CONFIG_TYPE);
+        props.put(Constants.EXPORTED_INTENTS, "HTTP");
+        
+        ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl("MyInterface", props);
+        CxfDistributionProvider dp = new DistributionProviderImpl(bc);
+        ConfigurationTypeHandler handler = f.getHandler(bc, sd, dp, new HashMap<String, Object>());
+        assertTrue(handler instanceof JaxRSPojoConfigurationTypeHandler);        
+        assertSame(dp, ((PojoConfigurationTypeHandler) handler).getDistributionProvider());
+    }
+    
+    public void testJaxrsPropertyIgnored() {
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.replay(bc);
+        
+        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(Constants.EXPORTED_CONFIGS, Constants.RS_CONFIG_TYPE);
+        props.put(Constants.EXPORTED_INTENTS, "SOAP HTTP");
+        
+        ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl("MyInterface", props);
+        CxfDistributionProvider dp = new DistributionProviderImpl(bc);
+        ConfigurationTypeHandler handler = f.getHandler(bc, sd, dp, new HashMap<String, Object>());
+        assertTrue(handler instanceof PojoConfigurationTypeHandler);
+        assertTrue(!(handler instanceof JaxRSPojoConfigurationTypeHandler));
+        assertSame(dp, ((PojoConfigurationTypeHandler) handler).getDistributionProvider());
+    }
+    
     public void testGetPojoHandler() {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bc);

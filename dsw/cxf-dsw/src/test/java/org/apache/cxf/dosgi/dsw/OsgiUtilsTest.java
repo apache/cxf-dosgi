@@ -135,6 +135,7 @@ public class OsgiUtilsTest extends TestCase {
         final Map<String, Object> props = new HashMap<String, Object>();
         props.put(org.osgi.framework.Constants.OBJECTCLASS, new String [] {"myClass"});
         props.put("osgi.remote.interfaces", "*");
+        props.put(Constants.WS_DATABINDING_PROP_KEY, "jaxb");
         
         Bundle b = EasyMock.createNiceMock(Bundle.class);        
         EasyMock.replay(b);
@@ -155,6 +156,7 @@ public class OsgiUtilsTest extends TestCase {
         // Actual test starts here
         ServiceEndpointDescription sd = OsgiUtils.getRemoteReference(sr, true);
         assertEquals("*", sd.getProperties().get("osgi.remote.interfaces"));
+        assertEquals("jaxb", sd.getProperties().get(Constants.WS_DATABINDING_PROP_KEY));
         
         EasyMock.verify(sr);
     }

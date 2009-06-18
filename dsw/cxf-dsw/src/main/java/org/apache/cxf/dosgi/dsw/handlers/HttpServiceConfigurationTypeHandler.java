@@ -28,11 +28,13 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceException;
@@ -95,13 +97,20 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
         }        
         Bus bus = cxf.getBus();
-        
+        DataBinding databinding;
+        String dataBindingImpl = (String) serviceReference.getProperty(Constants.WS_DATABINDING_PROP_KEY);
+        if("jaxb".equals(dataBindingImpl)) {
+          databinding = new JAXBDataBinding();
+        } else {
+          databinding = new AegisDatabinding();
+        }
+        String frontEndImpl = (String) serviceReference.getProperty(Constants.WS_FRONTEND_PROP_KEY);
+        ServerFactoryBean factory = createServerFactoryBean(frontEndImpl);
         String address = constructAddress(dswContext, contextRoot);
-        ServerFactoryBean factory = createServerFactoryBean();
         factory.setBus(bus);
         factory.setServiceClass(iClass);
         factory.setAddress("/");
-        factory.getServiceFactory().setDataBinding(new AegisDatabinding());
+        factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
@@ -122,13 +131,13 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         }       
     }
     
-    private Map<String, String> registerPublication(Server server, String[] intents, String address) {
+    protected Map<String, String> registerPublication(Server server, String[] intents, String address) {
         Map<String, String> publicationProperties = super.registerPublication(server, intents);
         publicationProperties.put(Constants.WS_ADDRESS_PROPERTY, address);
         return publicationProperties;
     }    
 
-    private String constructAddress(BundleContext ctx, String contextRoot) {
+    protected String constructAddress(BundleContext ctx, String contextRoot) {
         String port = null;
         boolean https = false;
         if ("true".equalsIgnoreCase(ctx.getProperty("org.osgi.service.http.secure.enabled"))) {
@@ -151,7 +160,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         return getAddress(https ? "https" : "http", hostName, port, contextRoot);
     }
 
-    private HttpService getHttpService() {
+    protected HttpService getHttpService() {
         for (ServiceReference sr : httpServiceReferences) {
             Object svc = bundleContext.getService(sr);
             if (svc instanceof HttpService) {
@@ -161,7 +170,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         throw new ServiceException("CXF DOSGi: No HTTP Service could be found to publish CXF endpoint in.");
     }
 
-    private String getServletContextRoot(ServiceEndpointDescription sd, Class<?> iClass) {
+    protected String getServletContextRoot(ServiceEndpointDescription sd, Class<?> iClass) {
         String context = OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT);
         if (context == null) {
             context = OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT_OLD);                      

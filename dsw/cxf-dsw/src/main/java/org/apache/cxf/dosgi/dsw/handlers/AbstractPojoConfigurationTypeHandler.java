@@ -42,6 +42,8 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 
@@ -59,13 +61,21 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     }
 
     // Isolated so that it can be substituted for testing
-    ClientProxyFactoryBean createClientProxyFactoryBean() {
+    ClientProxyFactoryBean createClientProxyFactoryBean(String frontEndImpl) {
+      if("jaxws".equals(frontEndImpl)) {
+        return new JaxWsProxyFactoryBean();
+      } else {
         return new ClientProxyFactoryBean();
+      }
     }
 
     // Isolated so that it can be substituted for testing
-    ServerFactoryBean createServerFactoryBean() {
+    ServerFactoryBean createServerFactoryBean(String frontEndImpl) {
+      if("jaxws".equals(frontEndImpl)) {
+        return new JaxWsServerFactoryBean();
+      } else {
         return new ServerFactoryBean();
+      }
     }
 
     Map<String, String> registerPublication(Server server, String[] intents) {

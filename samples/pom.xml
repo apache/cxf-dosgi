@@ -18,6 +18,7 @@
 
     <modules>
       <module>greeter</module>
+      <module>greeter_rest</module>
       <module>spring_dm</module>
       <module>ds</module>
       <module>discovery</module>

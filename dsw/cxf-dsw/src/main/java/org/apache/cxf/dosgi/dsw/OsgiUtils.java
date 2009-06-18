@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -46,7 +44,6 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.distribution.DistributionConstants;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 

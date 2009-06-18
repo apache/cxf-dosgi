@@ -40,10 +40,21 @@ public class Constants {
     public static final String WSDL_CONFIG_PREFIX = "osgi.remote.configuration" + "." + WSDL_CONFIG_TYPE;
     public static final String SERVICE_NAMESPACE = WSDL_CONFIG_PREFIX + ".service.ns";
     
+    // Provider prefix
+    public static final String PROVIDER_PREFIX = "org.apache.cxf";
+    
     // WS
-    public static final String WS_CONFIG_TYPE = "org.apache.cxf.ws";
+    public static final String WS_CONFIG_TYPE = PROVIDER_PREFIX + ".ws";
     public static final String WS_ADDRESS_PROPERTY = WS_CONFIG_TYPE + ".address";
     public static final String WS_HTTP_SERVICE_CONTEXT = WS_CONFIG_TYPE + ".httpservice.context";
+    public static final String WS_FRONTEND_PROP_KEY = WS_CONFIG_TYPE + ".frontend";
+    public static final String WS_DATABINDING_PROP_KEY = WS_CONFIG_TYPE + ".databinding";
+    
+    // Rest
+    public static final String RS_CONFIG_TYPE = PROVIDER_PREFIX + ".rs";
+    public static final String RS_ADDRESS_PROPERTY = RS_CONFIG_TYPE + ".address";
+    public static final String RS_HTTP_SERVICE_CONTEXT = RS_CONFIG_TYPE + ".httpservice.context";
+    public static final String RS_DATABINDING_PROP_KEY = WS_CONFIG_TYPE + ".databinding";
     
     // POJO (old value for WS)
     public static final String WS_CONFIG_TYPE_OLD = "pojo";
@@ -59,6 +70,8 @@ public class Constants {
     public static final String DEFAULT_HOST_VALUE = "localhost";
     public final static String USE_MASTER_MAP = "use.master.map";
     
-    // DSW Identification - TODO do we really need this one?
-    public static final String DSW_CLIENT_ID = "org.apache.cxf.remote.dsw.client";
+    
+    //DSW Identification - TODO do we really need this one?
+    public static final String DSW_CLIENT_ID = PROVIDER_PREFIX + ".remote.dsw.client";
+    
 }

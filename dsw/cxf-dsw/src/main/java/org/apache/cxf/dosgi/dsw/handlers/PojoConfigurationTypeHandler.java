@@ -23,12 +23,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServiceEndpointDescription;
@@ -60,10 +62,18 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ClientProxyFactoryBean factory = createClientProxyFactoryBean();
+            DataBinding databinding;
+            String dataBindingImpl = (String) serviceReference.getProperty(Constants.WS_DATABINDING_PROP_KEY);
+            if("jaxb".equals(dataBindingImpl)) {
+              databinding = new JAXBDataBinding();
+            } else {
+              databinding = new AegisDatabinding();
+            }
+            String frontEndImpl = (String) serviceReference.getProperty(Constants.WS_FRONTEND_PROP_KEY);
+            ClientProxyFactoryBean factory = createClientProxyFactoryBean(frontEndImpl);
             factory.setServiceClass(iClass);
             factory.setAddress(address);
-            factory.getServiceFactory().setDataBinding(new AegisDatabinding());
+            factory.getServiceFactory().setDataBinding(databinding);
 
             applyIntents(dswContext, 
                          callingContext, 
@@ -98,10 +108,19 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         LOG.info("Creating a " + sd.getProvidedInterfaces().toArray()[0]
             + " endpoint from CXF PublishHook, address is " + address);
         
-        ServerFactoryBean factory = createServerFactoryBean();
+        DataBinding databinding;
+        String dataBindingImpl = (String) serviceReference.getProperty(Constants.WS_DATABINDING_PROP_KEY);
+        if("jaxb".equals(dataBindingImpl)) {
+          databinding = new JAXBDataBinding();
+        } else {
+          databinding = new AegisDatabinding();
+        }
+        String frontEndImpl = (String) serviceReference.getProperty(Constants.WS_FRONTEND_PROP_KEY);
+        ServerFactoryBean factory = createServerFactoryBean(frontEndImpl);
+
         factory.setServiceClass(iClass);
         factory.setAddress(address);
-        factory.getServiceFactory().setDataBinding(new AegisDatabinding());
+        factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
@@ -132,7 +151,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return publicationProperties;
     }
 
-    private String getPojoAddress(ServiceEndpointDescription sd, Class<?> iClass) {
+    protected String getPojoAddress(ServiceEndpointDescription sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
         if (address == null) {
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);            

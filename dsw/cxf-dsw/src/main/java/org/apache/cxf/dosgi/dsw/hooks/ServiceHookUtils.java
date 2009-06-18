@@ -96,6 +96,7 @@ public final class ServiceHookUtils {
             } catch (Exception ex) {
                 LOG.warning("WARNING : Problem creating a remote endpoint for " + interfaceName
                         + " from CXF PublishHook, reason is " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
         

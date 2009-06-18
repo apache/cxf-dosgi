@@ -237,6 +237,7 @@
             <Embed-Directory>lib</Embed-Directory>
             <_exportcontents>
               javax.xml.ws.*;version="2.1.0",
+              javax.ws.rs.*;version="1.0.0", 
               javax.servlet.*;version="2.5.0",
               org.apache.cxf.dosgi.*;version="${pom.version}",
               org.apache.cxf.*;version="${cxf.version}",

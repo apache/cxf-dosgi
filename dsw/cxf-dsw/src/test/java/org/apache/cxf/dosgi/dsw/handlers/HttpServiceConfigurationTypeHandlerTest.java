@@ -46,7 +46,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         HttpServiceConfigurationTypeHandler h = 
             new HttpServiceConfigurationTypeHandler(dswContext, dp, handlerProps) {
                 @Override
-                ServerFactoryBean createServerFactoryBean() {
+                ServerFactoryBean createServerFactoryBean(String frontend) {
                     return sfb;
                 }
 
@@ -107,7 +107,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         HttpServiceConfigurationTypeHandler h = 
             new HttpServiceConfigurationTypeHandler(dswContext, dp, handlerProps) {
                 @Override
-                ServerFactoryBean createServerFactoryBean() {
+                ServerFactoryBean createServerFactoryBean(String frontend) {
                     return sfb;
                 }
 
@@ -169,7 +169,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         HttpServiceConfigurationTypeHandler h = 
             new HttpServiceConfigurationTypeHandler(dswContext, dp, handlerProps) {
                 @Override
-                ServerFactoryBean createServerFactoryBean() {
+                ServerFactoryBean createServerFactoryBean(String frontend) {
                     return sfb;
                 }
 

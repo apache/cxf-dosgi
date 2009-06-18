@@ -69,6 +69,8 @@
         <module>common</module>
         <module>multi_bundle_distro</module>
         <module>single_bundle_distro</module>
+        <module>common_rest</module>
+        <module>single_bundle_distro_rest</module>
     </modules>
 
     <build>

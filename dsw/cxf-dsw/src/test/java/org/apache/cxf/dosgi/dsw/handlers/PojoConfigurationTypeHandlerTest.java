@@ -79,7 +79,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         DistributionProviderImpl dp = new DistributionProviderImpl(bc);
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(bc, dp, handlerProps) {
             @Override
-            ClientProxyFactoryBean createClientProxyFactoryBean() {
+            ClientProxyFactoryBean createClientProxyFactoryBean(String frontend) {
                 return cpfb;
             }
             
@@ -115,7 +115,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         DistributionProviderImpl dp = new DistributionProviderImpl(dswContext);
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, dp, handlerProps) {
             @Override
-            ServerFactoryBean createServerFactoryBean() {
+            ServerFactoryBean createServerFactoryBean(String frontend) {
                 return sfb;
             }
 
@@ -155,7 +155,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         DistributionProviderImpl dp = new DistributionProviderImpl(dswContext);
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, dp, handlerProps) {
             @Override
-            ServerFactoryBean createServerFactoryBean() {
+            ServerFactoryBean createServerFactoryBean(String frontend) {
                 return sfb;
             }
 
@@ -627,7 +627,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, dp, handlerProps) {
             @Override
-            ServerFactoryBean createServerFactoryBean() {
+            ServerFactoryBean createServerFactoryBean(String frontend) {
                 return sfb;
             }
 
@@ -681,7 +681,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, dp, handlerProps) {
             @Override
-            ServerFactoryBean createServerFactoryBean() {
+            ServerFactoryBean createServerFactoryBean(String frontend) {
                 return sfb;
             }
 
