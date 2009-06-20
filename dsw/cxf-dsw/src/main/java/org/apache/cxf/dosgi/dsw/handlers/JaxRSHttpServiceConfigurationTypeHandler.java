@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -31,6 +32,7 @@ import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceException;
@@ -71,10 +73,18 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
         }        
         Bus bus = cxf.getBus();
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-        factory.setServiceClass(iClass);
-        factory.setAddress("/");
-        factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
         factory.setBus(bus);
+        
+        List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
+        if (resources != null) {
+        	factory.setModelBeansWithServiceClass(resources, iClass);
+        	factory.setServiceBeans(serviceBean);
+        } else {
+            factory.setServiceClass(iClass);
+            factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
+        }
+        
+        factory.setAddress("/");
         
         String address = constructAddress(dswContext, contextRoot);
         

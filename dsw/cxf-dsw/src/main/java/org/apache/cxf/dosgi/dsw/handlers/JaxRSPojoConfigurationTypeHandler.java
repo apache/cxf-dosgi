@@ -33,6 +33,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -66,7 +67,13 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
       try {
     	  JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
     	  bean.setAddress(address);
-    	  bean.setServiceClass(iClass);
+    	  
+    	  List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
+          if (resources != null) {
+          	  bean.setModelBeansWithServiceClass(resources, iClass);
+          } else {
+              bean.setServiceClass(iClass);
+          }
     	  if (!"jaxb".equals(sd.getProperty(Constants.RS_DATABINDING_PROP_KEY))) {
     	      bean.setProvider(new AegisElementProvider());
     	  }
@@ -99,9 +106,18 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
             + " endpoint from CXF PublishHook, address is " + address);
         
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-        factory.setServiceClass(iClass);
+        
+        List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
+        if (resources != null) {
+        	factory.setModelBeansWithServiceClass(resources, iClass);
+        	factory.setServiceBeans(serviceBean);
+        } else {
+            factory.setServiceClass(iClass);
+            factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
+        }
+        
         factory.setAddress(address);
-        factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
+        
         if (!"jaxb".equals(sd.getProperty(Constants.RS_DATABINDING_PROP_KEY))) {
 	        List<Object> providers = new ArrayList<Object>(); 
 	        providers.add(new AegisElementProvider());
@@ -136,4 +152,6 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
         }
         return address;
     }
+    
+    
 }
