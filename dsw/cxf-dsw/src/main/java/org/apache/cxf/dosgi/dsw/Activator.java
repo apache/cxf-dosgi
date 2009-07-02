@@ -25,6 +25,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
+import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
 import org.apache.cxf.dosgi.dsw.hooks.CxfFindListenerHook;
 import org.apache.cxf.dosgi.dsw.hooks.CxfPublishHook;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
@@ -37,6 +39,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.hooks.service.FindHook;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.cm.ConfigurationException;
@@ -54,6 +57,7 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
     CxfDistributionProvider dpService;
     CxfFindListenerHook lHook;
     CxfPublishHook pHook;
+    ServiceRegistration decoratorReg;
     
     public void start(BundleContext context) throws Exception {
         // Disable the fast infoset as it's not compatible (yet) with OSGi
@@ -63,8 +67,11 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
         // should we have a seperate PID for a find and publish hook ? 
         context.registerService(ManagedService.class.getName(), 
                                 this, getDefaults());
+    
+        decoratorReg = context.registerService(ServiceDecorator.class.getName(), 
+            new ServiceDecoratorImpl(context), null);
         
-        dpService = registerDistributionProviderService();
+        dpService = registerDistributionProviderService();        
 
         pHook = new CxfPublishHook(context, dpService);        
         lHook = new CxfFindListenerHook(context, dpService);
@@ -107,6 +114,9 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
         dpService.shutdown();
         execService.shutdown();
         pHook.removeEndpoints();
+
+        decoratorReg.unregister();        
+        // unregister other registered services (ManagedService + Hooks)
     }
 
     private Dictionary<String, String> getDefaults() {

@@ -37,6 +37,15 @@ public class ActivatorTest extends TestCase{
 
         EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
+        EasyMock.expect(bc.registerService(
+            (String) EasyMock.anyObject(), EasyMock.anyObject(), 
+            (Dictionary) EasyMock.anyObject())).andAnswer(new IAnswer<ServiceRegistration>() {
+                public ServiceRegistration answer() throws Throwable {
+                    ServiceRegistration sr = EasyMock.createNiceMock(ServiceRegistration.class);
+                    EasyMock.replay(sr);
+                    return sr;
+                }                
+            }).anyTimes();
         control.replay();
         return bc;
     }

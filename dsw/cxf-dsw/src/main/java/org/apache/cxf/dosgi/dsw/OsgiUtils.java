@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.service.ServiceEndpointDescriptionImpl;
 import org.jdom.Document;
@@ -93,6 +94,7 @@ public final class OsgiUtils {
                                                              names, 
                                                              userProperties,
                                                              matchAllNames);
+        setAdditionalProperties(sref, userProperties);
         
         if (srefs.isEmpty()) {
             return new ServiceEndpointDescriptionImpl(Arrays.asList(names), userProperties);
@@ -123,21 +125,6 @@ public final class OsgiUtils {
         
     }
     
-    @SuppressWarnings("unchecked")
-    public static List<ServiceEndpointDescription> getAllRemoteReferences(Bundle b) {
-        List<Element> references = getAllDescriptionElements(b);
-        
-        List<ServiceEndpointDescription> srefs = new ArrayList<ServiceEndpointDescription>();
-        Namespace ns = Namespace.getNamespace(REMOTE_SERVICES_NS);
-        for (Element ref : references) {
-            List<String> iNames = getProvidedInterfaces(ref.getChildren(PROVIDE_INTERFACE_ELEMENT, ns));
-            Map<String, Object> remoteProps = getProperties(ref.getChildren(PROPERTY_ELEMENT, ns));
-            srefs.add(new ServiceEndpointDescriptionImpl(iNames, remoteProps));
-        }
-        return srefs;
-        
-    }
-
     public static ServiceEndpointDescription[] flattenServiceDescription(ServiceEndpointDescription sd) {
         ServiceEndpointDescription[] list = null;
         int interfaceNameCount = sd.getProvidedInterfaces().size();
@@ -217,6 +204,27 @@ public final class OsgiUtils {
             }            
         }
         return elements; 
+    }
+    
+    private static void setAdditionalProperties(ServiceReference sref, Map<String, Object> props) {        
+        BundleContext bc = sref.getBundle().getBundleContext();
+        ServiceReference [] refs;
+            try {
+                refs = bc.getServiceReferences(ServiceDecorator.class.getName(), null);
+            } catch (InvalidSyntaxException e) {
+                // should never happen, filter is null
+                return;
+            }
+        if (refs == null) {
+            return;
+        }
+        
+        for (ServiceReference ref : refs) {
+            Object svc = bc.getService(ref);
+            if (svc instanceof ServiceDecorator) {
+                ((ServiceDecorator) svc).decorate(sref, props);
+            }            
+        }
     }
     
     private static boolean serviceNamesMatch(

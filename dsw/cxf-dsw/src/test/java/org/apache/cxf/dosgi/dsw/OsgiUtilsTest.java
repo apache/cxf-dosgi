@@ -12,12 +12,14 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 
@@ -131,13 +133,19 @@ public class OsgiUtilsTest extends TestCase {
         EasyMock.verify();
     }
 
-    public void testGetRemoteReferencesFromRegistrationProperties() {
+    public void testGetRemoteReferencesFromRegistrationProperties() throws Exception {
         final Map<String, Object> props = new HashMap<String, Object>();
         props.put(org.osgi.framework.Constants.OBJECTCLASS, new String [] {"myClass"});
         props.put("osgi.remote.interfaces", "*");
         props.put(Constants.WS_DATABINDING_PROP_KEY, "jaxb");
         
-        Bundle b = EasyMock.createNiceMock(Bundle.class);        
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.expect(bc.getServiceReferences(ServiceDecorator.class.getName(), null)).
+            andReturn(null).anyTimes();
+        EasyMock.replay(bc);
+        
+        Bundle b = EasyMock.createNiceMock(Bundle.class);
+        EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
         EasyMock.replay(b);
         
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
@@ -161,6 +169,49 @@ public class OsgiUtilsTest extends TestCase {
         EasyMock.verify(sr);
     }
     
+    public void testSetAdditionalDecoratorProperties() throws Exception {
+        final Map<String, Object> props = new HashMap<String, Object>();
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String [] {"myClass"});
+        
+        ServiceDecorator decorator = new ServiceDecorator() {            
+            public void decorate(ServiceReference sref, Map<String, Object> properties) {
+                properties.put("osgi.remote.interfaces", "*");               
+            }
+        };
+        
+        ServiceReference decoratorRef = EasyMock.createMock(ServiceReference.class);
+        EasyMock.replay(decoratorRef);
+        
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.expect(bc.getServiceReferences(ServiceDecorator.class.getName(), null)).
+            andReturn(new ServiceReference [] {decoratorRef}).anyTimes();
+        EasyMock.expect(bc.getService(decoratorRef)).andReturn(decorator).anyTimes();
+        EasyMock.replay(bc);
+        
+        Bundle b = EasyMock.createNiceMock(Bundle.class);
+        EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
+        EasyMock.replay(b);
+        
+        ServiceReference sr = EasyMock.createMock(ServiceReference.class);
+        // set behaviour for getPropertyKeys() and getProperty() based on the map above.
+        EasyMock.expect(sr.getPropertyKeys()).
+            andReturn(props.keySet().toArray(new String [] {})).anyTimes();
+        EasyMock.expect(sr.getProperty((String) EasyMock.anyObject())).
+            andAnswer(new IAnswer<Object>() {
+                public Object answer() throws Throwable {
+                    return props.get(EasyMock.getCurrentArguments()[0]);
+                }                
+            }).anyTimes();
+        EasyMock.expect(sr.getBundle()).andReturn(b).anyTimes();
+        EasyMock.replay(sr);
+        
+        // Actual test starts here
+        ServiceEndpointDescription sd = OsgiUtils.getRemoteReference(sr, true);
+        assertEquals("*", sd.getProperties().get("osgi.remote.interfaces"));
+        
+        EasyMock.verify(sr);
+    }
+
     public void testNoIntentMap() {
         Bundle b = EasyMock.createNiceMock(Bundle.class);
         EasyMock.replay(b);
