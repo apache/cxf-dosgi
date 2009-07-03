@@ -89,7 +89,6 @@ public class InterfaceRule implements Rule {
         }
         
         LOG.info("Adding the following properties to " + sref + ": " + addProps);
-        System.out.println("*** Adding the following properties to " + sref + ": " + addProps);
         target.putAll(addProps);
     }
 

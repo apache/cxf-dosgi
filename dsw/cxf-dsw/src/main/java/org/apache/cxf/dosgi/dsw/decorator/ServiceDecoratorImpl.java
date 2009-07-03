@@ -44,7 +44,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
     
     private final BundleContext bundleContext;
     private final BundleListenerImpl bundleListener;
-    private final List<Rule> decorations = new CopyOnWriteArrayList<Rule>();
+    final List<Rule> decorations = new CopyOnWriteArrayList<Rule>();
 
     public ServiceDecoratorImpl(BundleContext bc) {
         bundleContext = bc;
@@ -63,7 +63,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
     }
     
     @SuppressWarnings("unchecked")
-    public void addDecorations(Bundle bundle) {
+    void addDecorations(Bundle bundle) {
         Namespace ns = Namespace.getNamespace("http://cxf.apache.org/xmlns/service-decoration/1.0.0");
         for (Element decoration : getDecorationElements(bundle)) {
             for (Element match : (List<Element>) decoration.getChildren("match", ns)) {
@@ -100,10 +100,11 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         return elements;
     }
     
-    public void removeDecorations(Bundle bundle) {
+    void removeDecorations(Bundle bundle) {
         for (Iterator<Rule> i = decorations.iterator(); i.hasNext(); ) {
-            if (bundle.equals(i.next().getBundle())) {
-                i.remove();
+            Rule r = i.next();
+            if (bundle.equals(r.getBundle())) {
+                decorations.remove(r); // The iterator doesn't support 'remove'
             }
         }
     }
