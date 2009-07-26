@@ -89,9 +89,17 @@ public class Activator implements BundleActivator, ServiceListener, ManagedServi
         props.put(DistributionProvider.PRODUCT_VERSION, getHeader("Bundle-Version"));
         props.put(DistributionProvider.VENDOR_NAME, getHeader("Bundle-Vendor"));
                 
-        String supportedIntents = OsgiUtils.formatIntents(
-            getIntentMap().getIntents().keySet().toArray(new String [] {}));
-        props.put(DistributionProvider.SUPPORTED_INTENTS, supportedIntents);
+        String[] supportedIntents = getIntentMap().getIntents().keySet().toArray(new String [] {});
+        String siString = OsgiUtils.formatIntents(supportedIntents);
+        props.put(DistributionProvider.SUPPORTED_INTENTS, siString);
+        props.put("remote.intents.supported", supportedIntents);
+
+        // TODO make this a little smarter
+        String[] supportedConfigs = {
+                org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE, 
+                org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE_OLD, 
+                org.apache.cxf.dosgi.dsw.Constants.RS_CONFIG_TYPE};
+        props.put("remote.configs.supported", supportedConfigs);
         
         bc.registerService(DistributionProvider.class.getName(), dpService, props);
         return dpService;
