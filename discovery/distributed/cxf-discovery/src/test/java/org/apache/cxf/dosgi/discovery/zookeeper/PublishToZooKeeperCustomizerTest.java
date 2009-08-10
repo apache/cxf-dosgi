@@ -196,13 +196,18 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
         initial.put("osgi.remote.configuration.pojo.address", "http://localhost:9090/ps");
         
         String eid = UUID.randomUUID().toString();
+        String epLoc = "http://localhost:9090/ps";
         HashMap<String, Object> expected = new HashMap<String, Object>(initial);
         expected.put(ServicePublication.ENDPOINT_ID, eid);
+        expected.put(ServicePublication.ENDPOINT_LOCATION, 
+            "http://" + InetAddress.getLocalHost().getHostAddress() + ":9090/ps");
+        expected.put("osgi.remote.configuration.pojo.address", "http://" + 
+            InetAddress.getLocalHost().getHostAddress() + ":9090/ps");
                 
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sr.getProperty(ServicePublication.SERVICE_PROPERTIES)).andReturn(initial);
         EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_ID)).andReturn(eid);
-        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_LOCATION)).andReturn(null);
+        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_LOCATION)).andReturn(epLoc);
         EasyMock.replay(sr);
         
         byte[] data = PublishToZooKeeperCustomizer.getData(sr);
@@ -223,5 +228,18 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
         String hostAddr = InetAddress.getLocalHost().getHostAddress();
         assertEquals(hostAddr + "#8000##ps",
             PublishToZooKeeperCustomizer.getKey("http://localhost:8000/ps"));
+    }
+    
+    public void testLocalHostTranslation() {
+        assertEquals("http://somehost:9090", 
+            PublishToZooKeeperCustomizer.filterLocalHost("http://localhost:9090", "somehost"));
+        assertEquals("http://somehost:9090/myPath", 
+            PublishToZooKeeperCustomizer.filterLocalHost("http://127.0.0.1:9090/myPath", "somehost"));
+
+        // a few negative tests too
+        assertEquals("http://localhostt:9090", 
+            PublishToZooKeeperCustomizer.filterLocalHost("http://localhostt:9090", "somehost"));
+        assertEquals("There is a localhost on the planet.", 
+            PublishToZooKeeperCustomizer.filterLocalHost("There is a localhost on the planet.", "somehost"));
     }
 }

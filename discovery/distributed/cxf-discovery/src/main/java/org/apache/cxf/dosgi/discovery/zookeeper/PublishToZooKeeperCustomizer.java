@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
@@ -41,6 +43,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
     private static final Logger LOG = Logger.getLogger(PublishToZooKeeperCustomizer.class.getName());
+    private static final Pattern LOCALHOST_MATCH = Pattern.compile("(.*://)(localhost|127.0.0.1)(:.*)");
 
     private final BundleContext bundleContext;
     private final ZooKeeper zookeeper;
@@ -115,26 +118,33 @@ public class PublishToZooKeeperCustomizer implements ServiceTrackerCustomizer {
     @SuppressWarnings("unchecked")
     static byte[] getData(ServiceReference sr) throws IOException {
         Properties p = new Properties();
+        String host = InetAddress.getLocalHost().getHostAddress();
         
         Map<String, Object> serviceProps = (Map<String, Object>) sr.getProperty(ServicePublication.SERVICE_PROPERTIES);
         if (serviceProps != null) {
             for (Map.Entry<String, Object> prop : serviceProps.entrySet()) {
-                p.setProperty(prop.getKey(), prop.getValue().toString());
+                p.setProperty(prop.getKey(), 
+                    filterLocalHost(prop.getValue().toString(), host));
             }
         }
         
-        copyProperty(ServicePublication.ENDPOINT_ID, sr, p);
-        copyProperty(ServicePublication.ENDPOINT_LOCATION, sr, p);
+        copyProperty(ServicePublication.ENDPOINT_ID, sr, p, host);
+        copyProperty(ServicePublication.ENDPOINT_LOCATION, sr, p, host);
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         p.store(baos, "");
         return baos.toByteArray();
     }
 
-    private static void copyProperty(String key, ServiceReference sr, Properties p) {
+    static String filterLocalHost(String value, String replacement) {
+        Matcher m = LOCALHOST_MATCH.matcher(value);
+        return m.replaceAll("$1" + replacement + "$3");
+    }
+
+    private static void copyProperty(String key, ServiceReference sr, Properties p, String localhost) {
         Object eID = sr.getProperty(key);
         if (eID != null) {
-            p.setProperty(key, eID.toString());
+            p.setProperty(key, filterLocalHost(eID.toString(), localhost));
         }
     }
 
