@@ -39,9 +39,9 @@ public class Activator implements BundleActivator {
         String host = getHostName();
         int port = getPort();
         
-        props.put("osgi.remote.interfaces", "*");
-        props.put("osgi.remote.configuration.type", "pojo");
-        props.put("osgi.remote.configuration.pojo.address", getAddress(host, port));
+        props.put("service.exported.interfaces", "*");
+        props.put("service.exported.configs", "org.apache.cxf.ws");
+        props.put("org.apache.cxf.ws.address", getAddress(host, port));
 
         reg = bc.registerService(DisplayService.class.getName(), 
                 new DisplayServiceImpl(host + ":" + port), props);

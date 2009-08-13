@@ -16,9 +16,9 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="DS Service Sample">
   <implementation class="org.apache.cxf.dosgi.samples.ds.impl.AdderServiceImpl"/>
   
-  <property name="osgi.remote.interfaces">*</property>
-  <property name="osgi.remote.configuration.type" value="pojo" />
-  <property name="osgi.remote.configuration.pojo.address" value="http://localhost:9090/adder" />
+  <property name="service.exported.interfaces">*</property>
+  <property name="service.exported.configs" value="org.apache.cxf.ws" />
+  <property name="org.apache.cxf.ws.address" value="http://localhost:9090/adder" />
   
   <service>
     <provide interface="org.apache.cxf.dosgi.samples.ds.AdderService"/>

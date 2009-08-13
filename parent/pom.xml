@@ -18,7 +18,7 @@
          generally caused by the fact that not all versions are available yet as 
          OSGi bundles. -->
     <properties>
-        <cxf.version>2.2.3-SNAPSHOT</cxf.version>
+        <cxf.version>2.2.3</cxf.version>
         <felix.version>1.8.0</felix.version>
         <spring.version>2.5.6</spring.version>
         <spring.osgi.version>1.2.0</spring.osgi.version>
