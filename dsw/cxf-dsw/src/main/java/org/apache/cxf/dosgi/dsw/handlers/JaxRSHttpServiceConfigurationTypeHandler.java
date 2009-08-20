@@ -72,13 +72,14 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
         }        
         Bus bus = cxf.getBus();
+        
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
         factory.setBus(bus);
         
         List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
         if (resources != null) {
-        	factory.setModelBeansWithServiceClass(resources, iClass);
-        	factory.setServiceBeans(serviceBean);
+            factory.setModelBeansWithServiceClass(resources, iClass);
+            factory.setServiceBeans(serviceBean);
         } else {
             factory.setServiceClass(iClass);
             factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
@@ -93,6 +94,7 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             String [] intents = new String[] {"HTTP"};
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
+            registerStopHook(bus, httpService, server, contextRoot, Constants.RS_HTTP_SERVICE_CONTEXT);
             getDistributionProvider().addExposedService(serviceReference, registerPublication(server, intents, address));
             addAddressProperty(sd.getProperties(), address);
             return server;

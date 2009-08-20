@@ -33,6 +33,8 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.endpoint.ServerLifeCycleListener;
+import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
@@ -82,7 +84,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
                                ServiceEndpointDescription sd, 
                                Class<?> iClass, 
                                Object serviceBean) {
-        String contextRoot = getServletContextRoot(sd, iClass);
+        final String contextRoot = getServletContextRoot(sd, iClass);
         if (contextRoot == null) {
             LOG.warning("Remote address is unavailable");
             return null;
@@ -95,7 +97,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
         } catch (Exception e) {
             throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
-        }        
+        }
         Bus bus = cxf.getBus();
         DataBinding databinding;
         String dataBindingImpl = (String) serviceReference.getProperty(Constants.WS_DATABINDING_PROP_KEY);
@@ -120,6 +122,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
 
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
+            registerStopHook(bus, httpService, server, contextRoot, Constants.WS_HTTP_SERVICE_CONTEXT);
             getDistributionProvider().addExposedService(serviceReference, registerPublication(server, intents, address));
             addAddressProperty(sd.getProperties(), address);
             return server;
@@ -181,5 +184,27 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             LOG.info("Using a default address : " + context);
         }
         return context;
+    }
+    
+    protected void registerStopHook(Bus bus, final HttpService httpService, 
+                                    Server theServer, final String contextRoot,
+                                    final String propertyName) {
+        if(bus != null) {
+            theServer.getEndpoint().put(propertyName, contextRoot);
+            ServerLifeCycleListener stopHook = new ServerLifeCycleListener() {
+                public void stopServer(Server s) {
+                    Object contextProperty = s.getEndpoint().get(propertyName);
+                    if (contextProperty != null && contextProperty.equals(contextRoot)) {
+                        httpService.unregister(contextRoot);
+                    }
+                }
+                public void startServer(Server s) {
+                }
+            };
+            ServerLifeCycleManager mgr = bus.getExtension(ServerLifeCycleManager.class);
+            if (mgr != null) {
+                mgr.registerListener(stopHook);
+            }
+        }
     }
 }
