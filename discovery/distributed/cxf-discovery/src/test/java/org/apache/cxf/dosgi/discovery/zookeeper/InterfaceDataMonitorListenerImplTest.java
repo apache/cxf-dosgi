@@ -18,6 +18,7 @@
   */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import org.easymock.classextension.EasyMock;
 import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
 import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.discovery.ServicePublication;
 
 public class InterfaceDataMonitorListenerImplTest extends TestCase {
     public void testChange() throws Exception {
@@ -47,6 +49,7 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
         //----------------------------------------------------------------
         Properties initial = new Properties();
         initial.put("a", "b");     
+        initial.put(ServicePublication.ENDPOINT_LOCATION, "http://somehost:12345/some/context");
         ByteArrayOutputStream propBytes = new ByteArrayOutputStream();
         initial.store(propBytes, "");
         
@@ -67,8 +70,14 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
         assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
         assertEquals(0, dsn.getFilters().size());
         ServiceEndpointDescription sed = dsn.getServiceEndpointDescription();
-        assertEquals(Collections.singleton(String.class.getName()), sed.getProvidedInterfaces());        
-        assertEquals(initial, sed.getProperties());
+        assertEquals(Collections.singleton(String.class.getName()), sed.getProvidedInterfaces());    
+        
+        Properties expected = new Properties();
+        expected.load(new ByteArrayInputStream(propBytes.toByteArray()));
+        expected.put("service.exported.configs", "org.apache.cxf.ws");
+        expected.put("org.apache.cxf.ws.address", "http://somehost:12345/some/context");
+        
+        assertEquals(expected, sed.getProperties());
         EasyMock.verify(zk);
         
         // Again with the same data
@@ -90,6 +99,8 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
         //----------------------------------------------------------------
         Properties modified = new Properties();
         modified.put("c", "d");
+        modified.put(ServicePublication.ENDPOINT_LOCATION, "http://somehost:999/some/context");
+        modified.put("service.exported.configs", "org.apache.cxf.rs");
         ByteArrayOutputStream modBytes = new ByteArrayOutputStream();
         modified.store(modBytes, "");
         
@@ -115,6 +126,37 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
         EasyMock.verify(zk);
 
         //----------------------------------------------------------------
+        // Test DiscoveredServiceNotification.MODIFIED2
+        //----------------------------------------------------------------
+        Properties modified2 = new Properties();
+        modified2.put("c", "d2");
+        modified2.put(ServicePublication.ENDPOINT_LOCATION, "http://somehost:112/some/context");
+        modified2.put("service.exported.configs", "org.apache.cxf.ws");
+        modified2.put("org.apache.cxf.ws.address", "http://somewhereelse/123");
+        ByteArrayOutputStream modBytes2 = new ByteArrayOutputStream();
+        modified2.store(modBytes2, "");
+        
+        EasyMock.reset(zk);
+        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
+            .andReturn(Arrays.asList("x#y#z"));
+        EasyMock.expect(zk.getData(Util.getZooKeeperPath(String.class.getName()) + "/x#y#z", false, null))
+            .andReturn(modBytes2.toByteArray());
+        EasyMock.replay(zk);
+
+        dsnCallbacks.clear();
+        assertEquals("Precondition failed", 0, dsnCallbacks.size());
+        dml.change();
+        assertEquals(1, dsnCallbacks.size());
+        DiscoveredServiceNotification dsn3 = dsnCallbacks.iterator().next();
+        assertEquals(Collections.singleton(String.class.getName()), dsn3.getInterfaces());
+        assertEquals(DiscoveredServiceNotification.MODIFIED, dsn3.getType());
+        assertEquals(0, dsn3.getFilters().size());
+        ServiceEndpointDescription sed3 = dsn3.getServiceEndpointDescription();
+        assertEquals(Collections.singleton(String.class.getName()), sed3.getProvidedInterfaces());        
+        assertEquals(modified2, sed3.getProperties());
+        
+        EasyMock.verify(zk);
+        //----------------------------------------------------------------
         // Test DiscoveredServiceNotification.UNAVAILABLE
         //----------------------------------------------------------------
         EasyMock.reset(zk);
@@ -126,13 +168,13 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
         assertEquals("Precondition failed", 0, dsnCallbacks.size());
         dml.change();
         assertEquals(1, dsnCallbacks.size());
-        DiscoveredServiceNotification dsn3 = dsnCallbacks.iterator().next();
-        assertEquals(Collections.singleton(String.class.getName()), dsn3.getInterfaces());
-        assertEquals(DiscoveredServiceNotification.UNAVAILABLE, dsn3.getType());
-        assertEquals(0, dsn3.getFilters().size());
-        ServiceEndpointDescription sed3 = dsn3.getServiceEndpointDescription();
-        assertEquals(Collections.singleton(String.class.getName()), sed3.getProvidedInterfaces());        
-        assertEquals(modified, sed3.getProperties());
+        DiscoveredServiceNotification dsn4 = dsnCallbacks.iterator().next();
+        assertEquals(Collections.singleton(String.class.getName()), dsn4.getInterfaces());
+        assertEquals(DiscoveredServiceNotification.UNAVAILABLE, dsn4.getType());
+        assertEquals(0, dsn4.getFilters().size());
+        ServiceEndpointDescription sed4 = dsn4.getServiceEndpointDescription();
+        assertEquals(Collections.singleton(String.class.getName()), sed4.getProvidedInterfaces());        
+        assertEquals(modified2, sed4.getProperties());
         
         EasyMock.verify(zk);
         

@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.service.discovery.DiscoveredServiceNotification;
 import org.osgi.service.discovery.DiscoveredServiceTracker;
+import org.osgi.service.discovery.ServicePublication;
 
 public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
     private static final Logger LOG = Logger.getLogger(InterfaceDataMonitorListenerImpl.class.getName());
@@ -64,6 +65,15 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                 Map<String, Object> m = new HashMap<String, Object>();
                 for (Map.Entry<Object, Object> entry : p.entrySet()) {                    
                     m.put(entry.getKey().toString(), entry.getValue());
+                }
+                
+                // Put in some reasonable defaults, if not specified
+                if (!m.containsKey("service.exported.configs")) {
+                    m.put("service.exported.configs", "org.apache.cxf.ws");
+                }
+                if (Util.getMultiValueProperty(m.get("service.exported.configs")).contains("org.apache.cxf.ws") &&
+                    !m.containsKey("org.apache.cxf.ws.address")) {
+                    m.put("org.apache.cxf.ws.address", m.get(ServicePublication.ENDPOINT_LOCATION));                    
                 }
                 
                 newNodes.put(child, m);

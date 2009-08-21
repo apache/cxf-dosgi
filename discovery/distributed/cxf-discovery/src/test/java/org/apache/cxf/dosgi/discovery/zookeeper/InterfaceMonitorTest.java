@@ -53,6 +53,7 @@ public class InterfaceMonitorTest extends TestCase {
         assertSame(dst, listener.discoveredServiceTracker);
     }
     
+    @SuppressWarnings("unchecked")
     public void testInterfaceMonitor() throws Exception {
         Properties s1Props = new Properties();
         s1Props.put("a", "b");
@@ -95,10 +96,11 @@ public class InterfaceMonitorTest extends TestCase {
             ServiceEndpointDescription sed = dsn.getServiceEndpointDescription();
             assertEquals(Collections.singleton(String.class.getName()), sed.getProvidedInterfaces());
             Map<?, ?> m = sed.getProperties();
-            if (s1Props.equals(m)) {
+            if (m.entrySet().containsAll(s1Props.entrySet())) {
                 s1Found = true;
             }
-            if (s2Props.equals(m)) {
+            
+            if (m.entrySet().containsAll(s2Props.entrySet())) {
                 s2Found = true;
             }            
         }
@@ -128,7 +130,7 @@ public class InterfaceMonitorTest extends TestCase {
         assertEquals(Collections.singleton(String.class.getName()), dsn.getInterfaces());
         ServiceEndpointDescription sed = dsn.getServiceEndpointDescription();
         assertEquals(Collections.singleton(String.class.getName()), sed.getProvidedInterfaces());
-        assertEquals(s2Props, sed.getProperties());        
+        assertTrue(sed.getProperties().entrySet().containsAll(s2Props.entrySet()));
     }
     
     public void testInterfaceMonitorNoExist() throws Exception {
