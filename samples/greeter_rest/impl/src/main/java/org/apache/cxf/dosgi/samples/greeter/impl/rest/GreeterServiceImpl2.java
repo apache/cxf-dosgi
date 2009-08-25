@@ -27,6 +27,7 @@ public class GreeterServiceImpl2 implements GreeterService2 {
 	private GreeterServiceImpl greeter = new GreeterServiceImpl();
 	
     public GreeterInfo greetMe(String name) throws GreeterException {
+    	System.out.println("Delegating from GreeterServiceImpl2 to GreeterServiceImpl");
         return greeter.greetMe(name);
     }
 

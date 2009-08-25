@@ -86,6 +86,10 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
         }
         
         factory.setAddress("/");
+        List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd);
+        if (providers != null && providers.size() > 0) {
+	        factory.setProviders(providers);
+        }
         
         String address = constructAddress(dswContext, contextRoot);
         

@@ -136,7 +136,9 @@ public final class OsgiUtils {
             list = new ServiceEndpointDescription[iNames.length];
             for (int i = 0; i < iNames.length; i++) {
                 Map<String, Object> props = excludeProperty(sd.getProperties(),
-                        Constants.EXPORTED_INTERFACES, Constants.EXPORTED_INTERFACES_OLD);
+                        Constants.EXPORTED_INTERFACES, Constants.EXPORTED_INTERFACES_OLD,
+                        Constants.RS_PROVIDER_GLOBAL_PROP_KEY, Constants.RS_PROVIDER_EXPECTED_PROP_KEY,
+                        Constants.RS_PROVIDER_PROP_KEY);
                 
                 String keys[] = props.keySet().toArray(new String[props.size()]);
                 for (int j = 0; j < keys.length; j++) {

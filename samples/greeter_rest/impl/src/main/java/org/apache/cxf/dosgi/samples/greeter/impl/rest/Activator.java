@@ -23,39 +23,40 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.apache.cxf.dosgi.samples.greeter.rest.GreeterService;
+import org.apache.cxf.dosgi.samples.greeter.rest.GreeterService2;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-//TODO: remove the comments asap once the synchronization is complete
 public class Activator implements BundleActivator {
     private ServiceRegistration registration;
-    //private ServiceRegistration registration2;
+    private ServiceRegistration registration2;
 
     public void start(BundleContext bc) throws Exception {
         Dictionary props = getProperties("http://localhost:9090/greeter");
         registration = bc.registerService(GreeterService.class.getName(), 
                                           new GreeterServiceImpl(), props);
         
-//        props = getProperties("http://localhost:9089/greeter");
-//        registration2 = bc.registerService(GreeterService2.class.getName(), 
-//                                          new GreeterServiceImpl2(), props);
+        props = getProperties("http://localhost:9091/greeter2");
+        registration2 = bc.registerService(GreeterService2.class.getName(), 
+                                          new GreeterServiceImpl2(), props);
         
     }
 
-    private Dictionary getProperties(String address) { 
+    @SuppressWarnings("unchecked")
+	private Dictionary getProperties(String address) { 
     	Dictionary props = new Hashtable();
 
         props.put("service.exported.interfaces", "*");
         props.put("service.exported.configs", "org.apache.cxf.rs");
         props.put("service.exported.intents", "HTTP");
         props.put("org.apache.cxf.rs.address", address);
-        //props.put("org.apache.cxf.rs.httpservice.context", "/greeter");
+        props.put("org.apache.cxf.rs.databinding", "aegis");
         return props;
     }
     
     public void stop(BundleContext bc) throws Exception {
         registration.unregister();
-        //registration2.unregister();
+        registration2.unregister();
     }
 }

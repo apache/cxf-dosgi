@@ -54,7 +54,10 @@ public class Constants {
     public static final String RS_CONFIG_TYPE = PROVIDER_PREFIX + ".rs";
     public static final String RS_ADDRESS_PROPERTY = RS_CONFIG_TYPE + ".address";
     public static final String RS_HTTP_SERVICE_CONTEXT = RS_CONFIG_TYPE + ".httpservice.context";
-    public static final String RS_DATABINDING_PROP_KEY = WS_CONFIG_TYPE + ".databinding";
+    public static final String RS_DATABINDING_PROP_KEY = RS_CONFIG_TYPE + ".databinding";
+    public static final String RS_PROVIDER_PROP_KEY = RS_CONFIG_TYPE + ".provider";
+    public static final String RS_PROVIDER_EXPECTED_PROP_KEY = RS_PROVIDER_PROP_KEY + ".expected";
+    public static final String RS_PROVIDER_GLOBAL_PROP_KEY = RS_PROVIDER_PROP_KEY + ".globalquery";
     
     // POJO (old value for WS)
     public static final String WS_CONFIG_TYPE_OLD = "pojo";

@@ -60,7 +60,6 @@ public abstract class AbstractJaxRsPublishHookTest extends AbstractDosgiSystemTe
         assertEquals(1, srefs.length);
         ManagedService ms = (ManagedService)bundleContext.getService(srefs[0]);
         ms.updated(props);
-        
         ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
         installBundle("org.apache.cxf.dosgi.samples", "cxf-dosgi-ri-samples-greeter-rest-impl", null, "jar");
@@ -71,14 +70,16 @@ public abstract class AbstractJaxRsPublishHookTest extends AbstractDosgiSystemTe
         
         //do the invocation using a CXF api 
         GreeterService greeter1 = null;
+        boolean serviceUsed = false;
         try {
         	JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
             factory.setServiceClass(GreeterService.class);
             factory.setAddress(address);
             factory.setProvider(new AegisElementProvider());
             greeter1 = (GreeterService)factory.create();
-            useService(greeter1);
+            serviceUsed = useService(greeter1);
         } finally {
+        	assertTrue(serviceUsed);
             Thread.currentThread().setContextClassLoader(contextLoader);
         }
             
@@ -108,15 +109,16 @@ public abstract class AbstractJaxRsPublishHookTest extends AbstractDosgiSystemTe
         fail();
     }
     
-    private void useService(GreeterService greeter) throws Exception {
+    private boolean useService(GreeterService greeter) throws Exception {
         assertNotNull(greeter);
         
         GreeterInfo info = greeter.greetMe("Fred");
-        
+        assertTrue(info.getGreetings().size() > 0);
         for (GreetingPhrase greeting: info.getGreetings()) {
         	assertEquals("Fred", greeting.getName());
             System.out.println("  " + greeting.getPhrase() 
                     + " " + greeting.getName());
         }
+        return true;
     }
 }

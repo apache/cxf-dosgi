@@ -18,7 +18,6 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +33,6 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.UserResource;
-import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServiceEndpointDescription;
@@ -74,9 +72,10 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
           } else {
               bean.setServiceClass(iClass);
           }
-    	  if (!"jaxb".equals(sd.getProperty(Constants.RS_DATABINDING_PROP_KEY))) {
-    	      bean.setProvider(new AegisElementProvider());
-    	  }
+          List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd);
+          if (providers != null && providers.size() > 0) {
+  	        bean.setProviders(providers);
+          }
     	  Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
     	  Object proxy = getProxy(bean.create(), iClass);
     	  getDistributionProvider().addRemoteService(serviceReference);
@@ -117,10 +116,8 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
         }
         
         factory.setAddress(address);
-        
-        if (!"jaxb".equals(sd.getProperty(Constants.RS_DATABINDING_PROP_KEY))) {
-	        List<Object> providers = new ArrayList<Object>(); 
-	        providers.add(new AegisElementProvider());
+        List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd);
+        if (providers != null && providers.size() > 0) {
 	        factory.setProviders(providers);
         }
         

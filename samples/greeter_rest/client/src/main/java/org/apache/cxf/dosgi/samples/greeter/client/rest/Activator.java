@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreeterInfo;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreeterService;
+import org.apache.cxf.dosgi.samples.greeter.rest.GreeterService2;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreetingPhrase;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -31,6 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {    
     private ServiceTracker tracker;
+    private ServiceTracker tracker2;
 
     public void start(final BundleContext bc) {
         tracker = new ServiceTracker(bc, GreeterService.class.getName(), null) {
@@ -38,16 +40,27 @@ public class Activator implements BundleActivator {
             public Object addingService(ServiceReference reference) {
                 Object result = super.addingService(reference);
 
-                useService(bc, reference);
+                useGreeterService(bc, reference);
                 
                 return result;
             }
         };
         tracker.open();
         
+        tracker2 = new ServiceTracker(bc, GreeterService2.class.getName(), null) {
+            @Override
+            public Object addingService(ServiceReference reference) {
+                Object result = super.addingService(reference);
+
+                useGreeterService2(bc, reference);
+                
+                return result;
+            }
+        };
+        tracker2.open();
     }
 
-    protected void useService(final BundleContext bc, ServiceReference reference) {
+    protected void useGreeterService(final BundleContext bc, ServiceReference reference) {
         Object svc = bc.getService(reference);
         if (!(svc instanceof GreeterService)) {
             return;
@@ -57,6 +70,21 @@ public class Activator implements BundleActivator {
         Thread t = new Thread(new Runnable() {
             public void run() {
                 greeterUI(bc, greeter);
+            }
+        });
+        t.start();
+    }
+    
+    protected void useGreeterService2(final BundleContext bc, ServiceReference reference) {
+        Object svc = bc.getService(reference);
+        if (!(svc instanceof GreeterService2)) {
+            return;
+        }
+        final GreeterService2 greeter = (GreeterService2) svc;
+
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                greeter2UI(bc, greeter);
             }
         });
         t.start();
@@ -84,8 +112,32 @@ public class Activator implements BundleActivator {
             }
         }
     }
+    
+    private void greeter2UI(final BundleContext bc, final GreeterService2 greeter) {
+        while (true) {
+            System.out.println("*** Opening greeter2 client dialog ***");
+            String name = JOptionPane.showInputDialog("Greeter2 : Enter name");
+            if (name == null) {
+                break;
+            } else {
+                System.out.println("*** Invoking greeter2 ***");
+                try {
+                    GreeterInfo info = greeter.greetMe(name);
+    
+                    System.out.println("greetMe(\"" + name + "\") returns:");
+                    for (GreetingPhrase greeting: info.getGreetings()) {
+                        System.out.println("  " + greeting.getPhrase() 
+                                + " " + greeting.getName());
+                    }
+                } catch (GreeterException ex) {
+                    System.out.println("GreeterException : " + ex.toString());
+                }
+            }
+        }
+    }
 
     public void stop(BundleContext bc) throws Exception {
         tracker.close();
+        tracker2.close();
     }
 }

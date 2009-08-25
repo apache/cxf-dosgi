@@ -21,12 +21,19 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.jaxrs.model.UserResource;
+import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.discovery.ServiceEndpointDescription;
 
 public class JaxRSUtils {
 
@@ -34,6 +41,57 @@ public class JaxRSUtils {
 	
 	public final static String MODEL_FOLDER = "/OSGI-INF/cxf/jaxrs/";
 	public final static String DEFAULT_MODEL = "/OSGI-INF/cxf/jaxrs/model.xml";
+	public final static String PROVIDERS_FILTER = 
+		"(|" 
+		+ "(" + Constants.OBJECTCLASS + "=javax.ws.rs.ext.MessageBodyReader" + ")"
+		+ "(" + Constants.OBJECTCLASS + "=javax.ws.rs.ext.MessageBodyWriter" + ")"
+		+ "(" + Constants.OBJECTCLASS + "=javax.ws.rs.ext.ExceptionMapper" + ")"
+		+ "(" + Constants.OBJECTCLASS + "=org.apache.cxf.jaxrs.ext.RequestHandler" + ")"
+		+ "(" + Constants.OBJECTCLASS + "=org.apache.cxf.jaxrs.ext.ResponseHandler" + ")"
+		+ "(" + Constants.OBJECTCLASS + "=org.apache.cxf.jaxrs.ext.ParameterHandler" + ")"
+		+ ")";
+	
+	public static List<Object> getProviders(BundleContext callingContext, 
+			                                BundleContext dswBC,
+			                                ServiceEndpointDescription sd) {
+		
+		List<Object> providers = new ArrayList<Object>();
+		if ("aegis".equals(sd.getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_DATABINDING_PROP_KEY))) {
+	        providers.add(new AegisElementProvider());
+        }
+        Object serviceProviders = 
+        	sd.getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY);
+        if (serviceProviders != null) {
+        	providers.addAll(Arrays.asList((Object[])serviceProviders));
+        }
+		
+		Object globalQueryProp = 
+			sd.getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_GLOBAL_PROP_KEY);
+		boolean globalQueryRequired = globalQueryProp == null || OsgiUtils.toBoolean(globalQueryProp);
+        if (!globalQueryRequired) {
+        	return providers;
+        }
+		
+		boolean cxfProvidersOnly = OsgiUtils.getBooleanProperty(sd, 
+				org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_EXPECTED_PROP_KEY);
+		
+		try {
+			ServiceReference[] refs = callingContext.getServiceReferences(null, PROVIDERS_FILTER);			
+			if (refs != null) {
+				for (ServiceReference ref : refs) {
+					if (!cxfProvidersOnly || cxfProvidersOnly 
+						&& OsgiUtils.toBoolean(
+							ref.getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY))) {
+				        providers.add(callingContext.getService(ref));
+					}
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			LOG.fine("Problems finding JAXRS providers " + ex.getMessage());
+		}
+		return providers;
+    }
 	
 	public static List<UserResource> getModel(BundleContext callingContext, Class<?> iClass) {
 		String classModel = MODEL_FOLDER + iClass.getSimpleName() + "-model.xml";

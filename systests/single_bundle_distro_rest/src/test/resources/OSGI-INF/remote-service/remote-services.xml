@@ -20,6 +20,8 @@
     <property name="service.exported.intents">HTTP</property>
     <property name="service.exported.configs">org.apache.cxf.rs</property>
     <property name="org.apache.cxf.rs.address">http://localhost:9090/greeter</property>
+    <property name="org.apache.cxf.rs.databinding">aegis</property>
+    <property name="org.apache.cxf.rs.provider.globalquery">false</property>
   </service-description>
   <service-description>
     <provide interface="org.apache.cxf.dosgi.samples.greeter.rest.GreeterService" />

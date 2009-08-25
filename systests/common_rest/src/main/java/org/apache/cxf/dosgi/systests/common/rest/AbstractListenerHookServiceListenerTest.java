@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.systests.common.rest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -73,7 +74,8 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
     public void testBasicInvocation() throws Exception {
 
         Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
-
+        bundleContext.registerService(new String[]{"javax.ws.rs.ext.MessageBodyReader"}, 
+       		new AegisElementProvider(), new Hashtable()); 
         Server server1 = null;
         Server server2 = null;
         ServiceTracker tracker = null;
@@ -138,7 +140,8 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
     public void testMultiServiceProxification() throws Exception {
 
         Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
-
+        bundleContext.registerService(new String[]{"javax.ws.rs.ext.MessageBodyReader"}, 
+        		new AegisElementProvider(), new Hashtable()); 
         installDswIfNeeded();
 
         // sleep for a bit
