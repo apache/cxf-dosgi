@@ -62,7 +62,20 @@ public class JaxRSUtils {
         Object serviceProviders = 
         	sd.getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY);
         if (serviceProviders != null) {
-        	providers.addAll(Arrays.asList((Object[])serviceProviders));
+        	if (serviceProviders.getClass().isArray()) {
+        	    providers.addAll(Arrays.asList((Object[])serviceProviders));
+        	} else {
+        		String[] classNames = serviceProviders.toString().split(",");
+        		for (String className : classNames) {
+        			try {
+        			    Class<?> pClass = callingContext.getBundle().loadClass(className.trim());
+        			    providers.add(pClass.newInstance());
+        			} catch (Exception ex) {
+        				ex.printStackTrace();
+        				LOG.warning("JAXRS Provider " + className.trim() + " can not be loaded or created");
+        			}
+        		}
+        	}
         }
 		
 		Object globalQueryProp = 
