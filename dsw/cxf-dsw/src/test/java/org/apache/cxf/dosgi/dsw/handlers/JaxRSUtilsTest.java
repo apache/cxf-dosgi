@@ -66,6 +66,7 @@ public class JaxRSUtilsTest extends TestCase  {
         assertEquals(AegisElementProvider.class.getName(), providers.get(0).getClass().getName());
 	}
 	
+	
 	public void testServiceProviderProperty() throws Exception {
 		
 		BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
@@ -82,6 +83,34 @@ public class JaxRSUtilsTest extends TestCase  {
         props.put(Constants.RS_PROVIDER_PROP_KEY, 
         		"\r\n org.apache.cxf.jaxrs.provider.AegisElementProvider , \r\n" 
         		+ "org.apache.cxf.jaxrs.provider.JAXBElementProvider\r\n");
+        
+        props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");
+        ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl("MyInterface", props);
+        
+        List<Object> providers = JaxRSUtils.getProviders(bc, null, sd);
+        assertEquals(2, providers.size());
+        assertEquals(AegisElementProvider.class.getName(), providers.get(0).getClass().getName());
+        assertEquals(JAXBElementProvider.class.getName(), providers.get(1).getClass().getName());
+	}
+	
+    public void testServiceProviderStrings() throws Exception {
+		
+		BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+		Bundle bundle = EasyMock.createNiceMock(Bundle.class);
+		bc.getBundle();
+		EasyMock.expectLastCall().andReturn(bundle).times(2);
+		bundle.loadClass(AegisElementProvider.class.getName());
+		EasyMock.expectLastCall().andReturn(AegisElementProvider.class);
+		bundle.loadClass(JAXBElementProvider.class.getName());
+		EasyMock.expectLastCall().andReturn(JAXBElementProvider.class);
+		EasyMock.replay(bc, bundle);
+		
+		Map<String, Object> props = new HashMap<String, Object>();
+        props.put(Constants.RS_PROVIDER_PROP_KEY,
+        		  new String[] {
+        		    "\r\n org.apache.cxf.jaxrs.provider.AegisElementProvider", 
+        		    "org.apache.cxf.jaxrs.provider.JAXBElementProvider\r\n"
+                  });
         
         props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");
         ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl("MyInterface", props);

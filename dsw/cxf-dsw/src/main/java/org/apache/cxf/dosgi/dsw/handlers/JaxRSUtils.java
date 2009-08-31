@@ -63,18 +63,14 @@ public class JaxRSUtils {
         	sd.getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY);
         if (serviceProviders != null) {
         	if (serviceProviders.getClass().isArray()) {
-        	    providers.addAll(Arrays.asList((Object[])serviceProviders));
+        		if (serviceProviders.getClass().getComponentType() == String.class) {
+        			loadProviders(callingContext, providers, (String[])serviceProviders);	
+        		} else {
+        	        providers.addAll(Arrays.asList((Object[])serviceProviders));
+        		}
         	} else {
         		String[] classNames = serviceProviders.toString().split(",");
-        		for (String className : classNames) {
-        			try {
-        			    Class<?> pClass = callingContext.getBundle().loadClass(className.trim());
-        			    providers.add(pClass.newInstance());
-        			} catch (Exception ex) {
-        				ex.printStackTrace();
-        				LOG.warning("JAXRS Provider " + className.trim() + " can not be loaded or created");
-        			}
-        		}
+        		loadProviders(callingContext, providers, classNames);
         	}
         }
 		
@@ -105,6 +101,23 @@ public class JaxRSUtils {
 		}
 		return providers;
     }
+	
+	private static void loadProviders(BundleContext callingContext, 
+			                          List<Object> providers,
+			                          String[] classNames) {
+		for (String className : classNames) {
+			try {
+				String realName = className.trim();
+				if (realName.length() > 0) {
+				    Class<?> pClass = callingContext.getBundle().loadClass(realName);
+				    providers.add(pClass.newInstance());
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				LOG.warning("JAXRS Provider " + className.trim() + " can not be loaded or created");
+			}
+		}
+	}
 	
 	public static List<UserResource> getModel(BundleContext callingContext, Class<?> iClass) {
 		String classModel = MODEL_FOLDER + iClass.getSimpleName() + "-model.xml";
