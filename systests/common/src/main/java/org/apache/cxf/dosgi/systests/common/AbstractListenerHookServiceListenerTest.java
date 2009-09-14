@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 import org.apache.cxf.dosgi.samples.greeter.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
@@ -191,15 +192,8 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
     }
     
     private class GreeterServiceImpl implements GreeterService {
-
-        private final static String STRANGER_NAME = "Stranger";
-                
-        public Map<GreetingPhrase, String> greetMe(String name) 
-            throws GreeterException {
-
-            if (name.equals(STRANGER_NAME)) {
-                throw new GreeterException(name);
-            }
+        public Map<GreetingPhrase, String> greetMe(String name) {
+            System.out.println("Invoking: greetMe(" + name + ")");
             
             Map<GreetingPhrase, String> greetings = 
                 new HashMap<GreetingPhrase, String>();
@@ -213,7 +207,24 @@ public abstract class AbstractListenerHookServiceListenerTest extends AbstractDo
             return greetings;
         }
 
-    } 
+        public GreetingPhrase [] greetMe(GreeterData gd) throws GreeterException {
+            if (gd.isException()) {
+                System.out.println("Throwing custom exception from: greetMe(" + gd.getName() + ")");
+                throw new GreeterException(gd.getName());
+            }
+            
+            String details = gd.getName() + "(" + gd.getAge() + ")";
+            System.out.println("Invoking: greetMe(" + details + ")");
+            
+            GreetingPhrase [] greetings = new GreetingPhrase [] {
+                new GreetingPhrase("Howdy " + details),
+                new GreetingPhrase("Hallo " + details),
+                new GreetingPhrase("Ni hao " + details)
+            };
+            
+            return greetings;
+        }
+    }
     
     private Server startServer(String address, Class<?> type, Object impl) {
         ServerFactoryBean factory = new ServerFactoryBean();

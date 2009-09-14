@@ -27,6 +27,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 import org.apache.cxf.dosgi.samples.greeter.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
@@ -110,11 +111,35 @@ public abstract class AbstractBasicPublishHookTest extends AbstractDosgiSystemTe
         assertNotNull(greeter);
         
         Map<GreetingPhrase, String> greetings = greeter.greetMe("Fred");
-
         assertEquals("Fred", greetings.get(new GreetingPhrase("Hello")));
         
         try {
-            greeter.greetMe("Stranger");
+            class GreeterDataImpl implements GreeterData {
+                private String name;
+                private int age;
+                private boolean exception;
+
+                GreeterDataImpl(String n, int a, boolean ex) {
+                    name = n;
+                    age = a;
+                    exception = ex;
+                }
+                
+                public String getName() {
+                    return name;
+                }
+
+                public int getAge() {
+                    return age;
+                }
+
+                public boolean isException() {
+                    return exception;
+                }                
+            }
+            
+            GreeterData gd = new GreeterDataImpl("Stranger", 11, true);
+            greeter.greetMe(gd);
             fail("GreeterException has to be thrown");
         } catch (GreeterException ex) {
             assertEquals("Wrong exception message", 

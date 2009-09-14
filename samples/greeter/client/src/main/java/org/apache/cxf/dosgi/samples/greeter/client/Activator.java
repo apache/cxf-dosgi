@@ -20,8 +20,7 @@ package org.apache.cxf.dosgi.samples.greeter.client;
 
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-
+import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 import org.apache.cxf.dosgi.samples.greeter.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
@@ -66,24 +65,35 @@ public class Activator implements BundleActivator {
     private void greeterUI(final BundleContext bc, final GreeterService greeter) {
         while (true) {
             System.out.println("*** Opening greeter client dialog ***");
-            String name = JOptionPane.showInputDialog("Enter name:");
-            if (name == null) {
-                break;
-            } else {
+            Object gd = getGreeterData();
+            if (gd instanceof String) {
+                System.out.println("*** Invoking greeter ***");
+                Map<GreetingPhrase, String> result = greeter.greetMe((String) gd);
+
+                System.out.println("greetMe(\"" + gd + "\") returns:");
+                for (Map.Entry<GreetingPhrase, String> greeting : result.entrySet()) {
+                    System.out.println("  " + greeting.getKey().getPhrase() 
+                            + " " + greeting.getValue());
+                }
+            } else if (gd instanceof GreeterData) {
                 System.out.println("*** Invoking greeter ***");
                 try {
-                    Map<GreetingPhrase, String> result = greeter.greetMe(name);
-    
-                    System.out.println("greetMe(\"" + name + "\") returns:");
-                    for (Map.Entry<GreetingPhrase, String> greeting : result.entrySet()) {
-                        System.out.println("  " + greeting.getKey().getPhrase() 
-                                + " " + greeting.getValue());
+                    GreetingPhrase [] result = greeter.greetMe((GreeterData) gd);
+                    System.out.println("greetMe(\"" + gd + "\") returns:");
+                    for (GreetingPhrase phrase : result) {
+                        System.out.println("  " + phrase.getPhrase());
                     }
                 } catch (GreeterException ex) {
                     System.out.println("GreeterException : " + ex.toString());
-                }
+                }                
             }
         }
+    }
+
+    private static Object getGreeterData() {
+        GreeterDialog gd = new GreeterDialog();
+        gd.setVisible(true);
+        return gd.getSelection();
     }
 
     public void stop(BundleContext bc) throws Exception {

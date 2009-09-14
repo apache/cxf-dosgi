@@ -16,12 +16,30 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.samples.greeter;
+package org.apache.cxf.dosgi.samples.greeter.client;
 
-import java.util.Map;
+import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 
+public class GreeterDataImpl implements GreeterData {
+    private final String name;
+    private final int age;
+    private final boolean exception;
+        
+    public GreeterDataImpl(String n, int a, boolean b) {
+        name = n;
+        age = a;
+        exception = b;
+    }
+    
+    public String getName() {
+        return name;
+    }
 
-public interface GreeterService {
-    Map<GreetingPhrase, String> greetMe(String name);
-    GreetingPhrase [] greetMe(GreeterData name) throws GreeterException;
+    public int getAge() {
+        return age;
+    }
+
+    public boolean isException() {
+        return exception;
+    }
 }
