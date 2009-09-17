@@ -18,26 +18,18 @@
   */
 package org.apache.cxf.dosgi.dsw;
 
-public final class ClassUtils {
-    private ClassUtils() {}
-    
-    public static Class<?> getInterfaceClass(Object service, String interfaceName) {
-        return getInterfaceClass(service.getClass(), interfaceName);
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import junit.framework.TestCase;
+
+public class ClassUtilsTest extends TestCase {
+    @SuppressWarnings("unchecked")
+    public void testGetInterfaceClass() {
+        assertEquals(String.class, ClassUtils.getInterfaceClass("Hello", "java.lang.String"));
+        assertNull(ClassUtils.getInterfaceClass("Hello", "java.lang.Integer"));
+        assertEquals(List.class, ClassUtils.getInterfaceClass(new ArrayList(), "java.util.List"));
+        assertEquals(Collection.class, ClassUtils.getInterfaceClass(new ArrayList(), "java.util.Collection"));
     }
-    
-    private static Class<?> getInterfaceClass(Class<?> serviceClass, String interfaceName) {
-        for (Class<?> iClass : serviceClass.getInterfaces()) {
-            if (iClass.getName().equals(interfaceName)) {
-                return iClass;
-            }
-            Class<?> intf = getInterfaceClass(iClass, interfaceName);
-            if (intf != null) {
-                return intf;
-            }
-        }
-        if (serviceClass.getName().equals(interfaceName)) {
-            return serviceClass;
-        }
-        return null;
-    }    
 }
