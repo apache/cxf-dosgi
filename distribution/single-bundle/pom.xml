@@ -238,6 +238,8 @@
             <_exportcontents>
               javax.xml.ws.*;version="2.1.0",
               javax.ws.rs.*;version="1.0.0", 
+              javax.jws.*;version="2.0.0", 
+              javax.xml.bind.annotation.*;version="2.1",
               javax.servlet.*;version="2.5.0",
               org.apache.cxf.dosgi.*;version="${pom.version}",
               org.apache.cxf.*;version="${cxf.version}",
