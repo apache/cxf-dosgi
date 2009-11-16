@@ -50,8 +50,8 @@
                 <exclude>**/velocity.log</exclude>
                 <exclude>**/var/journal</exclude>
                 <exclude>**/build.out*</exclude>
-                <exclude>**/discovery/distributed</exclude>
-                <exclude>**/discovery/distributed/**/*</exclude>
+                <exclude>**/*.swp</exclude>
+                <exclude>**/org.eclipse.jdt.core.prefs</exclude>
             </excludes>
         </fileSet>
         <fileSet>
