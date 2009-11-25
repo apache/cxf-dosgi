@@ -33,3 +33,6 @@ New features in this release include:
 [CXF-2200] - Consuming more than 1 service using Spring-DM doesn't work
 
 
+Known limitations :
+
+* Schema validation can not be done for JAX-RS-based endpoints which use Aegis databinding
