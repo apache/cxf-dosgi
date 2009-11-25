@@ -183,6 +183,23 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.configadmin</artifactId>
+      <version>1.0.10</version>
+    </dependency>      
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
+      <version>1.0.0</version>
+    </dependency>      
+
+    <dependency> 
+      <groupId>org.apache.log4j</groupId> 
+      <artifactId>com.springsource.org.apache.log4j</artifactId> 
+      <version>${log4j.version}</version>
+    </dependency>
+    
+    <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle-minimal</artifactId>
       <version>${cxf.version}</version>
@@ -197,6 +214,18 @@
       <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
       <version>${project.version}</version>
     </dependency>
+   
+    <dependency>
+      <groupId>org.apache.cxf.dosgi</groupId>
+      <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf.dosgi</groupId>
+      <artifactId>cxf-dosgi-ri-discovery-distributed</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
