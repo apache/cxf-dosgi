@@ -35,4 +35,5 @@ New features in this release include:
 
 Known limitations :
 
-* Schema validation can not be done for JAX-RS-based endpoints which use Aegis databinding
+* Schema validation can not be done for JAX-RS-based endpoints which use
+  Aegis databinding
