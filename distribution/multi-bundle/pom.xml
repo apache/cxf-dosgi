@@ -196,6 +196,34 @@
       <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <!-- Discovery dependencies -->
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.configadmin</artifactId>
+      <version>1.0.10</version>
+    </dependency>      
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
+      <version>1.0.0</version>
+    </dependency>      
+
+    <dependency> 
+      <groupId>org.apache.log4j</groupId> 
+      <artifactId>com.springsource.org.apache.log4j</artifactId> 
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf.dosgi</groupId>
+      <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf.dosgi</groupId>
+      <artifactId>cxf-dosgi-ri-discovery-distributed</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>        
   
 
@@ -295,6 +323,22 @@
                 </xslt>
                 
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/equinox.config.ini.append" style="src/main/xsl/equinox_buildsystem_config.xslt">
+                      <param name="TargetDir" expression="${current.dir}/target/" />
+                </xslt>
+                
+                <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/distribution_configs/felix.discovery.config.properties.append" style="src/main/xsl/felix_distro_config.xslt">
+                    <param name="Version" expression="${dosgi.version}" />
+                </xslt>
+                
+                <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/felix.discovery.config.properties.append" style="src/main/xsl/felix_buildsystem_config.xslt">
+                      <param name="TargetDir" expression="${current.dir}/target/" />
+                </xslt>
+                
+                <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/distribution_configs/equinox.discovery.config.ini.append" style="src/main/xsl/equinox_distro_config.xslt">
+                    <param name="Version" expression="${dosgi.version}" />
+                </xslt>
+                
+                <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/equinox.discovery.config.ini.append" style="src/main/xsl/equinox_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/" />
                 </xslt>
               </tasks>
