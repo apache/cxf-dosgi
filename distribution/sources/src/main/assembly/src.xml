@@ -60,6 +60,7 @@
                 <include>LICENSE</include>
                 <include>NOTICE</include>
                 <include>README</include>
+                <include>release_notes.txt</include>
             </includes>
             <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}</outputDirectory>
         </fileSet>

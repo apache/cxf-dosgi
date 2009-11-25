@@ -1,0 +1,35 @@
+Apache CXF Distributed OSGi 1.1 Release Notes
+=============================================
+
+Specific issues, features, and improvements fixed in this version
+-----------------------------------------------------------------
+
+The Distributed OSGi 1.1 release provides the Reference Implementation
+of the Remote Services Specification version 1.0. Chapter 13 in the OSGi
+Compendium Specification (http://www.osgi.org/Download/Release4V42).
+
+New features in this release include:
+
+* A live Discovery System is now supported. The CXF-DOSGi implementation
+  makes use of Apache Zookeeper (http://hadoop.apache.org/zookeeper) as
+  the Discovery Server and provides client-side bundles for transparent
+  interaction with Zookeeper. See the Discovery Documentation pages
+  (http://cxf.apache.org/dosgi-discovery.html) for more details.
+
+* REST support for JAX-RS-based Remoted Services and Consumers through
+  the org.apache.cxf.rs configuration type.
+
+* Many user issues have been addressed. In addition the following bugs
+  have been fixed:
+
+[CXF-2182] - Exceptions when remoting pre-existing service
+[CXF-2337] - org.apache.cxf.dosgi.dsw.ClassUtils#getInterfaceClass() method
+             should search through super class interfaces too
+[CXF-2435] - Distributed OSGi having a problem with a custom type method
+             argument
+[CXF-2288] - Bundle cannot be restarted
+[CXF-2385] - Discovery doesn't fully translate 'localhost' into a proper 
+             machine name
+[CXF-2200] - Consuming more than 1 service using Spring-DM doesn't work
+
+
