@@ -24,12 +24,12 @@
     <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper</artifactId>
     <packaging>bundle</packaging>
     <name>CXF Distributed OSGI Distributed Discovery Zookeeper Library Wrapper Bundle</name>
-    <version>1.1</version>
+    <version>1.1-SNAPSHOT</version>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-parent</artifactId>
-      <version>1.1</version>
+      <version>1.1-SNAPSHOT</version>
       <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
