@@ -21,14 +21,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.cxf.dosgi.systests</groupId>
   <artifactId>cxf-dosgi-ri-systests-singlebundle-distro-rest</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Distributed OSGI RI REST System Test using Single Bundle Distro</name>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.systests</groupId>
     <artifactId>cxf-dosgi-ri-systests</artifactId>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>  
   </parent>
 
