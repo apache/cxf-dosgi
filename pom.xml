@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation</name>  
