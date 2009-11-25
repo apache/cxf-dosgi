@@ -273,6 +273,7 @@
               org.apache.cxf.dosgi.*;version="${pom.version}",
               org.apache.cxf.*;version="${cxf.version}",
               org.jdom.*;version="1.0.0",
+              org.osgi.service.cm;version="1.2",
               org.osgi.service.distribution;version="1.0.0",
               org.osgi.service.discovery;version="1.0.0",
               !*
