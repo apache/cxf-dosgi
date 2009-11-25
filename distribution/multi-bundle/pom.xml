@@ -312,10 +312,12 @@
                 
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/distribution_configs/felix.config.properties.append" style="src/main/xsl/felix_distro_config.xslt">
                     <param name="Version" expression="${dosgi.version}" />
+                    <param name="Offset" expression="50" />
                 </xslt>
                 
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/felix.config.properties.append" style="src/main/xsl/felix_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/" />
+                      <param name="Offset" expression="50" />
                 </xslt>
                 
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/distribution_configs/equinox.config.ini.append" style="src/main/xsl/equinox_distro_config.xslt">
@@ -328,10 +330,12 @@
                 
                 <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/distribution_configs/felix.discovery.config.properties.append" style="src/main/xsl/felix_distro_config.xslt">
                     <param name="Version" expression="${dosgi.version}" />
+                    <param name="Offset" expression="100" />
                 </xslt>
                 
                 <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/felix.discovery.config.properties.append" style="src/main/xsl/felix_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/" />
+                      <param name="Offset" expression="100" />
                 </xslt>
                 
                 <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/distribution_configs/equinox.discovery.config.ini.append" style="src/main/xsl/equinox_distro_config.xslt">
