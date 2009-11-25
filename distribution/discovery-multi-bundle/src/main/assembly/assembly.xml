@@ -50,7 +50,6 @@
       <directory>src/main/release</directory>
       <includes>
         <include>README</include>
-        <include>release_notes.txt</include>
       </includes>
       <outputDirectory>apache-cxf-dosgi-discovery-${dosgi.version}</outputDirectory>
     </fileSet>
