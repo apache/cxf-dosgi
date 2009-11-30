@@ -37,6 +37,8 @@
 
     <modules>
       <module>zookeeper-wrapper</module>
+      <module>zookeeper-server</module>
+      <module>zookeeper-server-config</module>
       <module>cxf-discovery</module>
     </modules> 
 </project>

@@ -21,9 +21,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
-    <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper</artifactId>
+    <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-server</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF Distributed OSGI Distributed Discovery Zookeeper Library Wrapper Bundle</name>
+    <name>CXF Distributed OSGI Distributed Discovery Zookeeper Server Control Bundle</name>
     <version>1.2-SNAPSHOT</version>
 
     <parent>
@@ -38,18 +38,42 @@
     </properties>
     
     <dependencies>
+        <dependency> 
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>${felix.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.osgi.foundation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency> 
+
         <dependency>
-            <groupId>org.apache.hadoop.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>${zookeeper.version}</version>
+            <groupId>org.apache.cxf.dosgi</groupId>
+            <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper</artifactId>
+            <version>${pom.version}</version>
         </dependency>
 
+        <!-- This is a zookeeper dependency that we apparently have to list here -->
         <dependency> 
             <groupId>org.apache.log4j</groupId> 
             <artifactId>com.springsource.org.apache.log4j</artifactId> 
             <version>${log4j.version}</version>
-            <scope>provided</scope> <!-- prevents the maven-bundle-plugin from embedding the log4j classes -->
+            <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>  
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <scope>test</scope>
+        </dependency> 
     </dependencies> 
 
     <build>
@@ -59,27 +83,16 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Name>ZooKeeper wrapper bundle</Bundle-Name>
-                        <Bundle-Description>This bundle wraps the ZooKeeper library</Bundle-Description>
+                        <Bundle-Name>ZooKeeper server control bundle</Bundle-Name>
+                        <Bundle-Description>This bundle can run the ZooKeeper server in an OSGi Framework</Bundle-Description>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-                        <Import-Package>
-                            !jline*,
-                            *
-                        </Import-Package>
-                        <Export-Package>*;version=${zookeeper.version}</Export-Package> 
+                        <Bundle-Activator>org.apache.cxf.dosgi.discovery.zookeeper.server.Activator</Bundle-Activator>
+                        <Import-Package>*</Import-Package>
+                        <Private-Package>org.apache.cxf.dosgi.discovery.zookeeper.server</Private-Package>
+                        <Export-Package/>
                     </instructions>
                 </configuration>
             </plugin> 
         </plugins>
     </build>    
-
-    <repositories>
-        <!-- The zookeeper jar file is not generally available via Maven, therefore we're picking it up
-             from the temporary repository below. -->
-        <repository>
-            <id>zookeeper.temp.repo</id>
-            <name>Hiram Chirino's temporary repo containing Apache Zookeeper</name>
-            <url>http://people.apache.org/~chirino/zk-repo</url>
-        </repository>
-    </repositories>
 </project>

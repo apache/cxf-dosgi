@@ -21,9 +21,10 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
-    <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper</artifactId>
+    <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-server-config</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF Distributed OSGI Distributed Discovery Zookeeper Library Wrapper Bundle</name>
+    <name>CXF Distributed OSGI Distributed Discovery Zookeeper Server Control Configuration Bundle</name>
+    <description>This bundle provides some default OSGi Configuration Admin data and is only useful for use in the OSGi CT suite</description>
     <version>1.2-SNAPSHOT</version>
 
     <parent>
@@ -38,18 +39,17 @@
     </properties>
     
     <dependencies>
-        <dependency>
-            <groupId>org.apache.hadoop.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>${zookeeper.version}</version>
-        </dependency>
-
         <dependency> 
-            <groupId>org.apache.log4j</groupId> 
-            <artifactId>com.springsource.org.apache.log4j</artifactId> 
-            <version>${log4j.version}</version>
-            <scope>provided</scope> <!-- prevents the maven-bundle-plugin from embedding the log4j classes -->
-        </dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>${felix.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.osgi.foundation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>          
     </dependencies> 
 
     <build>
@@ -59,27 +59,16 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Name>ZooKeeper wrapper bundle</Bundle-Name>
-                        <Bundle-Description>This bundle wraps the ZooKeeper library</Bundle-Description>
+                        <Bundle-Name>ZooKeeper server configuration bundle</Bundle-Name>
+                        <Bundle-Description>This bundle can configure the ZooKeeper server in an OSGi Framework</Bundle-Description>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-                        <Import-Package>
-                            !jline*,
-                            *
-                        </Import-Package>
-                        <Export-Package>*;version=${zookeeper.version}</Export-Package> 
+                        <Bundle-Activator>org.apache.cxf.dosgi.discovery.zookeeper.server.config.Activator</Bundle-Activator>
+                        <Import-Package>*</Import-Package>
+                        <Private-Package>org.apache.cxf.dosgi.discovery.zookeeper.server.config</Private-Package>
+                        <Export-Package/>
                     </instructions>
                 </configuration>
             </plugin> 
         </plugins>
     </build>    
-
-    <repositories>
-        <!-- The zookeeper jar file is not generally available via Maven, therefore we're picking it up
-             from the temporary repository below. -->
-        <repository>
-            <id>zookeeper.temp.repo</id>
-            <name>Hiram Chirino's temporary repo containing Apache Zookeeper</name>
-            <url>http://people.apache.org/~chirino/zk-repo</url>
-        </repository>
-    </repositories>
 </project>
