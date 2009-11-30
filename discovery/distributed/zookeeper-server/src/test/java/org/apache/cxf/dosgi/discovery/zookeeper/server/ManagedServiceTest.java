@@ -18,16 +18,20 @@
 package org.apache.cxf.dosgi.discovery.zookeeper.server;
 
 import java.io.File;
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.discovery.zookeeper.server.ManagedService.MyZooKeeperServerMain;
+import org.apache.zookeeper.ZooKeeperMain;
 import org.apache.zookeeper.server.ServerConfig;
 import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
 
 public class ManagedServiceTest extends TestCase {
     public void testManagedService() throws Exception {
@@ -100,5 +104,86 @@ public class ManagedServiceTest extends TestCase {
         ms.shutdown();
         assertNull(ms.main);
         assertNull(ms.zkMainThread);
+    }
+    
+    public void testRemoveConfiguration() throws Exception {
+        BundleContext bc = EasyMock.createMock(BundleContext.class);
+        
+        final StringBuilder shutDownTracker = new StringBuilder();
+        ManagedService ms = new ManagedService(bc) {
+            @Override
+            public synchronized void shutdown() {
+                shutDownTracker.append("called");
+            }            
+
+            @Override
+            void startThread() {}                        
+        };
+        
+        assertEquals("Precondition failed", 0, shutDownTracker.length());
+        ms.updated(null);
+        assertEquals("called", shutDownTracker.toString());
+        // check that it didn't get reinitialized TODO
+    }
+
+    public void testNewConfiguration() throws Exception {
+        BundleContext bc = EasyMock.createMock(BundleContext.class);
+        
+        final StringBuilder shutDownTracker = new StringBuilder();
+        ManagedService ms = new ManagedService(bc) {
+            @Override
+            public synchronized void shutdown() {
+                shutDownTracker.append("called");
+            }            
+
+            @Override
+            void startThread() {}                        
+        };
+        
+        assertEquals("Precondition failed", 0, shutDownTracker.length());
+        assertNull("Precondition failed", ms.main);
+        assertNull("Precondition failed", ms.zkMainThread);
+        
+        Hashtable<String, Object> props = new Hashtable<String, Object>();
+        props.put("clientPort", "9911");
+        ms.updated(props);
+        assertEquals("Shutdown should not have been called", 0, shutDownTracker.length());
+        assertNotNull(ms.main);
+        assertNotNull(ms.zkMainThread);
+    }
+
+    public void testChangeConfiguration() throws Exception {
+        BundleContext bc = EasyMock.createMock(BundleContext.class);
+        
+        final StringBuilder shutDownTracker = new StringBuilder();
+        ManagedService ms = new ManagedService(bc) {
+            @Override
+            public synchronized void shutdown() {
+                shutDownTracker.append("called");
+            }            
+
+            @Override
+            void startThread() {}                        
+        };
+        
+        MyZooKeeperServerMain initialMsMain = 
+            EasyMock.createMock(ManagedService.MyZooKeeperServerMain.class);
+        ms.main = initialMsMain;
+        Thread initialZkThread = new Thread();
+        ms.zkMainThread = initialZkThread;
+        
+        assertEquals("Precondition failed", 0, shutDownTracker.length());
+        assertNotNull("Precondition failed", ms.main);
+        assertNotNull("Precondition failed", ms.zkMainThread);
+        
+        Hashtable<String, Object> props = new Hashtable<String, Object>();
+        props.put("clientPort", "9911");
+        ms.updated(props);
+        assertEquals("We are reconfiguring, so shutdown should be called", 
+                "called", shutDownTracker.toString());
+        assertNotNull(ms.main);
+        assertNotNull(ms.zkMainThread);
+        assertNotSame(ms.main, initialMsMain);
+        assertNotSame(ms.zkMainThread, initialZkThread);
     }
 }

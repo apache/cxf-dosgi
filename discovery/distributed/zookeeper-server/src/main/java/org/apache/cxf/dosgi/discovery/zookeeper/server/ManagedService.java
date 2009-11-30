@@ -48,6 +48,11 @@ public class ManagedService implements org.osgi.service.cm.ManagedService {
         if (main != null) {
             LOG.info("Shutting down ZooKeeper server");
             main.shutdown();
+            try {
+                zkMainThread.join();
+            } catch (InterruptedException e) {
+                // ignore
+            }
             main = null;
             zkMainThread = null;
         }
@@ -72,13 +77,14 @@ public class ManagedService implements org.osgi.service.cm.ManagedService {
     @SuppressWarnings("unchecked")
     public synchronized void updated(Dictionary dict) throws ConfigurationException {
         if (dict == null) {
-            // stop server... TODO
+            shutdown();
             return;
         }
         
         if (main != null) {
-            // reconfiguration not yet supported
-            return;
+            // stop the current instance            
+            shutdown();
+            // then reconfigure and start again.
         }
         
         if (dict.get("clientPort") == null) {
