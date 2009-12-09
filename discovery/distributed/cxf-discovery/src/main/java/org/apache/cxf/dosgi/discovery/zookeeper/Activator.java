@@ -21,7 +21,7 @@ public class Activator implements BundleActivator, ManagedService {
     private DiscoveryDriver driver;
     ServiceRegistration cmReg;
 
-    public void start(BundleContext bc) throws Exception {
+    public synchronized void start(BundleContext bc) throws Exception {
         bundleContext = bc;        
         cmReg = bc.registerService(ManagedService.class.getName(), this, getCMDefaults());
     }
@@ -42,7 +42,7 @@ public class Activator implements BundleActivator, ManagedService {
         }
     }
 
-    public void updated(Dictionary configuration) throws ConfigurationException {
+    public synchronized void updated(Dictionary configuration) throws ConfigurationException {
         if (configuration == null) {
             return;
         }
