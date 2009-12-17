@@ -38,7 +38,7 @@
     <topDirectoryLocation>../..</topDirectoryLocation>
   </properties>
   
-  <dependencies>
+ <dependencies>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-annotation_1.0_spec</artifactId>
@@ -227,6 +227,12 @@
     </dependency>
     
     <dependency>
+      <groupId>org.apache.cxf.dosgi</groupId>
+      <artifactId>cxf-dosgi-topology-manager</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -276,6 +282,7 @@
               org.osgi.service.cm;version="1.2",
               org.osgi.service.distribution;version="1.0.0",
               org.osgi.service.discovery;version="1.0.0",
+              org.osgi.service.remoteserviceadmin;version="1.0.0",
               !*
             </_exportcontents> 
             <DynamicImport-Package>*</DynamicImport-Package>

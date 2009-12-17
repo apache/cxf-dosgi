@@ -33,7 +33,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class JaxRSUtils {
 
@@ -53,14 +53,14 @@ public class JaxRSUtils {
 	
 	public static List<Object> getProviders(BundleContext callingContext, 
 			                                BundleContext dswBC,
-			                                ServiceEndpointDescription sd) {
+			                                EndpointDescription sd) {
 		
 		List<Object> providers = new ArrayList<Object>();
-		if ("aegis".equals(sd.getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_DATABINDING_PROP_KEY))) {
+		if ("aegis".equals(sd.getProperties().get(org.apache.cxf.dosgi.dsw.Constants.RS_DATABINDING_PROP_KEY))) {
 	        providers.add(new AegisElementProvider());
         }
         Object serviceProviders = 
-        	sd.getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY);
+        	sd.getProperties().get(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY);
         if (serviceProviders != null) {
         	if (serviceProviders.getClass().isArray()) {
         		if (serviceProviders.getClass().getComponentType() == String.class) {
@@ -75,7 +75,7 @@ public class JaxRSUtils {
         }
 		
 		Object globalQueryProp = 
-			sd.getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_GLOBAL_PROP_KEY);
+			sd.getProperties().get(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_GLOBAL_PROP_KEY);
 		boolean globalQueryRequired = globalQueryProp == null || OsgiUtils.toBoolean(globalQueryProp);
         if (!globalQueryRequired) {
         	return providers;

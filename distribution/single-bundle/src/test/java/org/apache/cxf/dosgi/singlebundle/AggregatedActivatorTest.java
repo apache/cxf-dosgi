@@ -47,6 +47,7 @@ public class AggregatedActivatorTest extends TestCase {
             "org.apache.cxf.dosgi.discovery.local.Activator",
             "org.apache.cxf.dosgi.dsw.Activator",
             "org.apache.cxf.dosgi.discovery.zookeeper.Activator",
+            "org.apache.cxf.dosgi.topologymanager.Activator",
             "org.springframework.osgi.extender.internal.activator.ContextLoaderListener"};
         
         AggregatedActivator aa = new AggregatedActivator();

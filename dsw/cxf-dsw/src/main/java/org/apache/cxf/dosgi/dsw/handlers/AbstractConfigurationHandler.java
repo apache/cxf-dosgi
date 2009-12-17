@@ -23,19 +23,18 @@ import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.osgi.framework.BundleContext;
 
 public abstract class AbstractConfigurationHandler implements ConfigurationTypeHandler {
-    private final CxfDistributionProvider distributionProvider;
+    
     final Map<String, Object> handlerProps;
     protected BundleContext bundleContext;
     
     protected AbstractConfigurationHandler(BundleContext dswBC,
-                                           CxfDistributionProvider dp, 
+                                           
                                            Map<String, Object> handlerProps) {
         this.bundleContext = dswBC;
-        this.distributionProvider = dp;
+     
         this.handlerProps = handlerProps;
     }
     
@@ -61,13 +60,14 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
         return OsgiUtils.toBoolean(value);        
     }
     
-    protected CxfDistributionProvider getDistributionProvider() {
-        return distributionProvider;
-    }
-    
+ 
     protected Object getProxy(Object serviceProxy, Class<?> iType) {
         return Proxy.newProxyInstance(iType.getClassLoader(),
                       new Class[] {iType},
                       new ServiceInvocationHandler(serviceProxy, iType));
-    }    
+    }  
+    
+    protected BundleContext getBundleContext(){
+        return bundleContext;
+    }
 }

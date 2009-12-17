@@ -27,17 +27,20 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.AsyncCallback.StatCallback;
 import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.data.Stat;
-import org.osgi.service.discovery.DiscoveredServiceTracker;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 public class InterfaceMonitor implements Watcher, StatCallback {
     private static final Logger LOG = Logger.getLogger(InterfaceMonitor.class.getName());
 
-    DataMonitorListener listener;
+    InterfaceDataMonitorListenerImpl listener;
     final String znode;
     final ZooKeeper zookeeper;
+    
+    private boolean closed = false;
 
-    public InterfaceMonitor(ZooKeeper zk, String intf, DiscoveredServiceTracker dst) {
-        listener = new InterfaceDataMonitorListenerImpl(zk, intf, dst);
+    public InterfaceMonitor(ZooKeeper zk, String intf, EndpointListenerTrackerCustomizer.Interest zkd, String scope, BundleContext bctx) {
+        listener = new InterfaceDataMonitorListenerImpl(zk, intf, zkd,scope,bctx);
         zookeeper = zk;
         znode = Util.getZooKeeperPath(intf);
     }
@@ -49,6 +52,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
     public void process(WatchedEvent event) {
         LOG.finer("ZooKeeper watcher callback " + event);
+        
         processDelta();
     }
     
@@ -73,6 +77,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     }
 
     private void processDelta() {
+        if(closed) return;
         try {
             if (zookeeper.exists(znode, false) != null) {
                 listener.change();
@@ -81,5 +86,14 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         } catch (Exception ke) {
             LOG.log(Level.SEVERE, "Error getting ZooKeeper data.", ke);
         }
+    }
+
+    public void inform(ServiceReference sref) {
+       listener.inform(sref);
+    }
+
+    public void close() {
+        // TODO !!!     
+        closed = true;
     }
 }

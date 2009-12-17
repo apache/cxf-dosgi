@@ -18,15 +18,24 @@
   */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.util.Map;
-
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.distribution.DistributionProvider;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.ImportReference;
 
-public interface CxfDistributionProvider extends DistributionProvider {
-    void addExposedService(ServiceReference serviceReference, Map<String, String> publicationProperties);
-    void addRemoteService(ServiceReference serviceReference);
-    void intentsUnsatisfied(ServiceReference serviceReference);
-    
-    void shutdown();
+public class ImportReferenceImpl implements ImportReference {
+
+    private ImportRegistrationImpl importRegistration;
+
+    public ImportReferenceImpl(ImportRegistrationImpl ir) {
+        importRegistration = ir;
+    }
+
+    public EndpointDescription getImportedEndpoint() {
+        return importRegistration.getImportedEndpointDescription();
+    }
+
+    public ServiceReference getImportedService() {
+        return importRegistration.getImportedService();
+    }
+
 }

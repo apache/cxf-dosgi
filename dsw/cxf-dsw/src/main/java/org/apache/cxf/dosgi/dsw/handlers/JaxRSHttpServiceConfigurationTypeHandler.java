@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -37,8 +36,8 @@ import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.http.HttpService;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigurationTypeHandler {
     private static final Logger LOG = Logger.getLogger(JaxRSHttpServiceConfigurationTypeHandler.class.getName());
@@ -46,15 +45,15 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>(); 
 
     protected JaxRSHttpServiceConfigurationTypeHandler(BundleContext dswBC,
-                                                  CxfDistributionProvider dp,
+                                                 
                                                   Map<String, Object> handlerProps) {
-        super(dswBC, dp, handlerProps);
+        super(dswBC, handlerProps);
     }
 
     public Server createServer(ServiceReference serviceReference,
                                BundleContext dswContext, 
                                BundleContext callingContext,
-                               ServiceEndpointDescription sd, 
+                               EndpointDescription sd, 
                                Class<?> iClass, 
                                Object serviceBean) {
         String contextRoot = getServletContextRoot(sd, iClass);
@@ -99,11 +98,11 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
             registerStopHook(bus, httpService, server, contextRoot, Constants.RS_HTTP_SERVICE_CONTEXT);
-            getDistributionProvider().addExposedService(serviceReference, registerPublication(server, intents, address));
+            //MARC: FIXME !!!!  getDistributionProvider().addExposedService(serviceReference, registerPublication(server, intents, address));
             addAddressProperty(sd.getProperties(), address);
             return server;
         } catch (IntentUnsatifiedException iue) {
-            getDistributionProvider().intentsUnsatisfied(serviceReference);
+            //MARC: FIXME !!!! getDistributionProvider().intentsUnsatisfied(serviceReference);
             throw iue;
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
@@ -111,7 +110,7 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
     }
     
     @Override
-    protected String getServletContextRoot(ServiceEndpointDescription sd, Class<?> iClass) {
+    protected String getServletContextRoot(EndpointDescription sd, Class<?> iClass) {
         String context = OsgiUtils.getProperty(sd, Constants.RS_HTTP_SERVICE_CONTEXT);
         
         if (context == null) {

@@ -25,7 +25,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.discovery.zookeeper.Util;
+
 public class UtilTest extends TestCase {
+    
     public void testMultiValuePropertyAsString() {
         assertEquals(Collections.singleton("hi"), 
             Util.getMultiValueProperty("hi"));            

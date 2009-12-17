@@ -1,9 +1,30 @@
+/** 
+ * Licensed to the Apache Software Foundation (ASF) under one 
+ * or more contributor license agreements. See the NOTICE file 
+ * distributed with this work for additional information 
+ * regarding copyright ownership. The ASF licenses this file 
+ * to you under the Apache License, Version 2.0 (the 
+ * "License"); you may not use this file except in compliance 
+ * with the License. You may obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, 
+ * software distributed under the License is distributed on an 
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
+ * KIND, either express or implied. See the License for the 
+ * specific language governing permissions and limitations 
+ * under the License. 
+ */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,14 +37,69 @@ import org.osgi.service.cm.ManagedService;
 
 public class Activator implements BundleActivator, ManagedService {
     private static final Logger LOG = Logger.getLogger(Activator.class.getName());
-    
-    private BundleContext bundleContext;
-    private DiscoveryDriver driver;
-    ServiceRegistration cmReg;
 
-    public synchronized void start(BundleContext bc) throws Exception {
-        bundleContext = bc;        
-        cmReg = bc.registerService(ManagedService.class.getName(), this, getCMDefaults());
+    private ZooKeeperDiscovery zkd;
+    private ServiceRegistration cmReg;
+    private Dictionary zkProperties;
+    private BundleContext bctx;
+
+    public void start(BundleContext bc) throws Exception {
+        bctx = bc;
+        zkProperties = getCMDefaults();
+
+        zkd = createZooKeeperDiscovery();
+        // zkd.start() is invoked via configuration update
+        
+        
+        cmReg = bc.registerService(ManagedService.class.getName(), this, zkProperties);
+//        LOG.info("STARTING NOW");
+//        updated(null);
+        
+    }
+
+    public synchronized void stop(BundleContext bc) throws Exception {
+        cmReg.unregister();
+
+        zkd.stop();
+
+    }
+
+    public void updated(Dictionary configuration) throws ConfigurationException {
+
+        if (configuration == null) {
+
+        } else {
+
+            Dictionary effective = getCMDefaults();
+            // apply all values on top of the defaults
+            for (Enumeration e = configuration.keys(); e.hasMoreElements();) {
+                Object key = e.nextElement();
+                if (key != null) {
+                    Object val = configuration.get(key);
+                    effective.put(key, val);
+                }
+            }
+
+            if (zkProperties.equals(effective)) {
+                LOG.info("properties haven't changed ...");
+                return;
+            }
+
+            zkProperties = effective;
+            
+            synchronized (this) {
+                zkd.stop();
+                zkd = createZooKeeperDiscovery();
+            }
+        }
+        
+        // call start in any case 
+        try {
+            zkd.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
     }
 
     private Dictionary getCMDefaults() {
@@ -34,46 +110,9 @@ public class Activator implements BundleActivator, ManagedService {
         return props;    
     }
 
-    public synchronized void stop(BundleContext bc) throws Exception {
-        cmReg.unregister();
-        
-        if (driver != null) {
-            driver.destroy();
-        }
+    // for testing
+    protected ZooKeeperDiscovery createZooKeeperDiscovery() {
+        return new ZooKeeperDiscovery(bctx, zkProperties);
     }
 
-    public synchronized void updated(Dictionary configuration) throws ConfigurationException {
-        if (configuration == null) {
-            return;
-        }
-        
-        Dictionary effective = getCMDefaults();
-        // apply all values on top of the defaults
-        for (Enumeration e = configuration.keys(); e.hasMoreElements(); ) {
-            Object key = e.nextElement();
-            if (key != null) {
-                Object val = configuration.get(key);
-                effective.put(key, val);
-            }
-        }
-        
-        cmReg.setProperties(effective);
-        synchronized (this) {
-            try {
-                if (driver == null) {
-                    driver = createDriver(effective);
-                } else {
-                    driver.updateConfiguration(effective);
-                }
-            } catch (IOException e) {
-                LOG.log(Level.WARNING, "Could now create the ZooKeeper client", e);
-            }
-        }
-    }
-
-    // Isolated for testing
-    DiscoveryDriver createDriver(Dictionary configuration)
-            throws IOException, ConfigurationException {
-        return new DiscoveryDriver(bundleContext, configuration);
-    }
 }

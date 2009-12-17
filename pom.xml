@@ -110,7 +110,7 @@
         <module>discovery</module>
         <module>samples</module>
         <module>distribution</module>
-        <module>systests</module>
+    <!--    <module>systests</module>-->
     </modules>
 
     <profiles>

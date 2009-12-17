@@ -18,8 +18,6 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,7 +34,6 @@ import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
-import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
@@ -45,7 +42,8 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.discovery.ServiceEndpointDescription;
+
+import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
 
 public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
     private static final Logger LOG = Logger.getLogger(AbstractPojoConfigurationTypeHandler.class.getName());
@@ -55,9 +53,9 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     private IntentMap masterMap;
     
     public AbstractPojoConfigurationTypeHandler(BundleContext dswBC, 
-                                                CxfDistributionProvider dp, 
+                                                
                                                 Map<String, Object> handlerProps) {
-        super(dswBC, dp, handlerProps);
+        super(dswBC,  handlerProps);
     }
 
     // Isolated so that it can be substituted for testing
@@ -93,7 +91,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
                            BundleContext callingContext,
                            List<AbstractFeature> features,
                            AbstractEndpointFactory factory,
-                           ServiceEndpointDescription sd) throws IntentUnsatifiedException {
+                           Map sd) throws IntentUnsatifiedException {
         String[] requestedIntents = getRequestedIntents(sd);
         Set<String> appliedIntents = new HashSet<String>(Arrays.asList(requestedIntents));
         
@@ -190,7 +188,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return CONFIGURATION_TYPE;
     }
 
-    private static String[] getRequestedIntents(ServiceEndpointDescription sd) {
+    private static String[] getRequestedIntents(Map sd) {
         Collection<String> intents = Arrays.asList(
             OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS)));        
         Collection<String> extraIntents = Arrays.asList(

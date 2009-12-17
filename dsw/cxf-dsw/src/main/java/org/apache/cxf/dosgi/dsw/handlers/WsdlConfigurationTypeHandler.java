@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Dictionary;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -29,20 +30,20 @@ import javax.xml.ws.Service;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
+import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.endpoint.Server;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
     private static final String CONFIGURATION_TYPE = "wsdl";
     private static final Logger LOG = Logger.getLogger(WsdlConfigurationTypeHandler.class.getName());
     
     public WsdlConfigurationTypeHandler(BundleContext dswBC,
-                                        CxfDistributionProvider dp,
+                               
                                         Map<String, Object> handlerProps) {
-        super(dswBC, dp, handlerProps);
+        super(dswBC, handlerProps);
     }
     
     public String getType() {
@@ -53,7 +54,7 @@ public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
                               BundleContext dswContext,
                               BundleContext callingContext,
                               Class<?> iClass, 
-                              ServiceEndpointDescription sd) {
+                              EndpointDescription sd) {
         
         String wsdlAddressProp = getWsdlAddress(sd, iClass);
         if (wsdlAddressProp == null) {
@@ -69,7 +70,7 @@ public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
             return null;
         }
         
-        LOG.info("Creating a " + sd.getProvidedInterfaces().toArray()[0] + " client, wsdl address is "
+        LOG.info("Creating a " + sd.getInterfaces().toArray()[0] + " client, wsdl address is "
                  + OsgiUtils.getProperty(sd, Constants.WSDL_CONFIG_PREFIX));
         
         String serviceNs = OsgiUtils.getProperty(sd, Constants.SERVICE_NAMESPACE);
@@ -80,7 +81,7 @@ public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
         QName serviceQname = new QName(serviceNs, iClass.getSimpleName());
         Service service = createWebService(wsdlAddress, serviceQname);
         Object proxy = getProxy(service.getPort(iClass), iClass);
-        getDistributionProvider().addRemoteService(serviceReference);
+        //MARC: FIXME !!!! getDistributionProvider().addRemoteService(serviceReference);
         return proxy;
         
     }
@@ -90,10 +91,10 @@ public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
         return Service.create(wsdlAddress, serviceQname);
     }
 
-    public Server createServer(ServiceReference sr,
+    public void createServer(ExportRegistrationImpl exportRegistration,
                                BundleContext dswContext,
                                BundleContext callingContext,
-                               ServiceEndpointDescription sd, 
+                               Map sd, 
                                Class<?> iClass, 
                                Object serviceBean) {
         
@@ -101,7 +102,7 @@ public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
                   + " creating service endpoints");
     }
     
-    private String getWsdlAddress(ServiceEndpointDescription sd, Class<?> iClass) {
+    private String getWsdlAddress(EndpointDescription sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, Constants.WSDL_CONFIG_PREFIX);
         if (address == null) {
             address = getDefaultAddress(iClass);

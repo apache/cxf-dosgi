@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +32,7 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
+import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
@@ -41,8 +42,8 @@ import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.http.HttpService;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
@@ -51,9 +52,9 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>(); 
     
     protected HttpServiceConfigurationTypeHandler(BundleContext dswBC,
-                                                  CxfDistributionProvider dp,
+                                                 
                                                   Map<String, Object> handlerProps) {
-        super(dswBC, dp, handlerProps);
+        super(dswBC,  handlerProps);
 
         ServiceTracker st = new ServiceTracker(dswBC, HttpService.class.getName(), null) {
             @Override
@@ -73,65 +74,66 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
 
     public Object createProxy(ServiceReference serviceReference,
             BundleContext dswContext, BundleContext callingContext,
-            Class<?> iClass, ServiceEndpointDescription sd) {
+            Class<?> iClass, EndpointDescription sd) {
         // This handler doesn't make sense on the client side
         return null;
     }
 
-    public Server createServer(ServiceReference serviceReference,
+    public void createServer(ExportRegistrationImpl exportRegistration,
                                BundleContext dswContext, 
                                BundleContext callingContext,
-                               ServiceEndpointDescription sd, 
+                               Map sd, 
                                Class<?> iClass, 
                                Object serviceBean) {
-        final String contextRoot = getServletContextRoot(sd, iClass);
-        if (contextRoot == null) {
-            LOG.warning("Remote address is unavailable");
-            return null;
-        }
-
-        CXFNonSpringServlet cxf = new CXFNonSpringServlet();
-        HttpService httpService = getHttpService();
-        try {
-            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), null);
-            LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
-        } catch (Exception e) {
-            throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
-        }
-        Bus bus = cxf.getBus();
-        DataBinding databinding;
-        String dataBindingImpl = (String) serviceReference.getProperty(Constants.WS_DATABINDING_PROP_KEY);
-        if("jaxb".equals(dataBindingImpl)) {
-          databinding = new JAXBDataBinding();
-        } else {
-          databinding = new AegisDatabinding();
-        }
-        String frontEndImpl = (String) serviceReference.getProperty(Constants.WS_FRONTEND_PROP_KEY);
-        ServerFactoryBean factory = createServerFactoryBean(frontEndImpl);
-        String address = constructAddress(dswContext, contextRoot);
-        factory.setBus(bus);
-        factory.setServiceClass(iClass);
-        factory.setAddress("/");
-        factory.getServiceFactory().setDataBinding(databinding);
-        factory.setServiceBean(serviceBean);
-
-        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            String [] intents = 
-                applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
-
-            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
-            Server server = factory.create();
-            registerStopHook(bus, httpService, server, contextRoot, Constants.WS_HTTP_SERVICE_CONTEXT);
-            getDistributionProvider().addExposedService(serviceReference, registerPublication(server, intents, address));
-            addAddressProperty(sd.getProperties(), address);
-            return server;
-        } catch (IntentUnsatifiedException iue) {
-            getDistributionProvider().intentsUnsatisfied(serviceReference);
-            throw iue;
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldClassLoader);
-        }       
+//        final String contextRoot = getServletContextRoot(sd, iClass);
+//        if (contextRoot == null) {
+//            LOG.warning("Remote address is unavailable");
+//            return null;
+//        }
+//
+//        CXFNonSpringServlet cxf = new CXFNonSpringServlet();
+//        HttpService httpService = getHttpService();
+//        try {
+//            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), null);
+//            LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
+//        } catch (Exception e) {
+//            throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
+//        }
+//        Bus bus = cxf.getBus();
+//        DataBinding databinding;
+//        String dataBindingImpl = (String) serviceReference.getProperty(Constants.WS_DATABINDING_PROP_KEY);
+//        if("jaxb".equals(dataBindingImpl)) {
+//          databinding = new JAXBDataBinding();
+//        } else {
+//          databinding = new AegisDatabinding();
+//        }
+//        String frontEndImpl = (String) serviceReference.getProperty(Constants.WS_FRONTEND_PROP_KEY);
+//        ServerFactoryBean factory = createServerFactoryBean(frontEndImpl);
+//        String address = constructAddress(dswContext, contextRoot);
+//        factory.setBus(bus);
+//        factory.setServiceClass(iClass);
+//        factory.setAddress("/");
+//        factory.getServiceFactory().setDataBinding(databinding);
+//        factory.setServiceBean(serviceBean);
+//
+//        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+//        try {
+//            String [] intents = 
+//                applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
+//
+//            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
+//            Server server = factory.create();
+//            registerStopHook(bus, httpService, server, contextRoot, Constants.WS_HTTP_SERVICE_CONTEXT);
+//            //MARC: FIXME !!!!       getDistributionProvider().addExposedService(serviceReference, registerPublication(server, intents, address));
+//            addAddressProperty(sd.getProperties(), address);
+//            return server;
+//        } catch (IntentUnsatifiedException iue) {
+//            //MARC: FIXME !!!!       getDistributionProvider().intentsUnsatisfied(serviceReference);
+//            throw iue;
+//        } finally {
+//            Thread.currentThread().setContextClassLoader(oldClassLoader);
+//        }     
+        throw new RuntimeException("Marc: Implement me !!!!");
     }
     
     protected Map<String, String> registerPublication(Server server, String[] intents, String address) {
@@ -173,7 +175,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         throw new ServiceException("CXF DOSGi: No HTTP Service could be found to publish CXF endpoint in.");
     }
 
-    protected String getServletContextRoot(ServiceEndpointDescription sd, Class<?> iClass) {
+    protected String getServletContextRoot(EndpointDescription sd, Class<?> iClass) {
         String context = OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT);
         if (context == null) {
             context = OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT_OLD);                      

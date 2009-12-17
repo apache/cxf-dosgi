@@ -37,12 +37,23 @@
         <bundle.import.package>*</bundle.import.package>
         <bundle.export.package>
           org.apache.cxf.dosgi.*;version="${pom.version}",
-          org.osgi.service.distribution;version="1.0";-split-package:=merge-first,
-          org.osgi.service.discovery;version="1.0";-split-package:=merge-first 
+          org.osgi.service.remoteserviceadmin;version="${remote.service.admin.interfaces.version}"
         </bundle.export.package>
+        <!-- 
+                  org.osgi.service.discovery;-split-package:=merge-first,
+          org.osgi.service.distribution;-split-package:=merge-first
+         -->
     </properties>
     
     <dependencies>
+    
+        <dependency>
+            <groupId>org.apache.cxf.dosgi</groupId>
+            <artifactId>cxf-dosgi-remote-service-admin-interfaces</artifactId>
+            <version>${remote.service.admin.interfaces.version}</version>
+            <!-- <scope>provided</scope>    Include the interfaces -->
+        </dependency>
+    
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-bundle-minimal</artifactId>
@@ -86,16 +97,18 @@
         <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Name>CXF Distributed Software Bundle</Bundle-Name>
+                        <Bundle-Name>CXF dOSGi Remote Service Admin Implementation</Bundle-Name>
                         <Bundle-Description>This bundle contains the implementation required by the CXF Distributed Software Bundle</Bundle-Description>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
                         <Bundle-Activator>org.apache.cxf.dosgi.dsw.Activator</Bundle-Activator>
                         <Import-Package>${bundle.import.package}</Import-Package>
-                        <Export-Package>${bundle.export.package}</Export-Package> 
+                        <Export-Package>${bundle.export.package}</Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Private-Package>org.osgi.service.discovery,org.osgi.service.distribution</Private-Package>
                     </instructions>
                 </configuration>
           </plugin> 

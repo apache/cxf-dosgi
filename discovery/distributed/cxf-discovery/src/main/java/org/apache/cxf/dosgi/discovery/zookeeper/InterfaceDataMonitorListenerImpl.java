@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +27,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.zookeeper.ZooKeeper;
-import org.osgi.service.discovery.DiscoveredServiceNotification;
-import org.osgi.service.discovery.DiscoveredServiceTracker;
-import org.osgi.service.discovery.ServicePublication;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.EndpointListener;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
     private static final Logger LOG = Logger.getLogger(InterfaceDataMonitorListenerImpl.class.getName());
@@ -38,16 +40,21 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
     final ZooKeeper zookeeper;
     final String znode;
     final String interFace;
-    final DiscoveredServiceTracker discoveredServiceTracker;
-
+    final EndpointListenerTrackerCustomizer.Interest discoveredServiceTracker;
+    final String scope;
+    
+    private final BundleContext bctx;
+    
     // This map is *only* accessed in the change() method
     private Map<String, Map<String, Object>> nodes = new HashMap<String, Map<String,Object>>();
     
-    public InterfaceDataMonitorListenerImpl(ZooKeeper zk, String intf, DiscoveredServiceTracker dst) {
+    public InterfaceDataMonitorListenerImpl(ZooKeeper zk, String intf, EndpointListenerTrackerCustomizer.Interest dst,String scope, BundleContext bc) {
         zookeeper = zk;
         znode = Util.getZooKeeperPath(intf);
         interFace = intf;
         discoveredServiceTracker = dst;
+        bctx = bc;
+        this.scope = scope;
     }
     
     public synchronized void change() {
@@ -59,6 +66,8 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
             
             for (String child : children) {
                 byte[] data = zookeeper.getData(znode + '/' + child, false, null);
+                LOG.info("Child: " + znode + "/" + child);
+                
                 Properties p = new Properties();
                 p.load(new ByteArrayInputStream(data));
                 
@@ -67,43 +76,87 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                     m.put(entry.getKey().toString(), entry.getValue());
                 }
                 
-                // Put in some reasonable defaults, if not specified
-                if (!m.containsKey("service.exported.configs")) {
-                    m.put("service.exported.configs", "org.apache.cxf.ws");
+//                // Put in some reasonable defaults, if not specified
+//                if (!m.containsKey("service.exported.configs")) {
+//                    m.put("service.exported.configs", "org.apache.cxf.ws");
+//                }
+//                if (Util.getMultiValueProperty(m.get("service.exported.configs")).contains("org.apache.cxf.ws") &&
+//                    !m.containsKey("org.apache.cxf.ws.address")) {
+//                    m.put("org.apache.cxf.ws.address", m.get(ServicePublication.ENDPOINT_LOCATION));                    
+//                }
+
+                
+                
+                if(m.get(Constants.OBJECTCLASS) instanceof String){
+                    String s = (String)m.get(Constants.OBJECTCLASS);
+                    String[] a = new String[1];
+                    a[0] = s;
+                    m.put(Constants.OBJECTCLASS,a);
+                    LOG.fine("OBJECTCLASS: "+s);
                 }
-                if (Util.getMultiValueProperty(m.get("service.exported.configs")).contains("org.apache.cxf.ws") &&
-                    !m.containsKey("org.apache.cxf.ws.address")) {
-                    m.put("org.apache.cxf.ws.address", m.get(ServicePublication.ENDPOINT_LOCATION));                    
+                
+                
+                // the Endpoint.id must be a Long and can't be a string .... 
+                if(m.get(RemoteConstants.ENDPOINT_ID) instanceof String){
+                    String s = (String)m.get(RemoteConstants.ENDPOINT_ID);
+                    Long l = Long.parseLong(s);
+                    m.put(RemoteConstants.ENDPOINT_ID, l);
                 }
+                
+                
+                LOG.finest("Properties: "+m);
                 
                 newNodes.put(child, m);
                 Map<String, Object> prevVal = prevNodes.remove(child);
+                EndpointDescription epd = new EndpointDescription(m);
+                
                 if (prevVal == null) {
                     // This guy is new
-                    ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(Collections.singletonList(interFace), m);
-                    DiscoveredServiceNotification dsn = new DiscoveredServiceNotificationImpl(Collections.emptyList(),
-                        Collections.singleton(interFace), DiscoveredServiceNotification.AVAILABLE, sed);
-                    discoveredServiceTracker.serviceChanged(dsn);                    
+
+                    for (ServiceReference sref : discoveredServiceTracker.relatedServiceListeners) {
+                        if (bctx.getService(sref) instanceof EndpointListener) {
+                            EndpointListener epl = (EndpointListener)bctx.getService(sref);
+                            
+                            LOG.info("calling EndpointListener; "+epl+ "from bundle " + sref.getBundle().getSymbolicName() );
+                            
+                            epl.endpointAdded(epd, scope);
+                        }
+                    }
                 } else if (!prevVal.equals(m)){
                     // There's been a modification
-                    ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(Collections.singletonList(interFace), m);
-                    DiscoveredServiceNotification dsn = new DiscoveredServiceNotificationImpl(Collections.emptyList(),
-                        Collections.singleton(interFace), DiscoveredServiceNotification.MODIFIED, sed);
-                    discoveredServiceTracker.serviceChanged(dsn);                    
+//                    ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(Collections.singletonList(interFace), m);
+//                    DiscoveredServiceNotification dsn = new DiscoveredServiceNotificationImpl(Collections.emptyList(),
+//                        Collections.singleton(interFace), DiscoveredServiceNotification.MODIFIED, sed);
+//                    discoveredServiceTracker.serviceChanged(dsn);
+                    
+                   
+                    
                 }                
             }
 
             for (Map<String, Object> props : prevNodes.values()) {
                 // whatever's left in prevNodes now has been removed from Discovery
-                ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(Collections.singletonList(interFace), props);
-                DiscoveredServiceNotification dsn = new DiscoveredServiceNotificationImpl(Collections.emptyList(),
-                        Collections.singleton(interFace), DiscoveredServiceNotification.UNAVAILABLE, sed);
-                discoveredServiceTracker.serviceChanged(dsn);                
+                EndpointDescription epd = new EndpointDescription(props);
+                
+                for (ServiceReference sref : discoveredServiceTracker.relatedServiceListeners) {
+                    if (bctx.getService(sref) instanceof EndpointListener) {
+                        EndpointListener epl = (EndpointListener)bctx.getService(sref);
+                        LOG.info("calling EndpointListener endpointRemoved: "+epl+ "from bundle " + sref.getBundle().getSymbolicName() );
+                        epl.endpointRemoved(epd, scope);
+                    }
+                }
+                
             }
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Problem processing Zookeeper callback", e);
+            LOG.log(Level.SEVERE, "Problem processing Zookeeper callback: "+e.getMessage(), e);
         } finally {
             nodes = newNodes;
         }
+    }
+
+    public void inform(ServiceReference sref) {
+        LOG.fine("need to inform the service reference of maybe already existing endpoints");
+        // TODO Auto-generated method stub
+        
     }
 }

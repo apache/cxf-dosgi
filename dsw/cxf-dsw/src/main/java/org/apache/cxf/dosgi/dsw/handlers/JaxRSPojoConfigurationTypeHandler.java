@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.service.CxfDistributionProvider;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -35,7 +34,7 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.discovery.ServiceEndpointDescription;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHandler {
     private static final Logger LOG = Logger.getLogger(JaxRSPojoConfigurationTypeHandler.class.getName());
@@ -43,14 +42,14 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>(); 
 
     protected JaxRSPojoConfigurationTypeHandler(BundleContext dswBC,
-                                                  CxfDistributionProvider dp,
+                                                 
                                                   Map<String, Object> handlerProps) {
-        super(dswBC, dp, handlerProps);
+        super(dswBC, handlerProps);
     }
 
     public Object createProxy(ServiceReference serviceReference,
             BundleContext dswContext, BundleContext callingContext,
-            Class<?> iClass, ServiceEndpointDescription sd) {
+            Class<?> iClass, EndpointDescription sd) {
       String address = getPojoAddress(sd, iClass);
       
       if (address == null) {
@@ -58,7 +57,7 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
           return null;
       }
 
-      LOG.info("Creating a " + sd.getProvidedInterfaces().toArray()[0]
+      LOG.info("Creating a " + sd.getInterfaces().toArray()[0]
               + " client, endpoint address is " + address);
 
       ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
@@ -78,7 +77,7 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
           }
     	  Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
     	  Object proxy = getProxy(bean.create(), iClass);
-    	  getDistributionProvider().addRemoteService(serviceReference);
+    	  //MARC: FIXME !!!! getDistributionProvider().addRemoteService(serviceReference);
           return proxy;
       } catch (Exception e) {
           LOG.log(Level.WARNING, "proxy creation failed", e);
@@ -92,7 +91,7 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
     public Server createServer(ServiceReference serviceReference,
                                BundleContext dswContext, 
                                BundleContext callingContext,
-                               ServiceEndpointDescription sd, 
+                               EndpointDescription sd, 
                                Class<?> iClass, 
                                Object serviceBean) {
     	String address = getPojoAddress(sd, iClass);
@@ -101,7 +100,7 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
             return null;
         }
         
-        LOG.info("Creating a " + sd.getProvidedInterfaces().toArray()[0]
+        LOG.info("Creating a " + sd.getInterfaces().toArray()[0]
             + " endpoint from CXF PublishHook, address is " + address);
         
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
@@ -127,18 +126,18 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
 
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            getDistributionProvider().addExposedService(serviceReference, registerPublication(server, intents));
+            //MARC: FIXME !!!!            getDistributionProvider().addExposedService(serviceReference, registerPublication(server, intents));
             addAddressProperty(sd.getProperties(), address);
             return server;
         } catch (IntentUnsatifiedException iue) {
-            getDistributionProvider().intentsUnsatisfied(serviceReference);
+            //MARC: FIXME !!!! getDistributionProvider().intentsUnsatisfied(serviceReference);
             throw iue;
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }       
     }
 
-    protected String getPojoAddress(ServiceEndpointDescription sd, Class<?> iClass) {
+    protected String getPojoAddress(EndpointDescription sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
         
         if (address == null) {
