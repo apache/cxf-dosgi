@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Export-Package: org.osgi.service.remoteserviceadmin;uses:="org.osgi.fr
+ amework";version="1.0.0"
+Embed-Directory: target/dependency
+Built-By: dbosscha
+Tool: Bnd-0.0.238
+Bundle-Name: CXF OSGi Remote Service Admin interfaces
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: The Apache Software Foundation
+Build-Jdk: 1.6.0_13
+Bundle-Version: 1.0.0
+Bnd-LastModified: 1261045402373
+Bundle-ManifestVersion: 2
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Import-Package: org.osgi.framework,org.osgi.service.remoteserviceadmin
+ ;version="1.0.0"
+Embed-StripGroup: true
+Bundle-SymbolicName: cxf-dosgi-remote-service-admin-interfaces
+Bundle-DocURL: http://www.apache.org/
+Embed-Dependency: *;scope=compile|runtime;inline=false
+
