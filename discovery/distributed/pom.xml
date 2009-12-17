@@ -25,7 +25,7 @@
     <artifactId>cxf-dosgi-ri-discovery-distributed-parent</artifactId>
     <version>1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>CXF Distributed OSGI Distributed Discovery Parent</name>
+    <name>Distributed OSGI Distributed Discovery Parent</name>
     <url>http://cxf.apache.org</url>
 
     <parent>

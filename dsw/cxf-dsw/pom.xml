@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF Distribution Software Bundle</name>
+    <name>Distributed OSGi Distribution Software Bundle</name>
     <version>1.2-SNAPSHOT</version>
 
     <parent>

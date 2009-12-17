@@ -23,7 +23,7 @@
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-discovery-local</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF Distributed OSGI Local Discovery Service Bundle</name>
+    <name>Distributed OSGI Local Discovery Service Bundle</name>
     <version>1.2-SNAPSHOT</version>
 
     <parent>

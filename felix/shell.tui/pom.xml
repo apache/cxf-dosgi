@@ -20,7 +20,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <packaging>bundle</packaging>
-  <name>CXF Distributed OSGi Temporary Private Apache Felix Shell TUI Build</name>
+  <name>Distributed OSGi Temporary Private Apache Felix Shell TUI Build</name>
   <description>A simple textual user interface for Felix' shell service.</description>
   <groupId>org.apache.cxf.dosgi</groupId>
   <artifactId>felix-shell-extension</artifactId>

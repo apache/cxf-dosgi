@@ -44,7 +44,7 @@ public class Activator implements BundleActivator, ManagedService {
     
     private ServiceRegistration decoratorReg;
 
-    public void start(BundleContext context) throws Exception {
+    public synchronized void start(BundleContext context) throws Exception {
         // Disable the fast infoset as it's not compatible (yet) with OSGi
         System.setProperty("org.apache.cxf.nofastinfoset", "true");
 
@@ -121,7 +121,7 @@ public class Activator implements BundleActivator, ManagedService {
         return defaults;
     }
 
-    public void updated(Dictionary props) throws ConfigurationException {
+    public synchronized void updated(Dictionary props) throws ConfigurationException {
         if (props != null && CONFIG_SERVICE_PID.equals(props.get(Constants.SERVICE_PID))) {
           //  topManager.updated(props);
         }

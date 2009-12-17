@@ -19,13 +19,9 @@
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.osgi.framework.BundleActivator;
@@ -43,7 +39,7 @@ public class Activator implements BundleActivator, ManagedService {
     private Dictionary zkProperties;
     private BundleContext bctx;
 
-    public void start(BundleContext bc) throws Exception {
+    public synchronized void start(BundleContext bc) throws Exception {
         bctx = bc;
         zkProperties = getCMDefaults();
 
@@ -64,7 +60,7 @@ public class Activator implements BundleActivator, ManagedService {
 
     }
 
-    public void updated(Dictionary configuration) throws ConfigurationException {
+    public synchronized void updated(Dictionary configuration) throws ConfigurationException {
 
         if (configuration == null) {
 

@@ -20,7 +20,7 @@
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-remote-service-admin-interfaces</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF OSGi Remote Service Admin interfaces</name>
+    <name>Distributed OSGi Remote Service Admin interfaces</name>
     <version>${remote.service.admin.interfaces.version}</version>
 
     <parent>
@@ -31,15 +31,15 @@
     </parent>
 
 
-	<properties>
-		<bundle.symbolicName>cxf-dosgi-remote-service-admin-interfaces</bundle.symbolicName>
-		<bundle.namespace>org.osgi.service.remoteserviceadmin</bundle.namespace>
-	</properties>
-	
-	
-	
-	
-	<dependencies>
+    <properties>
+        <bundle.symbolicName>cxf-dosgi-remote-service-admin-interfaces</bundle.symbolicName>
+        <bundle.namespace>org.osgi.service.remoteserviceadmin</bundle.namespace>
+    </properties>
+    
+    
+    
+    
+    <dependencies>
         <dependency> 
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
@@ -52,45 +52,45 @@
             </exclusions>
             <scope>provided</scope>
         </dependency> 
-	</dependencies>
-	
-	
-	
+    </dependencies>
+    
+    
+    
 
     <build>
         <plugins>
             <plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>1.2.1</version>
-				<extensions>true</extensions>
-				<configuration>
-					<manifestLocation>META-INF</manifestLocation>
-					<instructions>
-						<Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
-						<Bundle-Version>${pom.version}</Bundle-Version>
-						<Export-Package>${bundle.namespace}.*;version="${pom.version}"</Export-Package>
-						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
-						<Embed-Directory>target/dependency</Embed-Directory>
-						<Embed-StripGroup>true</Embed-StripGroup>
-					</instructions>
-				</configuration>
-			</plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.2.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <manifestLocation>META-INF</manifestLocation>
+                    <instructions>
+                        <Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
+                        <Bundle-Version>${pom.version}</Bundle-Version>
+                        <Export-Package>${bundle.namespace}.*;version="${pom.version}"</Export-Package>
+                        <Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+                        <Embed-Directory>target/dependency</Embed-Directory>
+                        <Embed-StripGroup>true</Embed-StripGroup>
+                    </instructions>
+                </configuration>
+            </plugin>
 
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

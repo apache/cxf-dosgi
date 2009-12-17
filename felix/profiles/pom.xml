@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-felix-profiles</artifactId>
     <packaging>jar</packaging>
-    <name>CXF Distributed OSGi Felix Profiles</name>
+    <name>Distributed OSGi Felix Profiles</name>
     <version>1.2-SNAPSHOT</version>
 
     <parent>
