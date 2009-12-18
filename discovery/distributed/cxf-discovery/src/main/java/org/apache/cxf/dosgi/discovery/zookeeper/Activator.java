@@ -102,6 +102,7 @@ public class Activator implements BundleActivator, ManagedService {
         Dictionary props = new Hashtable();
         props.put("zookeeper.timeout", "3000");
         props.put("zookeeper.port", "2181");
+        props.put("zookeeper.host", "localhost");
         props.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper");
         return props;    
     }
