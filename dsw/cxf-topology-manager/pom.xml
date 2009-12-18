@@ -40,11 +40,6 @@
     </properties>
 
     <dependencies>
-        <!--
-            <dependency> <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle-minimal</artifactId>
-            <version>${cxf.version}</version> </dependency>
-        -->
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
@@ -60,8 +55,7 @@
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>
             <artifactId>cxf-dosgi-remote-service-admin-interfaces</artifactId>
-            <version>${remote.service.admin.interfaces.version}</version>
-            <!-- <scope>provided</scope>    Include the interfaces -->
+            <version>${pom.version}</version>
         </dependency>
 
         <dependency>
@@ -86,7 +80,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <instructions>
                         <Bundle-Name>CXF dOSGi Topology Manager</Bundle-Name>
-                        <Bundle-Description>TODO</Bundle-Description>
+                        <Bundle-Description>Default CXF Topology Manager as described in OSGi Remote Service Admin specification.</Bundle-Description>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
                         <Bundle-Activator>org.apache.cxf.dosgi.topologymanager.Activator</Bundle-Activator>
@@ -105,9 +99,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
-
 </project>

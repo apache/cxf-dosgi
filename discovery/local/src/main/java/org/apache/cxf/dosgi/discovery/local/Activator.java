@@ -18,34 +18,17 @@
   */
 package org.apache.cxf.dosgi.discovery.local;
 
-
-import java.util.Hashtable;
-import java.util.logging.Logger;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.discovery.Discovery;
-
 
 public class Activator implements BundleActivator {
-    private static final Logger LOG = Logger.getLogger(Activator.class.getName());
-
-    private LocalDiscoveryService discoveryService;
-    private ServiceRegistration discoveryServiceReg;
+    private LocalDiscovery localDiscovery;
     
-    public void start(BundleContext context) {        
-        LOG.info("Registering LocalDiscoveryService service object");
-        discoveryService = new LocalDiscoveryService(context);
-        
-        discoveryServiceReg = context.registerService(
-                Discovery.class.getName(), 
-                discoveryService,
-                new Hashtable<String, Object>());
+    public synchronized void start(BundleContext context) {
+        localDiscovery = new LocalDiscovery(context);
     }
 
-    public void stop(BundleContext context) {
-        discoveryServiceReg.unregister();
-        discoveryService.shutdown();
+    public synchronized void stop(BundleContext context) {
+        localDiscovery.shutDown();
     }
 }

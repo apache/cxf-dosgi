@@ -26,34 +26,28 @@
     <version>1.2-SNAPSHOT</version>
 
     <parent>
-       <groupId>org.apache.cxf.dosgi</groupId>
-       <artifactId>cxf-dosgi-ri-parent</artifactId>
-       <version>1.2-SNAPSHOT</version>
-       <relativePath>../../parent/pom.xml</relativePath>
+        <groupId>org.apache.cxf.dosgi</groupId>
+        <artifactId>cxf-dosgi-ri-parent</artifactId>
+        <version>1.2-SNAPSHOT</version>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
     <properties>
         <topDirectoryLocation>../..</topDirectoryLocation>
         <bundle.import.package>*</bundle.import.package>
         <bundle.export.package>
-          org.apache.cxf.dosgi.*;version="${pom.version}",
-          org.osgi.service.remoteserviceadmin;version="${remote.service.admin.interfaces.version}"
+            org.apache.cxf.dosgi.*;version="${pom.version}",
+            org.osgi.service.remoteserviceadmin;version="${remote.service.admin.interfaces.version}"
         </bundle.export.package>
-        <!-- 
-                  org.osgi.service.discovery;-split-package:=merge-first,
-          org.osgi.service.distribution;-split-package:=merge-first
-         -->
     </properties>
     
     <dependencies>
-    
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>
             <artifactId>cxf-dosgi-remote-service-admin-interfaces</artifactId>
-            <version>${remote.service.admin.interfaces.version}</version>
-            <!-- <scope>provided</scope>    Include the interfaces -->
+            <version>${pom.version}</version>
         </dependency>
-    
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-bundle-minimal</artifactId>
@@ -76,25 +70,25 @@
             <version>1.0.0</version> 
         </dependency>
         <dependency>
-           <groupId>junit</groupId>
-           <artifactId>junit</artifactId>
-           <scope>test</scope>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>  
         <dependency>
-           <groupId>org.easymock</groupId>
-           <artifactId>easymockclassextension</artifactId>
-           <scope>test</scope>
-         </dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
-          <groupId>org.springframework.osgi</groupId>
-          <artifactId>spring-osgi-core</artifactId>
-          <version>${spring.osgi.version}</version>
+            <groupId>org.springframework.osgi</groupId>
+            <artifactId>spring-osgi-core</artifactId>
+            <version>${spring.osgi.version}</version>
         </dependency> 
     </dependencies> 
 
     <build>
-      <plugins>
-        <plugin>
+        <plugins>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
@@ -111,20 +105,17 @@
                         <Private-Package>org.osgi.service.discovery,org.osgi.service.distribution</Private-Package>
                     </instructions>
                 </configuration>
-          </plugin> 
+            </plugin> 
 
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                 <excludes>
-                    <exclude>**/TestUtils*</exclude>
-                 </excludes>
-              </configuration>
-          </plugin>
-
-
-         </plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/TestUtils*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>    
-
 </project>
