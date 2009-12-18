@@ -30,17 +30,25 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
     final Map<String, Object> handlerProps;
     protected BundleContext bundleContext;
     
-    protected AbstractConfigurationHandler(BundleContext dswBC,
-                                           
+    protected AbstractConfigurationHandler(BundleContext dswBC,                                          
                                            Map<String, Object> handlerProps) {
-        this.bundleContext = dswBC;
-     
+        this.bundleContext = dswBC;     
         this.handlerProps = handlerProps;
     }
     
     protected String getDefaultAddress(Class<?> type) {        
-        String host = handlerProps.get(Constants.DEFAULT_HOST_CONFIG).toString();
-        String port = handlerProps.get(Constants.DEFAULT_PORT_CONFIG).toString();
+        Object h = handlerProps.get(Constants.DEFAULT_HOST_CONFIG);
+        if (h == null) {
+            h = "localhost";
+        }
+        String host = h.toString();
+        
+        Object p = handlerProps.get(Constants.DEFAULT_PORT_CONFIG);
+        if (p == null) {
+            p = "9000";
+        }
+        String port = p.toString();
+        
         return getAddress("http", host, port, "/" + type.getName().replace('.', '/'));        
     }
 

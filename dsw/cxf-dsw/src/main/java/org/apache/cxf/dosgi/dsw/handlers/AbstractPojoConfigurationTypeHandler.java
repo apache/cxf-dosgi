@@ -52,8 +52,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     
     private IntentMap masterMap;
     
-    public AbstractPojoConfigurationTypeHandler(BundleContext dswBC, 
-                                                
+    public AbstractPojoConfigurationTypeHandler(BundleContext dswBC,                                                
                                                 Map<String, Object> handlerProps) {
         super(dswBC,  handlerProps);
     }

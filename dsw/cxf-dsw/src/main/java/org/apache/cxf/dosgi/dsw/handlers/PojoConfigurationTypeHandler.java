@@ -44,9 +44,7 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
     private static final Logger LOG = Logger.getLogger(PojoConfigurationTypeHandler.class.getName());
 
-    public PojoConfigurationTypeHandler(BundleContext dswBC,
-
-    Map<String, Object> handlerProps) {
+    public PojoConfigurationTypeHandler(BundleContext dswBC, Map<String, Object> handlerProps) {
         super(dswBC, handlerProps);
     }
 
@@ -201,10 +199,12 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
     protected String getPojoAddress(Map sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_URI);
-        // if (address == null) {
-        // address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);
-        // }
-
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
+        }
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);
+        }
         if (address == null) {
             address = getDefaultAddress(iClass);
             if (address != null) {

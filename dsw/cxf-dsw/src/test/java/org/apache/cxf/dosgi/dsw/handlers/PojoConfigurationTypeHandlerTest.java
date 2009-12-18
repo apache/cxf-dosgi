@@ -52,15 +52,44 @@ import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 
 public class PojoConfigurationTypeHandlerTest extends TestCase {
-    
-    
-    public void testDUMMY(){
-        assertTrue(true);
+    public void testGetPojoAddressEndpointURI() {
+        Map<String, Object> hp = new HashMap<String, Object>();
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, hp);
+        Map<String, Object> sd = new HashMap<String, Object>();
+        String url = "http://somewhere:1234/blah";
+        sd.put(RemoteConstants.ENDPOINT_URI, url);
+        assertEquals(url, handler.getPojoAddress(sd, String.class));
     }
     
+    public void testGetPojoAddressEndpointCxf() {
+        Map<String, Object> hp = new HashMap<String, Object>();
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, hp);
+        Map<String, Object> sd = new HashMap<String, Object>();
+        String url = "http://somewhere:29/boo";
+        sd.put("org.apache.cxf.ws.address", url);
+        assertEquals(url, handler.getPojoAddress(sd, String.class));
+    }
+
+    public void testGetPojoAddressEndpointPojo() {
+        Map<String, Object> hp = new HashMap<String, Object>();
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, hp);
+        Map<String, Object> sd = new HashMap<String, Object>();
+        String url = "http://somewhere:32768/foo";
+        sd.put("osgi.remote.configuration.pojo.address", url);
+        assertEquals(url, handler.getPojoAddress(sd, String.class));
+    }
+
+    public void testGetDefaultPojoAddress() {
+        Map<String, Object> hp = new HashMap<String, Object>();
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, hp);
+        Map<String, Object> sd = new HashMap<String, Object>(); 
+        assertEquals("http://localhost:9000/java/lang/String", handler.getPojoAddress(sd, String.class));
+    }
+
 //    private Map<String, Object> handlerProps;
 //    
 //    @Override
