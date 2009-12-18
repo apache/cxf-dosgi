@@ -196,7 +196,12 @@
       <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+    <dependency>
+      <groupId>org.apache.cxf.dosgi</groupId>
+      <artifactId>cxf-dosgi-ri-topology-manager</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Discovery dependencies -->
     <dependency>
       <groupId>org.apache.felix</groupId>

@@ -28,9 +28,9 @@
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}.dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.stax-api-1.0-${servicemix.specs.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}.dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jaxb-api-2.1-${servicemix.specs.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}.dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jaxws-api-2.1-${servicemix.specs.version}.jar</bundle>
- 
-<bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}.dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jsr311-api-1.0-${servicemix.specs.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}.dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jsr311-api-1.0-${servicemix.specs.version}.jar</bundle>
 
-<bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}.dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-discovery-local-${pom.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}.dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-discovery-local-${pom.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}.dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-dsw-cxf-${pom.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}.dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-topology-manager-${pom.version}.jar</bundle>
 </bundles>
