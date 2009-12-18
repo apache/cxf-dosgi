@@ -54,9 +54,7 @@
             <groupId>org.apache.cxf.dosgi</groupId>
             <artifactId>cxf-dosgi-remote-service-admin-interfaces</artifactId>
             <version>${remote.service.admin.interfaces.version}</version>
-            <!-- <scope>provided</scope>    Include the interfaces -->
         </dependency>
-
 
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>
@@ -105,7 +103,7 @@
                         </Import-Package>
                         <Private-Package>org.apache.cxf.dosgi.discovery.zookeeper,org.apache.cxf.dosgi.discovery.zookeeper</Private-Package>
                         <Export-Package>
-                            org.osgi.service.remoteserviceadmin,
+                            org.osgi.service.remoteserviceadmin;version="${remote.service.admin.interfaces.version}"
                         </Export-Package>
                     </instructions>
                 </configuration>
