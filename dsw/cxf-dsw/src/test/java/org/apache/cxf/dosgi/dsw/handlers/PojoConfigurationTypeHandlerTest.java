@@ -52,6 +52,7 @@ import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 
@@ -90,17 +91,78 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         assertEquals("http://localhost:9000/java/lang/String", handler.getPojoAddress(sd, String.class));
     }
 
-//    private Map<String, Object> handlerProps;
-//    
-//    @Override
-//    protected void setUp() throws Exception {
-//        super.setUp();
-//        
-//        handlerProps = new HashMap<String, Object>();
-//        handlerProps.put(Constants.DEFAULT_HOST_CONFIG, "somehost");
-//        handlerProps.put(Constants.DEFAULT_PORT_CONFIG, "54321");
-//    }
-//
+    private Map<String, Object> handlerProps;
+    
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        
+        handlerProps = new HashMap<String, Object>();
+        handlerProps.put(Constants.DEFAULT_HOST_CONFIG, "somehost");
+        handlerProps.put(Constants.DEFAULT_PORT_CONFIG, "54321");
+    }
+    
+    //  todo: add test for data bindings
+    public void testCreateProxy(){
+        IMocksControl c = EasyMock.createNiceControl();
+        BundleContext bc1 = c.createMock(BundleContext.class);
+        BundleContext bc2 = c.createMock(BundleContext.class);
+        
+        ServiceReference sref = c.createMock(ServiceReference.class);
+        
+        final ClientProxyFactoryBean cpfb = c.createMock(ClientProxyFactoryBean.class);
+        ReflectionServiceFactoryBean sf = c.createMock(ReflectionServiceFactoryBean.class);
+        EasyMock.expect(cpfb.getServiceFactory()).andReturn(sf).anyTimes();
+        
+        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(bc1, handlerProps) {
+            @Override
+            ClientProxyFactoryBean createClientProxyFactoryBean(String frontend) {
+                return cpfb;
+            }
+            
+            @Override
+            String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
+                List<AbstractFeature> features, AbstractEndpointFactory factory, Map sd) {
+                return new String[0];
+            }
+        };
+        
+        Map props = new HashMap();
+        
+        props.put(RemoteConstants.ENDPOINT_URI, "http://google.de/");
+        
+        EndpointDescription endpoint = new EndpointDescription(props);
+        
+        
+        cpfb.setAddress((String)EasyMock.eq(props.get(RemoteConstants.ENDPOINT_URI)));
+        EasyMock.expectLastCall().atLeastOnce();
+        
+        cpfb.setServiceClass(EasyMock.eq(CharSequence.class));
+        EasyMock.expectLastCall().atLeastOnce();
+        
+        c.replay();
+        
+        
+        
+        
+        
+        Object proxy = p.createProxy(sref, bc1, bc2, CharSequence.class, endpoint);
+        
+        assertNotNull(proxy);
+        
+        if (proxy instanceof CharSequence) {
+            CharSequence cs = (CharSequence)proxy;
+            
+        }else{
+            assertTrue("Proxy is not of the requested type! ", false);
+        }
+        
+        
+        
+        c.verify();
+        
+    }
+
 //    public void testCreateProxyPopulatesDistributionProvider() {
 //        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
 //        EasyMock.replay(bc);
@@ -112,7 +174,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 //        EasyMock.replay(cpfb);
 //        
 //        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(bc);
-//        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(bc, dp, handlerProps) {
+//        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(bc, handlerProps) {
 //            @Override
 //            ClientProxyFactoryBean createClientProxyFactoryBean(String frontend) {
 //                return cpfb;
@@ -120,7 +182,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 //            
 //            @Override
 //            String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-//                List<AbstractFeature> features, AbstractEndpointFactory factory, ServiceEndpointDescription sd) {
+//                List<AbstractFeature> features, AbstractEndpointFactory factory, Map sd) {
 //                return new String[0];
 //            }
 //        };
@@ -221,56 +283,56 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 //        assertEquals(expected, dp.getExposedProperties(sr));
 //    }    
 //
-//    private ServerFactoryBean createMockServerFactoryBean() {
-//        ReflectionServiceFactoryBean sf = EasyMock.createNiceMock(ReflectionServiceFactoryBean.class);
-//        EasyMock.replay(sf);
-//        
-//        final StringBuilder serverURI = new StringBuilder();
-//        
-//        ServerFactoryBean sfb = EasyMock.createNiceMock(ServerFactoryBean.class);
-//        Server server = createMockServer(sfb);    
-//        
-//        EasyMock.expect(sfb.getServiceFactory()).andReturn(sf).anyTimes();
-//        EasyMock.expect(sfb.create()).andReturn(server);
-//        sfb.setAddress((String) EasyMock.anyObject());
-//        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-//            public Object answer() throws Throwable {
-//                serverURI.setLength(0);
-//                serverURI.append(EasyMock.getCurrentArguments()[0]);
-//                return null;
-//            }            
-//        });
-//        EasyMock.expect(sfb.getAddress()).andAnswer(new IAnswer<String>() {
-//            public String answer() throws Throwable {
-//                return serverURI.toString();
-//            }            
-//        });
-//        EasyMock.replay(sfb);
-//        return sfb;
-//    }
-//
-//    private Server createMockServer(final ServerFactoryBean sfb) {
-//        AttributedURIType addr = EasyMock.createMock(AttributedURIType.class);
-//        EasyMock.expect(addr.getValue()).andAnswer(new IAnswer<String>() {
-//            public String answer() throws Throwable {
-//                return sfb.getAddress();
-//            }            
-//        });
-//        EasyMock.replay(addr);
-//
-//        EndpointReferenceType er = EasyMock.createMock(EndpointReferenceType.class);
-//        EasyMock.expect(er.getAddress()).andReturn(addr);
-//        EasyMock.replay(er);
-//        
-//        Destination destination = EasyMock.createMock(Destination.class);
-//        EasyMock.expect(destination.getAddress()).andReturn(er);
-//        EasyMock.replay(destination);        
-//                
-//        Server server = EasyMock.createNiceMock(Server.class);
-//        EasyMock.expect(server.getDestination()).andReturn(destination);
-//        EasyMock.replay(server);
-//        return server;
-//    }
+    private ServerFactoryBean createMockServerFactoryBean() {
+        ReflectionServiceFactoryBean sf = EasyMock.createNiceMock(ReflectionServiceFactoryBean.class);
+        EasyMock.replay(sf);
+        
+        final StringBuilder serverURI = new StringBuilder();
+        
+        ServerFactoryBean sfb = EasyMock.createNiceMock(ServerFactoryBean.class);
+        Server server = createMockServer(sfb);    
+        
+        EasyMock.expect(sfb.getServiceFactory()).andReturn(sf).anyTimes();
+        EasyMock.expect(sfb.create()).andReturn(server);
+        sfb.setAddress((String) EasyMock.anyObject());
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+            public Object answer() throws Throwable {
+                serverURI.setLength(0);
+                serverURI.append(EasyMock.getCurrentArguments()[0]);
+                return null;
+            }            
+        });
+        EasyMock.expect(sfb.getAddress()).andAnswer(new IAnswer<String>() {
+            public String answer() throws Throwable {
+                return serverURI.toString();
+            }            
+        });
+        EasyMock.replay(sfb);
+        return sfb;
+    }
+
+    private Server createMockServer(final ServerFactoryBean sfb) {
+        AttributedURIType addr = EasyMock.createMock(AttributedURIType.class);
+        EasyMock.expect(addr.getValue()).andAnswer(new IAnswer<String>() {
+            public String answer() throws Throwable {
+                return sfb.getAddress();
+            }            
+        });
+        EasyMock.replay(addr);
+
+        EndpointReferenceType er = EasyMock.createMock(EndpointReferenceType.class);
+        EasyMock.expect(er.getAddress()).andReturn(addr);
+        EasyMock.replay(er);
+        
+        Destination destination = EasyMock.createMock(Destination.class);
+        EasyMock.expect(destination.getAddress()).andReturn(er);
+        EasyMock.replay(destination);        
+                
+        Server server = EasyMock.createNiceMock(Server.class);
+        EasyMock.expect(server.getDestination()).andReturn(destination);
+        EasyMock.replay(server);
+        return server;
+    }
 //    
 //    public void testIntents() throws Exception {
 //        Map<String, Object> intents = new HashMap<String, Object>();
@@ -749,18 +811,18 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 //        }
 //        EasyMock.verify(ea);
 //    }
-//
-//    private static class TestFeature extends AbstractFeature {
-//        private final String name;
-//        
-//        private TestFeature(String n) {
-//            name = n;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return name;
-//        }
-//    }
+
+    private static class TestFeature extends AbstractFeature {
+        private final String name;
+        
+        private TestFeature(String n) {
+            name = n;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
     
 }

@@ -105,7 +105,7 @@ public class ImportRegistrationImpl implements ImportRegistration {
     private synchronized void instanceClosed(ImportRegistrationImpl i) {
         childs.remove(i);
 
-        if (childs.isEmpty() & !detatched) {
+        if (childs.isEmpty() && !detatched && closed) {
             detatched = true; 
             
             LOG.fine("really closing ImportRegistartion now! ");

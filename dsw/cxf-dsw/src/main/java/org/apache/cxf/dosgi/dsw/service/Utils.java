@@ -18,12 +18,16 @@
   */
 package org.apache.cxf.dosgi.dsw.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 
 public class Utils {
 
+    private static final Logger LOG = Logger.getLogger(Utils.class.getName());
+    
     public static String[] normalizeStringPlus(Object object) {
 
         if (object instanceof String) {
@@ -36,12 +40,18 @@ public class Utils {
         if (object instanceof String[]) {
             return (String[])object;
         }
-        // FIXME: This needs to be tested !!!!!
         if (object instanceof Collection) {
             Collection col = (Collection)object;
-            if (col.toArray() instanceof String[]) {
-                return (String[])col.toArray();
+            ArrayList<String> ar = new ArrayList<String>(col.size());
+            for (Object o : col) {
+                if (o instanceof String) {
+                    String s = (String)o;
+                    ar.add(s);
+                }else{
+                    LOG.warning("stringPlus contained non string element in list ! Element was skipped");
+                }
             }
+            return ar.toArray(new String[ar.size()]);
         }
 
         return null;

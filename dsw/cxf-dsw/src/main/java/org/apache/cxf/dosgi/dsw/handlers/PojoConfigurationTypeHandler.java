@@ -58,7 +58,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             return null;
         }
 
-        LOG.info("Creating a " + sd.getInterfaces().toArray()[0] + " client, endpoint address is " + address);
+        LOG.info("Creating a " + iClass.getName() + " client, endpoint address is " + address);
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -80,7 +80,6 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
             Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
             Object proxy = getProxy(factory.create(), iClass);
-            // MARC: FIXME !!!! getDistributionProvider().addRemoteService(serviceReference);
             return proxy;
         } catch (Exception e) {
             LOG.log(Level.WARNING, "proxy creation failed", e);
@@ -117,8 +116,8 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         // FIXME: This key is not defined in the spec but is required by the EndpointDescription !!!!!
         endpointProps.put(RemoteConstants.ENDPOINT_ID, 123L);
 
-        endpointProps.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, getUUID());
-        endpointProps.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, Constants.WS_CONFIG_TYPE);
+        endpointProps.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(getBundleContext()));
+        endpointProps.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, Constants.WS_CONFIG_TYPE);
         endpointProps.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + sa[0], OsgiUtils.getVersion(iClass, dswContext));
 
         DataBinding databinding;
@@ -144,16 +143,11 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            // MARC: FIXME !!!! getDistributionProvider().addExposedService(serviceReference,
-            // registerPublication(server, intents));
-            // TODO: registerPublication(server, intents);
             endpointProps.put(RemoteConstants.ENDPOINT_URI, address);
 
             exportRegistration.setServer(server);
 
         } catch (IntentUnsatifiedException iue) {
-            // MARC: FIXME !!!! getDistributionProvider().intentsUnsatisfied(serviceReference);
-            // throw iue;
             exportRegistration.setException(iue);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
@@ -177,25 +171,16 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
     }
 
-    private String getUUID() {
-        synchronized ("org.osgi.framework.uuid") {
-            String uuid = getBundleContext().getProperty("org.osgi.framework.uuid");
-            if (uuid == null) {
-                uuid = UUID.randomUUID().toString();
-                System.setProperty("org.osgi.framework.uuid", uuid);
-            }
-            return uuid;
-        }
-    }
 
-    @Override
-    Map<String, String> registerPublication(Server server, String[] intents) {
-        Map<String, String> publicationProperties = super.registerPublication(server, intents);
-        publicationProperties.put(Constants.WS_ADDRESS_PROPERTY, server.getDestination().getAddress()
-            .getAddress().getValue());
 
-        return publicationProperties;
-    }
+//    @Override
+//    Map<String, String> registerPublication(Server server, String[] intents) {
+//        Map<String, String> publicationProperties = super.registerPublication(server, intents);
+//        publicationProperties.put(Constants.WS_ADDRESS_PROPERTY, server.getDestination().getAddress()
+//            .getAddress().getValue());
+//
+//        return publicationProperties;
+//    }
 
     protected String getPojoAddress(Map sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_URI);

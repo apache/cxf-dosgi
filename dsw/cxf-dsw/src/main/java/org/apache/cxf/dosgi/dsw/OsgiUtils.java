@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -591,4 +592,16 @@ public final class OsgiUtils {
         return "0.0.0";
     }
 
+    
+    public static String getUUID(BundleContext bc) {
+        synchronized ("org.osgi.framework.uuid") {
+            String uuid = bc.getProperty("org.osgi.framework.uuid");
+            if (uuid == null) {
+                uuid = UUID.randomUUID().toString();
+                System.setProperty("org.osgi.framework.uuid", uuid);
+            }
+            return uuid;
+        }
+    }
+    
 }

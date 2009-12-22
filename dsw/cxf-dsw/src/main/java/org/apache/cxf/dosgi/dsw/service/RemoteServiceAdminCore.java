@@ -36,20 +36,13 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.handlers.ClientServiceFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.handlers.IntentUnsatifiedException;
-import org.apache.cxf.dosgi.dsw.hooks.ServiceHookUtils;
-import org.apache.cxf.endpoint.Server;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
-import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
-import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
-import org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener;
 
 public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
@@ -62,6 +55,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     private EventProducer eventProducer;
 
+    private volatile boolean useMasterMap = true;
+    private volatile String defaultPort;
+    private volatile String defaultHost;
+    
+    
     private static List<String> supportedConfigurationTypes = new ArrayList<String>();
     static {
         supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
@@ -263,10 +261,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         }
     }
 
-    private volatile boolean useMasterMap = true;
-    // MARC: FIXME !!!!
-    private volatile String defaultPort;
-    private volatile String defaultHost;
+
 
     private ConfigurationTypeHandler getHandler(List<String> configurationTypes, Map serviceProperties,
                                                 Map<String, Object> props) {
@@ -306,16 +301,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return ir;
             }
 
-            // FIXME:
-            List remoteConfigurationTypes = endpoint.getConfigurationTypes(); // not yet implemented
-            {
-                Object ecs_o = endpoint.getProperties().get(RemoteConstants.SERVICE_EXPORTED_CONFIGS);
-
-                if (ecs_o instanceof String) {
-                    remoteConfigurationTypes = new ArrayList(1);
-                    remoteConfigurationTypes.add((String)ecs_o);
-                }
-            }
+            List remoteConfigurationTypes = endpoint.getConfigurationTypes(); 
 
             if (remoteConfigurationTypes == null) {
                 LOG.severe("the supplied endpoint has no configuration type");
@@ -332,7 +318,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             if (usableConfigurationTypes.size() == 0) {
                 LOG
                     .severe("the supplied endpoint has no compatible configuration type. Supported types are: "
-                            + supportedConfigurationTypes);
+                            + supportedConfigurationTypes  +  "    Types needed by the endpoint: " +remoteConfigurationTypes);
                 return null;
             }
 
@@ -360,6 +346,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
                 proxifyMatchingInterface(matchingInterfaces.get(0), imReg, handler, bctx);
                 importedServices.put(endpoint, imReg);
+                eventProducer.publishNotifcation(imReg);
                 return imReg;
             } else {
                 return null;
@@ -368,7 +355,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     }
 
-    private void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
+    protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
                                           ConfigurationTypeHandler handler, BundleContext requestingContext) {
 
         try {
