@@ -37,6 +37,7 @@ import org.jdom.Namespace;
 import org.osgi.framework.Bundle;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.discovery.ServicePublication;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class LocalDiscoveryUtilsTest extends TestCase {
     public void testNoRemoteServicesXMLFiles() {
@@ -147,5 +148,51 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         }
         
         return map;
+    }
+    
+    public void testEndpointDescriptionXMLFiles() {
+        URL ed1URL = getClass().getResource("/ed1.xml");
+        
+        Bundle b = EasyMock.createNiceMock(Bundle.class);
+        EasyMock.expect(b.findEntries(
+            EasyMock.eq("OSGI-INF/remote-service"), 
+            EasyMock.eq("*.xml"), EasyMock.anyBoolean())).andReturn(
+                Collections.enumeration(Arrays.asList(ed1URL))).anyTimes();
+        EasyMock.replay(b);
+        
+        List<Element> edElements = LocalDiscoveryUtils.getAllDescriptionElements(b);
+        assertEquals(4, edElements.size());
+    }
+    
+    public void testAllEndpoints() {
+        URL ed1URL = getClass().getResource("/ed1.xml");
+        
+        Bundle b = EasyMock.createNiceMock(Bundle.class);
+        EasyMock.expect(b.findEntries(
+            EasyMock.eq("OSGI-INF/remote-service"), 
+            EasyMock.eq("*.xml"), EasyMock.anyBoolean())).andReturn(
+                Collections.enumeration(Arrays.asList(ed1URL))).anyTimes();
+        EasyMock.replay(b);
+        
+        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
+        assertEquals(4, eds.size());
+        EndpointDescription ed0 = eds.get(0);
+        assertEquals("http://somewhere:12345", ed0.getRemoteURI());
+        assertEquals(Arrays.asList("SomeService"), ed0.getInterfaces());
+        assertEquals(Arrays.asList("confidentiality"), 
+            ed0.getProperties().get("osgi.remote.requires.intents"));
+        assertEquals("testValue", ed0.getProperties().get("testKey"));
+        
+        EndpointDescription ed1 = eds.get(1);
+        assertEquals("myScheme://somewhere:12345", ed1.getRemoteURI());
+        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed1.getInterfaces());
+        
+        EndpointDescription ed2 = eds.get(2);
+        assertEquals("http://somewhere", ed2.getRemoteURI());
+        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed2.getInterfaces());
+
+        EndpointDescription ed3 = eds.get(3);
+        assertEquals("http://somewhere:1/2/3/4?5", ed3.getRemoteURI());
+        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed3.getInterfaces());
     }
 }
