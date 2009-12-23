@@ -18,28 +18,109 @@
   */
 package org.apache.cxf.dosgi.discovery.local;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.Filter;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.EndpointListener;
+import org.osgi.util.tracker.ServiceTracker;
 
 public class LocalDiscovery implements BundleListener {   
     private static final Logger LOG = Logger.getLogger(LocalDiscovery.class.getName());
     
+    // this is effectively a set which allows for multiple service descriptions with the
+    // same interface name but different properties and takes care of itself with respect to concurrency 
+    ConcurrentHashMap<EndpointDescription, Bundle> endpointDescriptions = 
+        new ConcurrentHashMap<EndpointDescription, Bundle>();
+    Map<EndpointListener, Collection<String>> listenerToFilters = 
+        new HashMap<EndpointListener, Collection<String>>();
+    Map<String, Collection<EndpointListener>> filterToListeners = 
+        new HashMap<String, Collection<EndpointListener>>();
     private final BundleContext bundleContext;
+
+    private ServiceTracker listenerTracker;
 
     public LocalDiscovery(BundleContext bc) {
         bundleContext = bc;
         
+        listenerTracker = new ServiceTracker(bundleContext, EndpointListener.class.getName(), null) {
+
+            @Override
+            public Object addingService(ServiceReference reference) {
+                System.out.println("@@@@ " + reference + "-" + Arrays.asList(reference.getPropertyKeys()));
+                Object svc = super.addingService(reference);
+                cacheTracker(reference, svc);
+                return svc;
+            }
+
+            @Override
+            public void modifiedService(ServiceReference reference,
+                    Object service) {
+                System.out.println("#### " + reference + "-" + Arrays.asList(reference.getPropertyKeys()));
+
+                cacheTracker(reference, service);
+            }
+
+            @Override
+            public void removedService(ServiceReference reference,
+                    Object service) {
+                // TODO Auto-generated method stub
+                super.removedService(reference, service);
+            }
+            
+        };
+        listenerTracker.open();
+        
         bundleContext.addBundleListener(this);
+    }
+
+    protected void cacheTracker(ServiceReference reference, Object svc) {
+        if (svc instanceof EndpointListener) {
+            EndpointListener listener = (EndpointListener) svc;
+            Collection<String> filters = addListener(reference, listener);
+            triggerCallbacks(filters, listener);
+        }
+    }
+
+    private Collection<String> addListener(ServiceReference reference,
+            EndpointListener listener) {
+        List<String> filters = 
+            LocalDiscoveryUtils.getStringPlusProperty(reference, EndpointListener.ENDPOINT_LISTENER_SCOPE);
+        if (filters.size() == 0) {
+            return filters;
+        }
+        
+        listenerToFilters.put(listener, filters);
+        for (String filter : filters) {
+            if (filterToListeners.containsKey(filter)) {
+                filterToListeners.get(filter).add(listener);
+            } else {
+                List<EndpointListener> list = new ArrayList<EndpointListener>();
+                list.add(listener);
+                filterToListeners.put(filter, list);
+            }
+        }
+        
+        return filters;
     }
 
     public void shutDown() {
         bundleContext.removeBundleListener(this);
+        listenerTracker.close();
     }
 
     // BundleListener method
@@ -54,6 +135,73 @@ public class LocalDiscovery implements BundleListener {
     }
 
     private void findDeclaredRemoteServices(Bundle bundle) {
-//        List<EndpointDescription> refs = LocalDiscoveryUtils.getAllRemoteReferences(bundle);
+        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(bundle);
+        for (EndpointDescription ed : eds) {
+            endpointDescriptions.put(ed, bundle);
+            addedEndpointDescription(ed);
+        }
     }
+
+    private void addedEndpointDescription(EndpointDescription ed) {
+        triggerCallbacks(ed, true);
+    }
+
+    private void triggerCallbacks(EndpointDescription ed, boolean added) {
+        for (Map.Entry<EndpointListener, Collection<String>> entry : listenerToFilters.entrySet()) {
+            for (String match : entry.getValue()) {
+                triggerCallbacks(entry.getKey(), match, ed, added);
+            }
+        }
+    }
+
+    private void triggerCallbacks(EndpointListener listener, String toMatch,
+            EndpointDescription ed, boolean added) {
+        if (!filterMatches(toMatch, ed)) {
+            return;
+        }
+        
+        if (added) {
+            listener.endpointAdded(ed, toMatch);
+        } else {
+            listener.endpointRemoved(ed, toMatch);
+        }
+    }
+    
+    private void triggerCallbacks(Collection<String> filters, EndpointListener listener) {
+        if (endpointDescriptions.size() > 0) {
+            LOG.info("search for matches to trigger callbacks with delta: " + filters);
+        } else {
+            LOG.info("nothing to search for matches to trigger callbacks with delta: " + filters);
+        }
+        
+        for (String filter : filters) {
+            for (EndpointDescription ed : endpointDescriptions.keySet()) {
+                triggerCallbacks(listener, filter, ed, true);
+            }
+        }
+    }    
+
+    private boolean filterMatches(String match, EndpointDescription ed) {
+        Filter filter = createFilter(match);
+        
+        Dictionary<String, Object> props = 
+            new Hashtable<String, Object>(ed.getProperties());
+        
+        return filter != null
+            ? filter.match(props)
+            : false;
+    } 
+    
+    private Filter createFilter(String filterValue) {        
+        if (filterValue == null) {
+            return null;
+        }
+        
+        try {
+            return bundleContext.createFilter(filterValue); 
+        } catch (Exception ex) {
+            LOG.severe("Problem creating a Filter from " + filterValue); 
+        }
+        return null;
+    }    
 }

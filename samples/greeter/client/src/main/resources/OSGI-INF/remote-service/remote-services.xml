@@ -13,11 +13,16 @@
     License for the specific language governing permissions and
     limitations under the License.
   -->
-<service-descriptions xmlns="http://www.osgi.org/xmlns/sd/v1.0.0">
-  <service-description>
-    <provide interface="org.apache.cxf.dosgi.samples.greeter.GreeterService" />
-    <property name="service.exported.interfaces">*</property>
-    <property name="service.exported.configs">org.apache.cxf.ws</property>
-    <property name="org.apache.cxf.ws.address">http://localhost:9090/greeter</property>
-  </service-description>
-</service-descriptions>
+<rsa:endpoint-descriptions xmlns:rsa="http://www.osgi.org/xmlns/rsa/v1.0.0"
+  xmlns:other="http://www.acme.org/xmlns/other/v1.0.0">
+  <endpoint-description>
+    <property name="objectClass">
+      <array>
+        <value>org.apache.cxf.dosgi.samples.greeter.GreeterService</value>
+      </array>
+    </property>
+    <property name="endpoint.uri">http://localhost:9090/greeter</property>
+    <property name="service.imported.configs">org.apache.cxf.ws</property>
+  </endpoint-description>
+</rsa:endpoint-descriptions>
+

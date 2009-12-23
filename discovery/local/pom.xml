@@ -88,7 +88,8 @@
                         <Import-Package>*</Import-Package>
                         <Private-Package>org.apache.cxf.dosgi.discovery.local</Private-Package>
                         <Export-Package>
-                            org.osgi.service.remoteserviceadmin;version="${remote.service.admin.interfaces.version}"
+                            org.osgi.service.remoteserviceadmin;version="${remote.service.admin.interfaces.version}",
+                            org.osgi.service.discovery;version="1.0";-split-package:=merge-first
                         </Export-Package> 
                     </instructions>
                 </configuration>

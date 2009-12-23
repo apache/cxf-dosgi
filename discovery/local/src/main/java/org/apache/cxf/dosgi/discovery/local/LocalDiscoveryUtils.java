@@ -28,6 +28,7 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -41,6 +42,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.discovery.ServicePublication;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -394,4 +396,40 @@ public final class LocalDiscoveryUtils {
         
         return names;
     }
+    
+    public static List<String> getStringPlusProperty(ServiceReference sr, String key) {
+        Object value = sr.getProperty(key);
+        if (value == null) {
+            return Collections.emptyList();
+        }
+
+        if (value instanceof String) {
+            return Collections.singletonList((String) value);
+        }
+
+        if (value instanceof String[]) {
+            String[] values = (String[]) value;
+            List<String> result = new ArrayList<String>(values.length);
+            for (String v : values) {
+                if (v != null) {
+                    result.add(v);
+                }
+            }
+            return Collections.unmodifiableList(result);
+        }
+
+        if (value instanceof Collection<?>) {
+            Collection<?> values = (Collection<?>) value;
+            List<String> result = new ArrayList<String>(values.size());
+            for (Iterator<?> iter = values.iterator(); iter.hasNext();) {
+                Object v = iter.next();
+                if ((v != null) && (v instanceof String)) {
+                    result.add((String) v);
+                }
+            }
+            return Collections.unmodifiableList(result);
+        }
+
+        return Collections.emptyList();
+    }    
 }
