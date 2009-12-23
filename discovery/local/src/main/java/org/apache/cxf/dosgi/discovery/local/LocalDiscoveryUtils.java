@@ -38,6 +38,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.osgi.framework.Bundle;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.discovery.ServicePublication;
@@ -66,6 +68,7 @@ public final class LocalDiscoveryUtils {
     private static final String PROPERTY_ELEMENT = "property";
     private static final String PROPERTY_NAME_ATTRIBUTE = "name";
     private static final String PROPERTY_VALUE_ATTRIBUTE = "value";
+    private static final String PROPERTY_VALUE_TYPE_ATTRIBUTE = "value-type";
     private static final String PROPERTY_INTERFACE_ATTRIBUTE = "interface";
 
     private static final String INTERFACE_SEPARATOR = ":";
@@ -135,7 +138,11 @@ public final class LocalDiscoveryUtils {
             if (handled) {
                 continue;
             }
-            handled = handleList(prop, map);
+            handled = handleCollection(prop, map);
+            if (handled) {
+                continue;
+            }
+            handled = handleXML(prop, map);
             if (handled) {
                 continue;
             }
@@ -184,16 +191,16 @@ public final class LocalDiscoveryUtils {
         } else if ("short".equals(type)) {
             cls = short.class;
         }            
-        
+
         try {
             if (cls == null) {
-                cls = Class.forName("java.lang." + type, true, String.class.getClassLoader());
+                cls = ClassLoader.getSystemClassLoader().loadClass("java.lang." + type);
             }
             Object array = Array.newInstance(cls, values.size());
             
             for (int i=0; i < values.size(); i++) {
                 Element vEl = values.get(i);
-                Object val = instantiate(type, vEl.getText());
+                Object val = handleValue(vEl, type);
                 Array.set(array, i, val);
             }
             
@@ -207,7 +214,7 @@ public final class LocalDiscoveryUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static boolean handleList(Element prop, Map<String, Object> map) {
+    private static boolean handleCollection(Element prop, Map<String, Object> map) {
         Collection<Object> col = null;        
         Element el = prop.getChild("list");
         if (el != null) {
@@ -226,12 +233,55 @@ public final class LocalDiscoveryUtils {
         String type = getTypeName(prop);
         List<Element> values = el.getChildren("value");
         for (Element val : values) {
-            col.add(instantiate(type, val.getText()));
+            Object obj = handleValue(val, type);
+            col.add(obj);
         }
         
         String name = prop.getAttributeValue("name");
         map.put(name, col);
         return true;
+    }
+
+    private static boolean handleXML(Element prop, Map<String, Object> map) {
+        String sb = readXML(prop);
+        if (sb == null) {
+            return false;
+        }
+
+        String name = prop.getAttributeValue("name");
+        map.put(name, sb);
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String readXML(Element prop) {
+        Element el = prop.getChild("xml");
+        if (el == null) {
+            return null;
+        }
+        
+        String type = getTypeName(prop);
+        if (!"String".equals(type)) {
+            LOG.warning("Embedded XML must be of type String, found: " + type);
+            return null;
+        }
+        
+        XMLOutputter outputter = new XMLOutputter(Format.getCompactFormat());
+        StringBuilder sb = new StringBuilder();    
+        List<Element> children = el.getChildren();
+        for (Element child : children) {
+            sb.append(outputter.outputString(child));
+        }
+        return sb.toString();
+    }
+
+    private static Object handleValue(Element val, String type) {
+        String xml = readXML(val);
+        if (xml != null) {
+            return xml;
+        } else {
+            return instantiate(type, val.getText());
+        }
     }
 
     private static Object instantiate(String type, String value) {
@@ -264,8 +314,8 @@ public final class LocalDiscoveryUtils {
         }
         String javaType = "java.lang." + boxedType;
         
-        try {
-            Class<?> cls = String.class.getClassLoader().loadClass(javaType);
+        try {            
+            Class<?> cls = ClassLoader.getSystemClassLoader().loadClass(javaType);
             Constructor<?> ctor = cls.getConstructor(String.class);
             return ctor.newInstance(value);
         } catch (Exception e) {

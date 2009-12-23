@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.dosgi.discovery.local;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,8 +34,13 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.osgi.framework.Bundle;
 import org.osgi.service.discovery.ServiceEndpointDescription;
 import org.osgi.service.discovery.ServicePublication;
@@ -164,7 +171,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals(4, edElements.size());
     }
     
-    public void testAllEndpoints() {
+    public void testAllEndpoints1() {
         URL ed1URL = getClass().getResource("/ed1.xml");
         
         Bundle b = EasyMock.createNiceMock(Bundle.class);
@@ -195,4 +202,79 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals("http://somewhere:1/2/3/4?5", ed3.getRemoteURI());
         assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed3.getInterfaces());
     }
+    
+    @SuppressWarnings("unchecked")
+    public void testAllEndpoints2() throws Exception {
+        URL ed1URL = getClass().getResource("/ed2.xml");
+        
+        Bundle b = EasyMock.createNiceMock(Bundle.class);
+        EasyMock.expect(b.findEntries(
+            EasyMock.eq("OSGI-INF/remote-service"), 
+            EasyMock.eq("*.xml"), EasyMock.anyBoolean())).andReturn(
+                Collections.enumeration(Arrays.asList(ed1URL))).anyTimes();
+        EasyMock.replay(b);
+        
+        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
+        assertEquals(2, eds.size());
+        EndpointDescription ed0 = eds.get(0);
+        assertEquals("foo:bar", ed0.getRemoteURI());
+        assertEquals(Arrays.asList("com.acme.HelloService"), ed0.getInterfaces());
+        assertEquals(Arrays.asList("SOAP"), ed0.getIntents());
+        assertEquals("org.apache.cxf.ws", ed0.getProperties().get("service.exported.configs"));
+        
+        EndpointDescription ed1 = eds.get(1);
+        Map<String, Object> props = ed1.getProperties();
+        assertEquals(Arrays.asList("com.acme.HelloService", "some.other.Service"), ed1.getInterfaces());
+        assertFalse("Should not be exactly the same. The value should contain a bunch of newlines", 
+            "org.apache.cxf.ws".equals(props.get("service.exported.configs")));
+        assertEquals("org.apache.cxf.ws", props.get("service.exported.configs").toString().trim());
+        
+        assertEquals(normXML("<other:t1 xmlns:other='http://www.acme.org/xmlns/other/v1.0.0'><foo type='bar'>haha</foo></other:t1>"), 
+            normXML((String) props.get("someXML")));
+        
+        assertEquals(Long.MAX_VALUE, props.get("long"));
+        assertEquals(new Long(-1), props.get("long2"));
+        assertEquals(Double.MAX_VALUE, props.get("double"));
+        assertEquals(new Double(1.0d), props.get("Double2"));
+        assertEquals(new Float(42.24f), props.get("float"));
+        assertEquals(new Float(1.0f), props.get("Float2"));
+        assertEquals(new Integer(17), props.get("int"));
+        assertEquals(new Integer(42), props.get("Integer2"));
+        assertEquals(new Byte((byte) 127), props.get("byte"));
+        assertEquals(new Byte((byte) -128), props.get("Byte2"));
+        assertEquals(new Boolean(true), props.get("boolean"));
+        assertEquals(new Boolean(true), props.get("Boolean2"));
+        assertEquals(new Short((short) 99), props.get("short"));
+        assertEquals(new Short((short) -99), props.get("Short2"));
+        int [] intArray = (int []) props.get("int-array");
+        assertTrue(Arrays.equals(new int[] {1, 2}, intArray));
+        
+        Integer [] integerArray = (Integer []) props.get("Integer-array");
+        assertTrue(Arrays.equals(new Integer[] {2, 1}, integerArray));
+        
+        assertEquals(Arrays.asList(true, false), props.get("bool-list"));
+        assertEquals(new HashSet<Object>(), props.get("long-set"));
+        assertEquals("Hello", props.get("other1").toString().trim());
+        
+        List l = (List) props.get("other2");
+        assertEquals(1, l.size());
+        assertEquals(normXML("<other:t2 xmlns:other='http://www.acme.org/xmlns/other/v1.0.0'/>"),
+            normXML((String) l.get(0)));
+    }
+    
+    private static String normXML(String s) throws JDOMException, IOException {
+        String s2 = stripComment(s);
+        String s3 = stripProlog(s2);
+        Document d = new SAXBuilder().build(new ByteArrayInputStream(s3.getBytes()));
+        XMLOutputter outputter  = new XMLOutputter(Format.getPrettyFormat());
+        return outputter.outputString(d);
+    }
+    
+    private static String stripComment(String s) { 
+        return s.replaceAll("<!--(.*?)-->", "");
+    }
+    
+    private static String stripProlog(String s) {
+        return s.replaceAll("<\\?(.*?)\\?>", "");
+    }         
 }
