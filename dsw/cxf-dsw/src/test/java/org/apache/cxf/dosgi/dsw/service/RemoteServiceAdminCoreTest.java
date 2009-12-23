@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.jaxws.spring.EndpointDefinitionParser;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
 import org.osgi.framework.Bundle;
@@ -36,7 +35,7 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class RenoteServiceAdminCoreTest {
+public class RemoteServiceAdminCoreTest {
 
     @Test
     public void dontExportOwnServiceProxies(){
@@ -67,6 +66,7 @@ public class RenoteServiceAdminCoreTest {
     }
     
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testImport(){
         
