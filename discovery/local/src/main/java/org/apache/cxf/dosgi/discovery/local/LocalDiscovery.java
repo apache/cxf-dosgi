@@ -61,7 +61,14 @@ public class LocalDiscovery implements BundleListener {
 
             @Override
             public Object addingService(ServiceReference reference) {
-                System.out.println("@@@@ " + reference + "-" + Arrays.asList(reference.getPropertyKeys()));
+                System.out.println("@@@@ " + reference);
+                for (String key : reference.getPropertyKeys()) {
+                    Object val = reference.getProperty(key);
+                    if (val.getClass().isArray()) {
+                        val = Arrays.asList((Object []) val);
+                    }
+                    System.out.println("-----" + key + ":" + val);
+                }
                 Object svc = super.addingService(reference);
                 cacheTracker(reference, svc);
                 return svc;
@@ -70,7 +77,14 @@ public class LocalDiscovery implements BundleListener {
             @Override
             public void modifiedService(ServiceReference reference,
                     Object service) {
-                System.out.println("#### " + reference + "-" + Arrays.asList(reference.getPropertyKeys()));
+                System.out.println("#### " + reference);
+                for (String key : reference.getPropertyKeys()) {
+                    Object val = reference.getProperty(key);
+                    if (val.getClass().isArray()) {
+                        val = Arrays.asList((Object []) val);
+                    }
+                    System.out.println("-----" + key + ":" + val);
+                }
 
                 cacheTracker(reference, service);
             }
@@ -86,6 +100,20 @@ public class LocalDiscovery implements BundleListener {
         listenerTracker.open();
         
         bundleContext.addBundleListener(this);
+        processExistingBundles();
+    }
+
+    private void processExistingBundles() {
+        Bundle [] bundles = bundleContext.getBundles();
+        if (bundles == null) {
+            return;
+        }
+        
+        for (Bundle b : bundles) {
+            if (b.getState() == Bundle.ACTIVE) {
+                findDeclaredRemoteServices(b);
+            }
+        }
     }
 
     protected void cacheTracker(ServiceReference reference, Object svc) {
