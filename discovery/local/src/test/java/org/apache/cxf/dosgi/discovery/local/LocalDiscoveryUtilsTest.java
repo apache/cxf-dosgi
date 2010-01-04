@@ -95,7 +95,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
     public void testRemoteServicesXMLFileAlternateLocation() {
         URL rs1URL = getClass().getResource("/rs1.xml");
         Dictionary headers = new Hashtable();        
-        headers.put("Remote-Service", "META-INF/osgi");
+        headers.put("Remote-Service", "META-INF/osgi/");
         headers.put("Bundle-Name", "testing bundle");
         
         Bundle b = EasyMock.createNiceMock(Bundle.class);

@@ -54,7 +54,7 @@ public final class LocalDiscoveryUtils {
     
     private static final String REMOTE_SERVICES_HEADER_NAME = "Remote-Service";
     private static final String REMOTE_SERVICES_DIRECTORY =
-        "OSGI-INF/remote-service";
+        "OSGI-INF/remote-service/";
     private static final String REMOTE_SERVICES_NS =
         "http://www.osgi.org/xmlns/sd/v1.0.0"; // this one was replaced by the RSA one in the spec
     private static final String REMOTE_SERVICES_ADMIN_NS = 
@@ -328,18 +328,33 @@ public final class LocalDiscoveryUtils {
 
     @SuppressWarnings("unchecked")
     static List<Element> getAllDescriptionElements(Bundle b) {
-        Object directory = null;
+        Object header = null;
         
         Dictionary headers = b.getHeaders();
         if (headers != null) {
-            directory = headers.get(REMOTE_SERVICES_HEADER_NAME);
+            header = headers.get(REMOTE_SERVICES_HEADER_NAME);
         }
         
-        if (directory == null) {
-            directory = REMOTE_SERVICES_DIRECTORY;
+        if (header == null) {
+            header = REMOTE_SERVICES_DIRECTORY;
         }
         
-        Enumeration urls = b.findEntries(directory.toString(), "*.xml", false);
+        String dir = header.toString();
+        String filePattern = "*.xml";
+        if (dir.endsWith("/")) {
+            dir = dir.substring(0, dir.length()-1);
+        } else {
+            int idx = dir.lastIndexOf('/');
+            if (idx >= 0 & dir.length() > idx) {
+                filePattern = dir.substring(idx + 1);
+                dir = dir.substring(0, idx);
+            } else {
+                filePattern = dir;
+                dir = "";
+            }
+        }
+        
+        Enumeration urls = b.findEntries(dir, filePattern, false);
         if (urls == null) {
             return Collections.emptyList();
         }

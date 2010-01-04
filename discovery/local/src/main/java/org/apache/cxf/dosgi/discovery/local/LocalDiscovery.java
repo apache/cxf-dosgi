@@ -158,6 +158,7 @@ public class LocalDiscovery implements BundleListener {
             findDeclaredRemoteServices(be.getBundle());
             break;
         case BundleEvent.STOPPING:
+            // TODO
             break;
         }
     }
@@ -196,12 +197,6 @@ public class LocalDiscovery implements BundleListener {
     }
     
     private void triggerCallbacks(Collection<String> filters, EndpointListener listener) {
-        if (endpointDescriptions.size() > 0) {
-            LOG.info("search for matches to trigger callbacks with delta: " + filters);
-        } else {
-            LOG.info("nothing to search for matches to trigger callbacks with delta: " + filters);
-        }
-        
         for (String filter : filters) {
             for (EndpointDescription ed : endpointDescriptions.keySet()) {
                 triggerCallbacks(listener, filter, ed, true);
