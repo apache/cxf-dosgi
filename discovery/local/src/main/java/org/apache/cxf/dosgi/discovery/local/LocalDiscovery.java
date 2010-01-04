@@ -50,9 +50,9 @@ public class LocalDiscovery implements BundleListener {
         new HashMap<EndpointListener, Collection<String>>();
     Map<String, Collection<EndpointListener>> filterToListeners = 
         new HashMap<String, Collection<EndpointListener>>();
-    private final BundleContext bundleContext;
+    final BundleContext bundleContext;
 
-    private ServiceTracker listenerTracker;
+    ServiceTracker listenerTracker;
 
     public LocalDiscovery(BundleContext bc) {
         bundleContext = bc;
