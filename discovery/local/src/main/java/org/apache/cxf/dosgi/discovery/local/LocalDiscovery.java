@@ -19,13 +19,14 @@
 package org.apache.cxf.dosgi.discovery.local;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -61,39 +62,26 @@ public class LocalDiscovery implements BundleListener {
 
             @Override
             public Object addingService(ServiceReference reference) {
-                System.out.println("@@@@ " + reference);
-                for (String key : reference.getPropertyKeys()) {
-                    Object val = reference.getProperty(key);
-                    if (val.getClass().isArray()) {
-                        val = Arrays.asList((Object []) val);
-                    }
-                    System.out.println("-----" + key + ":" + val);
-                }
                 Object svc = super.addingService(reference);
-                cacheTracker(reference, svc);
+                registerTracker(reference, svc);
                 return svc;
             }
 
             @Override
-            public void modifiedService(ServiceReference reference,
-                    Object service) {
-                System.out.println("#### " + reference);
-                for (String key : reference.getPropertyKeys()) {
-                    Object val = reference.getProperty(key);
-                    if (val.getClass().isArray()) {
-                        val = Arrays.asList((Object []) val);
-                    }
-                    System.out.println("-----" + key + ":" + val);
-                }
-
-                cacheTracker(reference, service);
+            public void modifiedService(ServiceReference reference, Object service) {
+                super.modifiedService(reference, service);
+                clearTracker(service);
+                
+                // This may cause duplicate registrations of remote services,
+                // but that's fine and should be filtered out on another level.
+                // See Remove Service Admin spec section 122.6.3
+                registerTracker(reference, service);
             }
 
             @Override
-            public void removedService(ServiceReference reference,
-                    Object service) {
-                // TODO Auto-generated method stub
+            public void removedService(ServiceReference reference, Object service) {
                 super.removedService(reference, service);
+                clearTracker(service);
             }
             
         };
@@ -116,11 +104,21 @@ public class LocalDiscovery implements BundleListener {
         }
     }
 
-    protected void cacheTracker(ServiceReference reference, Object svc) {
+    void registerTracker(ServiceReference reference, Object svc) {
         if (svc instanceof EndpointListener) {
             EndpointListener listener = (EndpointListener) svc;
             Collection<String> filters = addListener(reference, listener);
             triggerCallbacks(filters, listener);
+        }
+    }
+
+    void clearTracker(Object svc) {
+        if (svc instanceof EndpointListener) {
+            EndpointListener listener = (EndpointListener) svc;
+            removeListener(listener);
+            // If the tracker was removed or the scope was changed this doesn't require 
+            // additional callbacks on the tracker. Its the responsibility of the tracker
+            // itself to clean up any orphans. See Remote Service Admin spec 122.6.3
         }
     }
 
@@ -145,6 +143,21 @@ public class LocalDiscovery implements BundleListener {
         
         return filters;
     }
+    
+    private void removeListener(EndpointListener listener) {
+        Collection<String> filters = listenerToFilters.remove(listener);
+        if (filters == null) {
+            return;
+        }
+        
+        for (String filter : filters) {
+            Collection<EndpointListener> listeners = filterToListeners.get(filter);
+            if (listeners == null) {
+                continue;
+            }
+            listeners.remove(listener);
+        }        
+    }
 
     public void shutDown() {
         bundleContext.removeBundleListener(this);
@@ -158,7 +171,7 @@ public class LocalDiscovery implements BundleListener {
             findDeclaredRemoteServices(be.getBundle());
             break;
         case BundleEvent.STOPPING:
-            // TODO
+            removeServicesDeclaredInBundle(be.getBundle());
             break;
         }
     }
@@ -171,8 +184,22 @@ public class LocalDiscovery implements BundleListener {
         }
     }
 
+    private void removeServicesDeclaredInBundle(Bundle bundle) {
+        for (Iterator<Entry<EndpointDescription, Bundle>> i = endpointDescriptions.entrySet().iterator(); i.hasNext(); ) {
+            Entry<EndpointDescription, Bundle> entry = i.next();
+            if (bundle.equals(entry.getValue())) {
+                removedEndpointDescription(entry.getKey());
+                i.remove();
+            }
+        }
+    }
+
     private void addedEndpointDescription(EndpointDescription ed) {
         triggerCallbacks(ed, true);
+    }
+
+    private void removedEndpointDescription(EndpointDescription ed) {
+        triggerCallbacks(ed, false);
     }
 
     private void triggerCallbacks(EndpointDescription ed, boolean added) {
