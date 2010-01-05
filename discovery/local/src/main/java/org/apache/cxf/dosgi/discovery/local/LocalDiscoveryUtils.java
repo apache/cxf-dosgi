@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,8 +42,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.discovery.ServicePublication;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 
@@ -77,32 +74,8 @@ public final class LocalDiscoveryUtils {
     
     static boolean addEndpointID = true; // for testing
     
-    private LocalDiscoveryUtils() {
-    }
+    private LocalDiscoveryUtils() {}
     
-    @SuppressWarnings("unchecked")
-    public static List<ServiceEndpointDescription> getAllRemoteReferences(Bundle b) {
-        List<Element> references = getAllDescriptionElements(b);
-        
-        List<ServiceEndpointDescription> srefs = new ArrayList<ServiceEndpointDescription>();
-        Namespace ns = Namespace.getNamespace(REMOTE_SERVICES_NS);
-        for (Element ref : references) {
-            List<String> iNames = getProvidedInterfaces(ref.getChildren(PROVIDE_INTERFACE_ELEMENT, ns));
-            Map<String, Object> remoteProps = getProperties(ref.getChildren(PROPERTY_ELEMENT, ns));
-            
-            // this property is used by discovery for matching
-            remoteProps.put(ServicePublication.SERVICE_INTERFACE_NAME, iNames); 
-            
-            if (addEndpointID) {
-                remoteProps.put(ServicePublication.ENDPOINT_ID, UUID.randomUUID().toString());
-            }
-            srefs.add(new ServiceEndpointDescriptionImpl(iNames, remoteProps));
-        }
-        return srefs;
-        
-    }
-    
-
     @SuppressWarnings("unchecked")
     public static List<EndpointDescription> getAllEndpointDescriptions(Bundle b) {
         List<Element> elements = getAllDescriptionElements(b);
@@ -118,11 +91,11 @@ public final class LocalDiscoveryUtils {
                 Map<String, Object> remoteProps = getProperties(el.getChildren(PROPERTY_ELEMENT, ns));
                 
                 // this property is used by discovery for matching
-                remoteProps.put(ServicePublication.SERVICE_INTERFACE_NAME, iNames); 
-                
-                if (addEndpointID) {
-                    remoteProps.put(ServicePublication.ENDPOINT_ID, UUID.randomUUID().toString());
-                }
+//                remoteProps.put(ServicePublication.SERVICE_INTERFACE_NAME, iNames); 
+//                
+//                if (addEndpointID) {
+//                    remoteProps.put(ServicePublication.ENDPOINT_ID, UUID.randomUUID().toString());
+//                }
                 // @@@@ TODO
                 // srefs.add(new ServiceEndpointDescriptionImpl(iNames, remoteProps));                
             }
