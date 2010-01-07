@@ -42,60 +42,61 @@ public class Activator implements BundleActivator, ManagedService {
     public synchronized void start(BundleContext bc) throws Exception {
         bctx = bc;
         zkProperties = getCMDefaults();
-
         zkd = createZooKeeperDiscovery();
-        // zkd.start() is invoked via configuration update
-        
-        
+
         cmReg = bc.registerService(ManagedService.class.getName(), this, zkProperties);
-//        LOG.info("STARTING NOW");
-//        updated(null);
         
+        LOG.info("Starting Zookeeper Discovery client with default configuration");
+        // Catch connection failures so that the bundle startup ist successful and other configuration can be
+        // received via ConfigurationAdmin
+        try {
+            zkd.start();
+        } catch (IOException e) {
+            LOG.warning("Startup with default configuration failed: " + e.getLocalizedMessage());
+        } catch (ConfigurationException e) {
+            LOG.warning("Startup with default configuration failed: " + e.getLocalizedMessage());
+        }
     }
 
     public synchronized void stop(BundleContext bc) throws Exception {
         cmReg.unregister();
-
         zkd.stop();
-
     }
 
     public synchronized void updated(Dictionary configuration) throws ConfigurationException {
 
-        if (configuration == null) {
+        if (configuration == null)
+            return;
 
-        } else {
-
-            Dictionary effective = getCMDefaults();
-            // apply all values on top of the defaults
-            for (Enumeration e = configuration.keys(); e.hasMoreElements();) {
-                Object key = e.nextElement();
-                if (key != null) {
-                    Object val = configuration.get(key);
-                    effective.put(key, val);
-                }
-            }
-
-            if (zkProperties.equals(effective)) {
-                LOG.info("properties haven't changed ...");
-                return;
-            }
-
-            zkProperties = effective;
-            
-            synchronized (this) {
-                zkd.stop();
-                zkd = createZooKeeperDiscovery();
+        Dictionary effective = getCMDefaults();
+        // apply all values on top of the defaults
+        for (Enumeration e = configuration.keys(); e.hasMoreElements();) {
+            Object key = e.nextElement();
+            if (key != null) {
+                Object val = configuration.get(key);
+                effective.put(key, val);
             }
         }
-        
-        // call start in any case 
+
+        if (zkProperties.equals(effective)) {
+            LOG.info("properties haven't changed ...");
+            return;
+        }
+
+        zkProperties = effective;
+
+        synchronized (this) {
+            zkd.stop();
+            zkd = createZooKeeperDiscovery();
+        }
+
+        // call start in any case
         try {
             zkd.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
     }
 
     private Dictionary getCMDefaults() {
@@ -104,7 +105,7 @@ public class Activator implements BundleActivator, ManagedService {
         props.put("zookeeper.port", "2181");
         props.put("zookeeper.host", "localhost");
         props.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper");
-        return props;    
+        return props;
     }
 
     // for testing

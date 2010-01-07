@@ -31,6 +31,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.cxf.dosgi.dsw.ClassUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.handlers.ClientServiceFactory;
@@ -78,8 +79,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
         LOG.fine("RemoteServiceAdmin: exportService: " + sref.getClass().getName());
 
-        // check if it is already exported ....
         synchronized (exportedServices) {
+            // check if it is already exported ....
             if (exportedServices.containsKey(sref)) {
                 LOG.fine("already exported ...  " + sref.getClass().getName());
                 Collection<ExportRegistrationImpl> regs = exportedServices.get(sref);
@@ -118,14 +119,29 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                             || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(key)) {
                             LOG
                                 .info("exportService called with additional properties map that contained illegal key: "
-                                      + key + "   Te key is ignored");
+                                      + key + "   The key is ignored");
                             continue;
                         }
                     }
                     serviceProperties.put(e.getKey(), e.getValue());
+                    LOG.fine("Overwriting property ["+e.getKey()+"]  with value ["+e.getValue()+"]");
                 }
             }
-
+            
+            
+          
+            
+            
+            // Get the intents that need to be supported by the RSA
+            String[] requiredIntents = Utils.getAllRequiredIntents(serviceProperties);
+            
+            { // TODO: Determine if the required intents can be provided by the RSA ....
+                
+                // if not return null
+            }
+            
+            
+            
             List<String> interfaces = new ArrayList<String>(1);
 
             {// determine which interfaces should be exported ? based on props and sRef
@@ -190,6 +206,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
             LinkedHashMap<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>(
                                                                                                                          1);
+            
             for (String iface : interfaces) {
                 LOG.info("creating initial ExportDescription for interface " + iface
                          + "  with configuration types " + configurationTypes);

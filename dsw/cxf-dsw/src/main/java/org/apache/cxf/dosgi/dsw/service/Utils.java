@@ -20,8 +20,13 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 
 public class Utils {
@@ -80,5 +85,55 @@ public class Utils {
             return "UNKNOWN_EVENT";
         }
     }
+    
+    
+    public static String[] getAllRequiredIntents(Map serviceProperties){
+        // Get the intents that need to be supported by the RSA
+        String[] requiredIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
+        if(requiredIntents==null){
+            requiredIntents = new String[0];
+        }
+        
+        { // merge with extra intents;
+            String[] requiredExtraIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
+            if(requiredExtraIntents!= null && requiredExtraIntents.length>0){
+                         
+                requiredIntents = mergeArrays(requiredIntents, requiredExtraIntents);
+            }
+        }
+        
+        return requiredIntents;
+    }
 
+    public static String[] getAllIntentsCombined(Map serviceProperties){
+        String[] requiredIntents = getAllRequiredIntents(serviceProperties);
+        
+        // Get the Intents that are implemented by the service 
+        String[] serviceIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_INTENTS));
+        
+        if(serviceIntents!= null && serviceIntents.length>0){
+            requiredIntents = mergeArrays(requiredIntents, serviceIntents);
+        }
+        
+        return requiredIntents;
+    }
+ 
+    
+    public static String[] mergeArrays(String[] a1,String[] a2){
+        if(a1==null) return a2;
+        if(a2==null) return a1;
+        
+        List<String> list = new ArrayList<String>(a1.length+a2.length);
+
+        for (String s : a1) {
+            list.add(s);  
+        }
+        
+        for (String s : a2) {
+            if(!list.contains(s))
+                list.add(s);  
+        }
+        
+        return list.toArray(new String[list.size()]);
+    }
 }

@@ -395,6 +395,7 @@ public final class OsgiUtils {
         }
 
         try {
+            LOG.fine("Loading Intent map from "+springIntentLocations);
             OsgiBundleXmlApplicationContext ctx = new OsgiBundleXmlApplicationContext(springIntentLocations
                 .toArray(new String[] {}));
             ctx.setPublishContextAsService(false);

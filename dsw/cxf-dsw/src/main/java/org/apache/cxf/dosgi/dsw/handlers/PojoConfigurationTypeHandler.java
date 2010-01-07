@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +30,7 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
+import org.apache.cxf.dosgi.dsw.service.Utils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -104,7 +106,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         // The properties for the EndpointDescription
         Map<String, Object> endpointProps = new HashMap<String, Object>();
 
-        copyEndpointProperties(exportRegistration, endpointProps);
+        copyEndpointProperties(sd, endpointProps);
 
         String[] sa = new String[1];
         sa[0] = iClass.getName();
@@ -119,6 +121,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         endpointProps.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(getBundleContext()));
         endpointProps.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, Constants.WS_CONFIG_TYPE);
         endpointProps.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + sa[0], OsgiUtils.getVersion(iClass, dswContext));
+        endpointProps.put(RemoteConstants.SERVICE_INTENTS, Utils.getAllIntentsCombined(sd));
 
         DataBinding databinding;
         String dataBindingImpl = (String)exportRegistration.getExportedService()
@@ -132,7 +135,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             .getProperty(Constants.WS_FRONTEND_PROP_KEY);
         ServerFactoryBean factory = createServerFactoryBean(frontEndImpl);
 
-        factory.setServiceClass(iClass);
+        factory.setServiceClass(iClass);        
         factory.setAddress(address);
         factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
@@ -160,15 +163,17 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
     
 
-    private void copyEndpointProperties(ExportRegistrationImpl exportRegistration,
-                                        Map<String, Object> endpointProps) {
-
-        String[] keys = exportRegistration.getExportedService().getPropertyKeys();
-        for (String key : keys) {
-            if (!key.startsWith("."))
-                endpointProps.put(key, exportRegistration.getExportedService().getProperty(key));
+    private void copyEndpointProperties(Map sd, Map<String, Object> endpointProps) {
+        Set<Map.Entry> keys = sd.entrySet();
+        for (Map.Entry entry : keys) {
+            try{
+                String skey = (String)entry.getKey();
+                if (!skey.startsWith("."))
+                    endpointProps.put(skey, entry.getValue());
+            }catch (ClassCastException e) {
+                LOG.warning("ServiceProperties Map contained non String key. Skipped  "+entry + "   "+e.getLocalizedMessage());
+            }
         }
-
     }
 
 
