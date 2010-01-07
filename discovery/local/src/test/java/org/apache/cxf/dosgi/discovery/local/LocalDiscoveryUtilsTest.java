@@ -124,7 +124,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         List<String> interfaces = Arrays.asList("SomeService");
         Map<String, Object> sed1Props = new HashMap<String, Object>();
         sed1Props.put("osgi.remote.requires.intents", "confidentiality");
-        sed1Props.put(ServicePublication.ENDPOINT_ID, eids.get(
+        sed1Props.put(ServicePublication.ENDPOINT_SERVICE_ID, eids.get(
                 Collections.singleton("SomeService")));
         sed1Props.put(ServicePublication.SERVICE_INTERFACE_NAME, interfaces);
         ServiceEndpointDescription sed1 = 
@@ -132,7 +132,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
 
         List<String> interfaces2 = Arrays.asList("SomeOtherService", "WithSomeSecondInterface");
         Map<String, Object> sed2Props = new HashMap<String, Object>();
-        sed2Props.put(ServicePublication.ENDPOINT_ID, eids.get(
+        sed2Props.put(ServicePublication.ENDPOINT_SERVICE_ID, eids.get(
                 new HashSet<String>(interfaces2)));
         sed2Props.put(ServicePublication.SERVICE_INTERFACE_NAME, interfaces2);
         ServiceEndpointDescription sed2 = 
@@ -180,22 +180,22 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
         assertEquals(4, eds.size());
         EndpointDescription ed0 = eds.get(0);
-        assertEquals("http://somewhere:12345", ed0.getRemoteURI());
+        assertEquals("http://somewhere:12345", ed0.getRemoteID());
         assertEquals(Arrays.asList("SomeService"), ed0.getInterfaces());
         assertEquals(Arrays.asList("confidentiality"), 
             ed0.getProperties().get("osgi.remote.requires.intents"));
         assertEquals("testValue", ed0.getProperties().get("testKey"));
         
         EndpointDescription ed1 = eds.get(1);
-        assertEquals("myScheme://somewhere:12345", ed1.getRemoteURI());
+        assertEquals("myScheme://somewhere:12345", ed1.getRemoteID());
         assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed1.getInterfaces());
         
         EndpointDescription ed2 = eds.get(2);
-        assertEquals("http://somewhere", ed2.getRemoteURI());
+        assertEquals("http://somewhere", ed2.getRemoteID());
         assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed2.getInterfaces());
 
         EndpointDescription ed3 = eds.get(3);
-        assertEquals("http://somewhere:1/2/3/4?5", ed3.getRemoteURI());
+        assertEquals("http://somewhere:1/2/3/4?5", ed3.getRemoteID());
         assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed3.getInterfaces());
     }
     
@@ -213,10 +213,11 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
         assertEquals(2, eds.size());
         EndpointDescription ed0 = eds.get(0);
-        assertEquals("foo:bar", ed0.getRemoteURI());
+        assertEquals("foo:bar", ed0.getRemoteID());
         assertEquals(Arrays.asList("com.acme.HelloService"), ed0.getInterfaces());
         assertEquals(Arrays.asList("SOAP"), ed0.getIntents());
-        assertEquals("org.apache.cxf.ws", ed0.getProperties().get("service.exported.configs"));
+        // changed from exported to imported 
+        assertEquals("org.apache.cxf.ws", ed0.getProperties().get("service.imported.configs"));
         
         EndpointDescription ed1 = eds.get(1);
         Map<String, Object> props = ed1.getProperties();

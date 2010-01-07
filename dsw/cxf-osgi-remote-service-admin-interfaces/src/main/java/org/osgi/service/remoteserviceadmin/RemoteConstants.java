@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2009). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2009, 2010). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,9 @@ public class RemoteConstants {
 	 * Service property identifying the configuration types supported by a
 	 * distribution provider. Registered by the distribution provider on one of
 	 * its services to indicate the supported configuration types.
-	 * 
 	 * <p>
 	 * The value of this property must be of type <code>String</code>,
-	 * <code>String[]</code>, or <code>Collection</code> of <code>String</code>.
+	 * <code>String[]</code>, or <code>Collection&lt;String&gt;</code>.
 	 */
 	public static final String	REMOTE_CONFIGS_SUPPORTED		= "remote.configs.supported";
 
@@ -44,7 +43,7 @@ public class RemoteConstants {
 	 * 
 	 * <p>
 	 * The value of this property must be of type <code>String</code>,
-	 * <code>String[]</code>, or <code>Collection</code> of <code>String</code>.
+	 * <code>String[]</code>, or <code>Collection&lt;String&gt;</code>.
 	 */
 	public static final String	REMOTE_INTENTS_SUPPORTED		= "remote.intents.supported";
 
@@ -59,7 +58,7 @@ public class RemoteConstants {
 	 * <code>Dictionary</code> object passed to the
 	 * <code>BundleContext.registerService</code> method. The value of this
 	 * property must be of type <code>String</code>, <code>String[]</code>, or
-	 * <code>Collection</code> of <code>String</code>.
+	 * <code>Collection&lt;String&gt;</code>.
 	 */
 	public static final String	SERVICE_EXPORTED_CONFIGS		= "service.exported.configs";
 
@@ -75,7 +74,7 @@ public class RemoteConstants {
 	 * <code>Dictionary</code> object passed to the
 	 * <code>BundleContext.registerService</code> method. The value of this
 	 * property must be of type <code>String</code>, <code>String[]</code>, or
-	 * <code>Collection</code> of <code>String</code>.
+	 * <code>Collection&lt;String&gt;</code>.
 	 */
 	public static final String	SERVICE_EXPORTED_INTENTS		= "service.exported.intents";
 
@@ -94,7 +93,7 @@ public class RemoteConstants {
 	 * <code>Dictionary</code> object passed to the
 	 * <code>BundleContext.registerService</code> method. The value of this
 	 * property must be of type <code>String</code>, <code>String[]</code>, or
-	 * <code>Collection</code> of <code>String</code>.
+	 * <code>Collection&lt;String&gt;</code>.
 	 */
 	public static final String	SERVICE_EXPORTED_INTENTS_EXTRA	= "service.exported.intents.extra";
 
@@ -113,7 +112,7 @@ public class RemoteConstants {
 	 * <code>Dictionary</code> object passed to the
 	 * <code>BundleContext.registerService</code> method. The value of this
 	 * property must be of type <code>String</code>, <code>String[]</code>, or
-	 * <code>Collection</code> of <code>String</code>.
+	 * <code>Collection&lt;String&gt;</code>.
 	 */
 	public static final String	SERVICE_EXPORTED_INTERFACES		= "service.exported.interfaces";
 
@@ -139,7 +138,7 @@ public class RemoteConstants {
 	 * 
 	 * <p>
 	 * The value of this property must be of type <code>String</code>,
-	 * <code>String[]</code>, or <code>Collection</code> of <code>String</code>.
+	 * <code>String[]</code>, or <code>Collection&lt;String&gt;</code>.
 	 * 
 	 * @see #SERVICE_EXPORTED_CONFIGS
 	 */
@@ -153,34 +152,30 @@ public class RemoteConstants {
 	 * provider that these intents are already implemented by the exported
 	 * service object.</li>
 	 * <li>A distribution provider must use this property to convey the combined
-	 * intents of:</li>
-	 * <ul>
-	 * <li>The exporting service, and</li>
-	 * <li>the intents that the exporting distribution provider adds, and</li>
-	 * <li>the intents that the importing distribution provider adds.</li>
+	 * intents of: The exporting service, and, the intents that the exporting
+	 * distribution provider adds, and the intents that the importing
+	 * distribution provider adds.</li>
 	 * </ul>
-	 * <i></i>
-	 * 
-	 * </ul> To export a service, a distribution provider must expand any
-	 * qualified intents. Both the exporting and importing distribution
-	 * providers must recognize all intents before a service can be distributed.
+	 * To export a service, a distribution provider must expand any qualified
+	 * intents. Both the exporting and importing distribution providers must
+	 * recognize all intents before a service can be distributed.
 	 * 
 	 * <p>
 	 * The value of this property must be of type <code>String</code>,
-	 * <code>String[]</code>, or <code>Collection</code> of <code>String</code>.
+	 * <code>String[]</code>, or <code>Collection&lt;String&gt;</code>.
 	 */
 	public static final String	SERVICE_INTENTS					= "service.intents";
 
 	/* above are from Ch 13 Remote Service spec. */
 
 	/**
-	 * Endpoint property identifying the URI for this endpoint. This service
+	 * Endpoint property identifying the id for this endpoint. This service
 	 * property must always be set.
 	 * 
 	 * <p>
 	 * The value of this property must be of type <code>String</code>.
 	 */
-	public final static String	ENDPOINT_URI					= "endpoint.uri";
+	public final static String	ENDPOINT_ID						= "endpoint.id";
 
 	/**
 	 * Endpoint property identifying the service id of the exported service. Can
@@ -189,7 +184,7 @@ public class RemoteConstants {
 	 * <p>
 	 * The value of this property must be of type <code>Long</code>.
 	 */
-	public final static String	ENDPOINT_ID						= "endpoint.id";
+	public final static String	ENDPOINT_SERVICE_ID				= "endpoint.service.id";
 
 	/**
 	 * Endpoint property identifying the universally unique id of the exporting

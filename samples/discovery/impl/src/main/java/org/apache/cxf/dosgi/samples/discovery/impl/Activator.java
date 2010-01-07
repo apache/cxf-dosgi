@@ -42,7 +42,7 @@ public class Activator implements BundleActivator {
         props.put("service.exported.interfaces", "*");
         props.put("service.exported.configs", "org.apache.cxf.ws");
         props.put("org.apache.cxf.ws.address", getAddress(host, port)); // old obsolete value
-        props.put("endpoint.uri", getAddress(host, port));
+        props.put("endpoint.id", getAddress(host, port));
 
         reg = bc.registerService(DisplayService.class.getName(), 
                 new DisplayServiceImpl(host + ":" + port), props);

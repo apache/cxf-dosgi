@@ -116,7 +116,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         // endpointProps.put(RemoteConstants.SERVICE_REMOTE_ID, "TODO");
 
         // FIXME: This key is not defined in the spec but is required by the EndpointDescription !!!!!
-        endpointProps.put(RemoteConstants.ENDPOINT_ID, 123L);
+        endpointProps.put(RemoteConstants.ENDPOINT_SERVICE_ID, 123L);
 
         endpointProps.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(getBundleContext()));
         endpointProps.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, Constants.WS_CONFIG_TYPE);
@@ -146,7 +146,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            endpointProps.put(RemoteConstants.ENDPOINT_URI, address);
+            endpointProps.put(RemoteConstants.ENDPOINT_ID, address);
 
             exportRegistration.setServer(server);
 
@@ -188,7 +188,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 //    }
 
     protected String getPojoAddress(Map sd, Class<?> iClass) {
-        String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_URI);
+        String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
         if (address == null) {
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
         }

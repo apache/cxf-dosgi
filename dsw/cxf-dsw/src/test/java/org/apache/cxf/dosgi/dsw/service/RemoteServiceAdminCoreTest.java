@@ -89,8 +89,9 @@ public class RemoteServiceAdminCoreTest {
         };
         
         Map p = new HashMap();
-        p.put(RemoteConstants.ENDPOINT_URI, "http://google.de");
-        
+        p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
+        p.put(Constants.OBJECTCLASS, new String[] {"es.schaaf.my.class"});
+        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "unsupportetConfiguration");
         EndpointDescription endpoint = new EndpointDescription(p);
         
         
@@ -103,15 +104,6 @@ public class RemoteServiceAdminCoreTest {
         
         
         p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "org.apache.cxf.ws");
-        endpoint = new EndpointDescription(p);
-        
-        // must be null as the endpoint has no interface
-        assertNull(rsaCore.importService(endpoint));
-        // must be empty ... 
-        assertEquals(rsaCore.getImportedEndpoints().size(),0);
-        
-        
-        p.put(Constants.OBJECTCLASS, new String[] {"es.schaaf.my.class"});
         endpoint = new EndpointDescription(p);
         
         

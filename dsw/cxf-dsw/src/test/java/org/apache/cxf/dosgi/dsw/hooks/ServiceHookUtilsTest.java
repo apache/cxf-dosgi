@@ -107,8 +107,8 @@ public class ServiceHookUtilsTest extends TestCase {
 //                        assertTrue(EasyMock.getCurrentArguments()[1] instanceof ServicePublication);
 //                        Dictionary<?, ?> actualProps = 
 //                            (Dictionary<?, ?>) EasyMock.getCurrentArguments()[2];
-//                        UUID uuid = UUID.fromString(actualProps.get(ServicePublication.ENDPOINT_ID).toString());
-//                        expectedProps.put(ServicePublication.ENDPOINT_ID, uuid.toString());
+//                        UUID uuid = UUID.fromString(actualProps.get(ServicePublication.ENDPOINT_SERVICE_ID).toString());
+//                        expectedProps.put(ServicePublication.ENDPOINT_SERVICE_ID, uuid.toString());
 //                        assertEquals(expectedProps, actualProps);
 //                        return EasyMock.createMock(ServiceRegistration.class);
 //                    }                

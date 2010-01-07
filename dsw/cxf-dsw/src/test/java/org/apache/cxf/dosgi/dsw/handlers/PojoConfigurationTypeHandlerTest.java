@@ -18,22 +18,13 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.TestUtils;
-import org.apache.cxf.dosgi.dsw.qos.IntentMap;
-import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
-import org.apache.cxf.dosgi.dsw.service.ServiceEndpointDescriptionImpl;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
@@ -48,10 +39,6 @@ import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
-import org.osgi.service.event.EventConstants;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
@@ -62,7 +49,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, hp);
         Map<String, Object> sd = new HashMap<String, Object>();
         String url = "http://somewhere:1234/blah";
-        sd.put(RemoteConstants.ENDPOINT_URI, url);
+        sd.put(RemoteConstants.ENDPOINT_ID, url);
         assertEquals(url, handler.getPojoAddress(sd, String.class));
     }
     
@@ -129,12 +116,13 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         
         Map props = new HashMap();
         
-        props.put(RemoteConstants.ENDPOINT_URI, "http://google.de/");
-        
+        props.put(RemoteConstants.ENDPOINT_ID, "http://google.de/");
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{"my.class"});
+        props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, new String[]{"my.config"});
         EndpointDescription endpoint = new EndpointDescription(props);
         
         
-        cpfb.setAddress((String)EasyMock.eq(props.get(RemoteConstants.ENDPOINT_URI)));
+        cpfb.setAddress((String)EasyMock.eq(props.get(RemoteConstants.ENDPOINT_ID)));
         EasyMock.expectLastCall().atLeastOnce();
         
         cpfb.setServiceClass(EasyMock.eq(CharSequence.class));

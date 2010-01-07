@@ -434,13 +434,15 @@ public class OsgiUtilsTest extends TestCase {
     public void testGetProperty(){
         
         Map<String, Object> p = new HashMap<String, Object>();
-        p.put(RemoteConstants.ENDPOINT_URI, "http://google.de");
+        p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
         p.put("notAString",new Object());
+        p.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{"my.class"});
+        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, new String[]{"my.config"});
         
         EndpointDescription ep = new EndpointDescription(p);
         
         assertNull(OsgiUtils.getProperty(ep, "unkownProp"));
-        assertEquals(p.get(RemoteConstants.ENDPOINT_URI),OsgiUtils.getProperty(ep, RemoteConstants.ENDPOINT_URI));
+        assertEquals(p.get(RemoteConstants.ENDPOINT_ID),OsgiUtils.getProperty(ep, RemoteConstants.ENDPOINT_ID));
         assertEquals(null, OsgiUtils.getProperty(ep, "notAString"));
     }
 }

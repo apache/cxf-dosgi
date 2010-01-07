@@ -35,7 +35,7 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
 //        ServiceReference sr = EasyMock.createMock(ServiceReference.class);
 //        EasyMock.expect(sr.getProperty(ServicePublication.SERVICE_INTERFACE_NAME)).andReturn(Arrays.asList("java.lang.String", "org.example.interface.AnInterface"));
 //        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_LOCATION)).andReturn(location).atLeastOnce();
-//        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_ID)).andReturn(eid).atLeastOnce();
+//        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_SERVICE_ID)).andReturn(eid).atLeastOnce();
 //        EasyMock.expect(sr.getProperty(ServicePublication.SERVICE_PROPERTIES)).andReturn(srProps).anyTimes();
 //        EasyMock.replay(sr);
 //
@@ -181,7 +181,7 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
 //        String eid = UUID.randomUUID().toString();
 //        String epLoc = "http://localhost:9090/ps";
 //        HashMap<String, Object> expected = new HashMap<String, Object>(initial);
-//        expected.put(ServicePublication.ENDPOINT_ID, eid);
+//        expected.put(ServicePublication.ENDPOINT_SERVICE_ID, eid);
 //        expected.put(ServicePublication.ENDPOINT_LOCATION, 
 //            "http://" + InetAddress.getLocalHost().getHostAddress() + ":9090/ps");
 //        expected.put("osgi.remote.configuration.pojo.address", "http://" + 
@@ -189,7 +189,7 @@ public class PublishToZooKeeperCustomizerTest extends TestCase {
 //                
 //        ServiceReference sr = EasyMock.createMock(ServiceReference.class);
 //        EasyMock.expect(sr.getProperty(ServicePublication.SERVICE_PROPERTIES)).andReturn(initial);
-//        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_ID)).andReturn(eid);
+//        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_SERVICE_ID)).andReturn(eid);
 //        EasyMock.expect(sr.getProperty(ServicePublication.ENDPOINT_LOCATION)).andReturn(epLoc);
 //        EasyMock.replay(sr);
 //        

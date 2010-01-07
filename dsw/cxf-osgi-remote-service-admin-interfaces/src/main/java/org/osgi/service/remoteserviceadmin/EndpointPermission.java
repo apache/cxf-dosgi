@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2000, 2009). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2000, 2010). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 
 package org.osgi.service.remoteserviceadmin;
 
-// TODO Hacked from ServiePermission
+import static org.osgi.service.remoteserviceadmin.RemoteConstants.*;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamField;
-import java.security.BasicPermission;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.util.ArrayList;
@@ -32,205 +31,166 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
- * <pre>
- * -------------------------------------------------------------
- * THIS CLASS IS A PLACEHOLDER (COPIED FROM SERVICE PERMISSION)!
- * -------------------------------------------------------------
- * </pre>
- * 
- * A bundle's authority to register or get a service.
+ * A bundle's authority to export, import or read an Endpoint.
  * <ul>
- * <li>The <code>register</code> action allows a bundle to register a service on
- * the specified names.
- * <li>The <code>get</code> action allows a bundle to detect a service and get
- * it.
+ * <li>The <code>export</code> action allows a bundle to export a service as an
+ * Endpoint.</li>
+ * <li>The <code>import</code> action allows a bundle to import a service from
+ * an Endpoint.</li>
+ * <li>The <code>read</code> action allows a bundle to read references to an
+ * Endpoint.</li>
  * </ul>
- * Permission to get a service is required in order to detect events regarding
- * the service. Untrusted bundles should not be able to detect the presence of
- * certain services unless they have the appropriate
- * <code>EndpointPermission</code> to get the specific service.
+ * Permission to read an Endpoint is required in order to detect events
+ * regarding an Endpoint. Untrusted bundles should not be able to detect the
+ * presence of certain Endpoints unless they have the appropriate
+ * <code>EndpointPermission</code> to read the specific service.
  * 
  * @ThreadSafe
  * @version $Revision$
  */
 
-public final class EndpointPermission extends BasicPermission {
-	static final long						serialVersionUID	= -7662148639076511574L;
-	/**
-	 * The action string <code>export</code>.
-	 */
-	public final static String				EXPORT				= "export";
-	/**
-	 * The action string <code>import</code>.
-	 */
-	public final static String				IMPORT				= "import";
+public final class EndpointPermission extends Permission {
+	static final long					serialVersionUID	= -7662148639076511574L;
 	/**
 	 * The action string <code>read</code>.
 	 */
-	public final static String				READ				= "read";
+	public final static String			READ				= "read";
+	/**
+	 * The action string <code>import</code>. The <code>import</code> action
+	 * implies the <code>read</code> action.
+	 */
+	public final static String			IMPORT				= "import";
+	/**
+	 * The action string <code>export</code>. The <code>export</code> action
+	 * implies the <code>read</code> action.
+	 */
+	public final static String			EXPORT				= "export";
 
-	private final static int				ACTION_EXPORT		= 0x00000001;
-	private final static int				ACTION_IMPORT		= 0x00000002;
-	private final static int				ACTION_READ			= 0x00000004;
-	private final static int				ACTION_ALL			= ACTION_EXPORT
-																		| ACTION_IMPORT
-																		| ACTION_READ;
-	final static int						ACTION_NONE			= 0;
+	private final static int			ACTION_READ			= 0x00000001;
+	private final static int			ACTION_IMPORT		= 0x00000002;
+	private final static int			ACTION_EXPORT		= 0x00000004;
+	private final static int			ACTION_ALL			= ACTION_EXPORT
+																	| ACTION_IMPORT
+																	| ACTION_READ;
+	final static int					ACTION_NONE			= 0;
 
 	/**
 	 * The actions mask.
 	 */
-	transient int							action_mask;
+	transient int						action_mask;
 
 	/**
 	 * The actions in canonical form.
 	 * 
 	 * @serial
 	 */
-	private volatile String					actions				= null;
+	private volatile String				actions				= null;
 
 	/**
-	 * The service used by this EndpointPermission. Must be null if not
-	 * constructed with a service.
+	 * The endpoint used by this EndpointPermission. Must be null if not
+	 * constructed with a endpoint.
 	 */
-	transient final EndpointDescription		endpoint;
-
-	/**
-	 * The object classes for this EndpointPermission. Must be null if not
-	 * constructed with a service.
-	 */
-	transient final String[]				objectClass;
-
-	/**
-	 * If this EndpointPermission was constructed with a filter, this holds a
-	 * Filter matching object used to evaluate the filter in implies.
-	 */
-	transient Filter						filter;
-
+	transient final EndpointDescription					endpoint;
+	
 	/**
 	 * This dictionary holds the properties of the permission, used to match a
-	 * filter in implies. This is not initialized until necessary, and then
-	 * cached in this object.
+	 * filter in implies.
 	 */
-	private transient volatile Dictionary	properties;
+	private transient final Dictionary<String, Object>	properties;
 
 	/**
-	 * True if constructed with a name and the name is "*" or ends with ".*".
+	 * If this EndpointPermission was not constructed with an
+	 * EndpointDescription, this holds a Filter matching object used to evaluate
+	 * the filter in implies or null for wildcard.
 	 */
-	private transient boolean				wildcard;
+	transient Filter					filter;
 
 	/**
-	 * If constructed with a name and the name ends with ".*", this contains the
-	 * name without the final "*".
-	 */
-	private transient String				prefix;
-
-	/**
-	 * Create a new EndpointPermission.
+	 * Create a new EndpointPermission with the specified filter.
 	 * 
 	 * <p>
-	 * The name of the service is specified as a fully qualified class name.
-	 * Wildcards may be used.
-	 * 
-	 * <pre>
-	 * name ::= &lt;class name&gt; | &lt;class name ending in &quot;.*&quot;&gt; | *
-	 * </pre>
-	 * 
-	 * Examples:
-	 * 
-	 * <pre>
-	 * org.osgi.service.http.HttpService
-	 * org.osgi.service.http.*
-	 * *
-	 * </pre>
-	 * 
-	 * For the <code>get</code> action, the name can also be a filter
-	 * expression. The filter gives access to the service properties as well as
-	 * the following attributes:
-	 * <ul>
-	 * <li>signer - A Distinguished Name chain used to sign the bundle
-	 * publishing the service. Wildcards in a DN are not matched according to
-	 * the filter string rules, but according to the rules defined for a DN
-	 * chain.</li>
-	 * <li>location - The location of the bundle publishing the service.</li>
-	 * <li>id - The bundle ID of the bundle publishing the service.</li>
-	 * <li>name - The symbolic name of the bundle publishing the service.</li>
-	 * </ul>
-	 * Since the above attribute names may conflict with service property names
-	 * used by a service, you can prefix an attribute name with '@' in the
-	 * filter expression to match against the service property and not one of
-	 * the above attributes. Filter attribute names are processed in a case
-	 * sensitive manner unless the attribute references a service property.
-	 * Service properties names are case insensitive.
+	 * The filter will be evaluated against the endpoint properties of a
+	 * requested EndpointPermission.
 	 * 
 	 * <p>
-	 * There are two possible actions: <code>get</code> and
-	 * <code>register</code>. The <code>get</code> permission allows the owner
-	 * of this permission to obtain a service with this name. The
-	 * <code>register</code> permission allows the bundle to register a service
-	 * under that name.
+	 * There are three possible actions: <code>read</code>, <code>import</code>
+	 * and <code>export</code>. The <code>read</code> action allows the owner of
+	 * this permission to see the presence of distributed services. The
+	 * <code>import</code> action allows the owner of this permission to import
+	 * an endpoint. The <code>export</code> action allows the owner of this
+	 * permission to export a service.
 	 * 
-	 * @param name The service class name
-	 * @param actions <code>get</code>,<code>register</code> (canonical order)
-	 * @throws IllegalArgumentException If the specified name is a filter
-	 *         expression and either the specified action is not
-	 *         <code>get</code> or the filter has an invalid syntax.
+	 * @param filterString The filter string or &quot;*&quot; to match all
+	 *        endpoints.
+	 * @param actions The actions <code>read</code>, <code>import</code>, or
+	 *        <code>export</code>.
+	 * @throws IllegalArgumentException If the filter has an invalid syntax or
+	 *         the actions are not valid.
 	 */
-	public EndpointPermission(String name, String actions) {
-		this(name, parseActions(actions));
-		if ((filter != null) && ((action_mask & ACTION_ALL) != ACTION_EXPORT)) {
-			throw new IllegalArgumentException(
-					"invalid action string for filter expression");
-		}
+	public EndpointPermission(String filterString, String actions) {
+		this(filterString, parseActions(actions));
 	}
 
 	/**
 	 * Creates a new requested <code>EndpointPermission</code> object to be used
-	 * by code that must perform <code>checkPermission</code> for the
-	 * <code>get</code> action. <code>EndpointPermission</code> objects created
-	 * with this constructor cannot be added to a
-	 * <code>EndpointPermission</code> permission collection.
+	 * by code that must perform <code>checkPermission</code>.
+	 * <code>EndpointPermission</code> objects created with this constructor
+	 * cannot be added to an <code>EndpointPermission</code> permission
+	 * collection.
 	 * 
-	 * @param endpoint The requested service.
-	 * @param actions The action <code>get</code>.
-	 * @throws IllegalArgumentException If the specified action is not
-	 *         <code>get</code> or reference is <code>null</code>.
-	 * @since 1.5
+	 * @param endpoint The requested endpoint.
+	 * @param localFrameworkUUID The UUID of the local framework. This is used
+	 *        to support matching the
+	 *        {@link RemoteConstants#ENDPOINT_FRAMEWORK_UUID
+	 *        endpoint.framework.uuid} endpoint property to the
+	 *        <code>&lt;&lt;LOCAL&gt;&gt;</code> value in the filter expression.
+	 * @param actions The actions <code>read</code>, <code>import</code>, or
+	 *        <code>export</code>.
+	 * @throws IllegalArgumentException If the endpoint is <code>null</code> or
+	 *         the actions are not valid.
 	 */
-	public EndpointPermission(EndpointDescription endpoint, String actions) {
+	public EndpointPermission(EndpointDescription endpoint,
+			String localFrameworkUUID, String actions) {
 		super(createName(endpoint));
 		setTransients(null, parseActions(actions));
-		this.endpoint = endpoint;
-		this.objectClass = (String[]) endpoint.getProperties().get(
-				Constants.OBJECTCLASS);
-		if ((action_mask & ACTION_ALL) != ACTION_EXPORT) {
-			throw new IllegalArgumentException("invalid action string");
+		Map<String, Object> props;
+		if ((localFrameworkUUID != null)
+				&& localFrameworkUUID.equals(endpoint.getRemoteFrameworkUUID())) {
+			props = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
+			props.putAll(endpoint.getProperties());
+			props.put(ENDPOINT_FRAMEWORK_UUID, new String[] {
+					endpoint.getRemoteFrameworkUUID(), "<<LOCAL>>"});
 		}
+		else {
+			props = endpoint.getProperties();
+		}
+		this.endpoint = endpoint;
+		this.properties = new EndpointDescription.UnmodifiableDictionary<String, Object>(
+				props);
 	}
 
 	/**
-	 * Create a permission name from a EndpointDescription TODO Needs work
+	 * Create a permission name from a EndpointDescription.
 	 * 
 	 * @param endpoint EndpointDescription to use to create permission name.
 	 * @return permission name.
 	 */
 	private static String createName(EndpointDescription endpoint) {
 		if (endpoint == null) {
-			throw new IllegalArgumentException("reference must not be null");
+			throw new IllegalArgumentException("invalid endpoint: null");
 		}
-		StringBuffer sb = new StringBuffer("(service.id=");
-		// TODO sb.append(endpoint.getProperty(Constants.SERVICE_ID));
+		StringBuffer sb = new StringBuffer("(" + ENDPOINT_ID + "=");
+		sb.append(endpoint.getRemoteID());
 		sb.append(")");
 		return sb.toString();
 	}
@@ -245,7 +205,7 @@ public final class EndpointPermission extends BasicPermission {
 		super(name);
 		setTransients(parseFilter(name), mask);
 		this.endpoint = null;
-		this.objectClass = null;
+		this.properties = null;
 	}
 
 	/**
@@ -259,16 +219,6 @@ public final class EndpointPermission extends BasicPermission {
 		}
 		action_mask = mask;
 		filter = f;
-		if (f == null) {
-			String name = getName();
-			int l = name.length();
-			/* if "*" or endsWith ".*" */
-			wildcard = ((name.charAt(l - 1) == '*') && ((l == 1) || (name
-					.charAt(l - 2) == '.')));
-			if (wildcard && (l > 1)) {
-				prefix = name.substring(0, l - 1);
-			}
-		}
 	}
 
 	/**
@@ -304,34 +254,45 @@ public final class EndpointPermission extends BasicPermission {
 			// check for the known strings
 			int matchlen;
 
-			if (i >= 2 && (a[i - 2] == 'g' || a[i - 2] == 'G')
-					&& (a[i - 1] == 'e' || a[i - 1] == 'E')
+			if (i >= 5 && (a[i - 5] == 'i' || a[i - 5] == 'I')
+					&& (a[i - 4] == 'm' || a[i - 4] == 'M')
+					&& (a[i - 3] == 'p' || a[i - 3] == 'P')
+					&& (a[i - 2] == 'o' || a[i - 2] == 'O')
+					&& (a[i - 1] == 'r' || a[i - 1] == 'R')
 					&& (a[i] == 't' || a[i] == 'T')) {
-				matchlen = 3;
-				mask |= ACTION_EXPORT;
+				matchlen = 6;
+				mask |= ACTION_IMPORT | ACTION_READ;
 
 			}
 			else
-				if (i >= 7 && (a[i - 7] == 'r' || a[i - 7] == 'R')
-						&& (a[i - 6] == 'e' || a[i - 6] == 'E')
-						&& (a[i - 5] == 'g' || a[i - 5] == 'G')
-						&& (a[i - 4] == 'i' || a[i - 4] == 'I')
-						&& (a[i - 3] == 's' || a[i - 3] == 'S')
-						&& (a[i - 2] == 't' || a[i - 2] == 'T')
-						&& (a[i - 1] == 'e' || a[i - 1] == 'E')
-						&& (a[i] == 'r' || a[i] == 'R')) {
-					matchlen = 8;
-					mask |= ACTION_IMPORT;
+				if (i >= 5 && (a[i - 5] == 'e' || a[i - 5] == 'E')
+						&& (a[i - 4] == 'x' || a[i - 4] == 'X')
+						&& (a[i - 3] == 'p' || a[i - 3] == 'P')
+						&& (a[i - 2] == 'o' || a[i - 2] == 'O')
+						&& (a[i - 1] == 'r' || a[i - 1] == 'R')
+						&& (a[i] == 't' || a[i] == 'T')) {
+					matchlen = 6;
+					mask |= ACTION_EXPORT | ACTION_READ;
 
 				}
 				else {
-					// parse error
-					throw new IllegalArgumentException("invalid permission: "
-							+ actions);
+					if (i >= 3 && (a[i - 3] == 'r' || a[i - 3] == 'R')
+							&& (a[i - 2] == 'e' || a[i - 2] == 'E')
+							&& (a[i - 1] == 'a' || a[i - 1] == 'A')
+							&& (a[i] == 'd' || a[i] == 'D')) {
+						matchlen = 4;
+						mask |= ACTION_READ;
+
+					}
+					else {
+						// parse error
+						throw new IllegalArgumentException(
+								"invalid permission: " + actions);
+					}
 				}
 
 			// make sure we didn't just match the tail of a word
-			// like "ackbarfregister". Also, skip to the comma.
+			// like "ackbarfread". Also, skip to the comma.
 			seencomma = false;
 			while (i >= matchlen && !seencomma) {
 				switch (a[i - matchlen]) {
@@ -366,16 +327,17 @@ public final class EndpointPermission extends BasicPermission {
 	 * Parse filter string into a Filter object.
 	 * 
 	 * @param filterString The filter string to parse.
-	 * @return a Filter for this bundle. If the specified filterString is not a
-	 *         filter expression, then <code>null</code> is returned.
+	 * @return a Filter for this bundle.
 	 * @throws IllegalArgumentException If the filter syntax is invalid.
 	 */
 	private static Filter parseFilter(String filterString) {
-		filterString = filterString.trim();
-		if (filterString.charAt(0) != '(') {
-			return null;
+		if (filterString == null) {
+			throw new IllegalArgumentException("invalid filter: null");
 		}
-
+		filterString = filterString.trim();
+		if (filterString.equals("*")) {
+			return null; // wildcard
+		}
 		try {
 			return FrameworkUtil.createFilter(filterString);
 		}
@@ -428,46 +390,19 @@ public final class EndpointPermission extends BasicPermission {
 		if ((effective & desired) != desired) {
 			return false;
 		}
-		/* we have name of "*" */
-		if (wildcard && (prefix == null)) {
+		/* if we have no filter */
+		Filter f = filter;
+		if (f == null) {
+			// it's "*"
 			return true;
 		}
-		/* if we have a filter */
-		Filter f = filter;
-		if (f != null) {
-			return f.matchCase(requested.getProperties());
-		}
-		/* if requested permission not created with EndpointDescription */
-		String[] requestedNames = requested.objectClass;
-		if (requestedNames == null) {
-			return super.implies(requested);
-		}
-		/* requested permission created with EndpointDescription */
-		if (wildcard) {
-			int pl = prefix.length();
-			for (int i = 0, l = requestedNames.length; i < l; i++) {
-				String requestedName = requestedNames[i];
-				if ((requestedName.length() > pl)
-						&& requestedName.startsWith(prefix)) {
-					return true;
-				}
-			}
-		}
-		else {
-			String name = getName();
-			for (int i = 0, l = requestedNames.length; i < l; i++) {
-				if (requestedNames[i].equals(name)) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return f.matchCase(requested.getProperties());
 	}
 
 	/**
 	 * Returns the canonical string representation of the actions. Always
-	 * returns present actions in the following order: <code>get</code>,
-	 * <code>register</code>.
+	 * returns present actions in the following canonical order:
+	 * <code>read</code>, <code>import</code>, <code>export</code>.
 	 * 
 	 * @return The canonical string representation of the actions.
 	 */
@@ -478,8 +413,8 @@ public final class EndpointPermission extends BasicPermission {
 			boolean comma = false;
 
 			int mask = action_mask;
-			if ((mask & ACTION_EXPORT) == ACTION_EXPORT) {
-				sb.append(EXPORT);
+			if ((mask & ACTION_READ) == ACTION_READ) {
+				sb.append(READ);
 				comma = true;
 			}
 
@@ -487,6 +422,12 @@ public final class EndpointPermission extends BasicPermission {
 				if (comma)
 					sb.append(',');
 				sb.append(IMPORT);
+			}
+
+			if ((mask & ACTION_EXPORT) == ACTION_EXPORT) {
+				if (comma)
+					sb.append(',');
+				sb.append(EXPORT);
 			}
 
 			actions = result = sb.toString();
@@ -509,12 +450,12 @@ public final class EndpointPermission extends BasicPermission {
 	/**
 	 * Determines the equality of two EndpointPermission objects.
 	 * 
-	 * Checks that specified object has the same class name and action as this
-	 * <code>EndpointPermission</code>.
+	 * Checks that specified object has the same name, actions and endpoint as
+	 * this <code>EndpointPermission</code>.
 	 * 
 	 * @param obj The object to test for equality.
 	 * @return true if obj is a <code>EndpointPermission</code>, and has the
-	 *         same class name and actions as this
+	 *         same name, actions and endpoint as this
 	 *         <code>EndpointPermission</code> object; <code>false</code>
 	 *         otherwise.
 	 */
@@ -527,13 +468,13 @@ public final class EndpointPermission extends BasicPermission {
 			return false;
 		}
 
-		EndpointPermission sp = (EndpointPermission) obj;
+		EndpointPermission ep = (EndpointPermission) obj;
 
-		return (action_mask == sp.action_mask)
-				&& getName().equals(sp.getName())
-				&& ((endpoint == sp.endpoint) || ((endpoint != null)
-						&& (sp.endpoint != null) && endpoint
-						.equals(sp.endpoint)));
+		return (action_mask == ep.action_mask)
+				&& getName().equals(ep.getName())
+				&& ((endpoint == ep.endpoint) || ((endpoint != null)
+						&& (ep.endpoint != null) && endpoint
+						.equals(ep.endpoint)));
 	}
 
 	/**
@@ -561,8 +502,9 @@ public final class EndpointPermission extends BasicPermission {
 		}
 		// Write out the actions. The superclass takes care of the name
 		// call getActions to make sure actions field is initialized
-		if (actions == null)
+		if (actions == null) {
 			getActions();
+		}
 		s.defaultWriteObject();
 	}
 
@@ -582,109 +524,8 @@ public final class EndpointPermission extends BasicPermission {
 	 * 
 	 * @return a dictionary of properties for this permission.
 	 */
-	private Dictionary/* <String,Object> */getProperties() {
-		Dictionary/* <String, Object> */result = properties;
-		if (result != null) {
-			return result;
-		}
-		if (endpoint == null) {
-			result = new Hashtable/* <String, Object> */(1);
-			if (filter == null) {
-				result.put(Constants.OBJECTCLASS, new String[] {getName()});
-			}
-			return properties = result;
-		}
-		final Map props = new HashMap(4);
-		// TODO needs work
-		/*
-		 * final Bundle bundle = endpoint.getBundle(); if (bundle != null) {
-		 * AccessController.doPrivileged(new PrivilegedAction() { public Object
-		 * run() { props.put("id", new Long(bundle.getBundleId()));
-		 * props.put("location", bundle.getLocation()); String name =
-		 * bundle.getSymbolicName(); if (name != null) { props.put("name",
-		 * name); } SignerProperty signer = new SignerProperty(bundle); if
-		 * (signer.isBundleSigned()) { props.put("signer", signer); } return
-		 * null; } }); }
-		 */
-		return properties = new Properties(props, endpoint);
-	}
-
-	private static class Properties extends Dictionary {
-		private final Map					properties;
-		private final EndpointDescription	service;
-
-		Properties(Map properties, EndpointDescription service) {
-			this.properties = properties;
-			this.service = service;
-		}
-
-		public Object get(Object k) {
-			if (!(k instanceof String)) {
-				return null;
-			}
-			String key = (String) k;
-			if (key.charAt(0) == '@') {
-				return service.getProperties().get(key.substring(1));
-			}
-			Object value = properties.get(key);
-			if (value != null) { // fall back to service properties
-				return value;
-			}
-			return service.getProperties().get(key);
-		}
-
-		public int size() {
-			return properties.size() + service.getProperties().size();
-		}
-
-		public boolean isEmpty() {
-			// we can return false because this must never be empty
-			return false;
-		}
-
-		public Enumeration keys() {
-			Collection pk = properties.keySet();
-			String spk[] = (String[]) service.getProperties().keySet().toArray(
-					new String[service.getProperties().size()]);
-			List all = new ArrayList(pk.size() + spk.length);
-			all.addAll(pk);
-			add: for (int i = 0, length = spk.length; i < length; i++) {
-				String key = spk[i];
-				for (Iterator iter = pk.iterator(); iter.hasNext();) {
-					if (key.equalsIgnoreCase((String) iter.next())) {
-						continue add;
-					}
-				}
-				all.add(key);
-			}
-			return Collections.enumeration(all);
-		}
-
-		public Enumeration elements() {
-			Collection pk = properties.keySet();
-			String spk[] = (String[]) service.getProperties().keySet().toArray(
-					new String[service.getProperties().size()]);
-			List all = new ArrayList(pk.size() + spk.length);
-			all.addAll(properties.values());
-			add: for (int i = 0, length = spk.length; i < length; i++) {
-				String key = spk[i];
-				for (Iterator iter = pk.iterator(); iter.hasNext();) {
-					if (key.equalsIgnoreCase((String) iter.next())) {
-						continue add;
-					}
-				}
-				all.add(service.getProperties().get(key));
-			}
-			return Collections.enumeration(all);
-		}
-
-		public Object put(Object key, Object value) {
-			throw new UnsupportedOperationException();
-		}
-
-		public Object remove(Object key) {
-			throw new UnsupportedOperationException();
-		}
+	private Dictionary<String, Object> getProperties() {
+		return properties;
 	}
 }
 
@@ -696,13 +537,14 @@ public final class EndpointPermission extends BasicPermission {
  * @see java.security.PermissionCollection
  */
 final class EndpointPermissionCollection extends PermissionCollection {
-	static final long		serialVersionUID	= 662615640374640621L;
+	static final long						serialVersionUID	= 662615640374640621L;
 	/**
 	 * Table of permissions.
 	 * 
+	 * @serial
 	 * @GuardedBy this
 	 */
-	private transient Map	permissions;
+	private Map<String, EndpointPermission>	permissions;
 
 	/**
 	 * Boolean saying if "*" is in the collection.
@@ -710,21 +552,13 @@ final class EndpointPermissionCollection extends PermissionCollection {
 	 * @serial
 	 * @GuardedBy this
 	 */
-	private boolean			all_allowed;
-
-	/**
-	 * Table of permissions with filter expressions.
-	 * 
-	 * @serial
-	 * @GuardedBy this
-	 */
-	private Map				filterPermissions;
+	private boolean							all_allowed;
 
 	/**
 	 * Creates an empty EndpointPermissions object.
 	 */
 	public EndpointPermissionCollection() {
-		permissions = new HashMap();
+		permissions = new HashMap<String, EndpointPermission>();
 		all_allowed = false;
 	}
 
@@ -748,39 +582,29 @@ final class EndpointPermissionCollection extends PermissionCollection {
 					+ "readonly PermissionCollection");
 		}
 
-		final EndpointPermission sp = (EndpointPermission) permission;
-		if (sp.endpoint != null) {
+		final EndpointPermission ep = (EndpointPermission) permission;
+		if (ep.endpoint != null) {
 			throw new IllegalArgumentException("cannot add to collection: "
-					+ sp);
+					+ ep);
 		}
 
-		final String name = sp.getName();
-		final Filter f = sp.filter;
+		final String name = ep.getName();
 		synchronized (this) {
 			/* select the bucket for the permission */
-			Map pc;
-			if (f != null) {
-				pc = filterPermissions;
-				if (pc == null) {
-					filterPermissions = pc = new HashMap();
-				}
-			}
-			else {
-				pc = permissions;
-			}
+			Map<String, EndpointPermission> pc = permissions;
 			final EndpointPermission existing = (EndpointPermission) pc
 					.get(name);
 
 			if (existing != null) {
 				final int oldMask = existing.action_mask;
-				final int newMask = sp.action_mask;
+				final int newMask = ep.action_mask;
 				if (oldMask != newMask) {
 					pc.put(name,
 							new EndpointPermission(name, oldMask | newMask));
 				}
 			}
 			else {
-				pc.put(name, sp);
+				pc.put(name, ep);
 			}
 
 			if (!all_allowed) {
@@ -808,97 +632,31 @@ final class EndpointPermissionCollection extends PermissionCollection {
 		if (requested.filter != null) {
 			return false;
 		}
-
 		int effective = EndpointPermission.ACTION_NONE;
-		Collection perms;
+		Collection<EndpointPermission> perms;
 		synchronized (this) {
 			final int desired = requested.action_mask;
 			/* short circuit if the "*" Permission was added */
 			if (all_allowed) {
-				EndpointPermission sp = (EndpointPermission) permissions
-						.get("*");
-				if (sp != null) {
-					effective |= sp.action_mask;
+				EndpointPermission ep = permissions.get("*");
+				if (ep != null) {
+					effective |= ep.action_mask;
 					if ((effective & desired) == desired) {
 						return true;
 					}
 				}
 			}
-
-			String[] requestedNames = requested.objectClass;
-			/* if requested permission not created with EndpointDescription */
-			if (requestedNames == null) {
-				effective |= effective(requested.getName(), desired, effective);
-				if ((effective & desired) == desired) {
-					return true;
-				}
-			}
-			/* requested permission created with EndpointDescription */
-			else {
-				for (int i = 0, l = requestedNames.length; i < l; i++) {
-					if ((effective(requestedNames[i], desired, effective) & desired) == desired) {
-						return true;
-					}
-				}
-			}
-			Map pc = filterPermissions;
-			if (pc == null) {
-				return false;
-			}
-			perms = pc.values();
+			perms = permissions.values();
 		}
 
-		/* iterate one by one over filteredPermissions */
-		for (Iterator iter = perms.iterator(); iter.hasNext();) {
-			if (((EndpointPermission) iter.next()).implies0(requested,
-					effective)) {
+		/* iterate one by one over permissions */
+		for (Iterator<EndpointPermission> iter = perms.iterator(); iter
+				.hasNext();) {
+			if (iter.next().implies0(requested, effective)) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Consult permissions map to compute the effective permission for the
-	 * requested permission name.
-	 * 
-	 * @param requestedName The requested service name.
-	 * @param desired The desired actions.
-	 * @param effective The effective actions.
-	 * @return The new effective actions.
-	 */
-	private int effective(String requestedName, final int desired, int effective) {
-		final Map pc = permissions;
-		EndpointPermission sp = (EndpointPermission) pc.get(requestedName);
-		// strategy:
-		// Check for full match first. Then work our way up the
-		// name looking for matches on a.b.*
-		if (sp != null) {
-			// we have a direct hit!
-			effective |= sp.action_mask;
-			if ((effective & desired) == desired) {
-				return effective;
-			}
-		}
-		// work our way up the tree...
-		int last;
-		int offset = requestedName.length() - 1;
-		while ((last = requestedName.lastIndexOf(".", offset)) != -1) {
-			requestedName = requestedName.substring(0, last + 1) + "*";
-			sp = (EndpointPermission) pc.get(requestedName);
-			if (sp != null) {
-				effective |= sp.action_mask;
-				if ((effective & desired) == desired) {
-					return effective;
-				}
-			}
-			offset = last - 1;
-		}
-		/*
-		 * we don't have to check for "*" as it was already checked before we
-		 * were called.
-		 */
-		return effective;
 	}
 
 	/**
@@ -907,37 +665,29 @@ final class EndpointPermissionCollection extends PermissionCollection {
 	 * 
 	 * @return Enumeration of all the EndpointPermission objects.
 	 */
-	public synchronized Enumeration elements() {
-		List all = new ArrayList(permissions.values());
-		Map pc = filterPermissions;
-		if (pc != null) {
-			all.addAll(pc.values());
-		}
+	public synchronized Enumeration<Permission> elements() {
+		List<Permission> all = new ArrayList<Permission>(permissions.values());
 		return Collections.enumeration(all);
 	}
 
 	/* serialization logic */
 	private static final ObjectStreamField[]	serialPersistentFields	= {
-			new ObjectStreamField("permissions", Hashtable.class),
-			new ObjectStreamField("all_allowed", Boolean.TYPE),
-			new ObjectStreamField("filterPermissions", HashMap.class)	};
+			new ObjectStreamField("permissions", HashMap.class),
+			new ObjectStreamField("all_allowed", Boolean.TYPE)			};
 
 	private synchronized void writeObject(ObjectOutputStream out)
 			throws IOException {
-		Hashtable hashtable = new Hashtable(permissions);
 		ObjectOutputStream.PutField pfields = out.putFields();
-		pfields.put("permissions", hashtable);
+		pfields.put("permissions", permissions);
 		pfields.put("all_allowed", all_allowed);
-		pfields.put("filterPermissions", filterPermissions);
 		out.writeFields();
 	}
 
 	private synchronized void readObject(java.io.ObjectInputStream in)
 			throws IOException, ClassNotFoundException {
 		ObjectInputStream.GetField gfields = in.readFields();
-		Hashtable hashtable = (Hashtable) gfields.get("permissions", null);
-		permissions = new HashMap(hashtable);
+		permissions = (HashMap<String, EndpointPermission>) gfields.get(
+				"permissions", new HashMap<String, EndpointPermission>());
 		all_allowed = gfields.get("all_allowed", false);
-		filterPermissions = (HashMap) gfields.get("filterPermissions", null);
 	}
 }

@@ -97,10 +97,10 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                 
                 
                 // the Endpoint.id must be a Long and can't be a string .... 
-                if(m.get(RemoteConstants.ENDPOINT_ID) instanceof String){
-                    String s = (String)m.get(RemoteConstants.ENDPOINT_ID);
+                if(m.get(RemoteConstants.ENDPOINT_SERVICE_ID) instanceof String){
+                    String s = (String)m.get(RemoteConstants.ENDPOINT_SERVICE_ID);
                     Long l = Long.parseLong(s);
-                    m.put(RemoteConstants.ENDPOINT_ID, l);
+                    m.put(RemoteConstants.ENDPOINT_SERVICE_ID, l);
                 }
                 
                 

@@ -8,11 +8,13 @@
       </array>
     </property>
     <property name="service.intents">SOAP</property>
-    <property name="service.exported.configs" value="org.apache.cxf.ws"/>
-    <property name="endpoint.uri">foo:bar</property>
+    <!-- Marc: Changed to from exported to imported  -->
+    <property name="service.imported.configs" value="org.apache.cxf.ws"/>
+    <property name="endpoint.id">foo:bar</property>
   </endpoint-description>
   <endpoint-description>
-    <property name="endpoint.uri">foo:bar</property>
+    <property name="service.imported.configs" value="org.apache.cxf.ws"/>
+    <property name="endpoint.id">foo:bar</property>
     <property name="objectClass" value-type="String">
       <array>
         <value>com.acme.HelloService</value>

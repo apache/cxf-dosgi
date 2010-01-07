@@ -27,7 +27,8 @@
         <value>org.example.ClassA</value>
       </array>
     </property>
-    <property name="endpoint.uri">http://somewhere</property>
+    <property name="endpoint.id">http://somewhere</property>
+    <property name="service.imported.configs" value="org.apache.cxf.ws"/>
   </endpoint-description>
 
   <endpoint-description>
@@ -36,7 +37,8 @@
         <value>org.example.ClassB</value>
       </array>
     </property>
-    <property name="endpoint.uri">http://somewhere:1</property>
+    <property name="endpoint.id">http://somewhere:1</property>
+    <property name="service.imported.configs" value="org.apache.cxf.ws"/>
   </endpoint-description>
 </rsa:endpoint-descriptions>
   

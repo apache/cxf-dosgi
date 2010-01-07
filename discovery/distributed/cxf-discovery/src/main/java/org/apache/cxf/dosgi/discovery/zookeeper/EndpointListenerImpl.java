@@ -85,7 +85,7 @@ public class EndpointListenerImpl implements EndpointListener {
             try {
 
                 Collection<String> interfaces = endpoint.getInterfaces();
-                String endpointKey = getKey(endpoint.getRemoteURI());
+                String endpointKey = getKey(endpoint.getRemoteID());
 
                 ZooKeeper zk = getZooKeeper();
                 for (String name : interfaces) {
@@ -130,7 +130,7 @@ public class EndpointListenerImpl implements EndpointListener {
     private void removeEndpoint(EndpointDescription endpoint) throws UnknownHostException,
         URISyntaxException, InterruptedException, KeeperException {
         Collection<String> interfaces = endpoint.getInterfaces();
-        String endpointKey = getKey(endpoint.getRemoteURI());
+        String endpointKey = getKey(endpoint.getRemoteID());
 
         ZooKeeper zk = getZooKeeper();
         for (String name : interfaces) {
@@ -183,7 +183,7 @@ public class EndpointListenerImpl implements EndpointListener {
         }
 
         // Marc: FIXME: What is/was ths good for ??!?!?
-        // copyProperty(ServicePublication.ENDPOINT_ID, sr, p, host);
+        // copyProperty(ServicePublication.ENDPOINT_SERVICE_ID, sr, p, host);
         // copyProperty(ServicePublication.ENDPOINT_LOCATION, sr, p, host);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

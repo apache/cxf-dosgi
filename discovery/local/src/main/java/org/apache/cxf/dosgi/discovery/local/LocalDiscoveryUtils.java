@@ -94,7 +94,7 @@ public final class LocalDiscoveryUtils {
 //                remoteProps.put(ServicePublication.SERVICE_INTERFACE_NAME, iNames); 
 //                
 //                if (addEndpointID) {
-//                    remoteProps.put(ServicePublication.ENDPOINT_ID, UUID.randomUUID().toString());
+//                    remoteProps.put(ServicePublication.ENDPOINT_SERVICE_ID, UUID.randomUUID().toString());
 //                }
                 // @@@@ TODO
                 // srefs.add(new ServiceEndpointDescriptionImpl(iNames, remoteProps));                

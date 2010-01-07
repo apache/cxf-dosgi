@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2008, 2009). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2008, 2010). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,18 +42,21 @@ import org.osgi.framework.Version;
  * A description of an endpoint that provides sufficient information for a
  * compatible distribution provider to create a connection to this endpoint
  * 
- * An Endpoint Description is easy to transfer between different systems. This
- * allows it to be used as a communications device to convey available endpoint
- * information to nodes in a network.
+ * An Endpoint Description is easy to transfer between different systems because
+ * it is property based where the property keys are strings and the values are
+ * simple types. This allows it to be used as a communications device to convey
+ * available endpoint information to nodes in a network.
  * 
- * An Endpoint Description reflects the perspective of an importer. That is, the
- * property keys have been chosen to match filters that are created by client
- * bundles that need a service. Therefore the map must not contain any
- * service.exported.* property and must contain the service.imported.* ones.
+ * An Endpoint Description reflects the perspective of an <i>importer</i>. That
+ * is, the property keys have been chosen to match filters that are created by
+ * client bundles that need a service. Therefore the map must not contain any
+ * <code>service.exported.*</code> property and must contain the corresponding
+ * <code>service.imported.*</code> ones.
  * 
- * The service.intents property contains the intents provided by the service
- * itself combined with the intents added by the exporting distribution
- * provider. Qualified intents appear expanded on this property.
+ * The <code>service.intents</code> property must contain the intents provided
+ * by the service itself combined with the intents added by the exporting
+ * distribution provider. Qualified intents appear fully expanded on this
+ * property.
  * 
  * @Immutable
  * @version $Revision$
@@ -62,15 +65,17 @@ import org.osgi.framework.Version;
 public class EndpointDescription {
 	private final Map<String, Object>	properties;
 	private final List<String>			interfaces;
-	private final long					remoteServiceId;
+	private final long					remoteServiceID;
 	private final String				remoteFrameworkUUID;
-	private final String				remoteUri;
+	private final String				remoteID;
 
 	/**
-	 * Create an Endpoint Description based on a Map.
+	 * Create an Endpoint Description from a Map.
 	 * 
 	 * <p>
-	 * The {@link RemoteConstants#ENDPOINT_URI} property must be set.
+	 * The {@link RemoteConstants#ENDPOINT_ID endpoint.id},
+	 * {@link RemoteConstants#SERVICE_IMPORTED_CONFIGS service.imported.configs}
+	 * and <code>objectClass</code> properties must be set.
 	 * 
 	 * @param properties The map from which to create the Endpoint Description.
 	 *        The keys in the map must be type <code>String</code> and, since
@@ -94,28 +99,46 @@ public class EndpointDescription {
 		}
 		if (props.size() < properties.size()) {
 			throw new IllegalArgumentException(
-					"duplicate keys with different cases in properties");
+					"duplicate keys with different cases in properties: "
+							+ new ArrayList<String>(props.keySet())
+									.removeAll(properties.keySet()));
 		}
 
+		if (!props.containsKey(SERVICE_IMPORTED)) {
+			props.put(SERVICE_IMPORTED, Boolean.toString(true));
+		}
 		this.properties = Collections.unmodifiableMap(props);
 		/* properties must be initialized before calling the following methods */
 		interfaces = verifyObjectClassProperty();
-		remoteServiceId = verifyLongProperty(ENDPOINT_ID);
+		remoteServiceID = verifyLongProperty(ENDPOINT_SERVICE_ID);
 		remoteFrameworkUUID = verifyStringProperty(ENDPOINT_FRAMEWORK_UUID);
-		remoteUri = verifyStringProperty(ENDPOINT_URI);
-		if (remoteUri == null) {
-			throw new IllegalArgumentException(ENDPOINT_URI
+		remoteID = verifyStringProperty(ENDPOINT_ID);
+		if (remoteID == null) {
+			throw new IllegalArgumentException(ENDPOINT_ID
 					+ " property must be set");
+		}
+		if (getConfigurationTypes().isEmpty()) {
+			throw new IllegalArgumentException(SERVICE_IMPORTED_CONFIGS
+					+ " property must be set and non-empty");
 		}
 	}
 
 	/**
-	 * Create an Endpoint Description based on a service reference and a map of
+	 * Create an Endpoint Description based on a Service Reference and a Map of
 	 * properties. The properties in the map take precedence over the properties
-	 * in the service reference.
+	 * in the Service Reference.
 	 * 
 	 * <p>
-	 * The {@link RemoteConstants#ENDPOINT_URI} property must be set.
+	 * This method will automatically set the
+	 * {@link RemoteConstants#ENDPOINT_FRAMEWORK_UUID endpoint.framework.uuid}
+	 * and {@link RemoteConstants#ENDPOINT_SERVICE_ID endpoint.service.id}
+	 * properties based on the specified Service Reference as well as the
+	 * {@link RemoteConstants#SERVICE_IMPORTED service.imported} property if
+	 * they are not specified as properties.
+	 * <p>
+	 * The {@link RemoteConstants#ENDPOINT_ID endpoint.id},
+	 * {@link RemoteConstants#SERVICE_IMPORTED_CONFIGS service.imported.configs}
+	 * and <code>objectClass</code> properties must be set.
 	 * 
 	 * @param reference A service reference that can be exported.
 	 * @param properties Map of properties. This argument can be
@@ -142,7 +165,9 @@ public class EndpointDescription {
 			}
 			if (props.size() < properties.size()) {
 				throw new IllegalArgumentException(
-						"duplicate keys with different cases in properties");
+						"duplicate keys with different cases in properties: "
+								+ new ArrayList<String>(props.keySet())
+										.removeAll(properties.keySet()));
 			}
 		}
 
@@ -152,8 +177,8 @@ public class EndpointDescription {
 			}
 		}
 
-		if (!props.containsKey(ENDPOINT_ID)) {
-			props.put(ENDPOINT_ID, reference.getProperty(Constants.SERVICE_ID));
+		if (!props.containsKey(ENDPOINT_SERVICE_ID)) {
+			props.put(ENDPOINT_SERVICE_ID, reference.getProperty(Constants.SERVICE_ID));
 		}
 		if (!props.containsKey(ENDPOINT_FRAMEWORK_UUID)) {
 			String uuid = null;
@@ -173,15 +198,22 @@ public class EndpointDescription {
 				props.put(ENDPOINT_FRAMEWORK_UUID, uuid);
 			}
 		}
+		if (!props.containsKey(SERVICE_IMPORTED)) {
+			props.put(SERVICE_IMPORTED, Boolean.toString(true));
+		}
 		this.properties = Collections.unmodifiableMap(props);
 		/* properties must be initialized before calling the following methods */
 		interfaces = verifyObjectClassProperty();
-		remoteServiceId = verifyLongProperty(ENDPOINT_ID);
+		remoteServiceID = verifyLongProperty(ENDPOINT_SERVICE_ID);
 		remoteFrameworkUUID = verifyStringProperty(ENDPOINT_FRAMEWORK_UUID);
-		remoteUri = verifyStringProperty(ENDPOINT_URI);
-		if (remoteUri == null) {
-			throw new IllegalArgumentException(ENDPOINT_URI
+		remoteID = verifyStringProperty(ENDPOINT_ID);
+		if (remoteID == null) {
+			throw new IllegalArgumentException(ENDPOINT_ID
 					+ " property must be set");
+		}
+		if (getConfigurationTypes().isEmpty()) {
+			throw new IllegalArgumentException(SERVICE_IMPORTED_CONFIGS
+					+ " property must be set and non-empty");
 		}
 	}
 
@@ -189,20 +221,20 @@ public class EndpointDescription {
 	 * Verify and obtain the interface list from the properties.
 	 * 
 	 * @return A list with the interface names.
-	 * @throws IllegalArgumentException When the properties do not contain the
-	 *         right values for and interface list.
-	 * 
+	 * @throws IllegalArgumentException If the objectClass property is not set
+	 *         or is empty or if the package version property values are
+	 *         malformed.
 	 */
 	private List<String> verifyObjectClassProperty() {
 		Object o = properties.get(Constants.OBJECTCLASS);
-		if (o == null) {
-			return Collections.EMPTY_LIST;
-		}
 		if (!(o instanceof String[])) {
 			throw new IllegalArgumentException(
 					"objectClass value must be of type String[]");
 		}
 		String[] objectClass = (String[]) o;
+		if (objectClass.length < 1) {
+			throw new IllegalArgumentException("objectClass is empty");
+		}
 		for (String interf : objectClass) {
 			int index = interf.lastIndexOf('.');
 			if (index == -1) {
@@ -269,19 +301,19 @@ public class EndpointDescription {
 	}
 
 	/**
-	 * Returns the endpoint's URI.
+	 * Returns the endpoint's id.
 	 * 
-	 * The URI is an opaque id for an endpoint in URI form. No two different
-	 * endpoints must have the same URI, two Endpoint Descriptions with the same
-	 * URI must represent the same endpoint.
+	 * The id is an opaque id for an endpoint. No two different endpoints must
+	 * have the same id. Two Endpoint Descriptions with the same id must
+	 * represent the same endpoint.
 	 * 
-	 * The value of the URI is stored in the
-	 * {@link RemoteConstants#ENDPOINT_URI} property.
+	 * The value of the id is stored in the
+	 * {@link RemoteConstants#ENDPOINT_ID} property.
 	 * 
-	 * @return The URI of the endpoint, never <code>null</code>.
+	 * @return The id of the endpoint, never <code>null</code>.
 	 */
-	public String getRemoteURI() {
-		return remoteUri;
+	public String getRemoteID() {
+		return remoteID;
 	}
 
 	/**
@@ -344,14 +376,14 @@ public class EndpointDescription {
 	 * id for a service.
 	 * 
 	 * The value of the remote service id is stored in the
-	 * {@link RemoteConstants#ENDPOINT_ID} endpoint property.
+	 * {@link RemoteConstants#ENDPOINT_SERVICE_ID} endpoint property.
 	 * 
 	 * @return Service id of a service or 0 if this Endpoint Description does
-	 *         not relate to an OSGi service
+	 *         not relate to an OSGi service.
 	 * 
 	 */
 	public long getRemoteServiceID() {
-		return remoteServiceId;
+		return remoteServiceID;
 	}
 
 	/**
@@ -426,7 +458,7 @@ public class EndpointDescription {
 			List<String> result = new ArrayList<String>(values.size());
 			for (Iterator< ? > iter = values.iterator(); iter.hasNext();) {
 				Object v = iter.next();
-				if ((v != null) && (v instanceof String)) {
+				if (v instanceof String) {
 					result.add((String) v);
 				}
 			}
@@ -464,7 +496,7 @@ public class EndpointDescription {
 	 * as the given Endpoint Description.
 	 * 
 	 * Two Endpoint Descriptions point to the same service if they have the same
-	 * URI or their framework UUIDs and remote service ids are equal.
+	 * id or their framework UUIDs and remote service ids are equal.
 	 * 
 	 * @param other The Endpoint Description to look at
 	 * @return True if this endpoint description points to the same service as
@@ -490,7 +522,7 @@ public class EndpointDescription {
 	 * @return An integer which is a hash code value for this object.
 	 */
 	public int hashCode() {
-		return getRemoteURI().hashCode();
+		return getRemoteID().hashCode();
 	}
 
 	/**
@@ -498,7 +530,7 @@ public class EndpointDescription {
 	 * 
 	 * <p>
 	 * An Endpoint Description is considered to be <b>equal to</b> another
-	 * Endpoint Description if their URIs are equal.
+	 * Endpoint Description if their ids are equal.
 	 * 
 	 * @param other The <code>EndpointDescription</code> object to be compared.
 	 * @return <code>true</code> if <code>object</code> is a
@@ -512,13 +544,13 @@ public class EndpointDescription {
 		if (!(other instanceof EndpointDescription)) {
 			return false;
 		}
-		return getRemoteURI().equals(
-				((EndpointDescription) other).getRemoteURI());
+		return getRemoteID().equals(
+				((EndpointDescription) other).getRemoteID());
 	}
 
 	/**
-	 * Tests the properties of this <code>EndpointDescription</code> against the
-	 * given filter using a case insensitive match.
+	 * Tests the properties of this <code>EndpointDescription</code> against
+	 * the given filter using a case insensitive match.
 	 * 
 	 * @param filter The filter to test.
 	 * @return <code>true</code> If the properties of this
@@ -548,9 +580,10 @@ public class EndpointDescription {
 	}
 
 	/**
-	 * Unmodifiable Dictionary wrapper for a Map.
+	 * Unmodifiable Dictionary wrapper for a Map. This class is also used by
+	 * EndpointPermission.
 	 */
-	private static class UnmodifiableDictionary<K, V> extends Dictionary<K, V> {
+	static class UnmodifiableDictionary<K, V> extends Dictionary<K, V> {
 		private final Map<K, V>	wrapped;
 
 		UnmodifiableDictionary(Map<K, V> wrapped) {
@@ -583,6 +616,10 @@ public class EndpointDescription {
 
 		public int size() {
 			return wrapped.size();
+		}
+
+		public String toString() {
+			return wrapped.toString();
 		}
 	}
 }

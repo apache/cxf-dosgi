@@ -71,7 +71,7 @@ public class EventAdminHelper {
         if (epd != null) {
             setIfNotNull(props, "service.remote.id", epd.getRemoteServiceID());
             setIfNotNull(props, "service.remote.uuid", epd.getRemoteFrameworkUUID());
-            setIfNotNull(props, "service.remote.uri", epd.getRemoteURI());
+            setIfNotNull(props, "service.remote.uri", epd.getRemoteID());
             // FIXME: correct ?!?
             setIfNotNull(props, "objectClass", epd.getInterfaces().toArray());
             setIfNotNull(props, "service.imported.configs", epd.getConfigurationTypes());
