@@ -41,8 +41,10 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 
 public final class LocalDiscoveryUtils {
@@ -76,7 +78,6 @@ public final class LocalDiscoveryUtils {
     
     private LocalDiscoveryUtils() {}
     
-    @SuppressWarnings("unchecked")
     public static List<EndpointDescription> getAllEndpointDescriptions(Bundle b) {
         List<Element> elements = getAllDescriptionElements(b);
         
@@ -85,23 +86,11 @@ public final class LocalDiscoveryUtils {
             if (ENDPOINT_DESCRIPTION_ELEMENT.equals(el.getName())) {
                 eds.add(getEndpointDescription(el));
             } else if (SERVICE_DESCRIPTION_ELEMENT.equals(el.getName())) {
-                Namespace ns = Namespace.getNamespace(REMOTE_SERVICES_NS);
-
-                List<String> iNames = getProvidedInterfaces(el.getChildren(PROVIDE_INTERFACE_ELEMENT, ns));
-                Map<String, Object> remoteProps = getProperties(el.getChildren(PROPERTY_ELEMENT, ns));
-                
-                // this property is used by discovery for matching
-//                remoteProps.put(ServicePublication.SERVICE_INTERFACE_NAME, iNames); 
-//                
-//                if (addEndpointID) {
-//                    remoteProps.put(ServicePublication.ENDPOINT_SERVICE_ID, UUID.randomUUID().toString());
-//                }
-                // @@@@ TODO
-                // srefs.add(new ServiceEndpointDescriptionImpl(iNames, remoteProps));                
+                eds.add(getLegacyEndpointDescription(el));
             }
         }
         return eds;
-    } 
+    }
 
     @SuppressWarnings("unchecked")
     private static EndpointDescription getEndpointDescription(Element endpointDescriptionElement) {
@@ -132,6 +121,42 @@ public final class LocalDiscoveryUtils {
         }
         return new EndpointDescription(map);
     }
+
+    @SuppressWarnings("unchecked")
+    private static EndpointDescription getLegacyEndpointDescription(Element el) {
+        Namespace ns = Namespace.getNamespace(REMOTE_SERVICES_NS);
+
+        List<String> iNames = getProvidedInterfaces(el.getChildren(PROVIDE_INTERFACE_ELEMENT, ns));
+        Map<String, Object> remoteProps = getProperties(el.getChildren(PROPERTY_ELEMENT, ns));
+        
+        if (remoteProps.get(Constants.OBJECTCLASS) == null) {
+            remoteProps.put(Constants.OBJECTCLASS, iNames.toArray(new String[] {}));
+        }
+        
+        Object uri = remoteProps.get("org.apache.cxf.ws.address");
+        if (uri == null) {
+            uri = remoteProps.get("osgi.remote.configuration.pojo.address");
+        }
+        if (uri == null) {
+            String firstIntf = iNames.get(0);
+            uri = "http://localhost:9000/" + firstIntf.replace('.', '/');
+        }
+        remoteProps.put(RemoteConstants.ENDPOINT_ID, uri.toString());
+        
+        Object exportedConfigs = remoteProps.get(RemoteConstants.SERVICE_EXPORTED_CONFIGS);
+        if (exportedConfigs == null) {
+            exportedConfigs = "org.apache.cxf.ws";
+        }
+        remoteProps.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, exportedConfigs);
+        
+        for(Iterator<String> it = remoteProps.keySet().iterator(); it.hasNext(); ) {
+            if (it.next().startsWith("service.exported.")) {
+                it.remove();
+            }
+        }
+        
+        return new EndpointDescription(remoteProps);
+    } 
 
     private static String getTypeName(Element prop) {
         String type = prop.getAttributeValue("value-type");

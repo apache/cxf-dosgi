@@ -21,8 +21,12 @@
 
 <service-descriptions xmlns="http://www.osgi.org/xmlns/sd/v1.0.0">
   <service-description>
-    <provide interface="org.example.Service" />
-    <property name="deployment.intents">confidentiality.message integrity</property>
-    <property name="osgi.remote.interfaces">*</property>
+    <provide interface="org.example.SomeService" />
+    <property name="service.intents">confidentiality</property>
+  </service-description>
+  <service-description>
+    <provide interface="SomeOtherService" />
+    <provide interface="WithSomeSecondInterface" />
+    <property name="blah">5</property>
   </service-description>
 </service-descriptions>

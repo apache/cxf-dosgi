@@ -23,9 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -35,12 +33,12 @@ import org.easymock.EasyMock;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.osgi.framework.Bundle;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class LocalDiscoveryUtilsTest extends TestCase {
     public void testNoRemoteServicesXMLFiles() {
@@ -50,108 +48,6 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         List<Element> rsElements = LocalDiscoveryUtils.getAllDescriptionElements(b);
         assertEquals(0, rsElements.size());        
     }
-    
-    public void testRemoteServicesXMLFiles() {
-        URL rs1URL = getClass().getResource("/rs1.xml");
-        
-        Bundle b = EasyMock.createNiceMock(Bundle.class);
-        EasyMock.expect(b.findEntries(
-            EasyMock.eq("OSGI-INF/remote-service"), 
-            EasyMock.eq("*.xml"), EasyMock.anyBoolean())).andReturn(
-                Collections.enumeration(Arrays.asList(rs1URL))).anyTimes();
-        EasyMock.replay(b);
-        
-        List<Element> rsElements = LocalDiscoveryUtils.getAllDescriptionElements(b);
-        assertEquals(2, rsElements.size());
-        Namespace ns = Namespace.getNamespace("http://www.osgi.org/xmlns/sd/v1.0.0");
-        assertEquals("SomeService", rsElements.get(0).getChild("provide", ns).getAttributeValue("interface"));
-        assertEquals("SomeOtherService", rsElements.get(1).getChild("provide", ns).getAttributeValue("interface"));
-    }
-    
-    public void testMultiRemoteServicesXMLFiles() {
-        URL rs1URL = getClass().getResource("/rs1.xml");
-        URL rs2URL = getClass().getResource("/rs2.xml");
-        
-        Bundle b = EasyMock.createNiceMock(Bundle.class);
-        EasyMock.expect(b.findEntries(
-            EasyMock.eq("OSGI-INF/remote-service"), 
-            EasyMock.eq("*.xml"), EasyMock.anyBoolean())).andReturn(
-                Collections.enumeration(Arrays.asList(rs1URL, rs2URL))).anyTimes();
-        EasyMock.replay(b);
-        
-        List<Element> rsElements = LocalDiscoveryUtils.getAllDescriptionElements(b);
-        assertEquals(3, rsElements.size());
-        Namespace ns = Namespace.getNamespace("http://www.osgi.org/xmlns/sd/v1.0.0");
-        assertEquals("SomeService", rsElements.get(0).getChild("provide", ns).getAttributeValue("interface"));
-        assertEquals("SomeOtherService", rsElements.get(1).getChild("provide", ns).getAttributeValue("interface"));
-        assertEquals("org.example.Service", rsElements.get(2).getChild("provide", ns).getAttributeValue("interface"));
-    }
-    
-    @SuppressWarnings("unchecked")
-    public void testRemoteServicesXMLFileAlternateLocation() {
-        URL rs1URL = getClass().getResource("/rs1.xml");
-        Dictionary headers = new Hashtable();        
-        headers.put("Remote-Service", "META-INF/osgi/");
-        headers.put("Bundle-Name", "testing bundle");
-        
-        Bundle b = EasyMock.createNiceMock(Bundle.class);
-        EasyMock.expect(b.getHeaders()).andReturn(headers).anyTimes();
-        EasyMock.expect(b.findEntries(
-            EasyMock.eq("META-INF/osgi"), 
-            EasyMock.eq("*.xml"), EasyMock.anyBoolean())).andReturn(
-                Collections.enumeration(Arrays.asList(rs1URL))).anyTimes();
-        EasyMock.replay(b);
-        
-        List<Element> rsElements = LocalDiscoveryUtils.getAllDescriptionElements(b);
-        assertEquals(2, rsElements.size());
-        Namespace ns = Namespace.getNamespace("http://www.osgi.org/xmlns/sd/v1.0.0");
-        assertEquals("SomeService", rsElements.get(0).getChild("provide", ns).getAttributeValue("interface"));
-        assertEquals("SomeOtherService", rsElements.get(1).getChild("provide", ns).getAttributeValue("interface"));
-    }
-    
-    /* public void testAllRemoteReferences() {
-        URL rs1URL = getClass().getResource("/rs1.xml");
-        
-        Bundle b = EasyMock.createNiceMock(Bundle.class);
-        EasyMock.expect(b.findEntries("OSGI-INF/remote-service", "*.xml", false)).
-                andReturn(Collections.enumeration(Arrays.asList(rs1URL)));
-        EasyMock.replay(b);
-        
-        List<ServiceEndpointDescription> seds = LocalDiscoveryUtils.getAllRemoteReferences(b);
-        assertEquals(2, seds.size());
-        Map<Collection<String>, String> eids = getEndpointIDs(seds);
-        
-        List<String> interfaces = Arrays.asList("SomeService");
-        Map<String, Object> sed1Props = new HashMap<String, Object>();
-        sed1Props.put("osgi.remote.requires.intents", "confidentiality");
-        sed1Props.put(ServicePublication.ENDPOINT_SERVICE_ID, eids.get(
-                Collections.singleton("SomeService")));
-        sed1Props.put(ServicePublication.SERVICE_INTERFACE_NAME, interfaces);
-        ServiceEndpointDescription sed1 = 
-            new ServiceEndpointDescriptionImpl(interfaces, sed1Props);
-
-        List<String> interfaces2 = Arrays.asList("SomeOtherService", "WithSomeSecondInterface");
-        Map<String, Object> sed2Props = new HashMap<String, Object>();
-        sed2Props.put(ServicePublication.ENDPOINT_SERVICE_ID, eids.get(
-                new HashSet<String>(interfaces2)));
-        sed2Props.put(ServicePublication.SERVICE_INTERFACE_NAME, interfaces2);
-        ServiceEndpointDescription sed2 = 
-            new ServiceEndpointDescriptionImpl(interfaces2, sed2Props);
-        assertTrue(seds.contains(sed1));
-        assertTrue(seds.contains(sed2));
-    } 
-
-    @SuppressWarnings("unchecked")
-    private Map<Collection<String>, String> getEndpointIDs(
-            List<ServiceEndpointDescription> seds) {
-        Map<Collection<String>, String> map = new HashMap<Collection<String>, String>();
-        
-        for (ServiceEndpointDescription sed : seds) {
-            map.put((Collection<String>) sed.getProvidedInterfaces(), sed.getEndpointID());
-        }
-        
-        return map;
-    } */
     
     public void testEndpointDescriptionXMLFiles() {
         URL ed1URL = getClass().getResource("/ed1.xml");
@@ -201,13 +97,13 @@ public class LocalDiscoveryUtilsTest extends TestCase {
     
     @SuppressWarnings("unchecked")
     public void testAllEndpoints2() throws Exception {
-        URL ed1URL = getClass().getResource("/ed2.xml");
+        URL ed2URL = getClass().getResource("/ed2.xml");
         
         Bundle b = EasyMock.createNiceMock(Bundle.class);
         EasyMock.expect(b.findEntries(
             EasyMock.eq("OSGI-INF/remote-service"), 
             EasyMock.eq("*.xml"), EasyMock.anyBoolean())).andReturn(
-                Collections.enumeration(Arrays.asList(ed1URL))).anyTimes();
+                Collections.enumeration(Arrays.asList(ed2URL))).anyTimes();
         EasyMock.replay(b);
         
         List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
@@ -259,6 +155,52 @@ public class LocalDiscoveryUtilsTest extends TestCase {
             normXML((String) l.get(0)));
     }
     
+    public void testLegacyServiceDescriptionFormat() {
+        URL sdURL = getClass().getResource("/sd.xml");
+        
+        Bundle b = EasyMock.createNiceMock(Bundle.class);
+        EasyMock.expect(b.findEntries(
+            EasyMock.eq("OSGI-INF/remote-service"), 
+            EasyMock.eq("*.xml"), EasyMock.anyBoolean())).andReturn(
+                Collections.enumeration(Arrays.asList(sdURL))).anyTimes();
+        EasyMock.replay(b);
+        
+        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
+        assertEquals(1, eds.size());
+        EndpointDescription ed = eds.get(0);
+        assertEquals("http://localhost:9090/greeter", ed.getRemoteID());
+        assertEquals(Arrays.asList("org.apache.cxf.ws"), ed.getConfigurationTypes());
+        assertEquals(Arrays.asList("org.apache.cxf.dosgi.samples.greeter.GreeterService"), ed.getInterfaces());
+        assertNull("Should not contain service.exported.*", 
+                ed.getProperties().get(RemoteConstants.SERVICE_EXPORTED_INTERFACES));
+        assertNull("Should not contain service.exported.*", 
+                ed.getProperties().get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
+    }
+    
+    public void testLegacyServiceDescriptionFormat2() {
+        URL sdURL = getClass().getResource("/sd2.xml");
+        
+        Bundle b = EasyMock.createNiceMock(Bundle.class);
+        EasyMock.expect(b.findEntries(
+            EasyMock.eq("OSGI-INF/remote-service"), 
+            EasyMock.eq("*.xml"), EasyMock.anyBoolean())).andReturn(
+                Collections.enumeration(Arrays.asList(sdURL))).anyTimes();
+        EasyMock.replay(b);
+        
+        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
+        assertEquals(2, eds.size());
+        
+        EndpointDescription ed0 = eds.get(0);
+        assertEquals("http://localhost:9000/org/example/SomeService", ed0.getRemoteID());
+        assertEquals(Arrays.asList("org.apache.cxf.ws"), ed0.getConfigurationTypes());
+        assertEquals(Arrays.asList("org.example.SomeService"), ed0.getInterfaces());
+        assertEquals(Arrays.asList("confidentiality"), ed0.getIntents());
+        
+        EndpointDescription ed1 = eds.get(1);
+        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed1.getInterfaces());
+        assertEquals("5", ed1.getProperties().get("blah"));
+    }
+
     private static String normXML(String s) throws JDOMException, IOException {
         String s2 = stripComment(s);
         String s3 = stripProlog(s2);
