@@ -22,7 +22,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
-    private LocalDiscovery localDiscovery;
+    LocalDiscovery localDiscovery;
     
     public synchronized void start(BundleContext context) {
         localDiscovery = new LocalDiscovery(context);

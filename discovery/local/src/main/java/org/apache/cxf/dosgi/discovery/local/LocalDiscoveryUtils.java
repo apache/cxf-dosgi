@@ -96,7 +96,7 @@ public final class LocalDiscoveryUtils {
     private static EndpointDescription getEndpointDescription(Element endpointDescriptionElement) {
         Map<String, Object> map = new HashMap<String, Object>();
         
-        List<Element> properties = endpointDescriptionElement.getChildren("property");
+        List<Element> properties = endpointDescriptionElement.getChildren(PROPERTY_ELEMENT);
         for (Element prop : properties) {
             boolean handled = handleArray(prop, map);
             if (handled) {
@@ -111,8 +111,8 @@ public final class LocalDiscoveryUtils {
                 continue;
             }
             
-            String name = prop.getAttributeValue("name");
-            String value = prop.getAttributeValue("value");
+            String name = prop.getAttributeValue(PROPERTY_NAME_ATTRIBUTE);
+            String value = prop.getAttributeValue(PROPERTY_VALUE_ATTRIBUTE);
             if (value == null) {
                 value = prop.getText();
             }
@@ -159,7 +159,7 @@ public final class LocalDiscoveryUtils {
     } 
 
     private static String getTypeName(Element prop) {
-        String type = prop.getAttributeValue("value-type");
+        String type = prop.getAttributeValue(PROPERTY_VALUE_TYPE_ATTRIBUTE);
         if (type == null) {
             type = "String";
         }
@@ -173,7 +173,7 @@ public final class LocalDiscoveryUtils {
             return false;
         }
         
-        List<Element> values = arrayEl.getChildren("value");
+        List<Element> values = arrayEl.getChildren(PROPERTY_VALUE_ATTRIBUTE);
         String type = getTypeName(prop);
         Class<?> cls = null;
         if ("long".equals(type)) {
@@ -204,7 +204,7 @@ public final class LocalDiscoveryUtils {
                 Array.set(array, i, val);
             }
             
-            String name = prop.getAttributeValue("name");
+            String name = prop.getAttributeValue(PROPERTY_NAME_ATTRIBUTE);
             map.put(name, array);
             return true;
         } catch (Exception e) {
@@ -231,13 +231,13 @@ public final class LocalDiscoveryUtils {
         }
         
         String type = getTypeName(prop);
-        List<Element> values = el.getChildren("value");
+        List<Element> values = el.getChildren(PROPERTY_VALUE_ATTRIBUTE);
         for (Element val : values) {
             Object obj = handleValue(val, type);
             col.add(obj);
         }
         
-        String name = prop.getAttributeValue("name");
+        String name = prop.getAttributeValue(PROPERTY_NAME_ATTRIBUTE);
         map.put(name, col);
         return true;
     }
@@ -248,7 +248,7 @@ public final class LocalDiscoveryUtils {
             return false;
         }
 
-        String name = prop.getAttributeValue("name");
+        String name = prop.getAttributeValue(PROPERTY_NAME_ATTRIBUTE);
         map.put(name, sb);
         return true;
     }

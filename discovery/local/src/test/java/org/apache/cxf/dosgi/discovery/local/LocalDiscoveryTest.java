@@ -206,7 +206,7 @@ public class LocalDiscoveryTest extends TestCase {
         assertEquals(2, ld.endpointDescriptions.size());        
 
         final Hashtable<String, Object> props = new Hashtable<String, Object>();
-        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(objectClass=org.example.ClassA)");
+        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, new String [] {"(objectClass=org.example.ClassA)"});
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sr.getPropertyKeys()).andReturn(props.keySet().toArray(new String [] {})).anyTimes();
         EasyMock.expect(sr.getProperty((String) EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
