@@ -21,7 +21,7 @@
         <value>org.apache.cxf.dosgi.samples.greeter.GreeterService</value>
       </array>
     </property>
-    <property name="endpoint.uri">http://localhost:9090/greeter</property>
+    <property name="endpoint.id">http://localhost:9090/greeter</property>
     <property name="service.imported.configs">org.apache.cxf.ws</property>
   </endpoint-description>
 </rsa:endpoint-descriptions>
