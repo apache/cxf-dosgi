@@ -19,25 +19,20 @@
 
 package org.apache.cxf.dosgi.dsw;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.easymock.classextension.EasyMock;
-import org.osgi.service.discovery.ServiceEndpointDescription;
 
 public final class TestUtils {
-    private TestUtils() {
-    }
-
-    public static ServiceEndpointDescription mockServiceDescription(String... interfaceNames) {
-        List<String> iList = new ArrayList<String>();
-        for (String iName : interfaceNames) {
-            iList.add(iName);
-        }
-        
-        ServiceEndpointDescription sd = EasyMock.createNiceMock(ServiceEndpointDescription.class);
-        sd.getProvidedInterfaces();
-        EasyMock.expectLastCall().andReturn(iList);
-        return sd;
-    }
+//    private TestUtils() {
+//    }
+//
+//    public static ServiceEndpointDescription mockServiceDescription(String... interfaceNames) {
+//        List<String> iList = new ArrayList<String>();
+//        for (String iName : interfaceNames) {
+//            iList.add(iName);
+//        }
+//        
+//        ServiceEndpointDescription sd = EasyMock.createNiceMock(ServiceEndpointDescription.class);
+//        sd.getProvidedInterfaces();
+//        EasyMock.expectLastCall().andReturn(iList);
+//        return sd;
+//    }
 }

@@ -51,8 +51,6 @@ public class EndpointListenerImpl implements EndpointListener {
 
     private Logger LOG = Logger.getLogger(EndpointListenerImpl.class.getName());
 
-    private static final Pattern LOCALHOST_MATCH = Pattern.compile("(.*://)(localhost|127.0.0.1)(:.*)");
-
     private ZooKeeperDiscovery discovery;
     private BundleContext bctx;
     
@@ -85,7 +83,7 @@ public class EndpointListenerImpl implements EndpointListener {
             try {
 
                 Collection<String> interfaces = endpoint.getInterfaces();
-                String endpointKey = getKey(endpoint.getRemoteID());
+                String endpointKey = getKey(endpoint.getId());
 
                 ZooKeeper zk = getZooKeeper();
                 for (String name : interfaces) {
@@ -130,7 +128,7 @@ public class EndpointListenerImpl implements EndpointListener {
     private void removeEndpoint(EndpointDescription endpoint) throws UnknownHostException,
         URISyntaxException, InterruptedException, KeeperException {
         Collection<String> interfaces = endpoint.getInterfaces();
-        String endpointKey = getKey(endpoint.getRemoteID());
+        String endpointKey = getKey(endpoint.getId());
 
         ZooKeeper zk = getZooKeeper();
         for (String name : interfaces) {
@@ -162,7 +160,6 @@ public class EndpointListenerImpl implements EndpointListener {
 
     static byte[] getData(EndpointDescription sr) throws IOException {
         Properties p = new Properties();
-        String host = InetAddress.getLocalHost().getHostAddress();
 
         Map<String, Object> serviceProps = (Map<String, Object>)sr.getProperties();
         if (serviceProps != null) {
@@ -172,7 +169,7 @@ public class EndpointListenerImpl implements EndpointListener {
                     // null values are not allowed
                     continue;
                 }
-                p.setProperty(prop.getKey(), filterLocalHost(val.toString(), host));
+                p.setProperty(prop.getKey(), val.toString());
             }
         }
 
@@ -191,24 +188,8 @@ public class EndpointListenerImpl implements EndpointListener {
         return baos.toByteArray();
     }
 
-    static String filterLocalHost(String value, String replacement) {
-        Matcher m = LOCALHOST_MATCH.matcher(value);
-        return m.replaceAll("$1" + replacement + "$3");
-    }
-
-    // private static void copyProperty(String key, ServiceReference sr, Properties p, String localhost) {
-    // Object eID = sr.getProperty(key);
-    // if (eID != null) {
-    // p.setProperty(key, filterLocalHost(eID.toString(), localhost));
-    // }
-    // }
-
     static String getKey(String endpoint) throws UnknownHostException, URISyntaxException {
         URI uri = new URI(endpoint);
-        if ("localhost".equals(uri.getHost()) || "127.0.0.1".equals(uri.getHost())) {
-            uri = new URI(uri.getScheme(), uri.getUserInfo(), InetAddress.getLocalHost().getHostAddress(),
-                          uri.getPort(), uri.getPath(), uri.getQuery(), uri.getFragment());
-        }
 
         StringBuilder sb = new StringBuilder();
         sb.append(uri.getHost());

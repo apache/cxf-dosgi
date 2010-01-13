@@ -19,11 +19,14 @@
 package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -32,6 +35,8 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 
 public class EventAdminHelper {
 
+    private final static Logger LOG = Logger.getLogger(EventAdminHelper.class.getName());
+    
     private BundleContext bctx;
 
     public EventAdminHelper(BundleContext bc) {
@@ -41,13 +46,22 @@ public class EventAdminHelper {
     private Event createEvent(Properties p, String t) {
 
         String topic = "org/osgi/service/remoteserviceadmin/" + t;
-        Properties props = new Properties(p);
+        Dictionary props = p;
 
         props.put("bundle", bctx.getBundle());
-        props.put("bundle-id", bctx.getBundle().getBundleId());
-        props.put("bundle-symbolicname", bctx.getBundle().getSymbolicName());
+        props.put("bundle.id", bctx.getBundle().getBundleId());
+        props.put("bundle.symbolicname", bctx.getBundle().getSymbolicName());
         // FIXME is this correct?
-        setIfNotNull(props, "bundle-version", bctx.getBundle().getHeaders("Bundle-Version"));
+        
+        String version = (String)bctx.getBundle().getHeaders().get("Bundle-Version");
+        
+        Version v;
+        if(version!=null)
+            v = new Version(version);
+        else
+            v = Version.emptyVersion;
+        
+        setIfNotNull(props, "bundle.version", v);
 
         return new Event(topic, props);
     }
@@ -56,25 +70,24 @@ public class EventAdminHelper {
 
         String topic = Utils.remoteServiceAdminEventTypeToString(rsae.getType());
 
-        EndpointDescription epd = null;
-        if (rsae.getImportReference()!= null) {
-            epd = rsae.getImportReference().getImportedEndpoint();
-        } else if (rsae.getExportReference() != null) {
-            epd = rsae.getExportReference().getExportedEndpoint();
-        }
-
         Properties props = new Properties();
         setIfNotNull(props, "cause", rsae.getException());
-//FIXME !!!!!!!!!!!!!
-//        setIfNotNull(props, "import.registration", rsae.getImportRegistration());
-//        setIfNotNull(props, "export.registration", rsae.getExportRegistration());
+
+        
+        EndpointDescription epd = null;
+        if (rsae.getImportReference()!= null) {
+            epd = ((ImportReferenceImpl)rsae.getImportReference()).getImportedEndpointAlways();
+            setIfNotNull(props, "import.registration", epd);
+        } else if (rsae.getExportReference() != null) {
+            epd = ((ExportReferenceImpl)rsae.getExportReference()).getExportedEndpointAlways();
+            setIfNotNull(props, "export.registration", epd);
+        }
+
         if (epd != null) {
-            setIfNotNull(props, "service.remote.id", epd.getRemoteServiceID());
-            setIfNotNull(props, "service.remote.uuid", epd.getRemoteFrameworkUUID());
-            setIfNotNull(props, "service.remote.uri", epd.getRemoteID());
-            // FIXME: correct ?!?
+            setIfNotNull(props, "service.remote.id", epd.getServiceId());
+            setIfNotNull(props, "service.remote.uuid", epd.getFrameworkUUID());
+            setIfNotNull(props, "service.remote.uri", epd.getId());
             setIfNotNull(props, "objectClass", epd.getInterfaces().toArray());
-            setIfNotNull(props, "service.imported.configs", epd.getConfigurationTypes());
             setIfNotNull(props, "service.imported.configs", epd.getConfigurationTypes());
         }
         props.put("timestamp", System.currentTimeMillis());
@@ -84,6 +97,7 @@ public class EventAdminHelper {
 
         EventAdmin[] eas = getEventAdmins();
         if (eas != null) {
+            LOG.fine("Publishing event to "+eas.length+" EventAdmins;  Topic:["+topic+"]");
             for (EventAdmin eventAdmin : eas) {
                 eventAdmin.postEvent(ev);
             }
@@ -91,7 +105,7 @@ public class EventAdminHelper {
 
     }
 
-    private void setIfNotNull(Properties props, String key, Object o) {
+    private void setIfNotNull(Dictionary props, String key, Object o) {
         if (o != null)
             props.put(key, o);
     }

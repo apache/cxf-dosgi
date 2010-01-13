@@ -76,22 +76,22 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
         assertEquals(4, eds.size());
         EndpointDescription ed0 = eds.get(0);
-        assertEquals("http://somewhere:12345", ed0.getRemoteID());
+        assertEquals("http://somewhere:12345", ed0.getId());
         assertEquals(Arrays.asList("SomeService"), ed0.getInterfaces());
         assertEquals(Arrays.asList("confidentiality"), 
             ed0.getProperties().get("osgi.remote.requires.intents"));
         assertEquals("testValue", ed0.getProperties().get("testKey"));
         
         EndpointDescription ed1 = eds.get(1);
-        assertEquals("myScheme://somewhere:12345", ed1.getRemoteID());
+        assertEquals("myScheme://somewhere:12345", ed1.getId());
         assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed1.getInterfaces());
         
         EndpointDescription ed2 = eds.get(2);
-        assertEquals("http://somewhere", ed2.getRemoteID());
+        assertEquals("http://somewhere", ed2.getId());
         assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed2.getInterfaces());
 
         EndpointDescription ed3 = eds.get(3);
-        assertEquals("http://somewhere:1/2/3/4?5", ed3.getRemoteID());
+        assertEquals("http://somewhere:1/2/3/4?5", ed3.getId());
         assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed3.getInterfaces());
     }
     
@@ -109,7 +109,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
         assertEquals(2, eds.size());
         EndpointDescription ed0 = eds.get(0);
-        assertEquals("foo:bar", ed0.getRemoteID());
+        assertEquals("foo:bar", ed0.getId());
         assertEquals(Arrays.asList("com.acme.HelloService"), ed0.getInterfaces());
         assertEquals(Arrays.asList("SOAP"), ed0.getIntents());
         // changed from exported to imported 
@@ -168,7 +168,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
         assertEquals(1, eds.size());
         EndpointDescription ed = eds.get(0);
-        assertEquals("http://localhost:9090/greeter", ed.getRemoteID());
+        assertEquals("http://localhost:9090/greeter", ed.getId());
         assertEquals(Arrays.asList("org.apache.cxf.ws"), ed.getConfigurationTypes());
         assertEquals(Arrays.asList("org.apache.cxf.dosgi.samples.greeter.GreeterService"), ed.getInterfaces());
         assertNull("Should not contain service.exported.*", 
@@ -191,7 +191,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals(2, eds.size());
         
         EndpointDescription ed0 = eds.get(0);
-        assertEquals("http://localhost:9000/org/example/SomeService", ed0.getRemoteID());
+        assertEquals("http://localhost:9000/org/example/SomeService", ed0.getId());
         assertEquals(Arrays.asList("org.apache.cxf.ws"), ed0.getConfigurationTypes());
         assertEquals(Arrays.asList("org.example.SomeService"), ed0.getInterfaces());
         assertEquals(Arrays.asList("confidentiality"), ed0.getIntents());

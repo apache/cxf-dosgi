@@ -125,7 +125,7 @@ public class LocalDiscoveryTest extends TestCase {
         Set<String> actual = new HashSet<String>();
         for (Map.Entry<EndpointDescription, Bundle> entry : ld.endpointDescriptions.entrySet()) {
             assertSame(b2, entry.getValue());
-            actual.add(entry.getKey().getRemoteID());
+            actual.add(entry.getKey().getId());
         }
         assertEquals(expected, actual);
     }
@@ -170,7 +170,7 @@ public class LocalDiscoveryTest extends TestCase {
         ld.bundleChanged(be);
         assertEquals(1, ld.endpointDescriptions.size());
         EndpointDescription ed = ld.endpointDescriptions.keySet().iterator().next();
-        assertEquals("http://somewhere:12345", ed.getRemoteID());
+        assertEquals("http://somewhere:12345", ed.getId());
         assertSame(bundle, ld.endpointDescriptions.get(ed));
         
         EasyMock.verify(el);

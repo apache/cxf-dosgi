@@ -50,8 +50,9 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private Logger LOG = Logger.getLogger(RemoteServiceAdminCore.class.getName());
 
     private LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>> exportedServices = new LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>>();
-    private LinkedHashMap<EndpointDescription, ImportRegistrationImpl> importedServices = new LinkedHashMap<EndpointDescription, ImportRegistrationImpl>();
-
+    private LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices = new LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>>();
+    
+    
     private BundleContext bctx;
 
     private EventProducer eventProducer;
@@ -60,8 +61,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private volatile String defaultPort;
     private volatile String defaultHost;
     
-    
-    private static List<String> supportedConfigurationTypes = new ArrayList<String>();
+    // protected because of tests
+    protected static List<String> supportedConfigurationTypes = new ArrayList<String>();
     static {
         supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
         supportedConfigurationTypes.add(Constants.RS_CONFIG_TYPE);
@@ -74,37 +75,46 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         eventProducer = new EventProducer(bctx);
     }
 
-    public List exportService(ServiceReference sref, Map additionalProperties)
+    public List exportService(ServiceReference serviceReference, Map additionalProperties)
         throws IllegalArgumentException, UnsupportedOperationException {
 
-        LOG.fine("RemoteServiceAdmin: exportService: " + sref.getClass().getName());
+        LOG.fine("RemoteServiceAdmin: exportService: " + serviceReference.getClass().getName());
 
         synchronized (exportedServices) {
             // check if it is already exported ....
-            if (exportedServices.containsKey(sref)) {
-                LOG.fine("already exported ...  " + sref.getClass().getName());
-                Collection<ExportRegistrationImpl> regs = exportedServices.get(sref);
+            if (exportedServices.containsKey(serviceReference)) {
+                LOG.fine("already exported ...  " + serviceReference.getClass().getName());
+                Collection<ExportRegistrationImpl> regs = exportedServices.get(serviceReference);
 
+                List<EndpointDescription> copiedEndpoints = new ArrayList<EndpointDescription>();
+                
                 // / create a new list with copies of the exportRegistrations
                 List<ExportRegistrationImpl> copy = new ArrayList<ExportRegistrationImpl>(regs.size());
                 for (ExportRegistrationImpl exportRegistration : regs) {
-                    copy.add(new ExportRegistrationImpl(exportRegistration));
+                    // create one copy for each distinct endpoint description 
+                    if(!copiedEndpoints.contains(exportRegistration.getEndpointDescription())){
+                        copiedEndpoints.add(exportRegistration.getEndpointDescription());
+                        copy.add(new ExportRegistrationImpl(exportRegistration));
+                    }
                 }
+                
+                regs.addAll(copy);
+                
                 eventProducer.publishNotifcation(copy);
                 return copy;
             }
 
-            if (isCreatedByThisRSA(sref)) {
-                LOG.fine("proxy provided by this bundle ...  " + sref.getClass().getName());
+            if (isCreatedByThisRSA(serviceReference)) {
+                LOG.fine("proxy provided by this bundle ...  " + serviceReference.getClass().getName());
                 return null;
             }
 
             Properties serviceProperties = new Properties();
 
             {// gather EventProducerproperties from sRef
-                String[] keys = sref.getPropertyKeys();
+                String[] keys = serviceReference.getPropertyKeys();
                 for (String k : keys) {
-                    serviceProperties.put(k, sref.getProperty(k));
+                    serviceProperties.put(k, serviceReference.getProperty(k));
                 }
             }
 
@@ -138,6 +148,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             { // TODO: Determine if the required intents can be provided by the RSA ....
                 
                 // if not return null
+                if(requiredIntents!=null && requiredIntents.length>0) 
+                    return null; 
             }
             
             
@@ -178,23 +190,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return null;
             }
 
-            List<String> configurationTypes = new ArrayList<String>();
-            {// determine which configuration types should be used / if the requested are supported
-                String[] requestedConfigurationTypes = Utils.normalizeStringPlus(serviceProperties
-                    .get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
-                if (requestedConfigurationTypes == null || requestedConfigurationTypes.length == 0) {
-                    // add all supported
-                    configurationTypes.addAll(supportedConfigurationTypes);
-                } else {
-                    for (String rct : requestedConfigurationTypes) {
-                        if (supportedConfigurationTypes.contains(rct)) {
-                            // this RSA supports this requested type ...
-                            configurationTypes.add(rct);
-                        }
-                    }
-                }
-
-            }
+            List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
 
             LOG.info("configuration types selected for export: " + configurationTypes);
 
@@ -212,14 +208,14 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                          + "  with configuration types " + configurationTypes);
 
                 // create initial ExportRegistartion
-                ExportRegistrationImpl expReg = new ExportRegistrationImpl(sref, null, this);
+                ExportRegistrationImpl expReg = new ExportRegistrationImpl(serviceReference, null, this);
 
                 exportRegs.put(iface, expReg);
 
             }
 
             // enlist initial export Registrations in global list of exprtRegistrations
-            exportedServices.put(sref, exportRegs.values());
+            exportedServices.put(serviceReference, new ArrayList<ExportRegistrationImpl>(exportRegs.values()));
 
             // FIXME: move out of synchronized ... -> blocks until publication is finished
             for (String iface : interfaces) {
@@ -228,8 +224,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 ExportRegistrationImpl exportRegistration = exportRegs.get(iface);
                 ConfigurationTypeHandler handler = getHandler(configurationTypes, serviceProperties,
                                                               getHandlerProperties());
-                Object serviceObject = bctx.getService(sref);
-                BundleContext callingContext = sref.getBundle().getBundleContext();
+                Object serviceObject = bctx.getService(serviceReference);
+                BundleContext callingContext = serviceReference.getBundle().getBundleContext();
 
                 if (handler == null) {
                     return null;
@@ -247,6 +243,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                                          interfaceClass, serviceObject);
                     LOG.info("created server for interface " + iface);
 
+                    exportRegistration.startServiceTracker(bctx);
+                    
                 }
             }
 
@@ -256,6 +254,30 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
             return lExpReg;
         }
+    }
+
+    protected List<String> determineConfigurationTypes(Properties serviceProperties) {
+        
+        List<String> configurationTypes = new ArrayList<String>();
+        
+        {// determine which configuration types should be used / if the requested are supported
+            String[] requestedConfigurationTypes = Utils.normalizeStringPlus(serviceProperties
+                .get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
+            if (requestedConfigurationTypes == null || requestedConfigurationTypes.length == 0) {
+                // add all supported
+                configurationTypes.addAll(supportedConfigurationTypes);
+            } else {
+                for (String rct : requestedConfigurationTypes) {
+                    if (supportedConfigurationTypes.contains(rct)) {
+                        // this RSA supports this requested type ...
+                        configurationTypes.add(rct);
+                    }
+                }
+            }
+
+        }
+        
+        return configurationTypes;
     }
 
     private boolean isCreatedByThisRSA(ServiceReference sref) {
@@ -274,7 +296,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     public Collection getImportedEndpoints() {
         synchronized (importedServices) {
-            return Collections.unmodifiableCollection(importedServices.values());
+            List<ImportRegistrationImpl> irs = new ArrayList<ImportRegistrationImpl>();
+            for (Collection<ImportRegistrationImpl> irl : importedServices.values()) {
+                irs.addAll(irl);
+            }
+            return Collections.unmodifiableCollection(irs);
         }
     }
 
@@ -312,8 +338,10 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         LOG.info("importService() Endpoint: " + endpoint.getProperties());
 
         synchronized (importedServices) {
-            if (importedServices.containsKey(endpoint)) {
-                ImportRegistrationImpl ir = new ImportRegistrationImpl(importedServices.get(endpoint));
+            if (importedServices.containsKey(endpoint) && importedServices.get(endpoint).size()>0) {
+                Collection<ImportRegistrationImpl> imRegs = importedServices.get(endpoint);
+                ImportRegistrationImpl irParent = imRegs.iterator().next();
+                ImportRegistrationImpl ir = new ImportRegistrationImpl(irParent);
                 eventProducer.publishNotifcation(ir);
                 return ir;
             }
@@ -362,7 +390,12 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 ImportRegistrationImpl imReg = new ImportRegistrationImpl(endpoint,this);
 
                 proxifyMatchingInterface(matchingInterfaces.get(0), imReg, handler, bctx);
-                importedServices.put(endpoint, imReg);
+                Collection<ImportRegistrationImpl> imRegs = importedServices.get(endpoint);
+                if(imRegs==null){
+                    imRegs = new ArrayList<ImportRegistrationImpl>();
+                    importedServices.put(endpoint,imRegs);
+                }
+                imRegs.add(imReg);
                 eventProducer.publishNotifcation(imReg);
                 return imReg;
             } else {
@@ -442,9 +475,21 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     protected void removeImportRegistration(ImportRegistrationImpl iri){
         synchronized (importedServices) {
             LOG.finest("Removing importRegistration "+iri);
-            if(importedServices.remove(iri.getImportedEndpointDescription())==null){
-                LOG.severe("An importRegistartion couldn't be removed from the internal management structure -> structure is inconsistent !!");
+            
+            Collection<ImportRegistrationImpl> imRegs = importedServices.get(iri.getImportedEndpointAlways());
+            if (imRegs.contains(iri)) {
+                imRegs.remove(iri);
+            } else {
+                LOG.severe("An importRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
             }
+            if (imRegs.size() == 0) {
+                importedServices.remove(iri.getImportedEndpointAlways());
+            }
+            
+//            if(importedServices.remove(iri.getImportedEndpointDescription())==null){
+//                LOG.severe("An importRegistartion couldn't be removed from the internal management structure -> structure is inconsistent !!");
+//            }
+            
             eventProducer.notifyRemoval(iri);
         }
     }

@@ -18,36 +18,8 @@
   */
 package org.apache.cxf.dosgi.dsw.hooks;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.cxf.dosgi.dsw.service.ServiceEndpointDescriptionImpl;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.hooks.service.ListenerHook;
-import org.osgi.service.discovery.DiscoveredServiceNotification;
-import org.osgi.service.discovery.DiscoveredServiceTracker;
-import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.discovery.ServicePublication;
-
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-
-import static org.osgi.service.discovery.DiscoveredServiceNotification.AVAILABLE;
-import static org.osgi.service.discovery.DiscoveredServiceNotification.UNAVAILABLE;
 
 public class CxfFindListenerHookTest extends Assert {
 

@@ -18,8 +18,11 @@
   */
 package org.apache.cxf.dosgi.dsw.service;
 
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.easymock.IMocksControl;
@@ -33,7 +36,11 @@ import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class RemoteServiceAdminCoreTest {
 
@@ -44,7 +51,11 @@ public class RemoteServiceAdminCoreTest {
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
         
+        
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
+        
+        Dictionary d = new Properties();
+        EasyMock.expect(b.getHeaders()).andReturn(d).anyTimes();
         
         ServiceReference sref = c.createMock(ServiceReference.class);
         EasyMock.expect(sref.getBundle()).andReturn(b).anyTimes();
@@ -73,6 +84,9 @@ public class RemoteServiceAdminCoreTest {
         IMocksControl c = EasyMock.createNiceControl();
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
+        
+        Dictionary d = new Properties();
+        EasyMock.expect(b.getHeaders()).andReturn(d).anyTimes();
         
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(b.getSymbolicName()).andReturn("BundleName").anyTimes();
@@ -138,4 +152,58 @@ public class RemoteServiceAdminCoreTest {
         
         
     }
+    
+    @Test
+    public void testDefaultConfigurationType(){
+        
+        IMocksControl c = EasyMock.createNiceControl();
+        Bundle b = c.createMock(Bundle.class);
+        BundleContext bc = c.createMock(BundleContext.class);
+        
+        c.replay();
+        
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc);
+        
+        Properties serviceProperties = new Properties();
+        
+        List<String> types  = rsaCore.determineConfigurationTypes(serviceProperties);
+        
+        c.verify();
+        
+        assertNotNull(types);
+        assertEquals(types.size(),rsaCore.supportedConfigurationTypes.size());
+        
+        for (String type : types) {
+            assertTrue(rsaCore.supportedConfigurationTypes.contains(type));
+        }
+    }
+    
+    
+    @Test
+    public void testSpecificConfigurationType(){
+        
+        IMocksControl c = EasyMock.createNiceControl();
+        Bundle b = c.createMock(Bundle.class);
+        BundleContext bc = c.createMock(BundleContext.class);
+        
+        c.replay();
+        
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc);
+        
+        
+        
+        Properties serviceProperties = new Properties();
+        
+        serviceProperties.setProperty(RemoteConstants.SERVICE_EXPORTED_CONFIGS, org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE);
+        
+        List<String> types  = rsaCore.determineConfigurationTypes(serviceProperties);
+        
+        c.verify();
+        
+        assertNotNull(types);
+        assertEquals(1,types.size());
+        
+        assertTrue(types.contains(org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE));
+    }
+    
 }

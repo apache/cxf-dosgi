@@ -38,4 +38,8 @@ public class ImportReferenceImpl implements ImportReference {
         return importRegistration.getImportedService();
     }
 
+    public EndpointDescription getImportedEndpointAlways() {
+        return importRegistration.getImportedEndpointAlways();
+    }
+
 }

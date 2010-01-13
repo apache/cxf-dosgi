@@ -38,4 +38,8 @@ public class ExportReferenceImpl implements ExportReference {
         return exportRegistartion.getExportedService();
     }
 
+    protected EndpointDescription getExportedEndpointAlways() {
+        return exportRegistartion.getEndpointDescriptionAlways();
+    }
+
 }

@@ -18,30 +18,7 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import junit.framework.TestCase;
-
-import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
-import org.apache.cxf.dosgi.dsw.service.ServiceEndpointDescriptionImpl;
-import org.apache.cxf.endpoint.AbstractEndpointFactory;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
-import org.apache.cxf.transport.Destination;
-import org.apache.cxf.ws.addressing.AttributedURIType;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.easymock.IAnswer;
-import org.easymock.classextension.EasyMock;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.http.HttpService;
 
 public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
     

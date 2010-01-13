@@ -104,15 +104,35 @@ public class ImportRegistrationImplTest {
         assertEquals(ed,i2.getImportedEndpointDescription());
         assertEquals(ed,i3.getImportedEndpointDescription());
         
+        c.verify();
+        c.reset();
+        
+        rsac.removeImportRegistration(EasyMock.eq(i3));
+        EasyMock.expectLastCall().once();
+        
+        c.replay();
+        
         i3.close();
         i3.close(); // shouldn't change anything
-        assertEquals(ed,i3.getImportedEndpointDescription());
+        
+        assertNull(i3.getImportedEndpointDescription());
+        
+        
+        c.verify();
+        c.reset();
+        
+        rsac.removeImportRegistration(EasyMock.eq(i1));
+        EasyMock.expectLastCall().once();
+        
+        c.replay();
         
         
         i1.close();
         
+        c.verify();
         c.reset();
-        rsac.removeImportRegistration(EasyMock.eq(i1));
+        
+        rsac.removeImportRegistration(EasyMock.eq(i2));
         EasyMock.expectLastCall().once();
         
         sr.unregister();
@@ -133,8 +153,6 @@ public class ImportRegistrationImplTest {
         EndpointDescription ed = c.createMock(EndpointDescription.class);
         RemoteServiceAdminCore rsac = c.createMock(RemoteServiceAdminCore.class);
         
-        
-        
         c.replay();
         
         ImportRegistrationImpl i1 = new ImportRegistrationImpl(ed,rsac);
@@ -148,11 +166,24 @@ public class ImportRegistrationImplTest {
         assertEquals(i1, i2.getParent());
         assertEquals(i1, i3.getParent());
         
-        i2.close();
-        
+        c.verify();
         c.reset();
+        
+        rsac.removeImportRegistration(EasyMock.eq(i2));
+        EasyMock.expectLastCall().once();
+        
+        c.replay();
+        
+        i2.close();
+
+        c.verify();
+        c.reset();
+        
         rsac.removeImportRegistration(EasyMock.eq(i1));
         EasyMock.expectLastCall().once();
+        rsac.removeImportRegistration(EasyMock.eq(i3));
+        EasyMock.expectLastCall().once();
+        
         c.replay();
         i3.closeAll();
         c.verify();

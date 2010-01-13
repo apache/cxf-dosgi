@@ -34,7 +34,11 @@
 
     <properties>
         <topDirectoryLocation>../..</topDirectoryLocation>
-        <bundle.import.package>*</bundle.import.package>
+        <bundle.import.package>
+            org.apache.cxf.ws.security.*,
+            org.apache.cxf.ws.policy.*,
+            *
+        </bundle.import.package>
         <bundle.export.package>
             org.apache.cxf.dosgi.*;version="${pom.version}",
             org.osgi.service.remoteserviceadmin;version="${remote.service.admin.interfaces.version}"

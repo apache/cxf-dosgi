@@ -95,7 +95,7 @@ public class ImportRegistrationImpl implements ImportRegistration {
             return;
 
         closed = true;
-
+        rsaCore.removeImportRegistration(this);
         parent.instanceClosed(this);
     }
 
@@ -110,7 +110,6 @@ public class ImportRegistrationImpl implements ImportRegistration {
             
             LOG.fine("really closing ImportRegistartion now! ");
 
-            rsaCore.removeImportRegistration(this);
             if (clientServiceFactory != null)
                 clientServiceFactory.setCloseable(true);
             if (importedService != null)
@@ -146,6 +145,9 @@ public class ImportRegistrationImpl implements ImportRegistration {
     public EndpointDescription getImportedEndpointDescription() {
         if (isFailure())
             return null;
+        if(closed)
+            return null;
+        
         return importedEndpoint;
     }
 
@@ -210,6 +212,10 @@ public class ImportRegistrationImpl implements ImportRegistration {
             importReference = new ImportReferenceImpl(this);
         }
         return importReference;
+    }
+
+    public EndpointDescription getImportedEndpointAlways() {
+        return importedEndpoint;
     }
 
 }

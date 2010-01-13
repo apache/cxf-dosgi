@@ -20,10 +20,15 @@ package org.apache.cxf.dosgi.dsw;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
+import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
+import org.apache.cxf.dosgi.dsw.service.ImportRegistrationImpl;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -31,17 +36,18 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.distribution.DistributionProvider;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
 public class Activator implements BundleActivator, ManagedService {
 
+    private final static Logger LOG = Logger.getLogger(Activator.class.getName());
+
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
     private BundleContext bc;
 
+    private RemoteServiceadminFactory rsaFactory;
+    private ServiceRegistration rsaFactoryReg;
 
-    private RemoteServiceadminFactory dpService;
-    
     private ServiceRegistration decoratorReg;
 
     public synchronized void start(BundleContext context) throws Exception {
@@ -50,46 +56,41 @@ public class Activator implements BundleActivator, ManagedService {
 
         bc = context;
         // should we have a seperate PID for a find and publish hook ?
-        //context.registerService(ManagedService.class.getName(), this, getDefaults());
+        // context.registerService(ManagedService.class.getName(), this, getDefaults());
 
-        dpService = registerRemoteServiceAdminService();
-
+        rsaFactory = registerRemoteServiceAdminService();
 
         /**
          * What is this decorator doing ?!?!?! Why as a service ?
          */
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc),
-                                            null);
-        
-        
-        
+                                          null);
 
     }
 
     private RemoteServiceadminFactory registerRemoteServiceAdminService() {
-        RemoteServiceadminFactory dpService = new RemoteServiceadminFactory(bc);
+        RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(bc);
         Hashtable<String, Object> props = new Hashtable<String, Object>();
 
         // TODO .... RemoteAdminService.XXX
-        props.put(DistributionProvider.PRODUCT_NAME, getHeader("Bundle-Name"));
-        props.put(DistributionProvider.PRODUCT_VERSION, getHeader("Bundle-Version"));
-        props.put(DistributionProvider.VENDOR_NAME, getHeader("Bundle-Vendor"));
+        // props.put(DistributionProvider.PRODUCT_NAME, getHeader("Bundle-Name"));
+        // props.put(DistributionProvider.PRODUCT_VERSION, getHeader("Bundle-Version"));
+        // props.put(DistributionProvider.VENDOR_NAME, getHeader("Bundle-Vendor"));
 
         String[] supportedIntents = getIntentMap().getIntents().keySet().toArray(new String[] {});
         String siString = OsgiUtils.formatIntents(supportedIntents);
-        props.put(DistributionProvider.SUPPORTED_INTENTS, siString);
-        props.put("remote.intents.supported", supportedIntents);
+        props.put("remote.intents.supported", siString);
 
-        // TODO make this a little smarter
+        // // TODO make this a little smarter
         String[] supportedConfigs = {
-            org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE,
-            org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE_OLD,
-            org.apache.cxf.dosgi.dsw.Constants.RS_CONFIG_TYPE
+                                     org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE,
+                                     org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE_OLD,
+                                     org.apache.cxf.dosgi.dsw.Constants.RS_CONFIG_TYPE
         };
         props.put("remote.configs.supported", supportedConfigs);
 
-        bc.registerService(RemoteServiceAdmin.class.getName(), dpService, props);
-        return dpService;
+        rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
+        return rsaf;
     }
 
     IntentMap getIntentMap() {
@@ -106,12 +107,33 @@ public class Activator implements BundleActivator, ManagedService {
     }
 
     public void stop(BundleContext context) {
-       // dpService.shutdown();
-
-       
-
+        LOG.fine("RemoteServiceAdmin Implementation is shutting down now");
+        rsaFactoryReg.unregister();
         decoratorReg.unregister();
+
+        for (Object o : rsaFactory.getRsaCore().getExportedServices()) {
+            if (o instanceof ExportRegistrationImpl) {
+                LOG.fine("closing Export");
+                ExportRegistrationImpl er = (ExportRegistrationImpl)o;
+                er.close();
+            }
+        }
         
+        for (Object o : rsaFactory.getRsaCore().getImportedEndpoints()) {
+            if (o instanceof ImportRegistrationImpl) {
+                LOG.fine("closing Import");
+                ImportRegistrationImpl er = (ImportRegistrationImpl)o;
+                er.close();
+            }
+        }
+        
+        // shutdown the CXF Bus -> Causes also the shutdown of the embedded HTTP server
+        Bus b = BusFactory.getDefaultBus();
+        if (b != null) {
+            LOG.fine("Shutting down the CXF Bus");
+            b.shutdown(true);
+        }
+
         // unregister other registered services (ManagedService + Hooks)
     }
 
@@ -123,7 +145,7 @@ public class Activator implements BundleActivator, ManagedService {
 
     public synchronized void updated(Dictionary props) throws ConfigurationException {
         if (props != null && CONFIG_SERVICE_PID.equals(props.get(Constants.SERVICE_PID))) {
-          //  topManager.updated(props);
+            // topManager.updated(props);
         }
     }
 

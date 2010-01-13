@@ -108,6 +108,8 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         copyEndpointProperties(sd, endpointProps);
 
+        
+        
         String[] sa = new String[1];
         sa[0] = iClass.getName();
         endpointProps.put(org.osgi.framework.Constants.OBJECTCLASS, sa);
@@ -122,7 +124,9 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         endpointProps.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, Constants.WS_CONFIG_TYPE);
         endpointProps.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + sa[0], OsgiUtils.getVersion(iClass, dswContext));
         endpointProps.put(RemoteConstants.SERVICE_INTENTS, Utils.getAllIntentsCombined(sd));
-
+        // make sure that the Endpoint contains the address that was actualy used
+        addAddressProperty(endpointProps, address);
+        
         DataBinding databinding;
         String dataBindingImpl = (String)exportRegistration.getExportedService()
             .getProperty(Constants.WS_DATABINDING_PROP_KEY);
@@ -146,7 +150,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            endpointProps.put(RemoteConstants.ENDPOINT_ID, address);
+
 
             exportRegistration.setServer(server);
 

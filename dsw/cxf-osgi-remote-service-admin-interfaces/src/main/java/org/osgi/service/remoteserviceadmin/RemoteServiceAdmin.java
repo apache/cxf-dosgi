@@ -43,8 +43,6 @@ public interface RemoteServiceAdmin {
 	 * exported because the endpoint could not be implemented by this Remote
 	 * Service Admin.
 	 * 
-	 * TODO Peter to update for case insensitive properties
-	 * 
 	 * The properties on a Service Reference are case insensitive while the
 	 * properties on a <code>properties</code> are case sensitive. A value in
 	 * the <code>properties</code> must therefore override any case variant in
@@ -67,11 +65,8 @@ public interface RemoteServiceAdmin {
 	 *        insensitive). This parameter can be <code>null</code>, this should
 	 *        be treated as an empty map.
 	 * 
-	 *        TODO Peter The return description does not mesh with returning a
-	 *        list! Why a list and not just one?
 	 * @return An Export Registration that combines the Endpoint Description and
-	 *         the Service Reference or <code>null</code> if the service could
-	 *         not be exported.
+	 *         the Service Reference.
 	 * @throws IllegalArgumentException If any of the properties has a value
 	 *         that is not syntactically correct or if the service properties
 	 *         and the overlaid properties do not contain a

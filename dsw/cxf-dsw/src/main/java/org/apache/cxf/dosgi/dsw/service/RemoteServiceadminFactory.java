@@ -57,4 +57,12 @@ public class RemoteServiceadminFactory implements ServiceFactory {
         }
     }
 
+    public void setRsaCore(RemoteServiceAdminCore rsaCore) {
+        this.rsaCore = rsaCore;
+    }
+
+    public RemoteServiceAdminCore getRsaCore() {
+        return rsaCore;
+    }
+
 }

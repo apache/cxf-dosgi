@@ -1,5 +1,5 @@
 /** 
-  * Licensed to the Apache Software Foundation (ASF) under one 
+s  * Licensed to the Apache Software Foundation (ASF) under one 
   * or more contributor license agreements. See the NOTICE file 
   * distributed with this work for additional information 
   * regarding copyright ownership. The ASF licenses this file 
@@ -18,22 +18,7 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-
 import junit.framework.TestCase;
-
-import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.TestUtils;
-import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
-import org.easymock.classextension.EasyMock;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.discovery.ServiceEndpointDescription;
 
 public class WsdlConfigurationTypeHandlerTest extends TestCase {
     

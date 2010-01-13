@@ -18,34 +18,8 @@
  */
 package org.apache.cxf.dosgi.dsw.hooks;
 
-import static org.apache.cxf.dosgi.dsw.Constants.WS_ADDRESS_PROPERTY;
-import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
-import static org.osgi.service.discovery.ServicePublication.SERVICE_INTERFACE_NAME;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.endpoint.Server;
-import org.easymock.IAnswer;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.discovery.ServiceEndpointDescription;
-import org.osgi.service.discovery.ServicePublication;
 
 public class CxfPublishHookTest extends Assert {
 

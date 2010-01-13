@@ -42,8 +42,7 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
-
-import static org.osgi.service.discovery.ServicePublication.ENDPOINT_LOCATION;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
     private static final Logger LOG = Logger.getLogger(AbstractPojoConfigurationTypeHandler.class.getName());
@@ -228,7 +227,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     protected void addAddressProperty(Map props, String address) {
         if (props != null) {
-            props.put(ENDPOINT_LOCATION, address);
+            props.put(RemoteConstants.ENDPOINT_ID, address);
         }
     }
 }
