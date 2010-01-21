@@ -35,9 +35,9 @@ public class Activator implements BundleActivator, ManagedService {
     private static final Logger LOG = Logger.getLogger(Activator.class.getName());
 
     private ZooKeeperDiscovery zkd;
-    private ServiceRegistration cmReg;
     private Dictionary zkProperties;
     private BundleContext bctx;
+    ServiceRegistration cmReg;
 
     public synchronized void start(BundleContext bc) throws Exception {
         bctx = bc;
@@ -45,17 +45,6 @@ public class Activator implements BundleActivator, ManagedService {
         zkd = createZooKeeperDiscovery();
 
         cmReg = bc.registerService(ManagedService.class.getName(), this, zkProperties);
-        
-        LOG.info("Starting Zookeeper Discovery client with default configuration");
-        // Catch connection failures so that the bundle startup ist successful and other configuration can be
-        // received via ConfigurationAdmin
-        try {
-            zkd.start();
-        } catch (IOException e) {
-            LOG.warning("Startup with default configuration failed: " + e.getLocalizedMessage());
-        } catch (ConfigurationException e) {
-            LOG.warning("Startup with default configuration failed: " + e.getLocalizedMessage());
-        }
     }
 
     public synchronized void stop(BundleContext bc) throws Exception {
@@ -64,7 +53,7 @@ public class Activator implements BundleActivator, ManagedService {
     }
 
     public synchronized void updated(Dictionary configuration) throws ConfigurationException {
-
+        LOG.info("Received configuration update for Zookeeper Discovery: " + configuration);
         if (configuration == null)
             return;
 
@@ -84,6 +73,7 @@ public class Activator implements BundleActivator, ManagedService {
         }
 
         zkProperties = effective;
+        cmReg.setProperties(zkProperties);
 
         synchronized (this) {
             zkd.stop();
@@ -103,7 +93,6 @@ public class Activator implements BundleActivator, ManagedService {
         Dictionary props = new Hashtable();
         props.put("zookeeper.timeout", "3000");
         props.put("zookeeper.port", "2181");
-        props.put("zookeeper.host", "localhost");
         props.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper");
         return props;
     }

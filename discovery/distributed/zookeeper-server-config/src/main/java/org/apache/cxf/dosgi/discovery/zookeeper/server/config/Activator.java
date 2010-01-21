@@ -25,6 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {
@@ -38,7 +39,8 @@ public class Activator implements BundleActivator {
                 Object svc = super.addingService(reference);
                 if (svc instanceof ConfigurationAdmin) {
                     try {
-                        Configuration cfg = ((ConfigurationAdmin) svc).getConfiguration(PID, null);
+                        ConfigurationAdmin cadmin = (ConfigurationAdmin) svc;
+                        Configuration cfg = cadmin.getConfiguration(PID, null);
                         Hashtable<String, Object> props = new Hashtable<String, Object>();
                         props.put("clientPort", 2181);
                         cfg.update(props);
@@ -51,6 +53,19 @@ public class Activator implements BundleActivator {
             }            
         };
         st.open();
+        
+        // The following section is done synchronously otherwise it doesn't happen in time for the CT
+        ServiceReference[] refs = context.getServiceReferences(ManagedService.class.getName(), 
+                "(service.pid=org.apache.cxf.dosgi.discovery.zookeeper)");
+        if (refs == null || refs.length == 0) {
+            throw new RuntimeException("This bundle must be started after the bundle with the Zookeeper Discovery Managed Service was started.");
+        }
+        Object svc = context.getService(refs[0]);
+        ManagedService ms = (ManagedService) svc;
+        Hashtable<String, Object> props = new Hashtable<String, Object>();
+        props.put("zookeeper.host", "127.0.0.1");
+        ms.updated(props);
+        System.out.println("Set the zookeeper.host on the Zookeeper Client managed service.");
 	}
     
 	public void stop(BundleContext context) throws Exception {

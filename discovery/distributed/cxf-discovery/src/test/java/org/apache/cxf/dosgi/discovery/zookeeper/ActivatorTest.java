@@ -18,23 +18,18 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-
-import org.junit.Test;
 
 public class ActivatorTest {
 
@@ -43,10 +38,6 @@ public class ActivatorTest {
 
         IMocksControl c = EasyMock.createNiceControl();
         final ZooKeeperDiscovery z = c.createMock(ZooKeeperDiscovery.class);
-
-        z.start();
-
-        EasyMock.expectLastCall().once();
 
         z.stop();
 
@@ -104,7 +95,7 @@ public class ActivatorTest {
         c.replay();
 
         a.start(bc);
-
+        
         a.updated(null);
 
         c.verify();
@@ -117,7 +108,17 @@ public class ActivatorTest {
         EasyMock.expectLastCall().once();
         z.start();
         EasyMock.expectLastCall().once();
-        
+
+        ServiceRegistration cmReg = c.createMock(ServiceRegistration.class);        
+        cmReg.setProperties((Dictionary) EasyMock.anyObject());
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+            public Object answer() throws Throwable {
+                Dictionary d = (Dictionary) EasyMock.getCurrentArguments()[0];
+                assertEquals("value", d.get("test"));
+                return null;
+            }
+        }).once();        
+        a.cmReg = cmReg;
         
         c.replay();
         a.updated(d);
