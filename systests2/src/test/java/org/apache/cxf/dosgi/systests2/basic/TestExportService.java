@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations 
  * under the License. 
  */
-package org.apache.cxf.dosgi.systests2.common;
+package org.apache.cxf.dosgi.systests2.basic;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -40,18 +40,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.CoreOptions;
-import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 
 @RunWith( JUnit4TestRunner.class )
 public class TestExportService {
-    @Inject
-    BundleContext bundleContext = null;
-
     @Configuration
     public static Option[] configure() {
         return CoreOptions.options(
@@ -70,11 +64,6 @@ public class TestExportService {
     
     @Test
     public void testCreateEndpoint() throws Exception {
-        for( Bundle b : bundleContext.getBundles() )
-        {
-            System.out.println( "Bundle " + b.getBundleId() + " : " + b.getSymbolicName() );
-        }        
-
         waitPort(9090);
         URL wsdlURL = new URL("http://localhost:9090/greeter?wsdl");
         
@@ -138,7 +127,7 @@ public class TestExportService {
     }
 
     private void waitPort(int port) throws Exception {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             Socket s = null;
             try {
                 s = new Socket((String) null, port);

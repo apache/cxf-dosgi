@@ -1,4 +1,4 @@
-package org.apache.cxf.dosgi.systests2.common;
+package org.apache.cxf.dosgi.systests2.basic;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

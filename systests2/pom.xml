@@ -37,6 +37,11 @@
             <version>1.2.0</version>
         </dependency>
         <dependency>
+            <groupId>org.ops4j.pax.swissbox</groupId>
+            <artifactId>pax-swissbox-tinybundles</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <version>4.1.0</version>
@@ -53,6 +58,7 @@
             <artifactId>cxf-dosgi-ri-singlebundle-distribution</artifactId>
             <version>${pom.version}</version>
             <scope>test</scope>
+            <!-- can we avoid transitive dependencies here? -->
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
@@ -79,6 +85,10 @@
             <scope>test</scope>
         </dependency> 
     </dependencies>
+
+    <!-- <modules>
+        <module>systest-greeter-client</module>
+    </modules> -->
 
     <build>
         <plugins>
