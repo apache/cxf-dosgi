@@ -56,7 +56,10 @@ public class MultiBundleTools {
                     File fullDir = new File(distroDir, val.substring("file:".length()));
                     bundles.put(i, fullDir.toURI().toASCIIString());
                 } else {
-                    bundles.put(i, val);
+                    if (!val.contains("org.osgi.compendium")) {
+                        // We're skipping that one as it's pulled in explicitly in the test
+                        bundles.put(i, val);
+                    }
                 }
             }
         }
