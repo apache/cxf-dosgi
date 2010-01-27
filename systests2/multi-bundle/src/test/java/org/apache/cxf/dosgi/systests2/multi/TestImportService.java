@@ -16,7 +16,12 @@
  * specific language governing permissions and limitations 
  * under the License. 
  */
-package org.apache.cxf.dosgi.systests2.basic;
+package org.apache.cxf.dosgi.systests2.multi;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.cxf.dosgi.systests2.common.AbstractTestImportService;
 import org.junit.Test;
@@ -34,19 +39,24 @@ public class TestImportService extends AbstractTestImportService {
     BundleContext bundleContext = null;
 
     @Configuration
-    public static Option[] configure() {
-        return CoreOptions.options(
-                CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
-                CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi").artifactId("cxf-dosgi-ri-singlebundle-distribution").versionAsInProject(),
-                CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
+    public static Option[] configure() throws Exception {
+        Map<Integer, String> bundles = new TreeMap<Integer, String>();
+        int startLevel = MultiBundleTools.getDistroBundles(bundles);
+        
+        List<Option> opts = new ArrayList<Option>();
+        opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));
+        for(Map.Entry<Integer, String> entry : bundles.entrySet()) {
+            opts.add(CoreOptions.bundle(entry.getValue()).startLevel(entry.getKey()));
+        }
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject());
 
-                // This bundle contains the common system testing code
-                CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
-
-                CoreOptions.provision(getTestClientBundle())
-        );
+        // This bundle contains the common system testing code
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject());
+        opts.add(CoreOptions.provision(getTestClientBundle()));
+        
+        return CoreOptions.options(opts.toArray(new Option[opts.size()]));
     }
-
+    
     protected BundleContext getBundleContext() {
         return bundleContext;
     }
