@@ -23,8 +23,6 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.util.Hashtable;
 
-import javax.swing.JOptionPane;
-
 import org.apache.cxf.dosgi.systests2.common.test2.Test2Service;
 import org.apache.cxf.dosgi.systests2.common.test2.client.ClientActivator;
 import org.apache.cxf.dosgi.systests2.common.test2.client.Test2ServiceTracker;
@@ -65,7 +63,7 @@ public abstract class AbstractTestDiscoveryRoundtrip {
     public void baseTestDiscoveryRoundtrip() throws Exception {
         for( Bundle b : getBundleContext().getBundles() )
         {
-            System.out.println( "*** Bundle " + b.getBundleId() + " : " + b.getSymbolicName() );
+            System.out.println( "*** Bundle " + b.getBundleId() + " : " + b.getSymbolicName() + "/" + b.getState());
         }
         
         // Find a free port to run the Zookeeper Server on
@@ -107,7 +105,7 @@ public abstract class AbstractTestDiscoveryRoundtrip {
             Assert.assertFalse("Stack trace must not contain client packages. " +
                 "Invocation should go through the protocol stack. " +
                 "It should not be directly invoked. " + trace,
-                trace.contains("org.apache.cxf.dosgi.systests2.single.test2.client"));
+                trace.contains("org.apache.cxf.dosgi.systests2.common.test2.client"));
             
             // If gone through the protocol stack the following packages should be 
             // in there:

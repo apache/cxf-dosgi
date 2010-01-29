@@ -67,7 +67,7 @@ public class MultiBundleTools {
                 }
             }
         }
-        return startLevel;
+        return startLevel + 1; // Add 1 to start level to be on the safe side
     }
 
     private static File getRootDirectory() {

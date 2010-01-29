@@ -45,7 +45,15 @@ public class TestDiscoveryRountrip extends AbstractTestDiscoveryRoundtrip {
         
         List<Option> opts = new ArrayList<Option>();
         
+        // Run this test under Equinox. 
+        opts.add(CoreOptions.frameworks(CoreOptions.equinox()));
+        
+        // This property sets the start level for felix
         opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));
+        
+        // This property sets the start level for equinox
+        opts.add(CoreOptions.systemProperty("osgi.startLevel").value("" + startLevel));
+
         opts.add(CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject());
         for(Map.Entry<Integer, String> entry : bundles.entrySet()) {
             opts.add(CoreOptions.bundle(entry.getValue()).startLevel(entry.getKey()));
@@ -69,7 +77,7 @@ public class TestDiscoveryRountrip extends AbstractTestDiscoveryRoundtrip {
 
     @Test
     public void testDiscoveryRoundtrip() throws Exception {
-        // enabled soon
+        // Enabled soon
         // baseTestDiscoveryRoundtrip();
     }
 }
