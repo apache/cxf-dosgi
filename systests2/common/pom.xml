@@ -82,10 +82,11 @@
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
                         <!-- The TinyBundles are only used during the 'configure' stage and are therefore not
-                             needed at runtime. -->
+                             needed at runtime.
+                             Other imports marked as optional as not all tests have the same dependencies. -->
                         <Import-Package>
                             !org.ops4j.pax.swissbox.tinybundles.*,
-                            *
+                            *;resolution:=optional
                         </Import-Package>
                         <Export-Package>*</Export-Package>
                     </instructions>

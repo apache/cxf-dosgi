@@ -35,18 +35,22 @@ import org.w3c.dom.NodeList;
 public class MultiBundleTools {
     private MultiBundleTools() {}
     
-    static int getDistroBundles(Map<Integer, String> bundles) throws Exception {
+    static int getDistroBundles(Map<Integer, String> bundles, boolean discovery) throws Exception {
         File root = getRootDirectory();        
         File mdRoot = new File(root, "distribution/multi-bundle");
         String pomVersion = getPomVersion(mdRoot);
         
-        return getDistroBundles(mdRoot, pomVersion, bundles);        
+        return getDistroBundles(mdRoot, pomVersion, bundles, discovery);
     }
     
-    private static int getDistroBundles(File mdRoot, String pomVersion, Map<Integer, String> bundles) throws Exception {
+    private static int getDistroBundles(File mdRoot, String pomVersion, Map<Integer, String> bundles, boolean discovery) throws Exception {
         File distroDir = new File(mdRoot, "target/cxf-dosgi-ri-multibundle-distribution-" + pomVersion + ".dir");
         Properties p = new Properties();
-        p.load(new FileInputStream(new File(distroDir, "apache-cxf-dosgi-ri-" + pomVersion + "/conf/felix.config.properties.append")));
+        File confDir = new File(distroDir, "apache-cxf-dosgi-ri-" + pomVersion + "/conf");
+        p.load(new FileInputStream(new File(confDir, "felix.config.properties.append")));
+        if (discovery) {
+            p.load(new FileInputStream(new File(confDir, "felix.discovery.config.properties.append")));
+        }
         
         int startLevel = Integer.parseInt(p.getProperty("org.osgi.framework.startlevel.beginning"));
         for (int i = 0; i <= startLevel; i++) {

@@ -41,7 +41,7 @@ public class TestExportService extends AbstractTestExportService {
     @Configuration
     public static Option[] configure() throws Exception {
         Map<Integer, String> bundles = new TreeMap<Integer, String>();
-        int startLevel = MultiBundleTools.getDistroBundles(bundles);
+        int startLevel = MultiBundleTools.getDistroBundles(bundles, false);
         
         List<Option> opts = new ArrayList<Option>();
         opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));

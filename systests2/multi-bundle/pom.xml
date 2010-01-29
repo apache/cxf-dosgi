@@ -66,6 +66,23 @@
             <version>${cxf.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency> 
+            <groupId>org.apache.log4j</groupId> 
+            <artifactId>com.springsource.org.apache.log4j</artifactId> 
+            <version>${log4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.dosgi</groupId>
+            <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.dosgi</groupId>
+            <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-server</artifactId>
+            <version>${pom.version}</version>
+            <scope>test</scope>           
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
             <artifactId>cxf-dosgi-ri-samples-greeter-impl</artifactId>

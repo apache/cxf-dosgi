@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.cxf.dosgi.systests2.common.AbstractTestImportService;
+import org.apache.cxf.dosgi.systests2.common.AbstractTestDiscoveryRoundtrip;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.CoreOptions;
@@ -34,28 +34,33 @@ import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
 
 @RunWith( JUnit4TestRunner.class )
-public class TestImportService extends AbstractTestImportService {
+public class TestDiscoveryRountrip extends AbstractTestDiscoveryRoundtrip {
     @Inject
     BundleContext bundleContext = null;
 
     @Configuration
     public static Option[] configure() throws Exception {
         Map<Integer, String> bundles = new TreeMap<Integer, String>();
-        int startLevel = MultiBundleTools.getDistroBundles(bundles, false);
+        int startLevel = MultiBundleTools.getDistroBundles(bundles, true);
         
         List<Option> opts = new ArrayList<Option>();
+        
         opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));
         opts.add(CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject());
         for(Map.Entry<Integer, String> entry : bundles.entrySet()) {
             opts.add(CoreOptions.bundle(entry.getValue()).startLevel(entry.getKey()));
         }
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject());
+      
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.log4j").artifactId("com.springsource.org.apache.log4j").versionAsInProject());
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi").artifactId("cxf-dosgi-ri-discovery-distributed-zookeeper-server").versionAsInProject());
 
         // This bundle contains the common system testing code
         opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject());
-        opts.add(CoreOptions.provision(getTestClientBundle()));
+
+        opts.add(CoreOptions.provision(getClientBundle()));
+        opts.add(CoreOptions.provision(getServerBundle()));
         
-        return CoreOptions.options(opts.toArray(new Option[opts.size()]));
+        return CoreOptions.options(opts.toArray(new Option[opts.size()]));                
     }
     
     protected BundleContext getBundleContext() {
@@ -63,7 +68,8 @@ public class TestImportService extends AbstractTestImportService {
     }
 
     @Test
-    public void testClientConsumer() throws Exception {
-        baseTestClientConsumer();
-    }    
+    public void testDiscoveryRoundtrip() throws Exception {
+        // enabled soon
+        // baseTestDiscoveryRoundtrip();
+    }
 }
