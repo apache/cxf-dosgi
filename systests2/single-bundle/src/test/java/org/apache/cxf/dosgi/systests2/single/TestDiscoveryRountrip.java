@@ -42,6 +42,9 @@ public class TestDiscoveryRountrip extends AbstractTestDiscoveryRoundtrip {
 //                // setting timeout to 0 means wait as long as the remote service comes available.
 //                waitForFrameworkStartup(),
                 
+                // Run this one in Felix
+                CoreOptions.frameworks(CoreOptions.felix()),
+
                 CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
                 CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi").artifactId("cxf-dosgi-ri-singlebundle-distribution").versionAsInProject(),
                 
@@ -63,7 +66,6 @@ public class TestDiscoveryRountrip extends AbstractTestDiscoveryRoundtrip {
 
     @Test
     public void testDiscoveryRoundtrip() throws Exception {
-         // Enabled soon
-         // baseTestDiscoveryRoundtrip();
+         baseTestDiscoveryRoundtrip();
     }
 }

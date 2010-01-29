@@ -44,6 +44,10 @@ public class TestImportService extends AbstractTestImportService {
         int startLevel = MultiBundleTools.getDistroBundles(bundles, false);
         
         List<Option> opts = new ArrayList<Option>();
+        
+        // Run this test under Felix. 
+        opts.add(CoreOptions.frameworks(CoreOptions.felix()));
+
         opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));
         opts.add(CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject());
         for(Map.Entry<Integer, String> entry : bundles.entrySet()) {

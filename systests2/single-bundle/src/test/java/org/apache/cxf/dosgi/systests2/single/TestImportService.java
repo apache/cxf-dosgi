@@ -36,6 +36,9 @@ public class TestImportService extends AbstractTestImportService {
     @Configuration
     public static Option[] configure() {
         return CoreOptions.options(
+                // Run this one in Equinox
+                CoreOptions.frameworks(CoreOptions.equinox()),
+                
                 CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
                 CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi").artifactId("cxf-dosgi-ri-singlebundle-distribution").versionAsInProject(),
                 CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),

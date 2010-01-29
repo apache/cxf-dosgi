@@ -36,6 +36,9 @@ public class TestExportService extends AbstractTestExportService {
 //                // this is necessary to let junit runner not timout the remote process before attaching debugger
 //                // setting timeout to 0 means wait as long as the remote service comes available.
 //                waitForFrameworkStartup(),
+
+                // Run this one in Felix
+                CoreOptions.frameworks(CoreOptions.felix()),
                 
                 CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
                 CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi").artifactId("cxf-dosgi-ri-singlebundle-distribution").versionAsInProject(),

@@ -77,7 +77,6 @@ public class TestDiscoveryRountrip extends AbstractTestDiscoveryRoundtrip {
 
     @Test
     public void testDiscoveryRoundtrip() throws Exception {
-        // Enabled soon
-        // baseTestDiscoveryRoundtrip();
+        baseTestDiscoveryRoundtrip();
     }
 }

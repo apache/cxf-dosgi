@@ -118,7 +118,7 @@ public abstract class AbstractTestDiscoveryRoundtrip {
     
     private ServiceReference waitService(String cls, String filter) throws Exception {        
         ServiceReference[] refs = null;
-        for (int i=0; i < 20; i++) {
+        for (int i=0; i < 60; i++) {
             refs = getBundleContext().getServiceReferences(cls, filter);
             if (refs != null && refs.length > 0) {
                 return refs[0];
