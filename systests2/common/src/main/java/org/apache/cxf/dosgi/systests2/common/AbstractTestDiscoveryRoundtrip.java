@@ -61,6 +61,26 @@ public abstract class AbstractTestDiscoveryRoundtrip {
     }
 
     public void baseTestDiscoveryRoundtrip() throws Exception {
+        // This test works as follows.
+        // 1. It loads the zookeeper server as a bundle and configures it and the client to
+        //    it with a free port number to set up the zookeeper discovery infrastructure.
+        //    This is done through the Configuration Admin Service.
+        // 2. It has a server bundle and a client bundle. The server bundle exposes Test2Service
+        //    on a dynamically allocated port. The service method returns a stack trace from the 
+        //    server in string format.
+        // 3. The client bundle is simply a client to an OSGi Service implementing the Test2Service.
+        //    It has the additional requirement that the service needs to have the service.imported 
+        //    property set on the service reference. This is needed to for the lookup of a proxy to
+        //    a remote service.
+        // 4. The client will automatically get a proxy to the remote service through the discovery
+        //    system.
+        // 5. The client invokes the remote service and registers a service when the invocation 
+        //    returns. It puts the return value (the remote stack trace) on that service as a 
+        //    'result' property
+        // 6. The test code waits for this service to appear and then checks:
+        //    * That the stack trace doesn't contain the client package (so no direct invocation)
+        //    * That the stack trace contains the CXF transport and interceptor packages
+        
         for( Bundle b : getBundleContext().getBundles() )
         {
             System.out.println( "*** Bundle " + b.getBundleId() + " : " + b.getSymbolicName() + "/" + b.getState());
