@@ -66,7 +66,7 @@ public class EndpointListenerFactory implements ServiceFactory {
 
     }
 
-    public void start() {
+    public synchronized void start() {
         serviceRegistartion = bctx.registerService(EndpointListener.class.getName(), this, null);
         updateServiceRegistration();
     }
@@ -77,7 +77,7 @@ public class EndpointListenerFactory implements ServiceFactory {
         serviceRegistartion.setProperties(props);
     }
 
-    public void stop() {
+    public synchronized void stop() {
         if (serviceRegistartion != null)
             serviceRegistartion.unregister();
         

@@ -60,6 +60,25 @@ public class ZooKeeperDiscovery implements Watcher {
         if(started) return;
         started = true;
         createZooKeeper(properties);
+        
+        // Wait up to 10 seconds for the connection to be established and only register 
+        // the listeners once the connection is established
+        int loops = 100;
+        
+        while(loops>0){
+            if(zooKeeper.getState()==ZooKeeper.States.CONNECTED){
+                break;
+            }
+            --loops;
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {}
+        }
+        
+        if(zooKeeper.getState()!=ZooKeeper.States.CONNECTED){
+            throw new IOException("Connection to ZookeeperServer failed !");
+        }
+        
         endpointListenerFactory.start();
         endpointListenerTracker.open();
     }
@@ -78,7 +97,6 @@ public class ZooKeeperDiscovery implements Watcher {
         zkTimeout = Integer.parseInt(getProp(props, "zookeeper.timeout", "3000"));
 
         zooKeeper = createZooKeeper();
-
     }
 
     // separated for testing

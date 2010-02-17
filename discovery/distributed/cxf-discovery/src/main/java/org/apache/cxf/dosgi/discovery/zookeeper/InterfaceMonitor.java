@@ -61,13 +61,14 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         
         switch (rc) {
         case Code.Ok:
-            break;
         case Code.NoNode:
             break;
+
         case Code.SessionExpired:
-            return;
         case Code.NoAuth:
+        case Code.ConnectionLoss:
             return;
+        
         default:
             process();
             return;
@@ -78,6 +79,12 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
     private void processDelta() {
         if(closed) return;
+        
+        if(zookeeper.getState() != ZooKeeper.States.CONNECTED){
+            LOG.info("zookeeper connection was already closed! Not processing changed event.");
+            return;
+        }
+        
         try {
             if (zookeeper.exists(znode, false) != null) {
                 listener.change();
