@@ -42,22 +42,8 @@ public final class ConfigTypeHandlerFactory {
     public ConfigurationTypeHandler getHandler(BundleContext dswBC, List<String> configurationTypes,
                                                Map serviceProperties, Map<String, Object> props) {
 
-        //  Marc FIXME:   write test case !!! 
-        
-        // EndpointDescription sd =null;
-
-        // Collection<String> types = configurationTypes;
-        // //OsgiUtils.getMultiValueProperty(sd.getProperties().get(Constants.EXPORTED_CONFIGS));
-        // if (types == null) {
-        // types = OsgiUtils.getMultiValueProperty(sd.getProperties().get(Constants.EXPORTED_CONFIGS_OLD));
-        // }
-
         if (configurationTypes.contains(Constants.WS_CONFIG_TYPE)
             || configurationTypes.contains(Constants.WS_CONFIG_TYPE_OLD) || configurationTypes.contains(Constants.RS_CONFIG_TYPE)) {
-
-//            if (types == null) {
-//                LOG.info("Defaulting to pojo configuration type ");
-//            }
 
             boolean jaxrs = isJaxrsRequested(configurationTypes, serviceProperties);
 

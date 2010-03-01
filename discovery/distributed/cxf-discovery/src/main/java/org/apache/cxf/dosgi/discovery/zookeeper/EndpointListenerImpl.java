@@ -53,7 +53,7 @@ public class EndpointListenerImpl implements EndpointListener {
 
     private ZooKeeperDiscovery discovery;
     private BundleContext bctx;
-    
+
     private List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
 
     private boolean closed = false;
@@ -139,8 +139,6 @@ public class EndpointListenerImpl implements EndpointListener {
         }
     }
 
- 
-
     private static void ensurePath(String path, ZooKeeper zk) throws KeeperException, InterruptedException {
         StringBuilder current = new StringBuilder();
 
@@ -169,19 +167,25 @@ public class EndpointListenerImpl implements EndpointListener {
                     // null values are not allowed
                     continue;
                 }
+                
+                if (val instanceof String[]) {
+                    String[] sa = (String[])val;
+                    val = Util.convertStringArrayToString(sa);
+                }
+
+                if (val instanceof Collection) {
+                    Collection sc = (Collection)val;
+                    try{
+                        String[] sa = (String[])sc.toArray();
+                        val = Util.convertStringArrayToString(sa);
+                    }catch (ClassCastException e) {
+                        e.printStackTrace();
+                    }
+                }
+                
                 p.setProperty(prop.getKey(), val.toString());
             }
         }
-
-        {
-            String[] oc = (String[])serviceProps.get(Constants.OBJECTCLASS);
-            if (oc.length > 0)
-                p.put(Constants.OBJECTCLASS, oc[0]);
-        }
-
-        // Marc: FIXME: What is/was ths good for ??!?!?
-        // copyProperty(ServicePublication.ENDPOINT_SERVICE_ID, sr, p, host);
-        // copyProperty(ServicePublication.ENDPOINT_LOCATION, sr, p, host);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         p.store(baos, "");

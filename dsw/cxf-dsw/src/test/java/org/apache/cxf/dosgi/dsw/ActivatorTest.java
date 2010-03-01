@@ -19,20 +19,15 @@
 package org.apache.cxf.dosgi.dsw;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.dosgi.dsw.hooks.TestService;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
 public class ActivatorTest extends TestCase{
@@ -45,22 +40,30 @@ public class ActivatorTest extends TestCase{
 
         EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
-//        EasyMock.expect(bc.registerService(
-//            (String) EasyMock.anyObject(), EasyMock.anyObject(), 
-//            (Dictionary) EasyMock.anyObject())).andAnswer(new IAnswer<ServiceRegistration>() {
-//                public ServiceRegistration answer() throws Throwable {
-//                    ServiceRegistration sr = EasyMock.createNiceMock(ServiceRegistration.class);
-//                    EasyMock.replay(sr);
-//                    return sr;
-//                }                
-//            }).anyTimes();
+        //        EasyMock.expect(bc.registerService(
+        //            (String) EasyMock.anyObject(), EasyMock.anyObject(), 
+        //            (Dictionary) EasyMock.anyObject())).andAnswer(new IAnswer<ServiceRegistration>() {
+        //                public ServiceRegistration answer() throws Throwable {
+        //                    ServiceRegistration sr = EasyMock.createNiceMock(ServiceRegistration.class);
+        //                    EasyMock.replay(sr);
+        //                    return sr;
+        //                }                
+        //            }).anyTimes();
         return bc;
     }
     
+    
+    
+    
     public void testCreateAndShutdownRemoteServiceAdminService() throws Exception {
+        
+       //IntentMap im = new IntentMap();
+       //im.setIntents(new HashMap<String, Object>());
+
+       // IntentMapLoader.initializeWithExistingMap(im);
+        
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext bc = getMockBundleContext(control);
-        
         
         ServiceRegistration sr = control.createMock(ServiceRegistration.class);
         EasyMock.expect(bc.registerService(EasyMock.eq(RemoteServiceAdmin.class.getName()),EasyMock.anyObject(), (Dictionary)EasyMock.anyObject())).andReturn(sr).atLeastOnce();
@@ -69,29 +72,10 @@ public class ActivatorTest extends TestCase{
         control.replay();
         
         
-        Activator a = new Activator() {
-//            @Override
-//            IntentMap getIntentMap() {
-//                IntentMap intentMap = new IntentMap();
-//                intentMap.setIntents(new HashMap<String, Object>());
-//                return intentMap;                
-//            }            
-        };   
-        
-        
-        
-        
+        Activator a = new Activator();   
         a.start(bc);
         
         control.verify();
-        
-        
-//        CxfRemoteServiceAdmin mockRSA = EasyMock.createMock(CxfRemoteServiceAdmin.class);
-//        mockRSA.shutdown();
-//        EasyMock.replay(mockRSA);
-//        a.rsa = mockRSA;
-//        a.stop(bc);
-//        EasyMock.verify(mockRSA);
         
     }
     

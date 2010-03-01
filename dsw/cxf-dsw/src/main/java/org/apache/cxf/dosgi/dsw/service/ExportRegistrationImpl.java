@@ -161,10 +161,10 @@ public class ExportRegistrationImpl implements ExportRegistration {
                 r += entry.getKey() + "  => " + entry.getValue() + "\n";
             }
         }
-        r += "\n\n";
+        r += "\n";
         r += "*** Exception: " + exception + " **** \n";
         r += "*** isClosed : " + closed + " ****\n";
-        r += "\n\n";
+        r += "\n";
 
         return r;
     }

@@ -54,6 +54,8 @@ import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 public final class OsgiUtils {
 
+    // TODO: cleanup old code fragments !!!
+    
     private static final Logger LOG = Logger.getLogger(OsgiUtils.class.getName());
 
     private static final String REMOTE_SERVICES_HEADER_NAME = "Remote-Service";
@@ -66,16 +68,16 @@ public final class OsgiUtils {
 
     private static final String SERVICE_DESCRIPTION_ELEMENT = "service-description";
 
-    private static final String PROVIDE_INTERFACE_ELEMENT = "provide";
-    private static final String PROVIDE_INTERFACE_NAME_ATTRIBUTE = "interface";
+//    private static final String PROVIDE_INTERFACE_ELEMENT = "provide";
+//    private static final String PROVIDE_INTERFACE_NAME_ATTRIBUTE = "interface";
 
-    private static final String PROPERTY_ELEMENT = "property";
-    private static final String PROPERTY_NAME_ATTRIBUTE = "name";
-    private static final String PROPERTY_VALUE_ATTRIBUTE = "value";
-    private static final String PROPERTY_INTERFACE_ATTRIBUTE = "interface";
+//    private static final String PROPERTY_ELEMENT = "property";
+//    private static final String PROPERTY_NAME_ATTRIBUTE = "name";
+//    private static final String PROPERTY_VALUE_ATTRIBUTE = "value";
+//    private static final String PROPERTY_INTERFACE_ATTRIBUTE = "interface";
 
-    private static final String INTERFACE_WILDCARD = "*";
-    private static final String INTERFACE_SEPARATOR = ":";
+//    private static final String INTERFACE_WILDCARD = "*";
+//    private static final String INTERFACE_SEPARATOR = ":";
 
     private OsgiUtils() {
     }
@@ -163,19 +165,19 @@ public final class OsgiUtils {
 //        return list;
 //    }
 
-    private static Map<String, Object> excludeProperty(Map properties, String... excludes) {
-        Collection<String> exList = Arrays.asList(excludes);
-
-        Map<String, Object> pruned = new HashMap<String, Object>();
-        for (Object key : properties.keySet()) {
-            if (exList.contains(key)) {
-                // exclude
-            } else {
-                pruned.put((String)key, properties.get(key));
-            }
-        }
-        return pruned;
-    }
+//    private static Map<String, Object> excludeProperty(Map properties, String... excludes) {
+//        Collection<String> exList = Arrays.asList(excludes);
+//
+//        Map<String, Object> pruned = new HashMap<String, Object>();
+//        for (Object key : properties.keySet()) {
+//            if (exList.contains(key)) {
+//                // exclude
+//            } else {
+//                pruned.put((String)key, properties.get(key));
+//            }
+//        }
+//        return pruned;
+//    }
 
     @SuppressWarnings("unchecked")
     public static List<Element> getAllDescriptionElements(Bundle b) {
@@ -209,47 +211,47 @@ public final class OsgiUtils {
         return elements;
     }
 
-    private static void setAdditionalProperties(ServiceReference sref, Map<String, Object> props) {
-        BundleContext bc = sref.getBundle().getBundleContext();
-        ServiceReference[] refs;
-        try {
-            refs = bc.getServiceReferences(ServiceDecorator.class.getName(), null);
-        } catch (InvalidSyntaxException e) {
-            // should never happen, filter is null
-            return;
-        }
-        if (refs == null) {
-            return;
-        }
+//    private static void setAdditionalProperties(ServiceReference sref, Map<String, Object> props) {
+//        BundleContext bc = sref.getBundle().getBundleContext();
+//        ServiceReference[] refs;
+//        try {
+//            refs = bc.getServiceReferences(ServiceDecorator.class.getName(), null);
+//        } catch (InvalidSyntaxException e) {
+//            // should never happen, filter is null
+//            return;
+//        }
+//        if (refs == null) {
+//            return;
+//        }
+//
+//        for (ServiceReference ref : refs) {
+//            Object svc = bc.getService(ref);
+//            if (svc instanceof ServiceDecorator) {
+//                ((ServiceDecorator)svc).decorate(sref, props);
+//            }
+//        }
+//    }
 
-        for (ServiceReference ref : refs) {
-            Object svc = bc.getService(ref);
-            if (svc instanceof ServiceDecorator) {
-                ((ServiceDecorator)svc).decorate(sref, props);
-            }
-        }
-    }
-
-    private static boolean serviceNamesMatch(String[] names, List<String> iNames, boolean matchAllNames) {
-        if (names == null || names.length == 0) {
-            return false;
-        }
-        if (matchAllNames) {
-            for (String name : names) {
-                if (!iNames.contains(name)) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            for (String name : names) {
-                if (iNames.contains(name)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
+//    private static boolean serviceNamesMatch(String[] names, List<String> iNames, boolean matchAllNames) {
+//        if (names == null || names.length == 0) {
+//            return false;
+//        }
+//        if (matchAllNames) {
+//            for (String name : names) {
+//                if (!iNames.contains(name)) {
+//                    return false;
+//                }
+//            }
+//            return true;
+//        } else {
+//            for (String name : names) {
+//                if (iNames.contains(name)) {
+//                    return true;
+//                }
+//            }
+//            return false;
+//        }
+//    }
 
     /*
      * // TODO : consider creating a new List rather than modifyiing the existing one public static void
@@ -319,41 +321,41 @@ public final class OsgiUtils {
         return sb.toString();
     }
 
-    private static Map<String, Object> getProperties(List<Element> elements) {
-        Map<String, Object> props = new HashMap<String, Object>();
-        addProperties(props, elements);
-        return props;
-    }
+//    private static Map<String, Object> getProperties(List<Element> elements) {
+//        Map<String, Object> props = new HashMap<String, Object>();
+//        addProperties(props, elements);
+//        return props;
+//    }
 
-    private static void addProperties(Map<String, Object> props, List<Element> elements) {
-        for (Element p : elements) {
-            String key = p.getAttributeValue(PROPERTY_NAME_ATTRIBUTE);
-            String value = p.getAttributeValue(PROPERTY_VALUE_ATTRIBUTE);
-            if (value == null) {
-                value = p.getTextTrim();
-            }
+//    private static void addProperties(Map<String, Object> props, List<Element> elements) {
+//        for (Element p : elements) {
+//            String key = p.getAttributeValue(PROPERTY_NAME_ATTRIBUTE);
+//            String value = p.getAttributeValue(PROPERTY_VALUE_ATTRIBUTE);
+//            if (value == null) {
+//                value = p.getTextTrim();
+//            }
+//
+//            String iface = p.getAttributeValue(PROPERTY_INTERFACE_ATTRIBUTE);
+//            if (key != null) {
+//                props.put(iface == null || iface.length() == 0 ? key : key + INTERFACE_SEPARATOR + iface,
+//                          value);
+//            }
+//        }
+//    }
 
-            String iface = p.getAttributeValue(PROPERTY_INTERFACE_ATTRIBUTE);
-            if (key != null) {
-                props.put(iface == null || iface.length() == 0 ? key : key + INTERFACE_SEPARATOR + iface,
-                          value);
-            }
-        }
-    }
-
-    private static List<String> getProvidedInterfaces(List<Element> elements) {
-
-        List<String> names = new ArrayList<String>();
-
-        for (Element p : elements) {
-            String name = p.getAttributeValue(PROVIDE_INTERFACE_NAME_ATTRIBUTE);
-            if (name != null) {
-                names.add(name);
-            }
-        }
-
-        return names;
-    }
+//    private static List<String> getProvidedInterfaces(List<Element> elements) {
+//
+//        List<String> names = new ArrayList<String>();
+//
+//        for (Element p : elements) {
+//            String name = p.getAttributeValue(PROVIDE_INTERFACE_NAME_ATTRIBUTE);
+//            if (name != null) {
+//                names.add(name);
+//            }
+//        }
+//
+//        return names;
+//    }
 
     @SuppressWarnings("unchecked")
     public static <T> OsgiService<T> getOsgiService(BundleContext bc, Class<T> serviceClass) {
@@ -442,8 +444,8 @@ public final class OsgiUtils {
 
     // TODO : move these property helpers into PropertyUtils ?
 
-    public static boolean getBooleanProperty(EndpointDescription sd, String name) {
-        Object value = sd.getProperties().get(name);
+    public static boolean getBooleanProperty(Map sd, String name) {
+        Object value = sd.get(name);
         return toBoolean(value);
     }
 
@@ -543,30 +545,30 @@ public final class OsgiUtils {
 //        return publishableInterfaces;
 //    }
 
-    private static String[] tokenize(String str, String delim) {
-        StringTokenizer tokenizer = new StringTokenizer(str, delim);
-        String[] tokens = new String[tokenizer.countTokens()];
-        for (int i = 0; tokenizer.hasMoreTokens(); i++) {
-            tokens[i] = tokenizer.nextToken();
-        }
-        return tokens;
-    }
-
-    private static boolean contains(String[] list, String member) {
-        boolean found = false;
-        for (int i = 0; i < list.length && !found; i++) {
-            found = member.equals(list[i]);
-        }
-        return found;
-    }
+//    private static String[] tokenize(String str, String delim) {
+//        StringTokenizer tokenizer = new StringTokenizer(str, delim);
+//        String[] tokens = new String[tokenizer.countTokens()];
+//        for (int i = 0; tokenizer.hasMoreTokens(); i++) {
+//            tokens[i] = tokenizer.nextToken();
+//        }
+//        return tokens;
+//    }
+//
+//    private static boolean contains(String[] list, String member) {
+//        boolean found = false;
+//        for (int i = 0; i < list.length && !found; i++) {
+//            found = member.equals(list[i]);
+//        }
+//        return found;
+//    }
 
     /**
-     * Tries to retrive the version of iClass via the PackageAdmin
+     * Tries to retrieve the version of iClass via the PackageAdmin
      * 
      * @param iClass - The interface for which the version should be found
      * @param bc - any valid BundleContext
      * @return the version of the interface or "0.0.0" if no version information could be found or an error
-     *         occured duriung the retrival
+     *         occurred during the retrieval
      */
     public static String getVersion(Class<?> iClass, BundleContext bc) {
 

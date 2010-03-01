@@ -111,22 +111,6 @@ public class Activator implements BundleActivator, ManagedService {
         rsaFactoryReg.unregister();
         decoratorReg.unregister();
 
-        for (Object o : rsaFactory.getRsaCore().getExportedServices()) {
-            if (o instanceof ExportRegistrationImpl) {
-                LOG.fine("closing Export");
-                ExportRegistrationImpl er = (ExportRegistrationImpl)o;
-                er.close();
-            }
-        }
-        
-        for (Object o : rsaFactory.getRsaCore().getImportedEndpoints()) {
-            if (o instanceof ImportRegistrationImpl) {
-                LOG.fine("closing Import");
-                ImportRegistrationImpl er = (ImportRegistrationImpl)o;
-                er.close();
-            }
-        }
-        
         // shutdown the CXF Bus -> Causes also the shutdown of the embedded HTTP server
         Bus b = BusFactory.getDefaultBus();
         if (b != null) {

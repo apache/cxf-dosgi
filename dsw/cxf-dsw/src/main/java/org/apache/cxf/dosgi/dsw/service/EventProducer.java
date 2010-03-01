@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
@@ -50,7 +51,7 @@ public class EventProducer {
     protected void publishNotifcation(ExportRegistration er) {
         RemoteServiceAdminEvent rsae = null;
         if (er.getException() != null) {
-            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_ERROR, bctx.getBundle(), er.getExportReference(), er
+            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_ERROR, bctx.getBundle(),(ExportReference)null, er
                 .getException());
         } else {
             rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_REGISTRATION, bctx.getBundle(),
@@ -68,7 +69,7 @@ public class EventProducer {
             if (listenerRefs != null) {
                 for (ServiceReference sref : listenerRefs) {
                     RemoteServiceAdminListener rsal = (RemoteServiceAdminListener)bctx.getService(sref);
-                    LOG.info("::::::::::::::::::::: notify RemoteServiceAdminListener " + rsal
+                    LOG.fine("notify RemoteServiceAdminListener " + rsal
                              + " of bundle " + sref.getBundle().getSymbolicName());
                     rsal.remoteAdminEvent(rsae);
                 }

@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -51,7 +52,7 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
     public List /* ExportRegistration */exportService(ServiceReference ref, Map properties)
         throws IllegalArgumentException, UnsupportedOperationException {
         if (closed)
-            return null;
+            return Collections.EMPTY_LIST;
 
         synchronized (exportedServices) {
             List er = rsaCore.exportService(ref, properties);

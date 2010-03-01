@@ -31,12 +31,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.cxf.dosgi.dsw.ClassUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.handlers.ClientServiceFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -51,8 +52,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     private LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>> exportedServices = new LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>>();
     private LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices = new LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>>();
-    
-    
+
     private BundleContext bctx;
 
     private EventProducer eventProducer;
@@ -60,7 +60,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private volatile boolean useMasterMap = true;
     private volatile String defaultPort;
     private volatile String defaultHost;
-    
+
     // protected because of tests
     protected static List<String> supportedConfigurationTypes = new ArrayList<String>();
     static {
@@ -69,6 +69,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE);
         supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
     }
+    
+    protected final static String DEFAULT_CONFIGURATION = Constants.WS_CONFIG_TYPE;
 
     public RemoteServiceAdminCore(BundleContext bc) {
         bctx = bc;
@@ -87,36 +89,40 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 Collection<ExportRegistrationImpl> regs = exportedServices.get(serviceReference);
 
                 List<EndpointDescription> copiedEndpoints = new ArrayList<EndpointDescription>();
-                
+
                 // / create a new list with copies of the exportRegistrations
                 List<ExportRegistrationImpl> copy = new ArrayList<ExportRegistrationImpl>(regs.size());
                 for (ExportRegistrationImpl exportRegistration : regs) {
-                    // create one copy for each distinct endpoint description 
-                    if(!copiedEndpoints.contains(exportRegistration.getEndpointDescription())){
+                    // create one copy for each distinct endpoint description
+                    if (!copiedEndpoints.contains(exportRegistration.getEndpointDescription())) {
                         copiedEndpoints.add(exportRegistration.getEndpointDescription());
                         copy.add(new ExportRegistrationImpl(exportRegistration));
                     }
                 }
-                
+
                 regs.addAll(copy);
-                
+
                 eventProducer.publishNotifcation(copy);
                 return copy;
             }
 
             if (isCreatedByThisRSA(serviceReference)) {
                 LOG.fine("proxy provided by this bundle ...  " + serviceReference.getClass().getName());
-                return null;
+                // TODO: publish error event ? Not sure
+                return Collections.EMPTY_LIST;
             }
 
+            
+            
             Properties serviceProperties = new Properties();
 
-            {// gather EventProducerproperties from sRef
+            {// gather properties from sRef
                 String[] keys = serviceReference.getPropertyKeys();
                 for (String k : keys) {
                     serviceProperties.put(k, serviceReference.getProperty(k));
                 }
             }
+
 
             if (additionalProperties != null) {// overlay properties with the additionalProperies
                 Set<Map.Entry> adProps = additionalProperties.entrySet();
@@ -134,26 +140,34 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                         }
                     }
                     serviceProperties.put(e.getKey(), e.getValue());
-                    LOG.fine("Overwriting property ["+e.getKey()+"]  with value ["+e.getValue()+"]");
+                    LOG.fine("Overwriting property [" + e.getKey() + "]  with value [" + e.getValue() + "]");
                 }
             }
-            
-            
-          
-            
-            
+
             // Get the intents that need to be supported by the RSA
             String[] requiredIntents = Utils.getAllRequiredIntents(serviceProperties);
-            
-            { // TODO: Determine if the required intents can be provided by the RSA ....
-                
-                // if not return null
-                if(requiredIntents!=null && requiredIntents.length>0) 
-                    return null; 
+
+            {
+                IntentMap im = OsgiUtils.getIntentMap(bctx);
+
+                List<String> unsupportedIntents = new ArrayList<String>();
+
+                for (String ri : requiredIntents) {
+                    if (!im.getIntents().containsKey(ri)) {
+                        unsupportedIntents.add(ri);
+                    }
+                }
+
+                if (unsupportedIntents.size() > 0) {
+                    LOG
+                        .severe("service cannot be exported because the following intents are not supported by this RSA: "
+                                + unsupportedIntents);
+                    // TODO: publish error event
+                    return Collections.EMPTY_LIST;
+                }
+
             }
-            
-            
-            
+
             List<String> interfaces = new ArrayList<String>(1);
 
             {// determine which interfaces should be exported ? based on props and sRef
@@ -164,7 +178,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 if (providedInterfaces == null || allowedInterfaces == null) {
                     LOG
                         .severe("export failed: no provided service interfaces found or service_exported_interfaces is null !!");
-                    return null;
+                    // TODO: publish error event ? not sure
+                    return Collections.EMPTY_LIST;
                 }
 
                 if (allowedInterfaces.length == 1 && "*".equals(allowedInterfaces[0])) {
@@ -187,7 +202,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             // if no interface is to be exported return null
             if (interfaces.size() == 0) {
                 LOG.info("no interfaces to be exported");
-                return null;
+                // TODO: publish error event ? not sure
+                return Collections.EMPTY_LIST;
             }
 
             List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
@@ -197,12 +213,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             // if no configuration type is supported ? return null
             if (configurationTypes.size() == 0) {
                 LOG.info("the requested configuration types are not supported");
-                return null;
+                // TODO: publish error event ? not sure
+                return Collections.EMPTY_LIST;
             }
 
             LinkedHashMap<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>(
                                                                                                                          1);
-            
+
             for (String iface : interfaces) {
                 LOG.info("creating initial ExportDescription for interface " + iface
                          + "  with configuration types " + configurationTypes);
@@ -215,7 +232,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
 
             // enlist initial export Registrations in global list of exprtRegistrations
-            exportedServices.put(serviceReference, new ArrayList<ExportRegistrationImpl>(exportRegs.values()));
+            exportedServices
+                .put(serviceReference, new ArrayList<ExportRegistrationImpl>(exportRegs.values()));
 
             // FIXME: move out of synchronized ... -> blocks until publication is finished
             for (String iface : interfaces) {
@@ -228,7 +246,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 BundleContext callingContext = serviceReference.getBundle().getBundleContext();
 
                 if (handler == null) {
-                    return null;
+                    // TODO: publish error event ? not sure
+                    return Collections.EMPTY_LIST;
                 }
 
                 LOG.info("found handler for " + iface + "  -> " + handler);
@@ -241,10 +260,17 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
                     handler.createServer(exportRegistration, bctx, callingContext, serviceProperties,
                                          interfaceClass, serviceObject);
-                    LOG.info("created server for interface " + iface);
-
-                    exportRegistration.startServiceTracker(bctx);
                     
+                    if(exportRegistration.getException()==null){
+                        LOG.info("created server for interface " + iface);
+
+                        exportRegistration.startServiceTracker(bctx);
+                    }else{
+                        LOG.warning("server creation for interface " + iface + "  failed!");
+                        // Fire event happens at the end
+                    }
+                    
+
                 }
             }
 
@@ -257,15 +283,15 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
     protected List<String> determineConfigurationTypes(Properties serviceProperties) {
-        
+
         List<String> configurationTypes = new ArrayList<String>();
-        
+
         {// determine which configuration types should be used / if the requested are supported
             String[] requestedConfigurationTypes = Utils.normalizeStringPlus(serviceProperties
                 .get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
             if (requestedConfigurationTypes == null || requestedConfigurationTypes.length == 0) {
-                // add all supported
-                configurationTypes.addAll(supportedConfigurationTypes);
+                // add default configuration
+                configurationTypes.add(DEFAULT_CONFIGURATION);
             } else {
                 for (String rct : requestedConfigurationTypes) {
                     if (supportedConfigurationTypes.contains(rct)) {
@@ -276,7 +302,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
 
         }
-        
+
         return configurationTypes;
     }
 
@@ -304,8 +330,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         }
     }
 
-
-
     private ConfigurationTypeHandler getHandler(List<String> configurationTypes, Map serviceProperties,
                                                 Map<String, Object> props) {
         return ConfigTypeHandlerFactory.getInstance().getHandler(bctx, configurationTypes, serviceProperties,
@@ -325,28 +349,22 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     /**
      * Importing form here ....
      */
-
-    /**
-     * For me it looks like the RSA is only able to import one interface by creating one proxy service which
-     * can than be placed in the ImportRegistration object. However the decision which service should be
-     * imported lies in the hands f the TopologyManager as the RSA has no idea about service interests ...
-     * Therefore the TM needs to modify the EndpointDescription in such a way that only one interface is
-     * listed in it anymore...
-     */
     public ImportRegistration importService(EndpointDescription endpoint) {
 
         LOG.info("importService() Endpoint: " + endpoint.getProperties());
 
         synchronized (importedServices) {
-            if (importedServices.containsKey(endpoint) && importedServices.get(endpoint).size()>0) {
+            if (importedServices.containsKey(endpoint) && importedServices.get(endpoint).size() > 0) {
+                LOG.fine("creating copy of existing import registrations");
                 Collection<ImportRegistrationImpl> imRegs = importedServices.get(endpoint);
                 ImportRegistrationImpl irParent = imRegs.iterator().next();
                 ImportRegistrationImpl ir = new ImportRegistrationImpl(irParent);
+                imRegs.add(ir);
                 eventProducer.publishNotifcation(ir);
                 return ir;
             }
 
-            List remoteConfigurationTypes = endpoint.getConfigurationTypes(); 
+            List remoteConfigurationTypes = endpoint.getConfigurationTypes();
 
             if (remoteConfigurationTypes == null) {
                 LOG.severe("the supplied endpoint has no configuration type");
@@ -363,7 +381,9 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             if (usableConfigurationTypes.size() == 0) {
                 LOG
                     .severe("the supplied endpoint has no compatible configuration type. Supported types are: "
-                            + supportedConfigurationTypes  +  "    Types needed by the endpoint: " +remoteConfigurationTypes);
+                            + supportedConfigurationTypes
+                            + "    Types needed by the endpoint: "
+                            + remoteConfigurationTypes);
                 return null;
             }
 
@@ -376,7 +396,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return null;
             }
 
-            LOG.fine("Handler: "+handler);
+            LOG.fine("Handler: " + handler);
 
             // // TODO: somehow select the interfaces that should be imported ----> job of the TopologyManager
             // ?
@@ -387,13 +407,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             if (matchingInterfaces.size() == 1) {
                 LOG.info("Proxifying interface : " + matchingInterfaces.get(0));
 
-                ImportRegistrationImpl imReg = new ImportRegistrationImpl(endpoint,this);
+                ImportRegistrationImpl imReg = new ImportRegistrationImpl(endpoint, this);
 
                 proxifyMatchingInterface(matchingInterfaces.get(0), imReg, handler, bctx);
                 Collection<ImportRegistrationImpl> imRegs = importedServices.get(endpoint);
-                if(imRegs==null){
+                if (imRegs == null) {
                     imRegs = new ArrayList<ImportRegistrationImpl>();
-                    importedServices.put(endpoint,imRegs);
+                    importedServices.put(endpoint, imRegs);
                 }
                 imRegs.add(imReg);
                 eventProducer.publishNotifcation(imReg);
@@ -406,7 +426,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
     protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
-                                          ConfigurationTypeHandler handler, BundleContext requestingContext) {
+                                            ConfigurationTypeHandler handler, BundleContext requestingContext) {
 
         try {
             // MARC: relies on dynamic imports ?
@@ -430,7 +450,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
                 // synchronized (discoveredServices) {
                 ClientServiceFactory csf = new ClientServiceFactory(actualContext, iClass, imReg
-                    .getImportedEndpointDescription(), handler,imReg);
+                    .getImportedEndpointDescription(), handler, imReg);
 
                 imReg.setClientServiceFactory(csf);
                 ServiceRegistration proxyRegistration = actualContext.registerService(interfaceName, csf,
@@ -458,12 +478,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
         synchronized (exportedServices) {
             Collection<ExportRegistrationImpl> exRegs = exportedServices.get(eri.getServiceReference());
-            if (exRegs.contains(eri)) {
+            if (exRegs != null && exRegs.contains(eri)) {
                 exRegs.remove(eri);
             } else {
-                LOG.severe("An exportRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
+                LOG
+                    .severe("An exportRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
             }
-            if (exRegs.size() == 0) {
+            if (exRegs == null || exRegs.size() == 0) {
                 exportedServices.remove(eri.getServiceReference());
             }
 
@@ -471,25 +492,22 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         }
 
     }
-    
-    protected void removeImportRegistration(ImportRegistrationImpl iri){
+
+    protected void removeImportRegistration(ImportRegistrationImpl iri) {
         synchronized (importedServices) {
-            LOG.finest("Removing importRegistration "+iri);
-            
+            LOG.finest("Removing importRegistration " + iri);
+
             Collection<ImportRegistrationImpl> imRegs = importedServices.get(iri.getImportedEndpointAlways());
-            if (imRegs.contains(iri)) {
+            if (imRegs!=null && imRegs.contains(iri)) {
                 imRegs.remove(iri);
             } else {
-                LOG.severe("An importRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
+                LOG
+                    .severe("An importRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
             }
-            if (imRegs.size() == 0) {
+            if (imRegs == null || imRegs.size() == 0) {
                 importedServices.remove(iri.getImportedEndpointAlways());
             }
-            
-//            if(importedServices.remove(iri.getImportedEndpointDescription())==null){
-//                LOG.severe("An importRegistartion couldn't be removed from the internal management structure -> structure is inconsistent !!");
-//            }
-            
+
             eventProducer.notifyRemoval(iri);
         }
     }

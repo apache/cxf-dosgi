@@ -188,9 +188,9 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     private static String[] getRequestedIntents(Map sd) {
         Collection<String> intents = Arrays.asList(
-            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS)));        
+            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));        
         Collection<String> extraIntents = Arrays.asList(
-            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_EXTRA)));
+            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));
         Collection<String> oldIntents = Arrays.asList(
             OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_OLD))); 
         
@@ -225,9 +225,5 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return intentMap;
     }    
 
-    protected void addAddressProperty(Map props, String address) {
-        if (props != null) {
-            props.put(RemoteConstants.ENDPOINT_ID, address);
-        }
-    }
+
 }

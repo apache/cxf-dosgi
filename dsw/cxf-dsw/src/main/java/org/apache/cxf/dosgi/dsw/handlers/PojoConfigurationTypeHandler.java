@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +61,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         String address = getPojoAddress(sd.getProperties(), iClass);
         if (address == null) {
             LOG.warning("Remote address is unavailable");
+            // TODO: fire Event
             return null;
         }
 
@@ -103,30 +108,6 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         LOG.info("Creating a " + iClass.getName() + " endpoint from CXF PublishHook, address is " + address);
 
-        // The properties for the EndpointDescription
-        Map<String, Object> endpointProps = new HashMap<String, Object>();
-
-        copyEndpointProperties(sd, endpointProps);
-
-        
-        
-        String[] sa = new String[1];
-        sa[0] = iClass.getName();
-        endpointProps.put(org.osgi.framework.Constants.OBJECTCLASS, sa);
-        // endpointProps.put(RemoteConstants.SERVICE_IMPORTED, "someValue;-)"); // should be done when the
-        // service is imported
-        // endpointProps.put(RemoteConstants.SERVICE_REMOTE_ID, "TODO");
-
-        // FIXME: This key is not defined in the spec but is required by the EndpointDescription !!!!!
-        endpointProps.put(RemoteConstants.ENDPOINT_SERVICE_ID, 123L);
-
-        endpointProps.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(getBundleContext()));
-        endpointProps.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, Constants.WS_CONFIG_TYPE);
-        endpointProps.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + sa[0], OsgiUtils.getVersion(iClass, dswContext));
-        endpointProps.put(RemoteConstants.SERVICE_INTENTS, Utils.getAllIntentsCombined(sd));
-        // make sure that the Endpoint contains the address that was actualy used
-        addAddressProperty(endpointProps, address);
-        
         DataBinding databinding;
         String dataBindingImpl = (String)exportRegistration.getExportedService()
             .getProperty(Constants.WS_DATABINDING_PROP_KEY);
@@ -139,7 +120,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             .getProperty(Constants.WS_FRONTEND_PROP_KEY);
         ServerFactoryBean factory = createServerFactoryBean(frontEndImpl);
 
-        factory.setServiceClass(iClass);        
+        factory.setServiceClass(iClass);
         factory.setAddress(address);
         factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
@@ -148,57 +129,62 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         try {
             String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
 
+            // The properties for the EndpointDescription
+            Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, address,intents);
+            
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
 
-
             exportRegistration.setServer(server);
-
+            
+            //  add the information on the new Endpoint to the export registration
+            EndpointDescription ed = new EndpointDescription(endpointProps);
+            exportRegistration.setEndpointdescription(ed);
+            
         } catch (IntentUnsatifiedException iue) {
             exportRegistration.setException(iue);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
 
-        // add the information on the new Endpoint to the export registration
-        EndpointDescription ed = new EndpointDescription(endpointProps);
-        exportRegistration.setEndpointdescription(ed);
-    }
-
-    
-
-    private void copyEndpointProperties(Map sd, Map<String, Object> endpointProps) {
-        Set<Map.Entry> keys = sd.entrySet();
-        for (Map.Entry entry : keys) {
-            try{
-                String skey = (String)entry.getKey();
-                if (!skey.startsWith("."))
-                    endpointProps.put(skey, entry.getValue());
-            }catch (ClassCastException e) {
-                LOG.warning("ServiceProperties Map contained non String key. Skipped  "+entry + "   "+e.getLocalizedMessage());
-            }
-        }
+        
     }
 
 
-
-//    @Override
-//    Map<String, String> registerPublication(Server server, String[] intents) {
-//        Map<String, String> publicationProperties = super.registerPublication(server, intents);
-//        publicationProperties.put(Constants.WS_ADDRESS_PROPERTY, server.getDestination().getAddress()
-//            .getAddress().getValue());
-//
-//        return publicationProperties;
-//    }
 
     protected String getPojoAddress(Map sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
+        if(address == null && sd.get(RemoteConstants.ENDPOINT_ID)!=null ){
+            LOG.severe("Could not use address property " + RemoteConstants.ENDPOINT_ID );
+            return null;
+        }
+        
+        
         if (address == null) {
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
         }
+        if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY)!=null ){
+            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
+            return null;
+        }
+        
         if (address == null) {
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);
         }
+        if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY_OLD)!=null ){
+            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
+            return null;
+        }
+        
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
+        }
+        if(address == null && sd.get(Constants.RS_ADDRESS_PROPERTY)!=null ){
+            LOG.severe("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
+            return null;
+        }
+        
+        
         if (address == null) {
             address = getDefaultAddress(iClass);
             if (address != null) {
@@ -207,5 +193,6 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         }
         return address;
     }
+
 
 }

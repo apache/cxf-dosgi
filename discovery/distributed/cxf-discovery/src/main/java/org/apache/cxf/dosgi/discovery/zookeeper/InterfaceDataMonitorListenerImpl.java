@@ -72,8 +72,17 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                 p.load(new ByteArrayInputStream(data));
                 
                 Map<String, Object> m = new HashMap<String, Object>();
-                for (Map.Entry<Object, Object> entry : p.entrySet()) {                    
-                    m.put(entry.getKey().toString(), entry.getValue());
+                for (Map.Entry<Object, Object> entry : p.entrySet()) { 
+                    Object value = entry.getValue();
+                    
+                    if (value instanceof String) {
+                        String s = (String)value;
+                        if(Util.isStringArray(s)){
+                            value = Util.convertStringToStringArray(s);
+                        }
+                    }
+                    
+                    m.put(entry.getKey().toString(),value);
                 }
                 
 //                // Put in some reasonable defaults, if not specified
@@ -129,7 +138,7 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
 //                        Collections.singleton(interFace), DiscoveredServiceNotification.MODIFIED, sed);
 //                    discoveredServiceTracker.serviceChanged(dsn);
                     
-                   
+                   // TODO
                     
                 }                
             }

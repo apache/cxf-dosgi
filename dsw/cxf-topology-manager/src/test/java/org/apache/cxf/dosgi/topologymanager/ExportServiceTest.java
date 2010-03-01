@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.easymock.IAnswer;
-import org.easymock.IMocksControl;
+import org.easymock.classextension.IMocksControl;
 import org.easymock.classextension.EasyMock;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -53,12 +55,16 @@ public class ExportServiceTest {
     @Test
     public void testServiceExport() throws Exception {
 
+        final Semaphore sema = new Semaphore(1);
+        sema.acquire(); 
+        
         String scope = "(objectClass=abc)";
      
         IMocksControl c = EasyMock.createNiceControl();
-          
+        
+        
         BundleContext bctx = c.createMock(BundleContext.class);
-
+        
         Bundle topMgrBundle = c.createMock(Bundle.class);
         
         RemoteServiceAdmin rsa = c.createMock(RemoteServiceAdmin.class);
@@ -102,6 +108,7 @@ public class ExportServiceTest {
 
             public Object answer() throws Throwable {
                 System.out.println("Call made !!!");
+                sema.release();
                 return null;
             }
             
@@ -113,8 +120,6 @@ public class ExportServiceTest {
             EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
 
                 public Object answer() throws Throwable {
-                    // TODO Auto-generated method stub
-
                     System.out.println("->   addServiceListener: "
                                        + EasyMock.getCurrentArguments()[1]);
                     ServiceListener sl = (ServiceListener)EasyMock.getCurrentArguments()[0];
@@ -137,8 +142,6 @@ public class ExportServiceTest {
             EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
 
                 public Object answer() throws Throwable {
-                    // TODO Auto-generated method stub
-
                     System.out.println("->   addServiceListener ");
 
                     ServiceListener sl = (ServiceListener)EasyMock.getCurrentArguments()[0];
@@ -173,18 +176,17 @@ public class ExportServiceTest {
 
         }
 
-
+        
         c.replay();
 
-//        TopologyManager tm = new TopologyManager(bctx);
-//        tm.start();
+        //        TopologyManager tm = new TopologyManager(bctx);
+        //        tm.start();
 
         Activator a = new Activator();
         a.start(bctx);
         
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {}
+        // Wait until the EndpointListener.endpointAdded call was made as the controlflow is asynchronous
+        sema.tryAcquire(30, TimeUnit.SECONDS);
         
         c.verify();
 

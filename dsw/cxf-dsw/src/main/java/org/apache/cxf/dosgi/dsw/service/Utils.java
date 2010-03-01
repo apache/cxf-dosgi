@@ -105,17 +105,11 @@ public class Utils {
         return requiredIntents;
     }
 
-    public static String[] getAllIntentsCombined(Map serviceProperties){
-        String[] requiredIntents = getAllRequiredIntents(serviceProperties);
-        
+    public static String[] getInetntsImplementedByTheService(Map serviceProperties){
         // Get the Intents that are implemented by the service 
         String[] serviceIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_INTENTS));
         
-        if(serviceIntents!= null && serviceIntents.length>0){
-            requiredIntents = mergeArrays(requiredIntents, serviceIntents);
-        }
-        
-        return requiredIntents;
+        return serviceIntents;
     }
  
     

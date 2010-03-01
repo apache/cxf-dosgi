@@ -51,9 +51,7 @@ public class JaxRSUtilsTest extends TestCase {
 
         props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");
 
-        EndpointDescription sd = new EndpointDescription(props);
-
-        assertEquals(0, JaxRSUtils.getProviders(null, null, sd).size());
+        assertEquals(0, JaxRSUtils.getProviders(null, null, props).size());
     }
 
     public void testAegisProvider() {
@@ -62,9 +60,8 @@ public class JaxRSUtilsTest extends TestCase {
         props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");
 
         addRequiredProps(props);
-        EndpointDescription sd = new EndpointDescription(props);
 
-        List<Object> providers = JaxRSUtils.getProviders(null, null, sd);
+        List<Object> providers = JaxRSUtils.getProviders(null, null, props);
         assertEquals(1, providers.size());
         assertEquals(AegisElementProvider.class.getName(), providers.get(0).getClass().getName());
     }
@@ -76,9 +73,8 @@ public class JaxRSUtilsTest extends TestCase {
         });
         props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");
         addRequiredProps(props);
-        EndpointDescription sd = new EndpointDescription(props);
 
-        List<Object> providers = JaxRSUtils.getProviders(null, null, sd);
+        List<Object> providers = JaxRSUtils.getProviders(null, null, props);
         assertEquals(1, providers.size());
         assertEquals(AegisElementProvider.class.getName(), providers.get(0).getClass().getName());
     }
@@ -102,9 +98,8 @@ public class JaxRSUtilsTest extends TestCase {
 
         props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");
         addRequiredProps(props);
-        EndpointDescription sd = new EndpointDescription(props);
 
-        List<Object> providers = JaxRSUtils.getProviders(bc, null, sd);
+        List<Object> providers = JaxRSUtils.getProviders(bc, null, props);
         assertEquals(2, providers.size());
         assertEquals(AegisElementProvider.class.getName(), providers.get(0).getClass().getName());
         assertEquals(JAXBElementProvider.class.getName(), providers.get(1).getClass().getName());
@@ -130,9 +125,8 @@ public class JaxRSUtilsTest extends TestCase {
 
         props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");
         addRequiredProps(props);
-        EndpointDescription sd = new EndpointDescription(props);
 
-        List<Object> providers = JaxRSUtils.getProviders(bc, null, sd);
+        List<Object> providers = JaxRSUtils.getProviders(bc, null, props);
         assertEquals(2, providers.size());
         assertEquals(AegisElementProvider.class.getName(), providers.get(0).getClass().getName());
         assertEquals(JAXBElementProvider.class.getName(), providers.get(1).getClass().getName());
@@ -153,9 +147,8 @@ public class JaxRSUtilsTest extends TestCase {
         EasyMock.replay(bc, sref);
         Map<String, Object> props = new HashMap<String, Object>();
         addRequiredProps(props);
-        EndpointDescription sd = new EndpointDescription(props);
 
-        List<Object> providers = JaxRSUtils.getProviders(bc, null, sd);
+        List<Object> providers = JaxRSUtils.getProviders(bc, null, props);
         assertEquals(1, providers.size());
         assertSame(p, providers.get(0));
     }
@@ -176,9 +169,8 @@ public class JaxRSUtilsTest extends TestCase {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.RS_PROVIDER_EXPECTED_PROP_KEY, "true");
         addRequiredProps(props);
-        EndpointDescription sd = new EndpointDescription(props);
 
-        List<Object> providers = JaxRSUtils.getProviders(bc, null, sd);
+        List<Object> providers = JaxRSUtils.getProviders(bc, null, props);
         assertEquals(0, providers.size());
     }
 
@@ -198,9 +190,8 @@ public class JaxRSUtilsTest extends TestCase {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.RS_PROVIDER_EXPECTED_PROP_KEY, "true");
         addRequiredProps(props);
-        EndpointDescription sd = new EndpointDescription(props);
 
-        List<Object> providers = JaxRSUtils.getProviders(bc, null, sd);
+        List<Object> providers = JaxRSUtils.getProviders(bc, null, props);
         assertEquals(1, providers.size());
         assertSame(p, providers.get(0));
     }
