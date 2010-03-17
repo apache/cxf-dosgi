@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rsa:endpoint-descriptions xmlns:rsa="http://www.osgi.org/xmlns/rsa/v1.0.0"
+<endpoint-descriptions xmlns="http://www.osgi.org/xmlns/rsa/v1.0.0"
   xmlns:other="http://www.acme.org/xmlns/other/v1.0.0">
   <endpoint-description>
     <property name="objectClass">
@@ -25,7 +25,7 @@
     <property name="someXML" value-type="String">
       <!-- Literal XML to be parsed into the String -->
       <xml>
-        <other:t1>
+        <other:t1 xmlns="http://www.acme.org/xmlns/other/v1.0.0">
           <foo type="bar">haha</foo>
         </other:t1>
       </xml>
@@ -45,6 +45,8 @@
     <property name="Boolean2" value-type="Boolean" value="true"/>
     <property name="short" value-type="short">99</property>
     <property name="Short2" value-type="Short" value="-99"/>
+    <property name="char" value-type="char">@</property>
+    <property name="Character2" value-type="Character" value="X"/>
     
     <property name="bool-list" value-type="boolean">
       <list>
@@ -87,6 +89,6 @@
       </list>
       <!-- This is a custom extension -->
       <other:t1/>                    
-    </property>
+    </property>    
   </endpoint-description>
-</rsa:endpoint-descriptions>
+</endpoint-descriptions>

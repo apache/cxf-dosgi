@@ -96,7 +96,8 @@ public final class LocalDiscoveryUtils {
     private static EndpointDescription getEndpointDescription(Element endpointDescriptionElement) {
         Map<String, Object> map = new HashMap<String, Object>();
         
-        List<Element> properties = endpointDescriptionElement.getChildren(PROPERTY_ELEMENT);
+        List<Element> properties = endpointDescriptionElement.getChildren(PROPERTY_ELEMENT,
+                Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS));
         for (Element prop : properties) {
             boolean handled = handleArray(prop, map);
             if (handled) {
@@ -168,12 +169,13 @@ public final class LocalDiscoveryUtils {
 
     @SuppressWarnings("unchecked")
     private static boolean handleArray(Element prop, Map<String, Object> map) {
-        Element arrayEl = prop.getChild("array");
+        Element arrayEl = prop.getChild("array", Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS));
         if (arrayEl == null) {
             return false;
         }
         
-        List<Element> values = arrayEl.getChildren(PROPERTY_VALUE_ATTRIBUTE);
+        List<Element> values = arrayEl.getChildren(PROPERTY_VALUE_ATTRIBUTE, 
+                Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS));
         String type = getTypeName(prop);
         Class<?> cls = null;
         if ("long".equals(type)) {
@@ -216,11 +218,12 @@ public final class LocalDiscoveryUtils {
     @SuppressWarnings("unchecked")
     private static boolean handleCollection(Element prop, Map<String, Object> map) {
         Collection<Object> col = null;        
-        Element el = prop.getChild("list");
+        Element el = prop.getChild("list",
+                Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS));
         if (el != null) {
             col = new ArrayList<Object>();
         } else {
-            el = prop.getChild("set");
+            el = prop.getChild("set", Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS));
             if (el != null) {
                 col = new HashSet<Object>();
             }
@@ -231,7 +234,8 @@ public final class LocalDiscoveryUtils {
         }
         
         String type = getTypeName(prop);
-        List<Element> values = el.getChildren(PROPERTY_VALUE_ATTRIBUTE);
+        List<Element> values = el.getChildren(PROPERTY_VALUE_ATTRIBUTE, 
+                Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS));
         for (Element val : values) {
             Object obj = handleValue(val, type);
             col.add(obj);
@@ -255,7 +259,7 @@ public final class LocalDiscoveryUtils {
 
     @SuppressWarnings("unchecked")
     private static String readXML(Element prop) {
-        Element el = prop.getChild("xml");
+        Element el = prop.getChild("xml", Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS));
         if (el == null) {
             return null;
         }
@@ -314,10 +318,14 @@ public final class LocalDiscoveryUtils {
         }
         String javaType = "java.lang." + boxedType;
         
-        try {            
-            Class<?> cls = ClassLoader.getSystemClassLoader().loadClass(javaType);
-            Constructor<?> ctor = cls.getConstructor(String.class);
-            return ctor.newInstance(value);
+        try {
+            if (boxedType.equals("Character")) {
+                return new Character(value.charAt(0));
+            } else {
+                Class<?> cls = ClassLoader.getSystemClassLoader().loadClass(javaType);
+                Constructor<?> ctor = cls.getConstructor(String.class);
+                return ctor.newInstance(value);
+            }
         } catch (Exception e) {
             LOG.warning("Could not create Endpoint Property of type " + type + " and value " + value);
             return null;
@@ -363,7 +371,8 @@ public final class LocalDiscoveryUtils {
             try {
                 Document d = new SAXBuilder().build(resourceURL.openStream());
                 if (d.getRootElement().getNamespaceURI().equals(REMOTE_SERVICES_ADMIN_NS)) {
-                    elements.addAll(d.getRootElement().getChildren(ENDPOINT_DESCRIPTION_ELEMENT));
+                    elements.addAll(d.getRootElement().getChildren(ENDPOINT_DESCRIPTION_ELEMENT,
+                            Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS)));
                 }
                 
                 Namespace nsOld = Namespace.getNamespace(REMOTE_SERVICES_NS);

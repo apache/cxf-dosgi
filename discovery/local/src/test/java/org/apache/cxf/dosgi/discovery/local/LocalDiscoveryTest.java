@@ -134,6 +134,7 @@ public class LocalDiscoveryTest extends TestCase {
         LocalDiscovery ld = getLocalDiscovery();
 
         Bundle bundle = EasyMock.createMock(Bundle.class);
+        EasyMock.expect(bundle.getSymbolicName()).andReturn("testing.bundle").anyTimes();
         EasyMock.expect(bundle.getState()).andReturn(Bundle.ACTIVE);
         Dictionary<String, Object> headers = new Hashtable<String, Object>();
         headers.put("Remote-Service", "OSGI-INF/rsa/");
@@ -181,7 +182,7 @@ public class LocalDiscoveryTest extends TestCase {
         EasyMock.expectLastCall();
         EasyMock.replay(el);
         
-        BundleEvent be1 = new BundleEvent(BundleEvent.STOPPING, bundle);
+        BundleEvent be1 = new BundleEvent(BundleEvent.STOPPED, bundle);
         ld.bundleChanged(be1);
         assertEquals(0, ld.endpointDescriptions.size());
         

@@ -122,7 +122,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
             "org.apache.cxf.ws".equals(props.get("service.exported.configs")));
         assertEquals("org.apache.cxf.ws", props.get("service.exported.configs").toString().trim());
         
-        assertEquals(normXML("<other:t1 xmlns:other='http://www.acme.org/xmlns/other/v1.0.0'><foo type='bar'>haha</foo></other:t1>"), 
+        assertEquals(normXML("<other:t1 xmlns:other='http://www.acme.org/xmlns/other/v1.0.0' xmlns='http://www.acme.org/xmlns/other/v1.0.0'><foo type='bar'>haha</foo></other:t1>"), 
             normXML((String) props.get("someXML")));
         
         assertEquals(Long.MAX_VALUE, props.get("long"));
@@ -139,6 +139,9 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals(new Boolean(true), props.get("Boolean2"));
         assertEquals(new Short((short) 99), props.get("short"));
         assertEquals(new Short((short) -99), props.get("Short2"));
+        assertEquals(new Character('@'), props.get("char"));
+        assertEquals(new Character('X'), props.get("Character2"));
+        
         int [] intArray = (int []) props.get("int-array");
         assertTrue(Arrays.equals(new int[] {1, 2}, intArray));
         

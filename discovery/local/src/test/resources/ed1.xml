@@ -19,7 +19,7 @@
   under the License.
 -->
 
-<rsa:endpoint-descriptions xmlns:rsa="http://www.osgi.org/xmlns/rsa/v1.0.0"
+<endpoint-descriptions xmlns="http://www.osgi.org/xmlns/rsa/v1.0.0"
   xmlns:other="http://www.acme.org/xmlns/other/v1.0.0">
   <endpoint-description>
     <property name="objectClass">
@@ -69,5 +69,5 @@
     <property name="endpoint.id" value-type="String">http://somewhere:1/2/3/4?5</property>
     <property name="service.imported.configs" value="org.apache.cxf.ws"/>
   </endpoint-description>
-</rsa:endpoint-descriptions>
+</endpoint-descriptions>
   
