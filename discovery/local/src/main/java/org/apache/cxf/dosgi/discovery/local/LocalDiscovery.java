@@ -171,7 +171,6 @@ public class LocalDiscovery implements BundleListener {
             findDeclaredRemoteServices(be.getBundle());
             break;
         case BundleEvent.STOPPED:
-            System.out.println("#### Bundle Stopped: " + be.getBundle().getSymbolicName());
             removeServicesDeclaredInBundle(be.getBundle());
             break;
         }
