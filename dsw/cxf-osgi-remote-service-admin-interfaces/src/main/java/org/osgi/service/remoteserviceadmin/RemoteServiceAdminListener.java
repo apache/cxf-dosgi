@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2009). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2009, 2010). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ package org.osgi.service.remoteserviceadmin;
 public interface RemoteServiceAdminListener {
 	/**
 	 * Receive notification of any export or import registrations and
-	 * unregistrations.
+	 * unregistrations as well as errors and warnings.
 	 * 
 	 * @param event The {@link RemoteServiceAdminEvent} object.
 	 */

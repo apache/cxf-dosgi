@@ -104,15 +104,13 @@ public class EndpointDescription {
 									.removeAll(properties.keySet()));
 		}
 
-		if (!props.containsKey(SERVICE_IMPORTED)) {
-			props.put(SERVICE_IMPORTED, Boolean.toString(true));
-		}
+		conditionProperties(props);
 		this.properties = Collections.unmodifiableMap(props);
 		/* properties must be initialized before calling the following methods */
 		interfaces = verifyObjectClassProperty();
 		serviceId = verifyLongProperty(ENDPOINT_SERVICE_ID);
 		frameworkUUID = verifyStringProperty(ENDPOINT_FRAMEWORK_UUID);
-		id = verifyStringProperty(ENDPOINT_ID);
+		id = verifyStringProperty(ENDPOINT_ID).trim();
 		if (id == null) {
 			throw new IllegalArgumentException(ENDPOINT_ID
 					+ " property must be set");
@@ -198,15 +196,13 @@ public class EndpointDescription {
 				props.put(ENDPOINT_FRAMEWORK_UUID, uuid);
 			}
 		}
-		if (!props.containsKey(SERVICE_IMPORTED)) {
-			props.put(SERVICE_IMPORTED, Boolean.toString(true));
-		}
+		conditionProperties(props);
 		this.properties = Collections.unmodifiableMap(props);
 		/* properties must be initialized before calling the following methods */
 		interfaces = verifyObjectClassProperty();
 		serviceId = verifyLongProperty(ENDPOINT_SERVICE_ID);
 		frameworkUUID = verifyStringProperty(ENDPOINT_FRAMEWORK_UUID);
-		id = verifyStringProperty(ENDPOINT_ID);
+		id = verifyStringProperty(ENDPOINT_ID).trim();
 		if (id == null) {
 			throw new IllegalArgumentException(ENDPOINT_ID
 					+ " property must be set");
@@ -214,6 +210,31 @@ public class EndpointDescription {
 		if (getConfigurationTypes().isEmpty()) {
 			throw new IllegalArgumentException(SERVICE_IMPORTED_CONFIGS
 					+ " property must be set and non-empty");
+		}
+	}
+
+	private static final String	SERVICE_EXPORTED_	= "service.exported.";
+	private static final int	SERVICE_EXPORTED_length	= SERVICE_EXPORTED_
+																.length();
+
+	/**
+	 * Condition the properties.
+	 * 
+	 * @param props Property map to condition.
+	 */
+	private void conditionProperties(Map<String, Object> props) {
+		// ensure service.imported is set
+		if (!props.containsKey(SERVICE_IMPORTED)) {
+			props.put(SERVICE_IMPORTED, Boolean.toString(true));
+		}
+
+		// remove service.exported.* properties
+		for (Iterator<String> iter = props.keySet().iterator(); iter.hasNext();) {
+			String key = iter.next();
+			if (SERVICE_EXPORTED_.regionMatches(true, 0, key, 0,
+					SERVICE_EXPORTED_length)) {
+				iter.remove();
+			}
 		}
 	}
 
@@ -259,7 +280,8 @@ public class EndpointDescription {
 	 * Verify and obtain a required String property.
 	 * 
 	 * @param propName The name of the property
-	 * @return The value of the property or null if the property is not set.
+	 * @return The value of the property or <code>null</code> if the property is
+	 *         not set.
 	 * @throws IllegalArgumentException when the property doesn't have the
 	 *         correct data type.
 	 */
@@ -307,10 +329,11 @@ public class EndpointDescription {
 	 * have the same id. Two Endpoint Descriptions with the same id must
 	 * represent the same endpoint.
 	 * 
-	 * The value of the id is stored in the
-	 * {@link RemoteConstants#ENDPOINT_ID} property.
+	 * The value of the id is stored in the {@link RemoteConstants#ENDPOINT_ID}
+	 * property.
 	 * 
-	 * @return The id of the endpoint, never <code>null</code>.
+	 * @return The id of the endpoint, never <code>null</code>. The returned
+	 *         value has leading and trailing whitespace removed.
 	 */
 	public String getId() {
 		return id;
@@ -426,8 +449,8 @@ public class EndpointDescription {
 
 	/**
 	 * Reads a 'String+' property from the properties map, which may be of type
-	 * String, String[] or Collection<String> and returns it as an unmodifiable
-	 * List.
+	 * String, String[] or Collection&lt;String&gt; and returns it as an
+	 * unmodifiable List.
 	 * 
 	 * @param key The property
 	 * @return An unmodifiable list
@@ -474,8 +497,8 @@ public class EndpointDescription {
 	 * The value of the remote framework uuid is stored in the
 	 * {@link RemoteConstants#ENDPOINT_FRAMEWORK_UUID} endpoint property.
 	 * 
-	 * @return Remote Framework UUID, or null if this endpoint is not associated
-	 *         with an OSGi framework having a framework uuid.
+	 * @return Remote Framework UUID, or <code>null</code> if this endpoint is
+	 *         not associated with an OSGi framework having a framework uuid.
 	 */
 	public String getFrameworkUUID() {
 		return frameworkUUID;
@@ -577,6 +600,63 @@ public class EndpointDescription {
 		 * insensitive key lookup.
 		 */
 		return f.matchCase(d);
+	}
+
+	/**
+	 * Returns the string representation of this EndpointDescription.
+	 * 
+	 * @return String form of this EndpointDescription.
+	 */
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append('{');
+		Iterator<Map.Entry<String, Object>> iter = properties.entrySet()
+				.iterator();
+		boolean comma = false;
+		while (iter.hasNext()) {
+			Map.Entry<String, Object> entry = iter.next();
+			if (comma) {
+				sb.append(", ");
+			}
+			else {
+				comma = true;
+			}
+			sb.append(entry.getKey());
+			sb.append('=');
+			Object value = entry.getValue();
+			if (value != null) {
+				Class< ? > valueType = value.getClass();
+				if (Object[].class.isAssignableFrom(valueType)) {
+					append(sb, (Object[]) value);
+					continue;
+				}
+			}
+			sb.append(value);
+		}
+		sb.append('}');
+		return sb.toString();
+	}
+
+	/**
+	 * Append the specified Object array to the specified StringBuffer.
+	 * 
+	 * @param sb Receiving StringBuffer.
+	 * @param value Object array to append to the specified StringBuffer.
+	 */
+	private static void append(StringBuffer sb, Object[] value) {
+		sb.append('[');
+		boolean comma = false;
+		final int length = value.length;
+		for (int i = 0; i < length; i++) {
+			if (comma) {
+				sb.append(", ");
+			}
+			else {
+				comma = true;
+			}
+			sb.append(String.valueOf(value[i]));
+		}
+		sb.append(']');
 	}
 
 	/**

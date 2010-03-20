@@ -20,9 +20,12 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -61,6 +64,8 @@ public class Utils {
 
         return null;
     }
+    
+    
     
     
     public static String remoteServiceAdminEventTypeToString(int type){
@@ -130,4 +135,44 @@ public class Utils {
         
         return list.toArray(new String[list.size()]);
     }
+    
+    
+    public static void overlayProperties(Properties serviceProperties, Map additionalProperties) {
+        Enumeration<Object> keys = serviceProperties.keys();
+        // Maps lower case key to original key
+        HashMap<String,String> keysLowerCase = new HashMap<String, String>();
+        while(keys.hasMoreElements()){
+            Object o = keys.nextElement(); 
+            if (o instanceof String) {
+                String ks = (String)o;
+                keysLowerCase.put(ks.toLowerCase(), ks);
+            }
+        }
+        
+        Set<Map.Entry> adProps = additionalProperties.entrySet();
+        for (Map.Entry e : adProps) {
+            // objectClass and service.id must not be overwritten
+            Object keyObj = e.getKey();
+            if (keyObj instanceof String && keyObj != null) {
+                String key = ((String)keyObj).toLowerCase();
+                if (org.osgi.framework.Constants.SERVICE_ID.toLowerCase().equals(key)
+                    || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(key)) {
+                    LOG.info("exportService called with additional properties map that contained illegal key: "
+                              + key + "   The key is ignored");
+                    continue;
+                }else if(keysLowerCase.containsKey(key)){
+                    String origKey = keysLowerCase.get(key);
+                    serviceProperties.put(origKey, e.getValue());
+                    LOG.fine("Overwriting property [" + origKey + "]  with value [" + e.getValue() + "]");
+                }else{
+                    serviceProperties.put(e.getKey(), e.getValue());
+                    keysLowerCase.put(e.getKey().toString().toLowerCase(), e.getKey().toString());
+                }
+            }
+            
+            
+        }
+    }
+
+    
 }

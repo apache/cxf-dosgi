@@ -22,8 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,23 +128,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
 
             if (additionalProperties != null) {// overlay properties with the additionalProperies
-                Set<Map.Entry> adProps = additionalProperties.entrySet();
-                for (Map.Entry e : adProps) {
-                    // objectClass and service.id must not be overwritten
-                    Object keyO = e.getKey();
-                    if (keyO instanceof String && keyO != null) {
-                        String key = ((String)keyO).toLowerCase();
-                        if (org.osgi.framework.Constants.SERVICE_ID.toLowerCase().equals(key)
-                            || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(key)) {
-                            LOG
-                                .info("exportService called with additional properties map that contained illegal key: "
-                                      + key + "   The key is ignored");
-                            continue;
-                        }
-                    }
-                    serviceProperties.put(e.getKey(), e.getValue());
-                    LOG.fine("Overwriting property [" + e.getKey() + "]  with value [" + e.getValue() + "]");
-                }
+                Utils.overlayProperties(serviceProperties,additionalProperties);
             }
 
             // Get the intents that need to be supported by the RSA
@@ -281,6 +268,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             return lExpReg;
         }
     }
+
 
     protected List<String> determineConfigurationTypes(Properties serviceProperties) {
 

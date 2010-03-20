@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2009). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2009, 2010). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,25 +23,25 @@ package org.osgi.service.remoteserviceadmin;
  * is interested in Endpoint Descriptions.
  * 
  * This white board service can be used in many different scenarios. However,
- * the primary use case is to allow a remote manager to be informed of End Point
+ * the primary use case is to allow a remote manager to be informed of Endpoint
  * Descriptions available in the network and inform the network about available
- * End Point Descriptions.
+ * Endpoint Descriptions.
  * 
  * Both the network bundle and the manager bundle register an Endpoint Listener
- * service. The manager informs the network bundle about End Points that it
+ * service. The manager informs the network bundle about Endpoints that it
  * creates. The network bundles then uses a protocol like SLP to announce these
  * local end-points to the network.
  * 
  * If the network bundle discovers a new Endpoint through its discovery
- * protocol, then it sends an End Point Description to all the End Point
- * Listener services that are registered (except its own) that have specified an
- * interest in that endpoint.
+ * protocol, then it sends an Endpoint Description to all the Endpoint Listener
+ * services that are registered (except its own) that have specified an interest
+ * in that endpoint.
  * 
  * Endpoint Listener services can express their <i>scope</i> with the service
  * property {@link #ENDPOINT_LISTENER_SCOPE}. This service property is a list of
  * filters. An Endpoint Description should only be given to a Endpoint Listener
  * when there is at least one filter that matches the Endpoint Description
- * properties. given to it.
+ * properties.
  * 
  * This filter model is quite flexible. For example, a discovery bundle is only
  * interested in locally originating Endpoint Descriptions. The following filter
@@ -77,7 +77,6 @@ package org.osgi.service.remoteserviceadmin;
  * bundles should do their utmost to keep the listeners up to date, but
  * implementers should realize that many endpoints come through unreliable
  * discovery processes.
- * 
  * 
  * @ThreadSafe
  * @version $Revision$

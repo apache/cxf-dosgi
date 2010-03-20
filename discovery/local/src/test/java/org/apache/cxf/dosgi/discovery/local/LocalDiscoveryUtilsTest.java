@@ -118,9 +118,9 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         EndpointDescription ed1 = eds.get(1);
         Map<String, Object> props = ed1.getProperties();
         assertEquals(Arrays.asList("com.acme.HelloService", "some.other.Service"), ed1.getInterfaces());
-        assertFalse("Should not be exactly the same. The value should contain a bunch of newlines", 
-            "org.apache.cxf.ws".equals(props.get("service.exported.configs")));
-        assertEquals("org.apache.cxf.ws", props.get("service.exported.configs").toString().trim());
+        assertEquals("org.apache.cxf.ws", props.get("service.imported.configs"));
+        // exports should have been removed
+        assertNull(props.get("service.exported.configs"));
         
         assertEquals(normXML("<other:t1 xmlns:other='http://www.acme.org/xmlns/other/v1.0.0' xmlns='http://www.acme.org/xmlns/other/v1.0.0'><foo type='bar'>haha</foo></other:t1>"), 
             normXML((String) props.get("someXML")));
