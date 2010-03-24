@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.cxf.dosgi.dsw.Activator;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -122,6 +123,10 @@ public class AggregatedActivator implements BundleActivator {
             SPIActivator sba = new SPIActivator();
             sba.start(ctx);
             activators.add(sba);
+            
+            DSWActivator dsw = new DSWActivator();
+            dsw.start(ctx);
+            activators.add(dsw);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }

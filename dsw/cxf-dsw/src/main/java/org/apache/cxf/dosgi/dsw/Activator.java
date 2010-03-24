@@ -37,8 +37,11 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
+import org.springframework.osgi.context.BundleContextAware;
 
-public class Activator implements BundleActivator, ManagedService {
+
+// registered as spring bean -> start / stop called accordingly 
+public class Activator implements ManagedService,BundleContextAware {
 
     private final static Logger LOG = Logger.getLogger(Activator.class.getName());
 
@@ -50,19 +53,15 @@ public class Activator implements BundleActivator, ManagedService {
 
     private ServiceRegistration decoratorReg;
 
-    public synchronized void start(BundleContext context) throws Exception {
+    public synchronized void start() {
         // Disable the fast infoset as it's not compatible (yet) with OSGi
         System.setProperty("org.apache.cxf.nofastinfoset", "true");
 
-        bc = context;
         // should we have a seperate PID for a find and publish hook ?
         // context.registerService(ManagedService.class.getName(), this, getDefaults());
 
         rsaFactory = registerRemoteServiceAdminService();
 
-        /**
-         * What is this decorator doing ?!?!?! Why as a service ?
-         */
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc),
                                           null);
 
@@ -106,8 +105,10 @@ public class Activator implements BundleActivator, ManagedService {
         }
     }
 
-    public void stop(BundleContext context) {
+    public void stop() {
         LOG.fine("RemoteServiceAdmin Implementation is shutting down now");
+        
+        // This also triggers the unimport and unexport of the remote services
         rsaFactoryReg.unregister();
         decoratorReg.unregister();
 
@@ -121,16 +122,14 @@ public class Activator implements BundleActivator, ManagedService {
         // unregister other registered services (ManagedService + Hooks)
     }
 
-    private Dictionary<String, String> getDefaults() {
-        Dictionary<String, String> defaults = new Hashtable<String, String>();
-        defaults.put(Constants.SERVICE_PID, CONFIG_SERVICE_PID);
-        return defaults;
-    }
-
     public synchronized void updated(Dictionary props) throws ConfigurationException {
         if (props != null && CONFIG_SERVICE_PID.equals(props.get(Constants.SERVICE_PID))) {
             // topManager.updated(props);
         }
+    }
+
+    public void setBundleContext(BundleContext bundleContext) {
+        bc = bundleContext;
     }
 
 }
