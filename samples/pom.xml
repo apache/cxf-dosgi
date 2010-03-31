@@ -22,5 +22,6 @@
       <module>spring_dm</module>
       <module>ds</module>
       <module>discovery</module>
+      <module>security_filter</module>
     </modules> 
 </project>

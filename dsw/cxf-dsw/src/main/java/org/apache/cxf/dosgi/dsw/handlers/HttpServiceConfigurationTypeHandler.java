@@ -42,6 +42,7 @@ import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.util.tracker.ServiceTracker;
@@ -89,7 +90,8 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         CXFNonSpringServlet cxf = new CXFNonSpringServlet();
         HttpService httpService = getHttpService();
         try {
-            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), null);
+            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), 
+                                       getHttpContext(dswContext, httpService));
             LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
         } catch (Exception e) {
             throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
@@ -218,5 +220,12 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
                 mgr.registerListener(stopHook);
             }
         }
+    }
+
+
+    protected HttpContext getHttpContext(BundleContext bundleContext, HttpService httpService) {
+
+        HttpContext httpContext = httpService.createDefaultHttpContext();
+        return new SecurityDelegatingHttpContext(bundleContext, httpContext);
     }
 }
