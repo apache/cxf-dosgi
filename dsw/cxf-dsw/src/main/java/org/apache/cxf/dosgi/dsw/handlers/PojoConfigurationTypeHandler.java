@@ -18,14 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,16 +27,12 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
-import org.apache.cxf.dosgi.dsw.service.Utils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.packageadmin.ExportedPackage;
-import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
@@ -186,7 +175,13 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         
         
         if (address == null) {
-            address = getDefaultAddress(iClass);
+            String port = null;
+            Object p = sd.get(Constants.WS_PORT_PROPERTY);
+            if (p instanceof String) {
+                port = (String) p;
+            }
+            
+            address = getDefaultAddress(iClass, port);
             if (address != null) {
                 LOG.info("Using a default address : " + address);
             }

@@ -46,6 +46,7 @@ public class Constants {
     // WS
     public static final String WS_CONFIG_TYPE = PROVIDER_PREFIX + ".ws";
     public static final String WS_ADDRESS_PROPERTY = WS_CONFIG_TYPE + ".address";
+    public static final String WS_PORT_PROPERTY = WS_CONFIG_TYPE + ".port";
     public static final String WS_HTTP_SERVICE_CONTEXT = WS_CONFIG_TYPE + ".httpservice.context";
     public static final String WS_FRONTEND_PROP_KEY = WS_CONFIG_TYPE + ".frontend";
     public static final String WS_DATABINDING_PROP_KEY = WS_CONFIG_TYPE + ".databinding";

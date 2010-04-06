@@ -78,6 +78,15 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         sd.put("osgi.remote.configuration.pojo.address", url);
         assertEquals(url, handler.getPojoAddress(sd, String.class));
     }
+    
+    public void testGetPojoAddressDefaultWithAlternatePort() {
+        Map<String, Object> hp = new HashMap<String, Object>();
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, hp);
+        Map<String, Object> sd = new HashMap<String, Object>();
+        String url = "http://localhost:1234/java/lang/String";
+        sd.put("org.apache.cxf.ws.port", "1234");
+        assertEquals(url, handler.getPojoAddress(sd, String.class));        
+    }
 
     public void testGetDefaultPojoAddress() {
         Map<String, Object> hp = new HashMap<String, Object>();
