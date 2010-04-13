@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.osgi.framework.Bundle;
@@ -29,6 +30,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class EndpointListenerFactory implements ServiceFactory {
 
@@ -73,10 +75,22 @@ public class EndpointListenerFactory implements ServiceFactory {
 
     private void updateServiceRegistration() {
         Properties props = new Properties();
-        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(" + Constants.OBJECTCLASS + "=*)");
+        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(&(" + Constants.OBJECTCLASS + "=*)("+RemoteConstants.ENDPOINT_FRAMEWORK_UUID+"="+getUUID(bctx)+"))");
         serviceRegistartion.setProperties(props);
     }
 
+    // copied from the DSW OSGiUtils class
+    public static String getUUID(BundleContext bc) {
+        synchronized ("org.osgi.framework.uuid") {
+            String uuid = bc.getProperty("org.osgi.framework.uuid");
+            if (uuid == null) {
+                uuid = UUID.randomUUID().toString();
+                System.setProperty("org.osgi.framework.uuid", uuid);
+            }
+            return uuid;
+        }
+    }
+    
     public synchronized void stop() {
         if (serviceRegistartion != null)
             serviceRegistartion.unregister();
