@@ -26,7 +26,13 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.dosgi.discovery.local.LocalDiscovery;
+import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
 import org.apache.zookeeper.ZooKeeper;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
@@ -68,56 +74,19 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                 byte[] data = zookeeper.getData(znode + '/' + child, false, null);
                 LOG.info("Child: " + znode + "/" + child);
                 
-                Properties p = new Properties();
-                p.load(new ByteArrayInputStream(data));
-                
-                Map<String, Object> m = new HashMap<String, Object>();
-                for (Map.Entry<Object, Object> entry : p.entrySet()) { 
-                    Object value = entry.getValue();
+                List<Element> elements = LocalDiscoveryUtils.getElements(new ByteArrayInputStream(data));
+                EndpointDescription epd = null;
+                if(elements.size()>0)
+                    epd = LocalDiscoveryUtils.getEndpointDescription(elements.get(0));
+                else{
+                    LOG.warning("No Discovery information found for node: "+znode + "/" + child);
+                    continue;
+                }
                     
-                    if (value instanceof String) {
-                        String s = (String)value;
-                        if(Util.isStringArray(s)){
-                            value = Util.convertStringToStringArray(s);
-                        }
-                    }
-                    
-                    m.put(entry.getKey().toString(),value);
-                }
+                LOG.finest("Properties: "+epd.getProperties());
                 
-//                // Put in some reasonable defaults, if not specified
-//                if (!m.containsKey("service.exported.configs")) {
-//                    m.put("service.exported.configs", "org.apache.cxf.ws");
-//                }
-//                if (Util.getMultiValueProperty(m.get("service.exported.configs")).contains("org.apache.cxf.ws") &&
-//                    !m.containsKey("org.apache.cxf.ws.address")) {
-//                    m.put("org.apache.cxf.ws.address", m.get(ServicePublication.ENDPOINT_LOCATION));                    
-//                }
-
-                
-                
-                if(m.get(Constants.OBJECTCLASS) instanceof String){
-                    String s = (String)m.get(Constants.OBJECTCLASS);
-                    String[] a = new String[1];
-                    a[0] = s;
-                    m.put(Constants.OBJECTCLASS,a);
-                    LOG.fine("OBJECTCLASS: "+s);
-                }
-                
-                
-                // the Endpoint.id must be a Long and can't be a string .... 
-                if(m.get(RemoteConstants.ENDPOINT_SERVICE_ID) instanceof String){
-                    String s = (String)m.get(RemoteConstants.ENDPOINT_SERVICE_ID);
-                    Long l = Long.parseLong(s);
-                    m.put(RemoteConstants.ENDPOINT_SERVICE_ID, l);
-                }
-                
-                
-                LOG.finest("Properties: "+m);
-                
-                newNodes.put(child, m);
+                newNodes.put(child, epd.getProperties());
                 Map<String, Object> prevVal = prevNodes.remove(child);
-                EndpointDescription epd = new EndpointDescription(m);
                 
                 if (prevVal == null) {
                     // This guy is new
@@ -131,7 +100,7 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                             epl.endpointAdded(epd, scope);
                         }
                     }
-                } else if (!prevVal.equals(m)){
+                } else if (!prevVal.equals(epd.getProperties())){
                     // There's been a modification
 //                    ServiceEndpointDescriptionImpl sed = new ServiceEndpointDescriptionImpl(Collections.singletonList(interFace), m);
 //                    DiscoveredServiceNotification dsn = new DiscoveredServiceNotificationImpl(Collections.emptyList(),

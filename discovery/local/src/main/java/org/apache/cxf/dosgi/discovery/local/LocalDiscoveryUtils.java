@@ -18,6 +18,8 @@
   */
 package org.apache.cxf.dosgi.discovery.local;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -37,6 +39,7 @@ import java.util.logging.Logger;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -94,7 +97,7 @@ public final class LocalDiscoveryUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static EndpointDescription getEndpointDescription(Element endpointDescriptionElement) {
+    public static EndpointDescription getEndpointDescription(Element endpointDescriptionElement) {
         Map<String, Object> map = new HashMap<String, Object>();
         
         List<Element> properties = endpointDescriptionElement.getChildren(PROPERTY_ELEMENT,
@@ -370,14 +373,7 @@ public final class LocalDiscoveryUtils {
         while (urls.hasMoreElements()) {
             URL resourceURL = (URL) urls.nextElement();
             try {
-                Document d = new SAXBuilder().build(resourceURL.openStream());
-                if (d.getRootElement().getNamespaceURI().equals(REMOTE_SERVICES_ADMIN_NS)) {
-                    elements.addAll(d.getRootElement().getChildren(ENDPOINT_DESCRIPTION_ELEMENT,
-                            Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS)));
-                }
-                
-                Namespace nsOld = Namespace.getNamespace(REMOTE_SERVICES_NS);
-                elements.addAll(d.getRootElement().getChildren(SERVICE_DESCRIPTION_ELEMENT, nsOld));
+                elements.addAll(getElements(resourceURL.openStream()));
             } catch (Exception ex) {
                 LOG.log(Level.WARNING, "Problem parsing: " + resourceURL, ex);
             }            
@@ -562,5 +558,21 @@ public final class LocalDiscoveryUtils {
             dataType = dataType.substring("java.lang.".length());
         }
         propEl.setAttribute("value-type", dataType);
+    }
+
+    public static List<Element> getElements(InputStream in) throws JDOMException, IOException {
+
+        List<Element> elements = new ArrayList<Element>();
+        
+        Document d = new SAXBuilder().build(in);
+        if (d.getRootElement().getNamespaceURI().equals(REMOTE_SERVICES_ADMIN_NS)) {
+            elements.addAll(d.getRootElement().getChildren(ENDPOINT_DESCRIPTION_ELEMENT,
+                    Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS)));
+        }
+        
+        Namespace nsOld = Namespace.getNamespace(REMOTE_SERVICES_NS);
+        elements.addAll(d.getRootElement().getChildren(SERVICE_DESCRIPTION_ELEMENT, nsOld));
+        
+        return elements;
     }    
 }

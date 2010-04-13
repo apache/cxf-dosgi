@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class Util {
-    private static final String DISCOVERY_STRINGARRAY_ID = "DISCOVERY_STRINGARRAY_TO_STRING;";
     static final String PATH_PREFIX = "/osgi/service_registry/";
 
     @SuppressWarnings("unchecked")
@@ -43,24 +42,4 @@ public class Util {
         return PATH_PREFIX + name.replace('.', '/');
     }
 
-    public static String convertStringArrayToString(String[] intents) {
-        String ret = DISCOVERY_STRINGARRAY_ID;
-        for (String s : intents) {
-            ret += s + ";";
-        }
-        return ret;
-    }
-
-    public static String[] convertStringToStringArray(String intents) {
-        if (intents == null)
-            return null;
-        intents = intents.substring(DISCOVERY_STRINGARRAY_ID.length());
-
-        String[] arr = intents.split(";");
-        return arr;
-    }
-
-    public static boolean isStringArray(String in) {
-        return in != null && in.startsWith(DISCOVERY_STRINGARRAY_ID);
-    }
 }

@@ -18,34 +18,24 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class EndpointListenerImpl implements EndpointListener {
 
@@ -157,39 +147,8 @@ public class EndpointListenerImpl implements EndpointListener {
     }
 
     static byte[] getData(EndpointDescription sr) throws IOException {
-        Properties p = new Properties();
-
-        Map<String, Object> serviceProps = (Map<String, Object>)sr.getProperties();
-        if (serviceProps != null) {
-            for (Map.Entry<String, Object> prop : serviceProps.entrySet()) {
-                Object val = prop.getValue();
-                if (val == null) {
-                    // null values are not allowed
-                    continue;
-                }
-                
-                if (val instanceof String[]) {
-                    String[] sa = (String[])val;
-                    val = Util.convertStringArrayToString(sa);
-                }
-
-                if (val instanceof Collection) {
-                    Collection sc = (Collection)val;
-                    try{
-                        String[] sa = (String[])sc.toArray();
-                        val = Util.convertStringArrayToString(sa);
-                    }catch (ClassCastException e) {
-                        e.printStackTrace();
-                    }
-                }
-                
-                p.setProperty(prop.getKey(), val.toString());
-            }
-        }
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        p.store(baos, "");
-        return baos.toByteArray();
+       String s = LocalDiscoveryUtils.getEndpointDescriptionXML(sr.getProperties());
+       return s.getBytes();
     }
 
     static String getKey(String endpoint) throws UnknownHostException, URISyntaxException {
