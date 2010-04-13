@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -150,6 +151,10 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         
         assertEquals(Arrays.asList(true, false), props.get("bool-list"));
         assertEquals(new HashSet<Object>(), props.get("long-set"));
+        Set<String> stringSet = new HashSet<String>();
+        stringSet.add("Hello there");
+        stringSet.add("How are you?");
+        assertEquals(stringSet, props.get("string-set"));
         assertEquals("Hello", props.get("other1").toString().trim());
         
         List l = (List) props.get("other2");

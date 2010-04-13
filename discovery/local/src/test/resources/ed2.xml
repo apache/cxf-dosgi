@@ -8,7 +8,6 @@
       </array>
     </property>
     <property name="service.intents">SOAP</property>
-    <!-- Marc: Changed to from exported to imported  -->
     <property name="service.imported.configs" value="org.apache.cxf.ws"/>
     <property name="endpoint.id">foo:bar</property>
   </endpoint-description>
@@ -56,6 +55,12 @@
     </property>
     <property name="long-set" value-type="long">
       <set/> <!-- empty set -->
+    </property>
+    <property name="string-set">
+      <set>
+        <value>Hello there</value>
+        <value>How are you?</value>
+      </set>
     </property>
     <property name="int-array" value-type="int">
       <array>
