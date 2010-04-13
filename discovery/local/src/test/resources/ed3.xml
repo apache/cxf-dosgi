@@ -19,8 +19,7 @@
   under the License.
 -->
 
-<endpoint-descriptions xmlns="http://www.osgi.org/xmlns/rsa/v1.0.0"
-  xmlns:other="http://www.acme.org/xmlns/other/v1.0.0">
+<endpoint-descriptions xmlns="http://www.osgi.org/xmlns/rsa/v1.0.0">
   <endpoint-description>
     <property name="objectClass">
       <array>

@@ -19,14 +19,21 @@
 package org.apache.cxf.dosgi.discovery.local;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
@@ -42,6 +49,8 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class LocalDiscoveryUtilsTest extends TestCase {
+    private static final String LF = System.getProperty("line.separator");
+
     public void testNoRemoteServicesXMLFiles() {
         Bundle b = EasyMock.createNiceMock(Bundle.class);
         EasyMock.replay(b);
@@ -209,6 +218,57 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals("5", ed1.getProperties().get("blah"));
     }
 
+    @SuppressWarnings("unchecked")
+    public void testCreateXML() throws Exception {
+        Map m = new LinkedHashMap();
+        m.put("service.imported.configs", "org.apache.cxf.ws");
+        m.put("endpoint.id", "foo:bar");
+        m.put("objectClass", new String [] {"com.acme.HelloService", "some.other.Service"});
+        m.put("long", 9223372036854775807L);
+        m.put("Long2", -1L);
+        m.put("double", 1.7976931348623157E308);
+        m.put("Double2", 1.0d);
+        m.put("float", 42.24f);
+        m.put("Float2", 1.0f);
+        m.put("int", 17);
+        m.put("Integer2", 42);
+        m.put("byte", (byte) 127);
+        m.put("Byte2", (byte) -128);
+        m.put("boolean", true);
+        m.put("Boolean2", false);
+        m.put("short", (short) 99);
+        m.put("Short2", (short) -99);
+        m.put("char", '@');
+        m.put("Character2", 'X');
+        
+        List<Boolean> boolList = new ArrayList<Boolean>();
+        boolList.add(true);
+        boolList.add(false);
+        m.put("bool-list", boolList);
+        m.put("empty-set", new HashSet()); 
+        
+        Set<String> stringSet= new LinkedHashSet<String>();
+        stringSet.add("Hello there");
+        stringSet.add("How are you?");
+        m.put("string-set", stringSet);
+        
+        int[] intArray = new int[] {1, 2};
+        m.put("int-array", intArray);                
+        
+        String xml = "<xml>" + LF + 
+                "<t1 xmlns=\"http://www.acme.org/xmlns/other/v1.0.0\">" + LF +
+                    "<foo type='bar'>haha</foo>" + LF +
+                "</t1>" + LF +
+            "</xml>";
+        m.put("someXML", xml);        
+        
+        String actual = LocalDiscoveryUtils.getEndpointDescriptionXML(m);
+        
+        URL edURL = getClass().getResource("/ed2-generated.xml");
+        String expected = new String(drainStream(edURL.openStream()));
+        assertEquals(normXML(expected), normXML(actual));
+    }
+    
     private static String normXML(String s) throws JDOMException, IOException {
         String s2 = stripComment(s);
         String s3 = stripProlog(s2);
@@ -218,10 +278,40 @@ public class LocalDiscoveryUtilsTest extends TestCase {
     }
     
     private static String stripComment(String s) { 
-        return s.replaceAll("<!--(.*?)-->", "");
+        return Pattern.compile("<!--(.*?)-->", Pattern.DOTALL).matcher(s).replaceAll("");        
     }
     
     private static String stripProlog(String s) {
         return s.replaceAll("<\\?(.*?)\\?>", "");
     }         
+    
+    public static void drainStream(InputStream is, OutputStream os) throws IOException {        
+        byte[] bytes = new byte[8192];
+
+        int length = 0;
+        int offset = 0;
+
+        while ((length = is.read(bytes, offset, bytes.length - offset)) != -1) {
+            offset += length;
+
+            if (offset == bytes.length) {
+                os.write(bytes, 0, bytes.length);
+                offset = 0;
+            }
+        }
+        if (offset != 0) {
+            os.write(bytes, 0, offset);
+        }
+    }
+    
+    public static byte [] drainStream(InputStream is) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            drainStream(is, baos);
+            return baos.toByteArray();
+        } finally {
+            is.close();
+        }
+    }
+    
 }

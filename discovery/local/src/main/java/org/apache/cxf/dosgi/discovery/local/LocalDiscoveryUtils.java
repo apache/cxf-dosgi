@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -453,5 +454,113 @@ public final class LocalDiscoveryUtils {
         }
 
         return Collections.emptyList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static String getEndpointDescriptionXML(Map m) {
+        Document d = new Document();
+        Namespace ns = Namespace.getNamespace("http://www.osgi.org/xmlns/rsa/v1.0.0");
+        Element rootEl = new Element("endpoint-descriptions", ns);
+        d.setRootElement(rootEl);
+        Element contentEl = new Element("endpoint-description", ns);
+        rootEl.addContent(contentEl);
+
+        for (Map.Entry entry : (Set<Map.Entry>) m.entrySet()) {
+            String key = entry.getKey().toString();
+            Object val = entry.getValue();
+            
+            Element propEl = new Element("property", ns);
+            propEl.setAttribute("name", key);
+            if (val.getClass().isArray()) {
+                Element arrayEl = new Element("array", ns);
+                propEl.addContent(arrayEl);
+                for (Object o : normalizeArray(val)) {
+                    setValueType(propEl, o);
+                    Element valueEl = new Element("value", ns);
+                    arrayEl.addContent(valueEl);
+                    valueEl.addContent(o.toString());
+                }
+            } else if (val instanceof List) {
+                Element listEl = new Element("list", ns);
+                propEl.addContent(listEl);
+                handleCollectionValue(ns, (Collection) val, propEl, listEl);
+            } else if (val instanceof Set) {
+                Element setEl = new Element("set", ns);
+                propEl.addContent(setEl);
+                handleCollectionValue(ns, (Collection) val, propEl, setEl);                
+            } else {
+                setValueType(propEl, val);
+                propEl.setAttribute("value", val.toString());
+            }
+            contentEl.addContent(propEl);
+        }
+        
+        return new XMLOutputter(Format.getPrettyFormat()).outputString(d);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object [] normalizeArray(Object val) {
+        List l = new ArrayList();
+        if (val instanceof int[]) {
+            int[] ia = (int []) val;
+            for (int i : ia) {
+                l.add(i);
+            }
+        } else if (val instanceof long[]) {
+            long[] la = (long []) val;
+            for (long i : la) {
+                l.add(i);
+            }
+        } else if (val instanceof float[]) {
+            float[] fa = (float[]) val;
+            for (float f : fa) {
+                l.add(f);
+            }
+        } else if (val instanceof byte[]) {
+            byte[] ba = (byte []) val;
+            for (byte b : ba) {
+                l.add(b);
+            }
+        } else if (val instanceof boolean[]) {
+            boolean[] ba = (boolean []) val;
+            for (boolean b : ba) {
+                l.add(b);
+            }
+        } else if (val instanceof short[]) {
+            short[] sa = (short []) val;
+            for (short s : sa) {
+                l.add(s);
+            }
+        } else if (val instanceof char[]) {
+            char[] ca = (char []) val;
+            for (char c : ca) {
+                l.add(c);
+            }
+        } else {
+            return (Object []) val;
+        }
+        return l.toArray();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void handleCollectionValue(Namespace ns, Collection val, Element propEl, Element listEl) {
+        for (Object o : val) {
+            setValueType(propEl, o);
+            Element valueEl = new Element("value", ns);
+            listEl.addContent(valueEl);
+            valueEl.addContent(o.toString());
+        }
+    }
+
+    private static void setValueType(Element propEl, Object val) {
+        if (val instanceof String) {
+            return;
+        }
+        
+        String dataType = val.getClass().getName();
+        if (dataType.startsWith("java.lang.")) {
+            dataType = dataType.substring("java.lang.".length());
+        }
+        propEl.setAttribute("value-type", dataType);
     }    
 }
