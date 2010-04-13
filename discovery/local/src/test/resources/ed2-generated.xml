@@ -48,6 +48,6 @@
         <value>2</value>
       </array>
     </property>
-    <property name="someXML" value="&lt;xml&gt;&#xD;&#xA;&lt;t1 xmlns=&quot;http://www.acme.org/xmlns/other/v1.0.0&quot;&gt;&#xD;&#xA;&lt;foo type='bar'&gt;haha&lt;/foo&gt;&#xD;&#xA;&lt;/t1&gt;&#xD;&#xA;&lt;/xml&gt;"/>   
+    <property name="someXML" value="&lt;xml&gt;&#xA;&lt;t1 xmlns=&quot;http://www.acme.org/xmlns/other/v1.0.0&quot;&gt;&#xA;&lt;foo type='bar'&gt;haha&lt;/foo&gt;&#xA;&lt;/t1&gt;&#xA;&lt;/xml&gt;"/>   
   </endpoint-description>
 </endpoint-descriptions>

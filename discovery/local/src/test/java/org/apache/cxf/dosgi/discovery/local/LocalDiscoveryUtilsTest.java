@@ -49,7 +49,7 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class LocalDiscoveryUtilsTest extends TestCase {
-    private static final String LF = System.getProperty("line.separator");
+    private static final String LF = "\n";
 
     public void testNoRemoteServicesXMLFiles() {
         Bundle b = EasyMock.createNiceMock(Bundle.class);
