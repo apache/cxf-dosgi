@@ -52,7 +52,6 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
     public void process(WatchedEvent event) {
         LOG.finer("ZooKeeper watcher callback " + event);
-        
         processDelta();
     }
     

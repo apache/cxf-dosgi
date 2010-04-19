@@ -48,7 +48,11 @@ public class UtilTest extends TestCase {
     }
     
     public void testGetZooKeeperPath() {
-        assertEquals(Util.PATH_PREFIX + "org/example/Test", 
+        assertEquals(Util.PATH_PREFIX + '/' +"org/example/Test", 
             Util.getZooKeeperPath("org.example.Test"));
+        
+        // used for the recursive discovery
+        assertEquals(Util.PATH_PREFIX,Util.getZooKeeperPath(null));
+        assertEquals(Util.PATH_PREFIX,Util.getZooKeeperPath(""));
     }
 }

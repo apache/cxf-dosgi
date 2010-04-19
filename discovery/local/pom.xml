@@ -84,11 +84,12 @@
                         <Bundle-Name>CXF Local Discovery Service Bundle</Bundle-Name>
                         <Bundle-Description>This bundle contains the implementation required by the CXF Local Discovery Service Bundle</Bundle-Description>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Activator>org.apache.cxf.dosgi.discovery.local.Activator</Bundle-Activator>
+                        <Bundle-Activator>org.apache.cxf.dosgi.discovery.local.internal.Activator</Bundle-Activator>
                         <Import-Package>*</Import-Package>
-                        <Private-Package>org.apache.cxf.dosgi.discovery.local</Private-Package>
+                        <Private-Package>org.apache.cxf.dosgi.discovery.local.internal</Private-Package>
                         <Export-Package>
                             org.osgi.service.remoteserviceadmin;version="${remote.service.admin.interfaces.version}",
+                            org.apache.cxf.dosgi.discovery.local
                         </Export-Package> 
                     </instructions>
                 </configuration>

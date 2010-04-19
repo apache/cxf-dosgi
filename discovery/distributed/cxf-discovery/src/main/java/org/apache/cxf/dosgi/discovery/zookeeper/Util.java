@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class Util {
-    static final String PATH_PREFIX = "/osgi/service_registry/";
+    static final String PATH_PREFIX = "/osgi/service_registry";
 
     @SuppressWarnings("unchecked")
     static Collection<String> getMultiValueProperty(Object property) {
@@ -39,7 +39,8 @@ public class Util {
     }
 
     static String getZooKeeperPath(String name) {
-        return PATH_PREFIX + name.replace('.', '/');
+        if(name==null || "".equals(name)) return PATH_PREFIX;
+        return PATH_PREFIX + '/' + name.replace('.', '/');
     }
 
 }

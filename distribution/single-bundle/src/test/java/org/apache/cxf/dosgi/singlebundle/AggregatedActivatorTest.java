@@ -62,7 +62,7 @@ public class AggregatedActivatorTest extends TestCase {
             "org.apache.felix.cm.impl.ConfigurationManager",
             "org.apache.felix.fileinstall.FileInstall",
             "org.ops4j.pax.web.service.internal.Activator",
-            "org.apache.cxf.dosgi.discovery.local.Activator",
+            "org.apache.cxf.dosgi.discovery.local.internal.Activator",
             "org.apache.cxf.dosgi.dsw.Activator",
             "org.apache.cxf.dosgi.discovery.zookeeper.Activator",
             "org.apache.cxf.dosgi.topologymanager.Activator",

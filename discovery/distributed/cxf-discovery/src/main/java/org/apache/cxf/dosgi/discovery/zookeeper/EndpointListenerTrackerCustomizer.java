@@ -57,34 +57,31 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
     }
 
     public Object addingService(ServiceReference sref) {
-        LOG.info("addingService: " + sref);
+        LOG.fine("addingService: " + sref);
         handleEndpointListener(sref);
         return sref;
     }
 
     public void modifiedService(ServiceReference sref, Object service) {
-        LOG.info("modifiedService: " + sref);
+        LOG.fine("modifiedService: " + sref);
         handleEndpointListener(sref);
     }
 
     private void handleEndpointListener(ServiceReference sref) {
         for (String key : sref.getPropertyKeys()) {
-            LOG.info("modifiedService: property: " + key + " => " + sref.getProperty(key));
+            LOG.finest("modifiedService: property: " + key + " => " + sref.getProperty(key));
         }
         String[] scopes = getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
-        LOG.info("trying to discover service for scopes[" + scopes.length + "]: " + scopes);
-
+        LOG.fine("trying to discover service for scopes[" + scopes.length + "]: ");
+        if(scopes!=null) for (String scope : scopes) {
+            LOG.fine("Scope: "+scope);
+        }
         if (scopes.length > 0) {
             for (String scope : scopes) {
-                LOG.info("***********  Handling scope: " + scope);
+                LOG.fine("***********  Handling scope: " + scope);
                 String objClass = getObjectClass(scope);
-                LOG.info("***********  objectClass: " + objClass);
+                LOG.fine("***********  objectClass: " + objClass);
 
-                if(objClass==null){
-                    LOG.severe("The implementation is currently unable to handle scopes without an objectClass component !");
-                    continue;
-                }
-                
                 synchronized (interestingScopes) {
                     synchronized (handledEndpointlisteners) {
                         Interest interest = interestingScopes.get(scope);

@@ -16,10 +16,12 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.discovery.local;
+package org.apache.cxf.dosgi.discovery.local.internal;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.discovery.local.internal.Activator;
+import org.apache.cxf.dosgi.discovery.local.internal.LocalDiscovery;
 import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
 import org.osgi.framework.BundleContext;

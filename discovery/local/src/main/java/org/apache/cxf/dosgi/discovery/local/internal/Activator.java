@@ -16,7 +16,7 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.discovery.local;
+package org.apache.cxf.dosgi.discovery.local.internal;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

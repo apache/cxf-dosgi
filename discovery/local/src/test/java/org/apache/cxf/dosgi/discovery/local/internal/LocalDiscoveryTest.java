@@ -16,7 +16,7 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.discovery.local;
+package org.apache.cxf.dosgi.discovery.local.internal;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.discovery.local.internal.LocalDiscovery;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.osgi.framework.Bundle;
