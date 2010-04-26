@@ -22,6 +22,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,7 +48,7 @@ public class ServiceInvocationHandler implements InvocationHandler {
         introspectType(iType);
     }
     
-    public Object invoke(Object proxy, Method m, Object[] params) throws Throwable {
+    public Object invoke(Object proxy, final Method m, Object[] params) throws Throwable {
         if (OBJECT_METHODS.contains(m)) {
             if (m.getName().equals("equals")) {
                 params = new Object[] {Proxy.getInvocationHandler(params[0])};
@@ -56,7 +59,12 @@ public class ServiceInvocationHandler implements InvocationHandler {
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try {            
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-            return m.invoke(serviceObject, params); 
+            final Object[] paramsFinal = params;
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                public Object run() throws Exception {
+                    return m.invoke(serviceObject, paramsFinal);
+                }
+            }); 
         } catch (Throwable ex) {
             Throwable theCause = ex.getCause() == null ? ex : ex.getCause();
             

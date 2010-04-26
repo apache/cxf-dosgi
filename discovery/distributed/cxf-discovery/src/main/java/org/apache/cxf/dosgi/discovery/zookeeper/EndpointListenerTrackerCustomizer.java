@@ -71,14 +71,21 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
         for (String key : sref.getPropertyKeys()) {
             LOG.finest("modifiedService: property: " + key + " => " + sref.getProperty(key));
         }
-        String[] scopes = getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
-        LOG.fine("trying to discover service for scopes[" + scopes.length + "]: ");
+
+        String[] scopes = Util.getScopes(sref);
+        
+        LOG.info("trying to discover services for scopes[" + scopes.length + "]: ");
         if(scopes!=null) for (String scope : scopes) {
-            LOG.fine("Scope: "+scope);
+            LOG.info("Scope: "+scope);
         }
         if (scopes.length > 0) {
             for (String scope : scopes) {
                 LOG.fine("***********  Handling scope: " + scope);
+                if("".equals(scope) || scope == null){
+                    LOG.warning("skipping empty scope from EndpointListener from " + sref.getBundle().getSymbolicName());
+                    continue;
+                }
+                
                 String objClass = getObjectClass(scope);
                 LOG.fine("***********  objectClass: " + objClass);
 
@@ -100,10 +107,10 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
                             interest.im.close();
                             interest.im = null;
                         }
-
+                        
                         InterfaceMonitor dm = new InterfaceMonitor(zooKeeperDiscovery.getZookeeper(),
                                                                    objClass, interest, scope, bctx);
-                        dm.process();
+                        dm.start();
                         interest.im = dm;
 
                         List<String> handledScopes = handledEndpointlisteners.get(sref);
@@ -149,34 +156,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
 
     }
 
-    private String[] getStringPlusProperty(Object property) {
-
-        if (property instanceof String) {
-            // System.out.println("String");
-            String[] ret = new String[1];
-            ret[0] = (String)property;
-            return ret;
-        }
-
-        if (property instanceof String[]) {
-            // System.out.println("String[]");
-            return (String[])property;
-        }
-
-        if (property instanceof Collection) {
-            Collection col = (Collection)property;
-            // System.out.println("Collection: size "+col.size());
-            String[] ret = new String[col.size()];
-            int x = 0;
-            for (Object s : col) {
-                ret[x] = (String)s;
-                ++x;
-            }
-            return ret;
-        }
-
-        return new String[0];
-    }
+    
 
 //    public void discoveredEndpont(EndpointDescription epd) {
 //        LOG.info("Endpoint Discovered: " + epd.getProperties());

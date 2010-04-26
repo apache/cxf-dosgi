@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.remoteserviceadmin.EndpointListener;
 
 public class Util {
     static final String PATH_PREFIX = "/osgi/service_registry";
@@ -43,4 +47,44 @@ public class Util {
         return PATH_PREFIX + '/' + name.replace('.', '/');
     }
 
+    
+    static String[] getStringPlusProperty(Object property) {
+
+        if (property instanceof String) {
+            // System.out.println("String");
+            String[] ret = new String[1];
+            ret[0] = (String)property;
+            return ret;
+        }
+
+        if (property instanceof String[]) {
+            // System.out.println("String[]");
+            return (String[])property;
+        }
+
+        if (property instanceof Collection) {
+            Collection col = (Collection)property;
+            // System.out.println("Collection: size "+col.size());
+            String[] ret = new String[col.size()];
+            int x = 0;
+            for (Object s : col) {
+                ret[x] = (String)s;
+                ++x;
+            }
+            return ret;
+        }
+
+        return new String[0];
+    }
+
+    public static String[] getScopes(ServiceReference sref) {
+        String[] scopes = Util.getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
+        ArrayList<String> normalizedScopes = new ArrayList<String>(scopes.length);
+        for (String scope : scopes) {
+            if(scope!=null || "".equals(scope))
+                normalizedScopes.add(scope);
+        }
+        return normalizedScopes.toArray(new String[normalizedScopes.size()]);
+    }
+    
 }

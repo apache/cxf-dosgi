@@ -19,9 +19,12 @@
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.io.ByteArrayInputStream;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +34,8 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.jdom.Element;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
@@ -63,6 +68,9 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
         discoveredServiceTracker = dst;
         bctx = bc;
         this.scope = scope;
+        
+        
+        LOG.fine("InterfaceDataMonitorListenerImpl is recursive: "+recursive);
     }
 
     public synchronized void change() {
@@ -94,7 +102,7 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
 
         List<String> children;
         try {
-            LOG.fine("Processing " + znode);
+            LOG.info("Processing the children of " + znode);
             children = zookeeper.getChildren(znode, false);
 
             for (String child : children) {
@@ -125,7 +133,7 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
         try {
             Stat s = zookeeper.exists(node, false);
             if (s.getDataLength() <= 0) {
-                LOG.fine(node + " does not contain any discovery data");
+                //LOG.info(node + " does not contain any discovery data");
                 return null;
             }
             byte[] data = zookeeper.getData(node, false, null);
@@ -149,10 +157,27 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                     if (bctx.getService(sref) instanceof EndpointListener) {
                         EndpointListener epl = (EndpointListener)bctx.getService(sref);
 
-                        LOG.info("calling EndpointListener; " + epl + "from bundle "
-                                 + sref.getBundle().getSymbolicName());
-
-                        epl.endpointAdded(epd, scope);
+                        // return the >first< matching scope of the listener
+                        String[] scopes = Util.getScopes(sref);
+                        for (String currentScope : scopes) {
+                            LOG.fine("matching " + epd + " against "+currentScope);
+                            Filter f = FrameworkUtil.createFilter(currentScope);
+                            
+                            Dictionary d = new Properties(); 
+                            Map<String, Object> props = epd.getProperties();
+                            Set<Map.Entry<String, Object>> entries = props.entrySet();
+                            for (Map.Entry<String, Object> entry : entries) {
+                                d.put(entry.getKey(), entry.getValue());
+                            }
+                            
+                            if(f.match(d)){
+                                LOG.fine("MATCHED " + epd + "against "+currentScope);    
+                                LOG.info("calling EndpointListener; " + epl + "  from bundle  "
+                                         + sref.getBundle().getSymbolicName() + " based on scope ["+currentScope+"]");
+                                epl.endpointAdded(epd, currentScope);
+                                break;
+                            }
+                        }
                     }
                 }
             } else if (!prevVal.equals(epd.getProperties())) {

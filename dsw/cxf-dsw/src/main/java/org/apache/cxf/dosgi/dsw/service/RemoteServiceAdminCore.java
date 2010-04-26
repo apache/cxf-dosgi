@@ -22,16 +22,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.cxf.dosgi.dsw.ClassUtils;
@@ -337,8 +333,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     /**
      * Importing form here ....
      */
-    public ImportRegistration importService(EndpointDescription endpoint) {
-
+    public ImportRegistration importService(EndpointDescription endpoint) {    
+        
         LOG.info("importService() Endpoint: " + endpoint.getProperties());
 
         synchronized (importedServices) {

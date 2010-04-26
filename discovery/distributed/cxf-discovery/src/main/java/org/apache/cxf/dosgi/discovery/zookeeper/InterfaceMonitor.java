@@ -40,12 +40,17 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     private boolean closed = false;
 
     public InterfaceMonitor(ZooKeeper zk, String intf, EndpointListenerTrackerCustomizer.Interest zkd, String scope, BundleContext bctx) {
+        LOG.fine("Creating new InterfaceMonitor for scope ["+scope+"] and objectClass ["+intf+"] ");
         listener = new InterfaceDataMonitorListenerImpl(zk, intf, zkd,scope,bctx);
         zookeeper = zk;
         znode = Util.getZooKeeperPath(intf);
     }
     
-    public void process() {
+    public void start() {
+        process();
+    }
+    
+    private void process() {
         LOG.finest("Kicking off a zookeeper.exists() on node: " + znode);
         zookeeper.exists(znode, this, this, null);
     }

@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,14 +54,20 @@ public class ClientServiceFactory implements ServiceFactory {
         importRegistartion = ir;
     }
 
-    public Object getService(Bundle requestingBundle, ServiceRegistration sreg) {
+    public Object getService(final Bundle requestingBundle, final ServiceRegistration sreg) {
         String interfaceName = sd.getInterfaces() != null && sd.getInterfaces().size() > 0 ? (String)sd
             .getInterfaces().toArray()[0] : null;
+            
         LOG.info("************ getService() from serviceFactory for " + interfaceName);
 
         try {
-            Object proxy = handler.createProxy(sreg.getReference(), dswContext, requestingBundle
-                .getBundleContext(), iClass, sd);
+            Object proxy = AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {                
+                     return handler.createProxy(sreg.getReference(), dswContext, requestingBundle
+                                                       .getBundleContext(), iClass, sd);
+                }
+            });
+            
             synchronized (this) {
                 ++serviceCounter;
             }
