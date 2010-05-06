@@ -30,7 +30,7 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {
-    private static final String ZOOKEEPER_PORT = "org.apache.cxf.dosgi.discovery.zookeeper.pport";
+    private static final String ZOOKEEPER_PORT = "org.apache.cxf.dosgi.discovery.zookeeper.port";
     private static final String PID = "org.apache.cxf.dosgi.discovery.zookeeper.server";
     private ServiceTracker st;
 

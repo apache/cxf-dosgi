@@ -29,6 +29,8 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.container.def.PaxRunnerOptions;
+import org.ops4j.pax.exam.container.def.options.VMOption;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
@@ -58,6 +60,11 @@ public class TestImportService extends AbstractTestImportService {
         // This bundle contains the common system testing code
         opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject());
         opts.add(CoreOptions.provision(getTestClientBundle()));
+        
+        // For debugging...
+        // opts.add(PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005" ));
+        // opts.add(CoreOptions.waitForFrameworkStartup());
+        // end debugging section.
         
         return CoreOptions.options(opts.toArray(new Option[opts.size()]));
     }
