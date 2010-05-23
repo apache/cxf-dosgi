@@ -21,7 +21,6 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.osgi.framework.Bundle;
@@ -34,6 +33,8 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class EndpointListenerFactory implements ServiceFactory {
 
+    public static final String DISCOVERY_ZOOKEEPER_ID = "org.apache.cxf.dosgi.discovery.zookeeper";
+    
     private Logger LOG = Logger.getLogger(EndpointListenerFactory.class.getName());
     private BundleContext bctx;
     private ZooKeeperDiscovery discovery;
@@ -52,7 +53,6 @@ public class EndpointListenerFactory implements ServiceFactory {
             listeners.add(epl);
             return epl;
         }
-
     }
 
     public void ungetService(Bundle b, ServiceRegistration sr, Object s) {
@@ -63,9 +63,7 @@ public class EndpointListenerFactory implements ServiceFactory {
                 epl.close();
                 listeners.remove(epl);
             }
-
         }
-
     }
 
     public synchronized void start() {
@@ -75,22 +73,11 @@ public class EndpointListenerFactory implements ServiceFactory {
 
     private void updateServiceRegistration() {
         Properties props = new Properties();
-        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(&(" + Constants.OBJECTCLASS + "=*)("+RemoteConstants.ENDPOINT_FRAMEWORK_UUID+"="+getUUID(bctx)+"))");
+        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(&(" + Constants.OBJECTCLASS + "=*)("+RemoteConstants.ENDPOINT_FRAMEWORK_UUID+"="+Util.getUUID(bctx)+"))");
+        props.put(DISCOVERY_ZOOKEEPER_ID, "true");
         serviceRegistartion.setProperties(props);
     }
 
-    // copied from the DSW OSGiUtils class
-    public static String getUUID(BundleContext bc) {
-        synchronized ("org.osgi.framework.uuid") {
-            String uuid = bc.getProperty("org.osgi.framework.uuid");
-            if (uuid == null) {
-                uuid = UUID.randomUUID().toString();
-                System.setProperty("org.osgi.framework.uuid", uuid);
-            }
-            return uuid;
-        }
-    }
-    
     public synchronized void stop() {
         if (serviceRegistartion != null)
             serviceRegistartion.unregister();
@@ -100,4 +87,11 @@ public class EndpointListenerFactory implements ServiceFactory {
         }
     }
 
+    /**
+     * only for the test case !
+     */
+    protected List<EndpointListenerImpl> getListeners(){
+        return listeners;
+    }
+    
 }

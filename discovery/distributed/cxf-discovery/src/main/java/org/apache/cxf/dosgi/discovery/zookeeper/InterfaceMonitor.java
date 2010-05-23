@@ -41,7 +41,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
     public InterfaceMonitor(ZooKeeper zk, String intf, EndpointListenerTrackerCustomizer.Interest zkd, String scope, BundleContext bctx) {
         LOG.fine("Creating new InterfaceMonitor for scope ["+scope+"] and objectClass ["+intf+"] ");
-        listener = new InterfaceDataMonitorListenerImpl(zk, intf, zkd,scope,bctx);
+        listener = createInterfaceDataMonitorListener(zk, intf, zkd, scope, bctx);
         zookeeper = zk;
         znode = Util.getZooKeeperPath(intf);
     }
@@ -51,7 +51,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     }
     
     private void process() {
-        LOG.finest("Kicking off a zookeeper.exists() on node: " + znode);
+        LOG.finest("registering a zookeeper.exists(" + znode+") callback");
         zookeeper.exists(znode, this, this, null);
     }
 
@@ -61,7 +61,8 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     }
     
     public void processResult(int rc, String path, Object ctx, Stat stat) {
-        LOG.finer("ZooKeeper callback on node: " + znode + " code: " + rc);
+
+        LOG.finer("ZooKeeper callback on node: " + znode + "   code: " + rc );
         
         switch (rc) {
         case Code.Ok:
@@ -91,8 +92,10 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         
         try {
             if (zookeeper.exists(znode, false) != null) {
-                listener.change();
                 zookeeper.getChildren(znode, this);
+                listener.change();
+            }else{
+                LOG.fine(znode+" doesn't exist -> not processing any changes");
             }
         } catch (Exception ke) {
             LOG.log(Level.SEVERE, "Error getting ZooKeeper data.", ke);
@@ -106,5 +109,15 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     public void close() {
         // TODO !!!     
         closed = true;
+    }
+    
+    /**
+     * Only for thest case
+     * @return 
+     * */
+    protected InterfaceDataMonitorListenerImpl createInterfaceDataMonitorListener(ZooKeeper zk, String intf,
+                                                      EndpointListenerTrackerCustomizer.Interest zkd,
+                                                      String scope, BundleContext bctx) {
+        return new InterfaceDataMonitorListenerImpl(zk, intf, zkd,scope,bctx,this);
     }
 }

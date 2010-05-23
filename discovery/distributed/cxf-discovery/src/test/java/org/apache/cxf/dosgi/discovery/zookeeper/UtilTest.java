@@ -26,6 +26,10 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.discovery.zookeeper.Util;
+import org.easymock.classextension.EasyMock;
+import org.easymock.classextension.IMocksControl;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.remoteserviceadmin.EndpointListener;
 
 public class UtilTest extends TestCase {
     
@@ -45,6 +49,9 @@ public class UtilTest extends TestCase {
         list.add("2");
         list.add("3");
         assertEquals(list, Util.getMultiValueProperty(list)); 
+        
+        assertEquals(Collections.emptySet(), Util.getMultiValueProperty(null));
+        
     }
     
     public void testGetZooKeeperPath() {
@@ -54,5 +61,47 @@ public class UtilTest extends TestCase {
         // used for the recursive discovery
         assertEquals(Util.PATH_PREFIX,Util.getZooKeeperPath(null));
         assertEquals(Util.PATH_PREFIX,Util.getZooKeeperPath(""));
+    }
+    
+    
+    public void testGetStringPlusProperty() {
+        Object in = "MyString";
+        String[] out = Util.getStringPlusProperty(in);
+        assertEquals(1, out.length);
+        assertEquals("MyString", out[0]);
+        
+        
+        in = new String[]{"MyString"};
+        out = Util.getStringPlusProperty(in);
+        assertEquals(1, out.length);
+        assertEquals("MyString", out[0]);
+        
+        in = new ArrayList<String>();
+        ((List<String>)in).add("MyString");
+        out = Util.getStringPlusProperty(in);
+        assertEquals(1, out.length);
+        assertEquals("MyString", out[0]);
+        
+        in = new Object();
+        out = Util.getStringPlusProperty(in);
+        assertEquals(0, out.length);
+    }
+    
+    public void testGetScopes(){
+        IMocksControl c = EasyMock.createNiceControl();
+        
+        String[] scopes = new String[]{"myScope=test",""};
+        
+        ServiceReference sref = c.createMock(ServiceReference.class);
+        EasyMock.expect(sref.getProperty(EasyMock.eq(EndpointListener.ENDPOINT_LISTENER_SCOPE))).andReturn(scopes).anyTimes();
+        
+        c.replay();
+        
+        String[] ret = Util.getScopes(sref);
+        
+        c.verify();
+        assertEquals(1, ret.length);
+        assertEquals(scopes[0], ret[0]);
+        
     }
 }

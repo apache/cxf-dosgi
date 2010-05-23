@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 
@@ -81,10 +83,22 @@ public class Util {
         String[] scopes = Util.getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
         ArrayList<String> normalizedScopes = new ArrayList<String>(scopes.length);
         for (String scope : scopes) {
-            if(scope!=null || "".equals(scope))
+            if(scope!=null && !"".equals(scope))
                 normalizedScopes.add(scope);
         }
         return normalizedScopes.toArray(new String[normalizedScopes.size()]);
+    }
+
+    // copied from the DSW OSGiUtils class
+    public static String getUUID(BundleContext bc) {
+        synchronized ("org.osgi.framework.uuid") {
+            String uuid = bc.getProperty("org.osgi.framework.uuid");
+            if (uuid == null) {
+                uuid = UUID.randomUUID().toString();
+                System.setProperty("org.osgi.framework.uuid", uuid);
+            }
+            return uuid;
+        }
     }
     
 }

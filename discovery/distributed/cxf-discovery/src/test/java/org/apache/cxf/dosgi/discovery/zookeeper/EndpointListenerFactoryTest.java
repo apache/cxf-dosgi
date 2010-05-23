@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
+import java.util.List;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -84,4 +85,68 @@ public class EndpointListenerFactoryTest extends TestCase {
         
     }
 
+    public void testServiceFactory(){
+        IMocksControl c = EasyMock.createNiceControl();
+        
+        BundleContext ctx = c.createMock(BundleContext.class);
+        ZooKeeperDiscovery zkd = c.createMock(ZooKeeperDiscovery.class);
+        ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
+        
+        EndpointListenerFactory eplf = new EndpointListenerFactory(zkd, ctx);
+
+        EasyMock.expect(
+                        ctx.registerService(EasyMock.eq(EndpointListener.class.getName()), EasyMock.eq(eplf),
+                                            (Properties)EasyMock.anyObject())).andReturn(sreg).once();
+
+        
+        sreg.setProperties((Properties)EasyMock.anyObject());
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+            public Object answer() throws Throwable {
+                Properties p = (Properties)EasyMock.getCurrentArguments()[0];
+                assertNotNull(p);
+                String scope = (String)p.get(EndpointListener.ENDPOINT_LISTENER_SCOPE);
+                assertNotNull(scope);
+                assertEquals("(&(" + Constants.OBJECTCLASS + "=*)(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID
+                             + "=myUUID))", scope);
+                return null;
+            }
+        }).once();
+
+        
+        EasyMock.expect(ctx.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("myUUID")
+            .anyTimes();
+
+        
+
+        EndpointListenerImpl eli = c.createMock(EndpointListenerImpl.class);
+        eli.close();
+        EasyMock.expectLastCall().once();
+        
+        c.replay();
+        eplf.start();
+        
+        
+        Object service = eplf.getService(null, null);
+        assertNotNull(service);
+        assertTrue(service instanceof EndpointListener);
+
+        List<EndpointListenerImpl> listeners = eplf.getListeners();
+        assertEquals(1, listeners.size());
+        assertEquals(service, listeners.get(0));
+        
+        eplf.ungetService(null, null, service);
+        listeners = eplf.getListeners();
+        assertEquals(0, listeners.size());
+        
+        eplf.ungetService(null, null, eli); // no call to close 
+        listeners.add(eli);
+        eplf.ungetService(null, null, eli); // call to close
+        listeners = eplf.getListeners();
+        assertEquals(0, listeners.size());
+        
+        
+        c.verify();
+    }
+    
 }

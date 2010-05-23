@@ -72,6 +72,11 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
             LOG.finest("modifiedService: property: " + key + " => " + sref.getProperty(key));
         }
 
+        if("true".equals(sref.getProperty(EndpointListenerFactory.DISCOVERY_ZOOKEEPER_ID))){
+            LOG.finest("found my own endpointListener ... skipping it");
+            return;
+        }
+        
         String[] scopes = Util.getScopes(sref);
         
         LOG.info("trying to discover services for scopes[" + scopes.length + "]: ");
@@ -108,8 +113,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
                             interest.im = null;
                         }
                         
-                        InterfaceMonitor dm = new InterfaceMonitor(zooKeeperDiscovery.getZookeeper(),
-                                                                   objClass, interest, scope, bctx);
+                        InterfaceMonitor dm = createInterfaceMonitor(scope, objClass, interest);
                         dm.start();
                         interest.im = dm;
 
@@ -128,6 +132,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
             }
         }
     }
+
 
     private String getObjectClass(String scope) {
         Matcher m = OBJECTCLASS_PATTERN.matcher(scope);
@@ -158,7 +163,27 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
 
     
 
-//    public void discoveredEndpont(EndpointDescription epd) {
-//        LOG.info("Endpoint Discovered: " + epd.getProperties());
-//    }
+    /**
+     * Only for test case !
+     * */
+    protected Map<String, Interest> getInterestingScopes() {
+        return interestingScopes;
+    }
+
+    /**
+     * Only for test case !
+     * */
+    protected Map<ServiceReference, List<String>>  getHandledEndpointlisteners() {
+        return handledEndpointlisteners;
+    }
+
+    
+    /**
+     * Only for test case !
+     * */
+    protected InterfaceMonitor createInterfaceMonitor(String scope, String objClass, Interest interest) {
+        InterfaceMonitor dm = new InterfaceMonitor(zooKeeperDiscovery.getZookeeper(),
+                                                   objClass, interest, scope, bctx);
+        return dm;
+    }
 }
