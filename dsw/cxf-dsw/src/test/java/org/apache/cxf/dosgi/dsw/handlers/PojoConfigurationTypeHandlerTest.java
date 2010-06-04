@@ -699,6 +699,28 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Set<String> expectedIntents = new HashSet<String>(Arrays.asList(new String [] {"A", "B"}));
         assertEquals(expectedIntents, effectiveIntents);
     }
+    
+    public void testCreateEndpointProps() {
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.expect(bc.getProperty("org.osgi.framework.uuid")).andReturn("some_uuid1");
+        EasyMock.replay(bc);
+        
+        PojoConfigurationTypeHandler pch = new PojoConfigurationTypeHandler(bc, null);
+        
+        Map<String, Object> sd = new HashMap<String, Object>();
+        sd.put(org.osgi.framework.Constants.SERVICE_ID, 42);
+        Map<String, Object> props = pch.createEndpointProps(sd, String.class, new String [] {"org.apache.cxf.ws"}, 
+                "http://localhost:12345", new String [] {"my_intent", "your_intent"});
+        
+        assertFalse(props.containsKey(org.osgi.framework.Constants.SERVICE_ID));
+        assertEquals(42, props.get(RemoteConstants.ENDPOINT_SERVICE_ID));
+        assertEquals("some_uuid1", props.get(RemoteConstants.ENDPOINT_FRAMEWORK_UUID));
+        assertEquals("http://localhost:12345", props.get(RemoteConstants.ENDPOINT_ID));
+        assertEquals(Arrays.asList("java.lang.String"), Arrays.asList((Object []) props.get(org.osgi.framework.Constants.OBJECTCLASS)));
+        assertEquals(Arrays.asList("org.apache.cxf.ws"), Arrays.asList((Object []) props.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS)));
+        assertEquals(Arrays.asList("my_intent", "your_intent"), Arrays.asList((Object []) props.get(RemoteConstants.SERVICE_INTENTS)));
+        assertEquals("0.0.0", props.get("endpoint.package.version.java.lang"));
+    }
 //    
 //    public void testServiceExposedAdminEvent() throws Exception {
 //        EventAdmin ea = EasyMock.createMock(EventAdmin.class);

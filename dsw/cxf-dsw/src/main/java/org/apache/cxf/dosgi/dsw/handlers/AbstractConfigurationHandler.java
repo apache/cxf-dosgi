@@ -96,21 +96,16 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
 
         copyEndpointProperties(sd, props);
 
-        String[] sa = new String[1];
-        sa[0] = iClass.getName();
-
+        String[] sa = new String[] {iClass.getName()};
+        String pkg = iClass.getPackage().getName();
+        
+        props.remove(org.osgi.framework.Constants.SERVICE_ID);
         props.put(org.osgi.framework.Constants.OBJECTCLASS, sa);
-        // endpointProps.put(RemoteConstants.SERVICE_IMPORTED, "someValue;-)"); // should be done when the
-        // service is imported
-        // endpointProps.put(RemoteConstants.SERVICE_REMOTE_ID, "TODO");
-
-        // FIXME: This key is not defined in the spec but is required by the EndpointDescription !!!!!
-        props.put(RemoteConstants.ENDPOINT_SERVICE_ID, 123L);
-
+        props.put(RemoteConstants.ENDPOINT_SERVICE_ID, sd.get(org.osgi.framework.Constants.SERVICE_ID));        
         props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(getBundleContext()));
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
-        props.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + sa[0], OsgiUtils.getVersion(iClass,
-                                                                                         getBundleContext()));
+        props.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + pkg, 
+                OsgiUtils.getVersion(iClass, getBundleContext()));
 
         for (String configurationType : importedConfigs) {
             if(Constants.WS_CONFIG_TYPE.equals(configurationType))
