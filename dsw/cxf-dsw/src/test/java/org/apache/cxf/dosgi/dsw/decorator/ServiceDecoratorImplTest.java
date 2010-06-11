@@ -40,10 +40,6 @@ import org.osgi.framework.ServiceReference;
 
 public class ServiceDecoratorImplTest extends TestCase {
     
-    public void testDUMMY(){
-        assertTrue(true);
-    }
-    
     public void testServiceDecorator() {
         final BundleListener[] bundleListener = new BundleListener[1]; 
         

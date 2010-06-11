@@ -591,7 +591,6 @@ public final class OsgiUtils {
             LOG.finest("Looking for Package: " + pack);
 
             for (ExportedPackage p : ep) {
-                // LOG.severe("comparing package: " + p.getName() + "   " + p.getVersion());
                 if (pack.equals(p.getName())) {
                     LOG.fine("found package -> Version: " + p.getVersion());
                     return p.getVersion().toString();

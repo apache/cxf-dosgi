@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -325,11 +327,23 @@ public class TopologyManagerImport {
     }
 
     public void triggerExportImportForRemoteSericeAdmin(RemoteServiceAdmin rsa) {
-        LOG.severe("NOT IMPLEMENTED !!!");
+        LOG.fine("New RSA detected trying to import services with it");
+        synchronized (importPossibilities) {
+            Set<Map.Entry<String, List<EndpointDescription>>> entries = importPossibilities.entrySet();
+            for (Entry<String, List<EndpointDescription>> entry : entries) {
+                triggerImport(entry.getKey());
+            }
+        }
     }
 
+    
+    /**
+     * This method is called once a RemoteServiceAdminEvent for an removed import reference is received.
+     * However the current implementation has no special support for multiple topology managers, therefore this method
+     * does nothing for the moment.
+     */
     public void removeImportReference(ImportReference anyObject) {
-        LOG.severe("NOT IMPLEMENTED !!!");
+        //LOG.severe("NOT IMPLEMENTED !!!");
     }
 
 }
