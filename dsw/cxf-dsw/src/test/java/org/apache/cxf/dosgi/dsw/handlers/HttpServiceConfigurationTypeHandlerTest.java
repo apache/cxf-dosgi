@@ -106,7 +106,12 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         //assertEquals(1, dp.getExposedServices().size());
         //assertSame(sr, dp.getExposedServices().iterator().next());
         
-        String hostName = InetAddress.getLocalHost().getHostName();
+        String hostName;
+        try {
+            hostName = AbstractConfigurationHandler.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            hostName = "localhost";
+        }
         
         Map edProps = exReg.getEndpointDescription().getProperties();
         
@@ -178,7 +183,13 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         //assertEquals(1, dp.getExposedServices().size());
         //assertSame(sr, dp.getExposedServices().iterator().next());
         
-        String hostname = InetAddress.getLocalHost().getHostName();
+        String hostname;
+        try {
+            hostname = AbstractConfigurationHandler.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            hostname = "localhost";
+        }
+        
         Map edProps = exReg.getEndpointDescription().getProperties();
         
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
@@ -247,7 +258,12 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         //assertEquals(1, dp.getExposedServices().size());
         //assertSame(sr, dp.getExposedServices().iterator().next());
         
-        String hostName = InetAddress.getLocalHost().getHostName();
+        String hostName;
+        try {
+            hostName = AbstractConfigurationHandler.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            hostName = "localhost";
+        }
         Map edProps = exReg.getEndpointDescription().getProperties();
         
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));

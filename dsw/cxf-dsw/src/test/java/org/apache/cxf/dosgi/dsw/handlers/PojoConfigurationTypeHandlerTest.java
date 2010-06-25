@@ -18,6 +18,7 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -83,7 +84,13 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Map<String, Object> hp = new HashMap<String, Object>();
         PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, hp);
         Map<String, Object> sd = new HashMap<String, Object>();
-        String url = "http://localhost:1234/java/lang/String";
+        String localIP;
+        try {
+            localIP = AbstractConfigurationHandler.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            localIP = "localhost";
+        }
+        String url = "http://"+localIP+":1234/java/lang/String";
         sd.put("org.apache.cxf.ws.port", "1234");
         assertEquals(url, handler.getPojoAddress(sd, String.class));        
     }
@@ -92,7 +99,13 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Map<String, Object> hp = new HashMap<String, Object>();
         PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, hp);
         Map<String, Object> sd = new HashMap<String, Object>(); 
-        assertEquals("http://localhost:9000/java/lang/String", handler.getPojoAddress(sd, String.class));
+        String localIP;
+        try {
+            localIP = AbstractConfigurationHandler.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            localIP = "localhost";
+        }
+        assertEquals("http://"+localIP+":9000/java/lang/String", handler.getPojoAddress(sd, String.class));
     }
 
     private Map<String, Object> handlerProps;

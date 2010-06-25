@@ -169,7 +169,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
 
         String hostName = null;
         try {
-            hostName = InetAddress.getLocalHost().getHostName();
+            hostName = AbstractConfigurationHandler.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
             hostName = "localhost";
         }
