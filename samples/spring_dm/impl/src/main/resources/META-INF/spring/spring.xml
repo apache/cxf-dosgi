@@ -24,7 +24,7 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
   <osgi:service interface="org.apache.cxf.dosgi.samples.springdm.DinnerService">
     <osgi:service-properties>
-      <entry key="osgi.remote.interfaces" value="*" />
+      <entry key="service.exported.interfaces" value="*" />
     </osgi:service-properties>
     
     <bean class="org.apache.cxf.dosgi.samples.springdm.impl.DinnerServiceImpl" />
