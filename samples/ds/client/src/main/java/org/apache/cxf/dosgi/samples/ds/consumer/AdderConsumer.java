@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.samples.ds.consumer;
 
 import org.apache.cxf.dosgi.samples.ds.AdderService;
-import org.osgi.service.component.ComponentContext;
 
 public class AdderConsumer {
     private AdderService adder;
@@ -32,7 +31,7 @@ public class AdderConsumer {
         adder = null;
     }
     
-    public void start(ComponentContext cc) {
+    public void start() {
         System.out.println("Declarative Service consumer component.");
         System.out.println("Using adder service: 1 + 1 = " + adder.add(1, 1));
     }

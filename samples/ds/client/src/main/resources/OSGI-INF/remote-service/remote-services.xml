@@ -13,11 +13,14 @@
     License for the specific language governing permissions and
     limitations under the License.
   -->
-<service-descriptions xmlns="http://www.osgi.org/xmlns/sd/v1.0.0">
-  <service-description>
-    <provide interface="org.apache.cxf.dosgi.samples.ds.AdderService" />
-    <property name="service.exported.interfaces">*</property>
-    <property name="service.exported.configs">org.apache.cxf.ws</property>
-    <property name="org.apache.cxf.ws.address">http://localhost:9090/adder</property>
-  </service-description>
-</service-descriptions>
+<endpoint-descriptions xmlns="http://www.osgi.org/xmlns/rsa/v1.0.0">
+  <endpoint-description>
+    <property name="objectClass">
+      <array>
+        <value>org.apache.cxf.dosgi.samples.ds.AdderService</value>
+      </array>
+    </property>
+    <property name="endpoint.id">http://localhost:9090/adder</property>
+    <property name="service.imported.configs">org.apache.cxf.ws</property>
+  </endpoint-description>
+</endpoint-descriptions>
