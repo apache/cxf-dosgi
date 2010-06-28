@@ -25,6 +25,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -36,6 +37,7 @@ import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
@@ -45,6 +47,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
@@ -75,7 +78,41 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
 
     public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
                               BundleContext callingContext, Class<?> iClass, EndpointDescription sd) {
-        // This handler doesn't make sense on the client side
+        String address = getHttpServiceAddress(sd.getProperties(), iClass);
+        if (address == null) {
+            LOG.warning("Remote address is unavailable");
+            // TODO: fire Event
+            return null;
+        }
+
+        LOG.info("Creating a " + iClass.getName() + " client, endpoint address is " + address);
+
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            DataBinding databinding;
+            String dataBindingImpl = (String)serviceReference.getProperty(Constants.WS_DATABINDING_PROP_KEY);
+            if ("jaxb".equals(dataBindingImpl)) {
+                databinding = new JAXBDataBinding();
+            } else {
+                databinding = new AegisDatabinding();
+            }
+            String frontEndImpl = (String)serviceReference.getProperty(Constants.WS_FRONTEND_PROP_KEY);
+            ClientProxyFactoryBean factory = createClientProxyFactoryBean(frontEndImpl);
+            factory.setServiceClass(iClass);
+            factory.setAddress(address);
+            factory.getServiceFactory().setDataBinding(databinding);
+
+            applyIntents(dswContext, callingContext, factory.getFeatures(), factory.getClientFactoryBean(),
+                         sd.getProperties());
+
+            Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
+            Object proxy = getProxy(factory.create(), iClass);
+            return proxy;
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "proxy creation failed", e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldClassLoader);
+        }
         return null;
     }
 
@@ -227,5 +264,40 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
 
         HttpContext httpContext = httpService.createDefaultHttpContext();
         return new SecurityDelegatingHttpContext(bundleContext, httpContext);
+    }
+    
+    protected String getHttpServiceAddress(Map sd, Class<?> iClass) {
+        String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
+        if(address == null && sd.get(RemoteConstants.ENDPOINT_ID)!=null ){
+            LOG.severe("Could not use address property " + RemoteConstants.ENDPOINT_ID );
+            return null;
+        }
+        
+        
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
+        }
+        if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY)!=null ){
+            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
+            return null;
+        }
+        
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);
+        }
+        if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY_OLD)!=null ){
+            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
+            return null;
+        }
+        
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
+        }
+        if(address == null && sd.get(Constants.RS_ADDRESS_PROPERTY)!=null ){
+            LOG.severe("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
+            return null;
+        }
+
+        return address;
     }
 }

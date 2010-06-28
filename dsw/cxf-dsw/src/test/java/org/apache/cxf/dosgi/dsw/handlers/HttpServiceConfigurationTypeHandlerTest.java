@@ -32,22 +32,21 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
+import org.easymock.classextension.IMocksControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
-    
-    public void testDUMMY(){
-        assertTrue(true);
-    }
     
     public void testServer() throws Exception {
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
@@ -321,6 +320,64 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         EasyMock.expect(server.getDestination()).andReturn(destination);
         EasyMock.replay(server);
         return server;
+    }
+    
+    public void testCreateProxy() {
+        IMocksControl c = EasyMock.createNiceControl();
+        BundleContext bc1 = c.createMock(BundleContext.class);
+        BundleContext bc2 = c.createMock(BundleContext.class);
+
+        HttpService httpService = c.createMock(HttpService.class);
+
+        ServiceReference httpSvcSR = c.createMock(ServiceReference.class);
+        EasyMock.expect(bc1.getService(httpSvcSR)).andReturn(httpService).anyTimes();
+
+        final ClientProxyFactoryBean cpfb = c.createMock(ClientProxyFactoryBean.class);
+        ReflectionServiceFactoryBean sf = c.createMock(ReflectionServiceFactoryBean.class);
+        EasyMock.expect(cpfb.getServiceFactory()).andReturn(sf).anyTimes();
+
+        ServiceReference sr = c.createMock(ServiceReference.class);
+
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(RemoteConstants.ENDPOINT_ID, "http://google.de/");
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[] { "my.class" });
+        props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, new String[] { "my.config" });
+        EndpointDescription endpoint = new EndpointDescription(props);
+
+        cpfb.setAddress((String) EasyMock.eq(props.get(RemoteConstants.ENDPOINT_ID)));
+        EasyMock.expectLastCall().atLeastOnce();
+
+        cpfb.setServiceClass(EasyMock.eq(CharSequence.class));
+        EasyMock.expectLastCall().atLeastOnce();
+
+        c.replay();
+
+        Map<String, Object> handlerProps = new HashMap<String, Object>();
+        HttpServiceConfigurationTypeHandler h = new HttpServiceConfigurationTypeHandler(bc1, handlerProps) {
+            @Override
+            ClientProxyFactoryBean createClientProxyFactoryBean(String frontend) {
+                return cpfb;
+            }
+
+            @Override
+            String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
+                    List<AbstractFeature> features, AbstractEndpointFactory factory, Map sd) {
+                return new String[] { "a.b.c" };
+            }
+        };
+
+        h.httpServiceReferences.add(httpSvcSR);
+
+        Object proxy = h.createProxy(sr, bc1, bc2, CharSequence.class, endpoint);
+        assertNotNull(proxy);
+
+        if (proxy instanceof CharSequence) {
+            CharSequence cs = (CharSequence) proxy;
+        } else {
+            assertTrue("Proxy is not of the requested type! ", false);
+        }
+
+        c.verify();
     }
 
     // TODO these tests still need to be written...
