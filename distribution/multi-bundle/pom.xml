@@ -63,6 +63,17 @@
       <artifactId>com.springsource.org.apache.commons.logging</artifactId>
       <version>1.1.1</version>
     </dependency>
+    <dependency>  
+        <groupId>org.slf4j</groupId>  
+        <artifactId>com.springsource.slf4j.api</artifactId>  
+        <version>1.5.10</version> 
+    </dependency>
+    <dependency>  
+        <groupId>org.slf4j</groupId>  
+        <artifactId>com.springsource.slf4j.jcl</artifactId>  
+        <version>1.5.10</version> 
+    </dependency>
+    
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>com.springsource.org.jdom</artifactId>
@@ -180,7 +191,11 @@
        <artifactId>org.apache.servicemix.bundles.woodstox</artifactId> 
        <version>${woodstox.bundle.version}</version> 
     </dependency>
-    
+    <dependency>
+       <groupId>org.apache.servicemix.bundles</groupId> 
+       <artifactId>org.apache.servicemix.bundles.commons-pool</artifactId> 
+       <version>${commons.pool.bundle.version}</version> 
+    </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle-minimal</artifactId>

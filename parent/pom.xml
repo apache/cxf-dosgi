@@ -18,7 +18,7 @@
          generally caused by the fact that not all versions are available yet as 
          OSGi bundles. -->
     <properties>
-        <cxf.version>2.2.5</cxf.version>
+        <cxf.version>2.2.9</cxf.version>
         <felix.version>1.8.0</felix.version>
         <spring.version>2.5.6</spring.version>
         <spring.osgi.version>1.2.0</spring.osgi.version>
@@ -37,6 +37,7 @@
         <wsdl4j.bundle.version>1.6.1_1</wsdl4j.bundle.version> <!-- CXF uses 1.6.2 -->
         <xmlsec.bundle.version>1.3.0_1</xmlsec.bundle.version>
         <asm.bundle.version>2.2.3_1</asm.bundle.version> 
+        <commons.pool.bundle.version>1.5.4_1</commons.pool.bundle.version>
         <woodstox.bundle.version>3.2.7_1</woodstox.bundle.version> <!-- CXF uses 3.2.8 -->
         <jaxbimpl.bundle.version>2.1.6_1</jaxbimpl.bundle.version> <!-- CXF uses 2.1.9 -->
         <slf4j.version>1.5.0</slf4j.version>
