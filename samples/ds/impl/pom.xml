@@ -22,12 +22,12 @@
   <artifactId>cxf-dosgi-ri-samples-ds-impl</artifactId>
   <packaging>bundle</packaging>
   <name>Distributed OSGI Declarative Services Sample Implementation Bundle</name>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-bundles-ds-parent</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
   </parent>
 
   <dependencies>
