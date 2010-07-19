@@ -24,12 +24,12 @@
     <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-server</artifactId>
     <packaging>bundle</packaging>
     <name>Distributed OSGI Distributed Discovery Zookeeper Server Control Bundle</name>
-    <version>1.2</version>
+    <version>1.2-SNAPSHOT</version>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-parent</artifactId>
-      <version>1.2</version>
+      <version>1.2-SNAPSHOT</version>
       <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -89,7 +89,7 @@
                         <Bundle-Activator>org.apache.cxf.dosgi.discovery.zookeeper.server.Activator</Bundle-Activator>
                         <Import-Package>*</Import-Package>
                         <Private-Package>org.apache.cxf.dosgi.discovery.zookeeper.server</Private-Package>
-                        <Export-Package />
+                        <Export-Package/>
                     </instructions>
                 </configuration>
             </plugin> 
