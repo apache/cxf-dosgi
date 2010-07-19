@@ -3,28 +3,32 @@ Welcome to the Apache CXF Distributed OSGi DSW Reference Implementation
 
 
 The dOSGi subproject of Apache CXF provides the Reference Implementation
-of the Distribution Software (DSW) component of the Distributed OSGi
+of the Remote Services Specification version 1.0, Chapter 13 in the OSGi
+Compendium Specification, and OSGi Remote Service Admin Specification
+version 1.0, Chapter 122 in the OSGi Enterprise Specification[1].
+
+
+Distribution Software (DSW) component of the Distributed OSGi
 Specification[1].
 
 
 This release is provided for your convenience in three different 
 distribution formats:
 
-1. Multi-bundle distro: cxf-dosgi-ri-multibundle-distribution-1.1.{tar.gaz|zip}
+1. Multi-bundle distro: cxf-dosgi-ri-multibundle-distribution-1.2.{tar.gaz|zip}
 
 Contains the dOSGi implementation and all 3rd party dependencies as 
 separate bundles within an archive. The current distribution is an
 instance of this type.
 
 
-2. Single-bundle distro: cxf-dosgi-ri-singlebundle-distribution-1.1.jar
+2. Single-bundle distro: cxf-dosgi-ri-singlebundle-distribution-1.2.jar
 
 Contains the dOSGi implementation and all 3rd party dependencies wrapped
 in a single OSGi bundle so as to allow direct installation in your favourite 
 OSGi container in one fell swoop.
 
-	
-3. Source distro: cxf-dosgi-ri-source-distribution-1.1.{tar.gz|zip}
+3. Source distro: cxf-dosgi-ri-source-distribution-1.2.{tar.gz|zip}
 
 Contains the entire source tree for dOSGi. The current distribution is
 an instance of this type. It may be built by running "mvn install" from
@@ -50,7 +54,7 @@ Regards,
 The CXF dOSGi team.
 
 
-[1] See RFC 119 in http://www.osgi.org/download/osgi-4.2-early-draft3.pdf
+[1] see chapter 122 http://www.osgi.org/Download/Release4V42
 [2] http://cxf.apache.org/distributed-osgi.html#DistributedOSGi-GettingStarted
 [3] http://cxf.apache.org/distributed-osgi-greeter-demo-walkthrough.htm
 [4] http://cxf.apache.org/mailing-lists.html
