@@ -1,3 +1,27 @@
+Apache CXF Distributed OSGi 1.2 Release Notes
+=============================================
+
+In addition to providing the Reference Implementation to the OSGi Remote
+Services Specification, the CXF Distributed OSGi 1.2 release now also
+provides the Reference Implementation of the OSGi Remote Service Admin
+Specification version 1.0, Chapter 122 in the OSGi Enterprise
+Specification.
+
+To achieve compliance with the RSA specification a major refactoring has
+been done on the code base.
+
+For the new features applicable to the RSA specification, see chapter
+122 in the OSGi Enterprise Spec (http://www.osgi.org/Download/Release4V42).
+
+Additionally, a number of bugs have been fixed. 
+
+The following configuration property has been introduced:
+* org.apache.cxf.ws.port=[port number]
+  This property can be used to change the default port at which a remote
+service appears. When setting this property the default context will
+still be used.
+
+
 Apache CXF Distributed OSGi 1.1 Release Notes
 =============================================
 
