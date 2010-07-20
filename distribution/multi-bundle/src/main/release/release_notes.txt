@@ -13,13 +13,19 @@ been done on the code base.
 For the new features applicable to the RSA specification, see chapter
 122 in the OSGi Enterprise Spec (http://www.osgi.org/Download/Release4V42).
 
-Additionally, a number of bugs have been fixed. 
+The following new features have been introduced:
 
-The following configuration property has been introduced:
 * org.apache.cxf.ws.port=[port number]
-  This property can be used to change the default port at which a remote
+  This configuration property can be used to change the default port at which a remote
 service appears. When setting this property the default context will
 still be used.
+
+* Servlet Filters (javax.servlet.Filter) can now be registered as OSGi services with
+  an "org.apache.cxf.httpservice.filter" boolean property set to true and used to secure DOSGi server endpoints.
+  Endpoints can enforce the registration of the filters by setting an "org.apache.cxf.httpservice.requirefilter" 
+  boolean property to true
+
+Additionally, a number of bugs has also been fixed.
 
 
 Apache CXF Distributed OSGi 1.1 Release Notes
