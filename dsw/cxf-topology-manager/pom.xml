@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!--
         Licensed to the Apache Software Foundation (ASF) under one or more
         contributor license agreements. See the NOTICE file distributed with
@@ -21,12 +20,12 @@
     <artifactId>cxf-dosgi-ri-topology-manager</artifactId>
     <packaging>bundle</packaging>
     <name>Distributed OSGi Topology Manager implementation</name>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
         <artifactId>cxf-dosgi-ri-parent</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
