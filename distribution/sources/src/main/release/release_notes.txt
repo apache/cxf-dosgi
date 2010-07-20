@@ -26,7 +26,47 @@ The following new features have been introduced:
   Endpoints can enforce the registration of the filters by setting an
   "org.apache.cxf.httpservice.requirefilter" boolean property to true
 
-Additionally, a number of bugs has also been fixed.
+Additionally, a number of bugs has been fixed including:
+
+[DOSGI-13] - The CXF DOSGi implementation needs to be updated to support the
+             latest OSGi Remote Services Admin spec.
+[DOSGI-24] - org.apache.cxf.dosgi.dsw.ClassUtils#getInterfaceClass() method
+             should search through super class interfaces too
+[DOSGI-25] - FileNotFoundException when client-side proxy is being created
+             [META-INF/cxf/cxf.xml]
+[DOSGI-27] - Discovery problem when two dependent bundles export interfaces
+[DOSGI-28] - Consuming more than 1 service using Spring-DM doesn't work
+[DOSGI-29] - Exception when stopping DOSGi bundle
+[DOSGI-30] - ClassNotFoundException when exposing service.
+[DOSGI-31] - Distributed OSGi having a problem with a custom type method
+             argument
+[DOSGI-32] - The default amount of logging should be significantly reduced
+[DOSGI-33] - Exception when exposing remote service using DOSGi
+[DOSGI-34] - org.apache.servicemix.specs.locator-1.1.1.jar useless?
+[DOSGI-35] - ServicePublication.PROP_KEY_ENDPOINT_LOCATION is now a URI,
+             instead of a URL
+[DOSGI-37] - Fix the dependency on Equinox for the DOSGi system tests
+[DOSGI-38] - single-bundle distribution has incorrect Import-Package and
+             Export-Package declaration in the manifest
+[DOSGI-40] - Remoted service fails to register endpoint after framework is
+             restarted
+[DOSGI-41] - Remove simple-pojo demo (temporarily) as its currently not
+             supported
+[DOSGI-43] - ClassCastException with Declarative Services
+[DOSGI-44] - Existing OSGi Services are not remoted when CXF-DOSGi is started
+[DOSGI-50] - Need to automatically infer SOAP/HTTP transport intents if not
+             explicily set via osgi.remote.requires.intents
+[DOSGI-54] - RemoteServiceAdmin interfaces/classes out of sync with official
+             version
+[DOSGI-61] - The Zookeeper Discovery only supports primitive types as service
+             properties
+[DOSGI-62] - The DSW creates endpoints with localhost URLs 
+[DOSGI-66] - The DSW only loads the intent map when certain spring bundles
+             are loaded and started upfront
+[DOSGI-67] - Enable filters on DOSGi endpoints
+[DOSGI-72] - DOSGI not working with HTTP Service
+[DOSGI-74] - Update CXF version to 2.2.9
+
 
 Apache CXF Distributed OSGi 1.1 Release Notes
 =============================================
