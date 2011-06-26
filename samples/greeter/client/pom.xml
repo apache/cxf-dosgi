@@ -65,7 +65,7 @@
                     <instructions>
                         <Bundle-Name>CXF Distributed OSGi Greeter Demo Client Bundle</Bundle-Name>
                         <Bundle-Description>This bundle contains the implementation the Distributed OSGi Greeter Demo Client</Bundle-Description>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.apache.cxf.dosgi.samples.greeter.client.Activator</Bundle-Activator>
                         <Import-Package>${bundle.import.package}</Import-Package>
                         <Private-Package>${bundle.private.package}</Private-Package> 

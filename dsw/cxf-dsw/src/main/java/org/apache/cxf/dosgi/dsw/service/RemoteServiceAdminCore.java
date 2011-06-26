@@ -49,8 +49,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     private Logger LOG = Logger.getLogger(RemoteServiceAdminCore.class.getName());
 
-    private LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>> exportedServices = new LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>>();
-    private LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices = new LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>>();
+    private final LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>> exportedServices = new LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>>();
+    private final LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices = new LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>>();
 
     private BundleContext bctx;
 
@@ -61,7 +61,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private volatile String defaultHost;
 
     // protected because of tests
-    protected static List<String> supportedConfigurationTypes = new ArrayList<String>();
+    protected static final List<String> supportedConfigurationTypes = new ArrayList<String>();
+
     static {
         supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
         supportedConfigurationTypes.add(Constants.RS_CONFIG_TYPE);

@@ -97,14 +97,24 @@ public abstract class AbstractTestImportService {
             ServiceReference ref = waitService(String.class.getName(), "(testResult=test1)");
             Assert.assertEquals("HiOSGi", ref.getProperty("result"));
         } finally {
-            server.stop(); 
+            if(server != null) {
+                server.stop();
+            } 
             Thread.currentThread().setContextClassLoader(cl);
         }
     }
     
     private ServiceReference waitService(String cls, String filter) throws Exception {        
         ServiceReference[] refs = null;
-        for (int i=0; i < 20; i++) {
+        
+        String timeoutStr = System.getProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout", "20");
+        
+        int timeout = Integer.valueOf(timeoutStr);
+        if(timeout <= 0) {
+            timeout = Integer.MAX_VALUE;
+        }
+        
+        for (int i=0; i < timeout; i++) {
             refs = getBundleContext().getServiceReferences(cls, filter);
             if (refs != null && refs.length > 0) {
                 return refs[0];

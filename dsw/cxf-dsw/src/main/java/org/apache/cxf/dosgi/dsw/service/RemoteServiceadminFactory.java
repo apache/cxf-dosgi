@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.jaxws.javaee.ResAuthType;
@@ -42,14 +43,16 @@ public class RemoteServiceadminFactory implements ServiceFactory {
     }
 
     public Object getService(Bundle b, ServiceRegistration sr) {
-        LOG.finest("new RemoteServiceAdmin ServiceInstance created for Bundle "+b.getSymbolicName());
+        LOG.log(Level.FINEST, "new RemoteServiceAdmin ServiceInstance created for Bundle {0}",
+                b.getSymbolicName());
         RemoteServiceAdminInstance rsai = new RemoteServiceAdminInstance(bctx,rsaCore);
         rsaServiceInstances.add(rsai);
         return rsai;
     }
 
     public void ungetService(Bundle b, ServiceRegistration sr, Object serviceObject) {
-        LOG.finest("RemoteServiceAdmin ServiceInstance removed for Bundle "+b.getSymbolicName());
+        LOG.log(Level.FINEST, "RemoteServiceAdmin ServiceInstance removed for Bundle {0}",
+                b.getSymbolicName());
         if (serviceObject instanceof RemoteServiceAdminInstance) {
             RemoteServiceAdminInstance rsai = (RemoteServiceAdminInstance)serviceObject;
             rsai.close();

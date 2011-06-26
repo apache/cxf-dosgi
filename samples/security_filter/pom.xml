@@ -45,9 +45,9 @@
           </exclusions>
       </dependency> 
       <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>${servlet.version}</version>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-servlet_${servlet.version}_spec</artifactId>
+        <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.specs</groupId>
@@ -65,7 +65,7 @@
           <instructions>
             <Bundle-Name>${pom.name}</Bundle-Name>
             <Bundle-Description>This bundle contains an example Distributed OSGi endpoint that passes requests through a security filter.</Bundle-Description>
-            <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Private-Package>org.apache.cxf.dosgi.samples.security</Private-Package>
             <Bundle-Activator>org.apache.cxf.dosgi.samples.security.Activator</Bundle-Activator>
           </instructions>

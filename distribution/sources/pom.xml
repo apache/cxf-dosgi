@@ -34,7 +34,7 @@
 
     <properties>
         <maven.test.skip>true</maven.test.skip>
-        <dosgi.version>${pom.version}</dosgi.version>
+        <dosgi.version>${project.version}</dosgi.version>
         <topDirectoryLocation>../..</topDirectoryLocation>
     </properties>
 

@@ -61,12 +61,15 @@
                     <instructions>
                         <Bundle-Name>ZooKeeper wrapper bundle</Bundle-Name>
                         <Bundle-Description>This bundle wraps the ZooKeeper library</Bundle-Description>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>
                             !jline*,
+                            com.sun.jdmk.comm*;resolution:=optional,
+                            javax.jms*;resolution:=optional,
+                            javax.mail*;resolution:=optional,
                             *
                         </Import-Package>
-                        <Export-Package>*;version=${zookeeper.version}</Export-Package> 
+                        <Export-Package>*;-split-package:=merge-last;version=${zookeeper.version}</Export-Package> 
                     </instructions>
                 </configuration>
             </plugin> 

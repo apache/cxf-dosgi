@@ -47,7 +47,7 @@
           <instructions>
             <Bundle-Name>CXF Distributed OSGi Spring-DM Sample Implementation Bundle</Bundle-Name>
             <Bundle-Description>This bundle contains the server-side implementation of the Distributed OSGi with Spring-DM sample.</Bundle-Description>
-            <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>org.apache.cxf.dosgi.samples.springdm</Import-Package> 
             <Private-Package>org.apache.cxf.dosgi.samples.springdm.impl</Private-Package> 
           </instructions>

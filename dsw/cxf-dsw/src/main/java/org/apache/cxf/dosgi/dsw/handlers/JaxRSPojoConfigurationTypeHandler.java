@@ -106,7 +106,7 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
         List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
         if (resources != null) {
             factory.setModelBeansWithServiceClass(resources, iClass);
-            factory.setServiceBeans(serviceBean);
+            factory.setServiceBeanObjects(serviceBean);
         } else {
             factory.setServiceClass(iClass);
             factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));

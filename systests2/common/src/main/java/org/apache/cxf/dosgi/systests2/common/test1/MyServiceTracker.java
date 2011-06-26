@@ -37,6 +37,7 @@ public class MyServiceTracker extends ServiceTracker {
     public Object addingService(ServiceReference reference) {
         Object svc = super.addingService(reference);
         if (svc instanceof GreeterService) {
+            System.out.println("[client] Got a GreeterService...");
             invokeGreeter((GreeterService) svc);
         }
         return svc;
@@ -47,16 +48,23 @@ public class MyServiceTracker extends ServiceTracker {
     }
 
     private void invokeGreeter(GreeterService svc) {
-        Map<GreetingPhrase, String> result = svc.greetMe("OSGi");
-        for (Map.Entry<GreetingPhrase, String> e : result.entrySet()) {
-            GreetingPhrase key = e.getKey();
-            invocationResult.append(key.getPhrase());
-            invocationResult.append(e.getValue());
+        try {
+            Map<GreetingPhrase, String> result = svc.greetMe("OSGi");
+            for (Map.Entry<GreetingPhrase, String> e : result.entrySet()) {
+                GreetingPhrase key = e.getKey();
+                invocationResult.append(key.getPhrase());
+                invocationResult.append(e.getValue());
+            }
+
+            Hashtable<String, Object> props = new Hashtable<String, Object>();
+            props.put("result", invocationResult.toString());
+            props.put("testResult", "test1");
+
+            System.out.println("[client] Successfully invoked remote service. Registering test response service...");
+            context.registerService(String.class.getName(), "test1", props);
+        } catch(Exception x) {
+            System.err.println("[client] Error during remote service invocation:");
+            x.printStackTrace(System.err);
         }
-        
-        Hashtable<String, Object> props = new Hashtable<String, Object>();
-        props.put("result", invocationResult.toString());
-        props.put("testResult", "test1");
-        context.registerService(String.class.getName(), "test1", props);
     }    
 }

@@ -22,11 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.cxf.dosgi.dsw.handlers.IntentUnsatifiedException;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.frontend.ServerFactoryBean;
-import org.mortbay.jetty.servlet.PathMap.Entry;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;

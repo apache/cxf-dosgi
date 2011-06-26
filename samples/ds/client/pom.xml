@@ -53,7 +53,7 @@
           <instructions>
             <Bundle-Name>${pom.name}</Bundle-Name>
             <Bundle-Description>This bundle contains the client-side implementation of the Distributed OSGi with Declarative Services sample.</Bundle-Description>
-            <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Activator>org.apache.cxf.dosgi.samples.ds.consumer.Activator</Bundle-Activator>
             <Import-Package>*</Import-Package> 
             <Private-Package>org.apache.cxf.dosgi.samples.ds.consumer</Private-Package> 

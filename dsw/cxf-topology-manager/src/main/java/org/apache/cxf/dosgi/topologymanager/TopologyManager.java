@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.topologymanager;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -30,6 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
@@ -56,7 +58,7 @@ public class TopologyManager {
     private ExecutorService execService = new ThreadPoolExecutor(5, 10, 50, TimeUnit.SECONDS,
                                                                  new LinkedBlockingQueue<Runnable>());
 
-    private RemoteServiceAdminList remoteServiceAdminList;
+    private final RemoteServiceAdminList remoteServiceAdminList;
 
     private ServiceListenerImpl serviceListerner;
 
@@ -77,14 +79,14 @@ public class TopologyManager {
      * 
      * </pre>
      */
-    private HashMap<ServiceReference, HashMap<RemoteServiceAdmin, Collection<ExportRegistration>>> exportedServices = new LinkedHashMap<ServiceReference, HashMap<RemoteServiceAdmin, Collection<ExportRegistration>>>();
+    private final HashMap<ServiceReference, HashMap<RemoteServiceAdmin, Collection<ExportRegistration>>> exportedServices = new LinkedHashMap<ServiceReference, HashMap<RemoteServiceAdmin, Collection<ExportRegistration>>>();
 
     private BundleContext bctx;
     // private List<RemoteServiceAdmin> remoteServiceAdmins = new ArrayList<RemoteServiceAdmin>();
 
     private ServiceTracker stEndpointListeners;
 
-    public TopologyManager(BundleContext ctx, RemoteServiceAdminList rsaList) {
+    public TopologyManager(BundleContext ctx, final RemoteServiceAdminList rsaList) {
         bctx = ctx;
 
         remoteServiceAdminList = rsaList;
@@ -228,43 +230,45 @@ public class TopologyManager {
         execService.execute(new Runnable() {
             @SuppressWarnings("unchecked")
             public void run() {
-                LOG.info("TopologyManager: exporting  serice ...");
+                LOG.info("TopologyManager: exporting service ...");
 
-                HashMap<RemoteServiceAdmin, Collection<ExportRegistration>> exports = null;
+                Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports = null;
 
                 synchronized (exportedServices) {
-                    exports = exportedServices.get(sref);
+                    exports = Collections.synchronizedMap(exportedServices.get(sref));
                 }
                 // FIXME: Not thread safe...?
                 if (exports != null) {
-                    synchronized (exports) {
-                        synchronized (remoteServiceAdminList) {
-                            for (RemoteServiceAdmin remoteServiceAdmin : remoteServiceAdminList) {
-                                LOG
-                                    .info("TopologyManager: handling remoteServiceAdmin "
-                                          + remoteServiceAdmin);
+                    if(remoteServiceAdminList == null || remoteServiceAdminList.size() == 0) {
+                        LOG.log(Level.SEVERE, "No RemoteServiceAdmin available! Unable to export service from bundle {0}, interfaces: {1}",
+                                new Object[]{sref.getBundle().getSymbolicName(), sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS)});
+                    }
 
-                                if (exports.containsKey(remoteServiceAdmin)) {
-                                    // already handled by this remoteServiceAdmin
-                                    LOG
-                                        .info("TopologyManager: already handled by this remoteServiceAdmin -> skipping");
+                    synchronized (remoteServiceAdminList) {
+                        for (final RemoteServiceAdmin remoteServiceAdmin : remoteServiceAdminList) {
+                            LOG
+                                .info("TopologyManager: handling remoteServiceAdmin "
+                                      + remoteServiceAdmin);
+
+                            if (exports.containsKey(remoteServiceAdmin)) {
+                                // already handled by this remoteServiceAdmin
+                                LOG.info("TopologyManager: already handled by this remoteServiceAdmin -> skipping");
+                            } else {
+                                // TODO: additional parameter Map ?
+                                LOG.info("TopologyManager: exporting ...");
+                                Collection<ExportRegistration> endpoints = remoteServiceAdmin
+                                    .exportService(sref, null);
+                                if (endpoints == null) {
+                                    // TODO export failed -> What should be done here?
+                                    LOG.info("TopologyManager: export failed");
+                                    exports.put(remoteServiceAdmin, null);
                                 } else {
-                                    // TODO: additional parameter Map ?
-                                    LOG.info("TopologyManager: exporting ...");
-                                    Collection<ExportRegistration> endpoints = remoteServiceAdmin
-                                        .exportService(sref, null);
-                                    if (endpoints == null) {
-                                        // TODO export failed -> What should be done here?
-                                        LOG.info("TopologyManager: export failed");
-                                        exports.put(remoteServiceAdmin, null);
-                                    } else {
-                                        LOG.info("TopologyManager: export sucessful Endpoints:" + endpoints);
-                                        // enqueue in local list of endpoints
-                                        exports.put(remoteServiceAdmin, endpoints);
+                                    LOG.info("TopologyManager: export sucessful Endpoints:" + endpoints);
+                                    // enqueue in local list of endpoints
+                                    exports.put(remoteServiceAdmin, endpoints);
 
-                                        // publish to endpoint listeners
-                                        nofifyListeners(endpoints);
-                                    }
+                                    // publish to endpoint listeners
+                                    nofifyListeners(endpoints);
                                 }
                             }
                         }

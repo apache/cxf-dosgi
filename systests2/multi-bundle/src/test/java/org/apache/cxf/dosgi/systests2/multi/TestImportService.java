@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.container.def.PaxRunnerOptions;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
@@ -58,11 +59,19 @@ public class TestImportService extends AbstractTestImportService {
         opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject().startLevel(++startLevel));
         opts.add(CoreOptions.provision(getTestClientBundle()));
         opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));
-        
+
+        opts.add(CoreOptions.systemProperty("java.util.logging.config.file").value(System.getProperty("java.util.logging.config.file")));
+
         // For debugging...
-        // opts.add(PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005" ));
-        // opts.add(CoreOptions.waitForFrameworkStartup());
+        final String debugPort = System.getProperty("org.apache.cxf.dosgi.test.debug.port");
+        if(debugPort != null) {
+            opts.add(PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=" + debugPort ));
+            opts.add(CoreOptions.waitForFrameworkStartup());
+        }
         // end debugging section.
+
+        // service wait timeout (this should also be increased for debugging)...
+        opts.add(CoreOptions.systemProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout").value(System.getProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout", "20")));
         
         return CoreOptions.options(opts.toArray(new Option[opts.size()]));
     }

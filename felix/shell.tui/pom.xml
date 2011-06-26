@@ -77,8 +77,8 @@
           <instructions>
             <Private-Package>org.apache.felix.shell.tui.*</Private-Package>
             <Bundle-Activator>org.apache.felix.shell.tui.Activator</Bundle-Activator>
-            <Bundle-DocURL>http://oscar-osgi.sf.net/obr2/${pom.artifactId}/</Bundle-DocURL>
-            <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+            <Bundle-DocURL>http://oscar-osgi.sf.net/obr2/${project.artifactId}/</Bundle-DocURL>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
             <Import-Service>org.apache.felix.shell.ShellService</Import-Service>
           </instructions>

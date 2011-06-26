@@ -36,7 +36,7 @@
     <topDirectoryLocation>../..</topDirectoryLocation>
     <bundle.import.package>*</bundle.import.package>
     <bundle.export.package>
-      org.apache.cxf.dosgi.systests.common;version="${pom.version}"
+      org.apache.cxf.dosgi.systests.common;version="${project.version}"
     </bundle.export.package>
   </properties>
   
@@ -95,7 +95,7 @@
           <instructions>
             <Bundle-Name>CXF DOSGi System Tests Common Bundle</Bundle-Name>
             <Bundle-Description>This bundle contains common classes used by the system tests.</Bundle-Description>
-            <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
             <Import-Package>${bundle.import.package}</Import-Package>
             <Export-Package>${bundle.export.package}</Export-Package> 

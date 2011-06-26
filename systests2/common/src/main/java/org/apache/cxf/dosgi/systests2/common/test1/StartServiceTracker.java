@@ -33,6 +33,7 @@ public class StartServiceTracker extends ServiceTracker {
 
     @Override
     public Object addingService(ServiceReference reference) {
+        System.out.println("Test object available, so starting the service client tracker...");
         tracker.open();
         return super.addingService(reference);
     }

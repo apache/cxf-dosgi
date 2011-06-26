@@ -44,7 +44,7 @@ public class MultiBundleTools {
     }
     
     private static int getDistroBundles(File mdRoot, String pomVersion, Map<Integer, String> bundles, boolean discovery) throws Exception {
-        File distroDir = new File(mdRoot, "target/cxf-dosgi-ri-multibundle-distribution-" + pomVersion + ".dir");
+        File distroDir = new File(mdRoot, "target/cxf-dosgi-ri-multibundle-distribution-" + pomVersion + "-dir");
         Properties p = new Properties();
         File confDir = new File(distroDir, "apache-cxf-dosgi-ri-" + pomVersion + "/conf");
         p.load(new FileInputStream(new File(confDir, "felix.config.properties.append")));

@@ -58,7 +58,7 @@
           <instructions>
             <Bundle-Name>${pom.name}</Bundle-Name>
             <Bundle-Description>This bundle contains the server-side implementation of the Distributed OSGi Discovery sample.</Bundle-Description>
-            <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Activator>org.apache.cxf.dosgi.samples.discovery.impl.Activator</Bundle-Activator>
             <Import-Package>
               org.apache.cxf.dosgi.samples.discovery,

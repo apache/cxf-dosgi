@@ -87,6 +87,8 @@ public class Activator implements ManagedService,BundleContextAware {
                                      org.apache.cxf.dosgi.dsw.Constants.RS_CONFIG_TYPE
         };
         props.put("remote.configs.supported", supportedConfigs);
+        
+        LOG.info("Registering RemoteServiceAdminFactory...");
 
         rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
         return rsaf;

@@ -31,10 +31,12 @@
 
     <properties>
         <topDirectoryLocation>../..</topDirectoryLocation>
-        <bundle.import.package>*</bundle.import.package>
+        <bundle.import.package>
+            org.osgi.service.remoteserviceadmin;version="[${remote.service.admin.interfaces.version},2)",
+            *
+        </bundle.import.package>
         <bundle.export.package>
-            org.apache.cxf.dosgi.*;version="${pom.version}",
-            org.osgi.service.remoteserviceadmin;version="${remote.service.admin.interfaces.version}"
+            org.apache.cxf.dosgi.*;version="${project.version}"
         </bundle.export.package>
     </properties>
 
@@ -54,7 +56,7 @@
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>
             <artifactId>cxf-dosgi-remote-service-admin-interfaces</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -80,7 +82,7 @@
                     <instructions>
                         <Bundle-Name>CXF dOSGi Topology Manager</Bundle-Name>
                         <Bundle-Description>Default CXF Topology Manager as described in OSGi Remote Service Admin specification.</Bundle-Description>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
                         <Bundle-Activator>org.apache.cxf.dosgi.topologymanager.Activator</Bundle-Activator>
                         <Import-Package>${bundle.import.package}</Import-Package>

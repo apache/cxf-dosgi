@@ -38,6 +38,13 @@
     </properties>
     
     <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>${osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency> 
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
@@ -53,7 +60,7 @@
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>
             <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- This is a zookeeper dependency that we apparently have to list here -->
@@ -85,7 +92,7 @@
                     <instructions>
                         <Bundle-Name>ZooKeeper server control bundle</Bundle-Name>
                         <Bundle-Description>This bundle can run the ZooKeeper server in an OSGi Framework</Bundle-Description>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.apache.cxf.dosgi.discovery.zookeeper.server.Activator</Bundle-Activator>
                         <Import-Package>*</Import-Package>
                         <Private-Package>org.apache.cxf.dosgi.discovery.zookeeper.server</Private-Package>

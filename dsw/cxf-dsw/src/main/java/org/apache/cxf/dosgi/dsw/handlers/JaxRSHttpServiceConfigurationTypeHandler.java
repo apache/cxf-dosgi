@@ -79,7 +79,7 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
         List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
         if (resources != null) {
             factory.setModelBeansWithServiceClass(resources, iClass);
-            factory.setServiceBeans(serviceBean);
+            factory.setServiceBeanObjects(serviceBean);
         } else {
             factory.setServiceClass(iClass);
             factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));

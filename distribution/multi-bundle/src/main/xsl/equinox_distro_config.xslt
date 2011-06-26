@@ -2,7 +2,7 @@
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
   <xsl:param name="Version"/>
-  <xsl:variable name = "Basename">.dir/apache-cxf-dosgi-ri-<xsl:value-of select="$Version"/>/dosgi_bundles/</xsl:variable>
+  <xsl:variable name = "Basename">-dir/apache-cxf-dosgi-ri-<xsl:value-of select="$Version"/>/dosgi_bundles/</xsl:variable>
   <xsl:template match="/">
 org.ops4j.pax.web.session.timeout=30
 

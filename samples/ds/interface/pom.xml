@@ -40,7 +40,7 @@
           <instructions>
             <Bundle-Name>${pom.name}</Bundle-Name>
             <Bundle-Description>This bundle contains the interfaces of the Distributed OSGi with Declarative Services sample.</Bundle-Description>
-            <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package />
             <Export-Package>org.apache.cxf.dosgi.samples.ds</Export-Package> 
           </instructions>

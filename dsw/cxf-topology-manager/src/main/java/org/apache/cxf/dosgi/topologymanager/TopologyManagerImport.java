@@ -29,10 +29,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ImportReference;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
@@ -44,10 +44,10 @@ public class TopologyManagerImport {
     private ExecutorService execService = new ThreadPoolExecutor(5, 10, 50, TimeUnit.SECONDS,
                                                                  new LinkedBlockingQueue<Runnable>());
 
-    private EndpointListenerImpl endpointListener;
-    private BundleContext bctx;
-    private RemoteServiceAdminList remoteServiceAdminList;
-    private ListenerHookImpl listenerHook;
+    private final EndpointListenerImpl endpointListener;
+    private final BundleContext bctx;
+    private final RemoteServiceAdminList remoteServiceAdminList;
+    private final ListenerHookImpl listenerHook;
 
     /**
      * If set to false only one service is imported for each import interest even it multiple services are
@@ -62,7 +62,7 @@ public class TopologyManagerImport {
      * counter. If an interest is removed, the related ServiceInterest object is used to reduce the reference
      * counter until it reaches zero. in this case the interest is removed.
      */
-    private Map<String/* filter */, ImportInterest> importInterests = new HashMap<String, ImportInterest>();
+    private final Map<String/* filter */, ImportInterest> importInterests = new HashMap<String, ImportInterest>();
 
     private static class ImportInterest {
         String filter;
@@ -86,14 +86,18 @@ public class TopologyManagerImport {
     /**
      * FIXME: Documnet me .... !
      */
-    private Map<String /* filter */, List<EndpointDescription>> importPossibilities = new HashMap<String, List<EndpointDescription>>();
-    private Map<String /* filter */, List<ImportRegistration>> importedServices = new HashMap<String, List<ImportRegistration>>();
+    private final Map<String /* filter */, List<EndpointDescription>> importPossibilities = new HashMap<String, List<EndpointDescription>>();
+    private final Map<String /* filter */, List<ImportRegistration>> importedServices = new HashMap<String, List<ImportRegistration>>();
 
     public TopologyManagerImport(BundleContext bc, RemoteServiceAdminList rsaList) {
         bctx = bc;
         remoteServiceAdminList = rsaList;
         endpointListener = new EndpointListenerImpl(bctx, this);
         listenerHook = new ListenerHookImpl(bctx, this);
+        
+        if(rsaList == null || rsaList.size() == 0) {
+            LOG.log(Level.WARNING, "No RemoteServiceAdmin service available!");
+        }
     }
 
     public void start() {
@@ -134,8 +138,9 @@ public class TopologyManagerImport {
                 // remove reference
                 if (i.removeReference() <= 0) {
                     // last reference, remove from scope
-                    LOG.fine("last reference to import interest is gone -> removing interest  filter:"
-                             + exFilter);
+                    LOG.log(Level.FINE,
+                            "last reference to import interest is gone -> removing interest  filter: {0}",
+                            exFilter);
                     endpointListener.reduceScope(exFilter);
                     importInterests.remove(exFilter);
                     List<ImportRegistration> irs = importedServices.remove(exFilter);
@@ -171,7 +176,9 @@ public class TopologyManagerImport {
 
     public void addImportableService(String filter, EndpointDescription epd) {
 
-        LOG.fine("importable service added for filter " + filter + " -> " + epd);
+        LOG.log(Level.FINE, "importable service added for filter {0} -> {1}",
+                new Object[]{filter, epd});
+
         synchronized (importPossibilities) {
             List<EndpointDescription> ips = importPossibilities.get(filter);
             if (ips == null) {
@@ -187,7 +194,7 @@ public class TopologyManagerImport {
 
     private void triggerImport(final String filter) {
 
-        LOG.fine("import of a service for filter " + filter + " was queued");
+        LOG.log(Level.FINE, "import of a service for filter {0} was queued", filter);
 
         execService.execute(new Runnable() {
             public void run() {
@@ -304,6 +311,12 @@ public class TopologyManagerImport {
 
     private ImportRegistration importService(EndpointDescription ep) {
         synchronized (remoteServiceAdminList) {
+            if(remoteServiceAdminList == null || remoteServiceAdminList.size() == 0) {
+                LOG.log(Level.WARNING,
+                        "Unable to import service ({0}): no RemoteServiceAdmin service available!",
+                        ep);
+            }
+
             for (RemoteServiceAdmin rsa : remoteServiceAdminList) {
                 ImportRegistration ir = rsa.importService(ep);
                 if (ir != null && ir.getException() == null) {

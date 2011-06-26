@@ -18,17 +18,23 @@
   */
 package org.apache.cxf.dosgi.discovery.local.internal;
 
+import java.util.logging.Logger;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
+
+    private static final Logger LOG = Logger.getLogger(Activator.class.getName());
+
     LocalDiscovery localDiscovery;
     
     public synchronized void start(BundleContext context) {
         localDiscovery = new LocalDiscovery(context);
+        LOG.info("Local D-OSGi service discovery started");
     }
 
     public synchronized void stop(BundleContext context) {
         localDiscovery.shutDown();
+        LOG.info("Local D-OSGi service discovery stopped");
     }
 }
