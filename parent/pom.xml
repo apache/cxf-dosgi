@@ -23,10 +23,10 @@
 
         <osgi.version>4.2.0</osgi.version>
 
-        <cxf.version>2.4.1</cxf.version>
-        <cxf.build-utils.version>2.3.2</cxf.build-utils.version>
+        <cxf.version>2.5.0</cxf.version>
+        <cxf.build-utils.version>2.4.0</cxf.build-utils.version>
         <felix.version>3.0.8</felix.version>
-        <spring.version>3.0.5.RELEASE</spring.version>
+        <spring.version>3.0.6.RELEASE</spring.version>
         <spring.osgi.version>1.2.1</spring.osgi.version>
         <zookeeper.version>3.2.1</zookeeper.version>
 
@@ -37,16 +37,16 @@
         <servlet.version>3.0</servlet.version>
         <log4j.version>1.2.15</log4j.version>
         <jetty.version>7.4.2.v20110526</jetty.version>
-        <xmlschema.bundle.version>2.0</xmlschema.bundle.version>
+        <xmlschema.bundle.version>2.0.1</xmlschema.bundle.version>
         <xmlresolver.bundle.version>1.2_4</xmlresolver.bundle.version>          
-        <neethi.bundle.version>3.0.0</neethi.bundle.version>
+        <neethi.bundle.version>3.0.1</neethi.bundle.version>
         <wsdl4j.bundle.version>1.6.2_5</wsdl4j.bundle.version> <!-- CXF uses 1.6.2 -->
         <xmlsec.bundle.version>1.4.5_1</xmlsec.bundle.version>
         <asm.bundle.version>3.3_2</asm.bundle.version> 
         <commons.pool.bundle.version>1.5.4_1</commons.pool.bundle.version>
         <woodstox.bundle.version>4.1.1</woodstox.bundle.version> <!-- CXF 2.4.1 uses 4.1.1 -->
         <jaxbimpl.bundle.version>2.1.13_2</jaxbimpl.bundle.version> <!-- CXF 2.4.1 uses 2.1.13_2 -->
-        <slf4j.version>1.5.0</slf4j.version>
+        <slf4j.version>1.6.2</slf4j.version>
 
         <felix.plugin.version>2.3.4</felix.plugin.version>
     </properties>
