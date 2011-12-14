@@ -64,9 +64,23 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.cxf.dosgi</groupId>
-            <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>${zookeeper.version}</version>
+            <exclusions>
+                <exclusion>
+                   <groupId>com.sun.jdmk</groupId>
+                   <artifactId>jmxtools</artifactId> 
+                </exclusion>
+                <exclusion>
+                   <groupId>com.sun.jmx</groupId>
+                   <artifactId>jmxri</artifactId> 
+                </exclusion>
+                <exclusion>
+                   <groupId>log4j</groupId>
+                   <artifactId>log4j</artifactId> 
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <dependency>
