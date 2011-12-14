@@ -45,7 +45,7 @@ public class ManagedServiceTest extends TestCase {
                 ServerConfig sc = (ServerConfig) EasyMock.getCurrentArguments()[0];
                 assertEquals(new File(tempDir, "zkdata").getCanonicalFile().toString(), 
                     sc.getDataDir());
-                assertEquals(1234, sc.getClientPort());
+                assertEquals(1234, sc.getClientPortAddress().getPort());
                 assertEquals(2000, sc.getTickTime());
                 return null;
             }

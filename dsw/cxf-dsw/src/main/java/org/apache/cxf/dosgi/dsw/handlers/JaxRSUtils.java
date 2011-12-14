@@ -85,7 +85,7 @@ public class JaxRSUtils {
             .getBooleanProperty(sd, org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_EXPECTED_PROP_KEY);
 
         try {
-            ServiceReference[] refs = callingContext.getServiceReferences(null, PROVIDERS_FILTER);
+            ServiceReference[] refs = callingContext.getServiceReferences((String)null, PROVIDERS_FILTER);
             if (refs != null) {
                 for (ServiceReference ref : refs) {
                     if (!cxfProvidersOnly
