@@ -9,7 +9,7 @@ org.osgi.framework.startlevel.beginning=<xsl:value-of select="count(//bundles/fe
 felix.auto.start.<xsl:value-of select="$Offset"/>=http://repo2.maven.org/maven2/org/osgi/org.osgi.compendium/4.2.0/org.osgi.compendium-4.2.0.jar
     <xsl:for-each select="//bundles/bundle">
       <xsl:variable name="i" select="position() + count(//bundles/felix_deps) + $Offset"/>
-felix.auto.start.<xsl:value-of select="$i"/>=file:/<xsl:value-of select="$TargetDir"/><xsl:value-of select="text()"/>
+felix.auto.start.<xsl:value-of select="$i"/>=file:<xsl:if test="not(starts-with($TargetDir,'/'))"><xsl:value-of select="'/'"/></xsl:if><xsl:value-of select="$TargetDir"/><xsl:value-of select="text()"/>
     </xsl:for-each>
   </xsl:template>
 </xsl:transform>
