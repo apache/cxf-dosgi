@@ -589,12 +589,15 @@ public final class OsgiUtils {
 
             String pack = iClass.getPackage().getName();
             LOG.finest("Looking for Package: " + pack);
-
-            for (ExportedPackage p : ep) {
-                if (pack.equals(p.getName())) {
-                    LOG.fine("found package -> Version: " + p.getVersion());
-                    return p.getVersion().toString();
-                }
+            if (ep != null) {
+	            for (ExportedPackage p : ep) {
+	            	if (p != null) {
+		                if (pack.equals(p.getName())) {
+		                    LOG.fine("found package -> Version: " + p.getVersion());
+		                    return p.getVersion().toString();
+		                }
+	            	}
+	            }
             }
         } else {
             LOG.severe("Was unable to obtain the package admin service -> can't resolve interface versions");
