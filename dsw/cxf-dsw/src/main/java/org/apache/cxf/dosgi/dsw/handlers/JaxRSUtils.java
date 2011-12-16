@@ -53,7 +53,9 @@ public class JaxRSUtils {
                                                   + Constants.OBJECTCLASS
                                                   + "=org.apache.cxf.jaxrs.ext.ResponseHandler" + ")" + "("
                                                   + Constants.OBJECTCLASS
-                                                  + "=org.apache.cxf.jaxrs.ext.ParameterHandler" + ")" + ")";
+                                                  + "=org.apache.cxf.jaxrs.ext.ParameterHandler" + ")" + "("
+                                                  + Constants.OBJECTCLASS
+                                                  + "=org.apache.cxf.jaxrs.ext.ResponseExceptionMapper" + ")" + ")";
 
     public static List<Object> getProviders(BundleContext callingContext, BundleContext dswBC, Map sd) {
 
