@@ -68,6 +68,11 @@
       <artifactId>com.springsource.org.apache.commons.logging</artifactId>
       <version>1.1.1</version>
     </dependency>
+    <dependency>
+	<groupId>org.osgi</groupId>
+	<artifactId>org.osgi.enterprise</artifactId>
+	<version>${osgi.version}</version>
+    </dependency> 
     <dependency>  
         <groupId>org.slf4j</groupId>  
         <artifactId>com.springsource.slf4j.api</artifactId>  
@@ -245,11 +250,6 @@
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle-minimal</artifactId>
       <version>${cxf.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.cxf.dosgi</groupId>
-      <artifactId>cxf-dosgi-remote-service-admin-interfaces</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf.dosgi</groupId>

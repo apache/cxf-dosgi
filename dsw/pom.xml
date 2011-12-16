@@ -23,6 +23,5 @@
     <modules>
       <module>cxf-dsw</module>
       <module>cxf-topology-manager</module>
-      <module>cxf-osgi-remote-service-admin-interfaces</module>
     </modules> 
 </project>
