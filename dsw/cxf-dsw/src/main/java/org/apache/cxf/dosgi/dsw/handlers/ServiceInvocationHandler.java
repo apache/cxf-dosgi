@@ -19,11 +19,9 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,18 +65,21 @@ public class ServiceInvocationHandler implements InvocationHandler {
             }); 
         } catch (Throwable ex) {
             Throwable theCause = ex.getCause() == null ? ex : ex.getCause();
-            
+            Throwable theCauseCause = theCause.getCause() == null ? theCause : theCause.getCause();
             List<Class<?>> excTypes = exceptionsMap.get(m);
             if (excTypes != null) {
                 for (Class<?> type : excTypes) {
                     if (type.isAssignableFrom(theCause.getClass())) {
                         throw theCause;
                     }
+                    if (type.isAssignableFrom(theCauseCause.getClass())) {
+                        throw theCauseCause;
+                    }
                 }
+                
             }
                         
-            throw new InvocationTargetException(
-                    new ServiceException(REMOTE_EXCEPTION_TYPE, theCause));
+            throw new ServiceException(REMOTE_EXCEPTION_TYPE, theCause);
         } finally {
             Thread.currentThread().setContextClassLoader(oldCl);
         }

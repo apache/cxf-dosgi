@@ -95,7 +95,7 @@ public abstract class AbstractTestImportService {
     
             // Wait for the service tracker in the test bundle to register a service with the test result
             ServiceReference ref = waitService(String.class.getName(), "(testResult=test1)");
-            Assert.assertEquals("HiOSGi", ref.getProperty("result"));
+            Assert.assertEquals("HiOSGi;exception", ref.getProperty("result"));
         } finally {
             if(server != null) {
                 server.stop();

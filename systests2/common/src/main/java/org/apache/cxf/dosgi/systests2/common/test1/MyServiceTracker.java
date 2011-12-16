@@ -21,9 +21,12 @@ package org.apache.cxf.dosgi.systests2.common.test1;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.apache.cxf.dosgi.samples.greeter.GreeterData;
+import org.apache.cxf.dosgi.samples.greeter.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -49,13 +52,17 @@ public class MyServiceTracker extends ServiceTracker {
 
     private void invokeGreeter(GreeterService svc) {
         try {
-            Map<GreetingPhrase, String> result = svc.greetMe("OSGi");
+        	Map<GreetingPhrase, String> result = svc.greetMe("OSGi");
             for (Map.Entry<GreetingPhrase, String> e : result.entrySet()) {
                 GreetingPhrase key = e.getKey();
                 invocationResult.append(key.getPhrase());
                 invocationResult.append(e.getValue());
             }
-
+            try {
+        	    svc.greetMe(new GreeterDataImpl() {});
+        	} catch (GreeterException ex) {
+        		invocationResult.append(";exception");
+        	} 
             Hashtable<String, Object> props = new Hashtable<String, Object>();
             props.put("result", invocationResult.toString());
             props.put("testResult", "test1");
@@ -67,4 +74,23 @@ public class MyServiceTracker extends ServiceTracker {
             x.printStackTrace(System.err);
         }
     }    
+    
+    private static class GreeterDataImpl implements GreeterData {
+
+		public int getAge() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		public String getName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public boolean isException() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+    	
+    }
 }
