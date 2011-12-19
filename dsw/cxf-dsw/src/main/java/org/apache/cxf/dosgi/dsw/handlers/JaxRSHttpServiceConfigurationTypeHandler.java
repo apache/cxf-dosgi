@@ -66,7 +66,9 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
         CXFNonSpringServlet cxf = new CXFNonSpringServlet();
         HttpService httpService = getHttpService();
         try {
-            HttpContext httpContext = getHttpContext(dswContext, httpService);                                httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(),                                         httpContext);
+            HttpContext httpContext = getHttpContext(dswContext, httpService);
+            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), httpContext);
+            registerUnexportHook(exportRegistration, contextRoot);
             LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
         } catch (Exception e) {
             throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);

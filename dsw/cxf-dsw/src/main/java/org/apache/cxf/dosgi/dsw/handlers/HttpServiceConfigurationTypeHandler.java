@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Dictionary;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +42,11 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceException;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
@@ -54,7 +58,8 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     private static final Logger LOG = Logger.getLogger(HttpServiceConfigurationTypeHandler.class.getName());
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
-
+    Map<Long, String> exportedAliases = Collections.synchronizedMap(new HashMap<Long, String>());
+    
     protected HttpServiceConfigurationTypeHandler(BundleContext dswBC,
 
     Map<String, Object> handlerProps) {
@@ -129,22 +134,29 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         try {
             httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), 
                                        getHttpContext(dswContext, httpService));
+            registerUnexportHook(exportRegistration, contextRoot);
+            
             LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
         } catch (Exception e) {
             throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
         }
         Bus bus = cxf.getBus();
+        final ServiceReference sref = exportRegistration.getExportedService();
         DataBinding databinding;
         String dataBindingImpl = (String)exportRegistration.getExportedService()
             .getProperty(Constants.WS_DATABINDING_PROP_KEY);
-        if ("jaxb".equals(dataBindingImpl)) {
+        String dataBindingImpl2 = (String) sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
+        if ("jaxb".equals(dataBindingImpl) || "jaxb".equals(dataBindingImpl2)) {
             databinding = new JAXBDataBinding();
         } else {
             databinding = new AegisDatabinding();
         }
         String frontEndImpl = (String)exportRegistration.getExportedService()
             .getProperty(Constants.WS_FRONTEND_PROP_KEY);
-        ServerFactoryBean factory = createServerFactoryBean(frontEndImpl);
+        String frontEndImpl2 = (String) sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
+        
+        ServerFactoryBean factory = 
+        	createServerFactoryBean(frontEndImpl != null ? frontEndImpl : frontEndImpl2);
         String address = constructAddress(dswContext, contextRoot);
         factory.setBus(bus);
         factory.setServiceClass(iClass);
@@ -300,4 +312,68 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
 
         return address;
     }
+    
+    /**
+     * This listens for service removal events and "un-exports" the service
+     * from the HttpService.
+     * 
+     * @param reference The service reference to track
+     * @param alias The HTTP servlet context alias
+     */
+    protected void registerUnexportHook(ExportRegistrationImpl export, String alias) {
+    	final ServiceReference sref = export.getExportedService();
+        final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
+        LOG.log(Level.FINE, "Registering service listener for service with ID {0}", sid);
+     
+        String previous = exportedAliases.put(sid, alias);
+        if(previous != null) {
+            LOG.log(Level.WARNING, "Overwriting service export for service with ID {0}", sid);
+        }
+        
+        try {
+            Filter f = bundleContext.createFilter("(" + org.osgi.framework.Constants.SERVICE_ID + "=" + sid + ")");
+            
+            if(f != null) {
+                bundleContext.addServiceListener(new ServiceListener() {
+     
+                    public void serviceChanged(ServiceEvent event) {
+
+                        if (event.getType() == ServiceEvent.UNREGISTERING) {
+                            final ServiceReference sref = event.getServiceReference();
+                            final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
+                            final String alias = exportedAliases.remove(sid);
+
+                            if(alias != null) {
+                                LOG.log(Level.FINE, "Unexporting HTTP servlet for alias ''{0}''...", alias);
+                                HttpService http = getHttpService();
+
+                                if(http != null) {
+                                    try {
+                                        http.unregister(alias);
+                                    } catch(Exception e) {
+                                        LOG.log(Level.WARNING,
+                                                "An exception occurred while unregistering service for HTTP servlet alias '"
+                                                + alias + "'", e);
+                                    }
+                                } else {
+                                    LOG.log(Level.WARNING,
+                                            "Unable to unexport HTTP servlet for alias ''{0}'': no HTTP service available",
+                                            alias);
+                                }
+                            } else {
+                                LOG.log(Level.WARNING,
+                                        "Unable to unexport HTTP servlet for service class ''{0}'', service-id {1}: no servlet alias found",
+                                        new Object[] {sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid});
+                            }
+                        }
+                    }
+                }, f.toString());
+            } else {
+                LOG.warning("Service listener could not be started. The service will not be automatically unexported.");
+            }
+        } catch (InvalidSyntaxException e) {
+            LOG.log(Level.WARNING, "Service listener could not be started. The service will not be automatically unexported.", e);
+        }
+    }
+
 }
