@@ -18,6 +18,9 @@
   */
 package org.apache.cxf.dosgi.samples.greeter.rest;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class GreetingPhrase {
     private String phrase;
     private String name;

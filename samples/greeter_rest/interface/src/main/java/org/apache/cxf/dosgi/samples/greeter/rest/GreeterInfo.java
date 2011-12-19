@@ -21,6 +21,8 @@ package org.apache.cxf.dosgi.samples.greeter.rest;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+@XmlRootElement
 public class GreeterInfo {
     private List<GreetingPhrase> greetings = new ArrayList<GreetingPhrase>();
     
