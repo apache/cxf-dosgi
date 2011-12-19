@@ -41,6 +41,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.ImportReference;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
@@ -307,9 +308,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     public Collection getImportedEndpoints() {
         synchronized (importedServices) {
-            List<ImportRegistrationImpl> irs = new ArrayList<ImportRegistrationImpl>();
+            List<ImportReference> irs = new ArrayList<ImportReference>();
             for (Collection<ImportRegistrationImpl> irl : importedServices.values()) {
-                irs.addAll(irl);
+            	for (ImportRegistrationImpl impl : irl) {
+            		irs.add(impl.getImportReference());
+            	}
             }
             return Collections.unmodifiableCollection(irs);
         }
