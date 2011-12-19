@@ -137,7 +137,7 @@
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-runtime</artifactId>
-      <version>1.0.3</version>
+      <version>1.0.8</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.aggregate</groupId>
@@ -147,7 +147,7 @@
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-jetty</artifactId>
-      <version>1.0.3</version>
+      <version>1.0.8</version>
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
