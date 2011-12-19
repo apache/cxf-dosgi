@@ -35,9 +35,49 @@ public final class ClassUtils {
                 return intf;
             }
         }
+        
         if (serviceClass.getName().equals(interfaceName)) {
             return serviceClass;
         }
+        
+        Class<?> interfaceOnProxiedClass = getInterfaceClassOnSuperClasses(serviceClass, interfaceName);
+        if (interfaceOnProxiedClass != null){
+        	return interfaceOnProxiedClass;
+        }
+        
         return null;
     }    
+    
+    /**
+     * <pre>
+     * 
+     * The following method tries to deal specifically with classes that might have been proxied 
+     * eg. CGLIB proxies of which there might be a chain of proxies as different osgi frameworks
+     * might be proxying the original service class that has been registered and then proxying the proxy.
+     * 
+     * </pre>
+     * 
+     * @param serviceClass
+     * @param interfaceName
+     * @return
+     */
+    private static Class<?> getInterfaceClassOnSuperClasses(Class<?> serviceClass, String interfaceName){
+        Class<?> superClass = serviceClass.getSuperclass();
+		if (superClass != null){
+		    for (Class<?> iClass : superClass.getInterfaces()) {
+	            if (iClass.getName().equals(interfaceName)) {
+	                return iClass;
+	            }
+	            Class<?> intf = getInterfaceClass(iClass, interfaceName);
+	            if (intf != null) {
+	                return intf;
+	            }
+	        }
+		    Class<?> foundOnSuperclass = getInterfaceClassOnSuperClasses(superClass, interfaceName);
+		    if (foundOnSuperclass != null){
+		    	return foundOnSuperclass;
+		    }
+		}
+    	return null;
+    }
 }

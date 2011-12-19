@@ -20,7 +20,9 @@ package org.apache.cxf.dosgi.dsw;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -32,4 +34,18 @@ public class ClassUtilsTest extends TestCase {
         assertEquals(List.class, ClassUtils.getInterfaceClass(new ArrayList(), "java.util.List"));
         assertEquals(Collection.class, ClassUtils.getInterfaceClass(new ArrayList(), "java.util.Collection"));
     }
+    
+    public void testGetInterfaceClassFromSubclass() {
+	    assertEquals(Map.class, ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.Map"));
+	    assertNull(ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.UnknownType"));
+    }
+    static class MyMapSubclass extends HashMap{}
+
+    static class MySubclassOne extends MyMapSubclass{}
+
+    static class MySubclassTwo extends MySubclassOne{}
+
+    static class MySubclassThree extends MySubclassTwo{}
+
+    static class MySubclassFour extends MySubclassThree{}
 }
