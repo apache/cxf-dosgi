@@ -75,7 +75,7 @@ public class ServiceListenerImpl implements ServiceListener {
      */
     private boolean analyzeService(ServiceReference sref) {
 
-        if ("*".equals(sref.getProperty(RemoteConstants.SERVICE_EXPORTED_INTERFACES))) {
+        if (sref.getProperty(RemoteConstants.SERVICE_EXPORTED_INTERFACES) != null) {
             return true;
         }
         return false;
