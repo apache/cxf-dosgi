@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.topologymanager;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -42,7 +41,6 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
-import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.osgi.util.tracker.ServiceTracker;
@@ -198,9 +196,12 @@ public class TopologyManager {
                 Map<RemoteServiceAdmin, Collection<ExportRegistration>> rsas = exportedServices.get(sref);
                 for (Map.Entry<RemoteServiceAdmin, Collection<ExportRegistration>> entry : rsas.entrySet()) {
                     if (entry.getValue() != null) {
-                        for (ExportRegistration exReg : entry.getValue()) {
-                            if (exReg != null)
-                                exReg.close();
+                    	Collection<ExportRegistration> registrations = entry.getValue();
+                        notifyListenersOfRemovalIfAppropriate(registrations);
+                        for (ExportRegistration exReg : registrations) {
+                            if (exReg != null) {
+                                 exReg.close();
+                            }
                         }
                     }
                 }
@@ -210,6 +211,12 @@ public class TopologyManager {
         }
     }
 
+    private void notifyListenersOfRemovalIfAppropriate(Collection<ExportRegistration> registrations) {
+    	for (ServiceReference endpointReference : stEndpointListeners.getServiceReferences()) {
+    	    notifyListenersOfRemovalIfAppropriate(endpointReference, registrations);
+    	}
+    }
+    
     protected void exportService(ServiceReference sref) {
 
         // add to local list of services that should/are be exported
