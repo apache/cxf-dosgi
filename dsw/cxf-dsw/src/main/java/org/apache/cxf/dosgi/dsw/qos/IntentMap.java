@@ -21,10 +21,11 @@ package org.apache.cxf.dosgi.dsw.qos;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
+
 public final class IntentMap {
 
-    private static final Logger LOG = 
-        Logger.getLogger(IntentMap.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(IntentMap.class);
 
     private Map<String, Object> intents; 
 

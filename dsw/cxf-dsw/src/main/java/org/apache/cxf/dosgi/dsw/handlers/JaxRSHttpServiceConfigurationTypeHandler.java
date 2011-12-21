@@ -26,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
@@ -42,8 +43,7 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigurationTypeHandler {
-    private static final Logger LOG = Logger.getLogger(JaxRSHttpServiceConfigurationTypeHandler.class
-        .getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(JaxRSHttpServiceConfigurationTypeHandler.class);
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
 

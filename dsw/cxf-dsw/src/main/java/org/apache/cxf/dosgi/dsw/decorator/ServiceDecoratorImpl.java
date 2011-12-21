@@ -29,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -40,7 +41,7 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceReference;
 
 public class ServiceDecoratorImpl implements ServiceDecorator {
-    private static final Logger LOG = Logger.getLogger(ServiceDecoratorImpl.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(ServiceDecoratorImpl.class);
     
     private final BundleContext bundleContext;
     private final BundleListenerImpl bundleListener;

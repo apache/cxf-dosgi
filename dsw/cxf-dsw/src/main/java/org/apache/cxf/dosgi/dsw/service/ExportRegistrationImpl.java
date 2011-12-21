@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Server;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -39,7 +40,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /// *************************** FIXME: some old methods might be in here **** 
 public class ExportRegistrationImpl implements ExportRegistration {
 
-    private Logger LOG = Logger.getLogger(ExportRegistrationImpl.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(ExportRegistrationImpl.class);
     
     private Server server;
     private boolean closed = false;

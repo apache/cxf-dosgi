@@ -18,11 +18,11 @@
   */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -30,12 +30,11 @@ import org.osgi.framework.Version;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 
 public class EventAdminHelper {
 
-    private final static Logger LOG = Logger.getLogger(EventAdminHelper.class.getName());
+    private final static Logger LOG = LogUtils.getL7dLogger(EventAdminHelper.class);
     
     private BundleContext bctx;
 

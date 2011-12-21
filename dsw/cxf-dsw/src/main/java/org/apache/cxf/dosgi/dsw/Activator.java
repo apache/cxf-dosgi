@@ -24,13 +24,11 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
-import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
-import org.apache.cxf.dosgi.dsw.service.ImportRegistrationImpl;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
@@ -43,12 +41,11 @@ import org.springframework.osgi.context.BundleContextAware;
 // registered as spring bean -> start / stop called accordingly 
 public class Activator implements ManagedService,BundleContextAware {
 
-    private final static Logger LOG = Logger.getLogger(Activator.class.getName());
+    private final static Logger LOG = LogUtils.getL7dLogger(Activator.class);
 
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
     private BundleContext bc;
 
-    private RemoteServiceadminFactory rsaFactory;
     private ServiceRegistration rsaFactoryReg;
 
     private ServiceRegistration decoratorReg;
@@ -60,7 +57,7 @@ public class Activator implements ManagedService,BundleContextAware {
         // should we have a seperate PID for a find and publish hook ?
         // context.registerService(ManagedService.class.getName(), this, getDefaults());
 
-        rsaFactory = registerRemoteServiceAdminService();
+        registerRemoteServiceAdminService();
 
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc),
                                           null);

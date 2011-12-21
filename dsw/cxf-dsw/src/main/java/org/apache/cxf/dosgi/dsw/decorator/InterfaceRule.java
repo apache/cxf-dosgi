@@ -26,12 +26,13 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
 public class InterfaceRule implements Rule {
-    private static final Logger LOG = Logger.getLogger(InterfaceRule.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(InterfaceRule.class);
     
     private final Bundle bundle;
     private final Pattern matchPattern;

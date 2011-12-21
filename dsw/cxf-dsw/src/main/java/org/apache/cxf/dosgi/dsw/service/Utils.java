@@ -28,13 +28,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 
 public class Utils {
 
-    private static final Logger LOG = Logger.getLogger(Utils.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(Utils.class);
     
     public static String[] normalizeStringPlus(Object object) {
 

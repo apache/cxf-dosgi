@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.AegisElementProvider;
@@ -34,11 +35,10 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class JaxRSUtils {
 
-    private static final Logger LOG = Logger.getLogger(JaxRSUtils.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(JaxRSUtils.class);
 
     public final static String MODEL_FOLDER = "/OSGI-INF/cxf/jaxrs/";
     public final static String DEFAULT_MODEL = "/OSGI-INF/cxf/jaxrs/model.xml";

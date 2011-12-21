@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
@@ -55,7 +56,7 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
-    private static final Logger LOG = Logger.getLogger(HttpServiceConfigurationTypeHandler.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(HttpServiceConfigurationTypeHandler.class);
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
     Map<Long, String> exportedAliases = Collections.synchronizedMap(new HashMap<Long, String>());

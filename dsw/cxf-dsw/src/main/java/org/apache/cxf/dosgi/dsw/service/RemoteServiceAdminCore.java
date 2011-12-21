@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.ClassUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
@@ -48,7 +49,7 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
 public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
-    private Logger LOG = Logger.getLogger(RemoteServiceAdminCore.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(RemoteServiceAdminCore.class);
 
     private final LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>> exportedServices = new LinkedHashMap<ServiceReference, Collection<ExportRegistrationImpl>>();
     private final LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices = new LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>>();

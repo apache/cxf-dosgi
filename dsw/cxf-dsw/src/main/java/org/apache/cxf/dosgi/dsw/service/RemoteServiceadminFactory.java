@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.cxf.jaxws.javaee.ResAuthType;
+import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
@@ -31,7 +31,7 @@ import org.osgi.framework.ServiceRegistration;
 
 public class RemoteServiceadminFactory implements ServiceFactory {
 
-    private Logger LOG = Logger.getLogger(RemoteServiceadminFactory.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(RemoteServiceadminFactory.class);
     private BundleContext bctx;
     private List<RemoteServiceAdminInstance> rsaServiceInstances = new ArrayList<RemoteServiceAdminInstance>();
 

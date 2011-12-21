@@ -19,10 +19,10 @@
 package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.handlers.ClientServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -33,7 +33,7 @@ import org.osgi.service.remoteserviceadmin.ImportRegistration;
 // *************************** FIXME: some old methods might be in here ****
 public class ImportRegistrationImpl implements ImportRegistration {
 
-    Logger LOG = Logger.getLogger(ImportRegistrationImpl.class.getName());
+    private final static Logger LOG = LogUtils.getL7dLogger(ImportRegistrationImpl.class);
 
     private Throwable exception;
     private ServiceRegistration importedService;

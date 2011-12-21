@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -38,7 +38,7 @@ import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
 public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
-    Logger LOG = Logger.getLogger(RemoteServiceAdminInstance.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(RemoteServiceAdminInstance.class);
 
     private BundleContext bctx;
     private RemoteServiceAdminCore rsaCore;

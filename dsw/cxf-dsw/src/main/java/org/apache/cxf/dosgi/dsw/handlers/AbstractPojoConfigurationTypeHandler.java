@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
@@ -45,7 +46,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
-    private static final Logger LOG = Logger.getLogger(AbstractPojoConfigurationTypeHandler.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractPojoConfigurationTypeHandler.class);
     private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
     private static final String CONFIGURATION_TYPE = "org.apache.cxf.ws";
     

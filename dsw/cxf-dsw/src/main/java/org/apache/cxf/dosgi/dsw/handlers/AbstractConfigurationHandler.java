@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.Utils;
@@ -38,7 +39,7 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public abstract class AbstractConfigurationHandler implements ConfigurationTypeHandler {
 
-    private static final Logger LOG = Logger.getLogger(AbstractConfigurationHandler.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractConfigurationHandler.class);
 
     final Map<String, Object> handlerProps;
     protected BundleContext bundleContext;

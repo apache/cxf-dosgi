@@ -20,10 +20,10 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.service.ImportRegistrationImpl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -33,7 +33,7 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class ClientServiceFactory implements ServiceFactory {
 
-    private static final Logger LOG = Logger.getLogger(ClientServiceFactory.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(ClientServiceFactory.class);
 
     private BundleContext dswContext;
     private Class<?> iClass;

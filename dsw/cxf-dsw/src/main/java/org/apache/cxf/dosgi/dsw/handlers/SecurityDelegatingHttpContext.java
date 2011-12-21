@@ -30,6 +30,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -48,7 +49,7 @@ import org.osgi.service.http.HttpContext;
  * </p>
  */
 public class SecurityDelegatingHttpContext implements HttpContext {
-  private static final Logger LOG = Logger.getLogger(SecurityDelegatingHttpContext.class.getName());
+  private static final Logger LOG = LogUtils.getL7dLogger(SecurityDelegatingHttpContext.class);
   public static final String FILTER_PROP = "org.apache.cxf.httpservice.filter";
   public static final String FILTER_REQUIRED_PROP = "org.apache.cxf.httpservice.requirefilter";
   private static final String FILTER_FILTER = "(" + FILTER_PROP + "=*)";

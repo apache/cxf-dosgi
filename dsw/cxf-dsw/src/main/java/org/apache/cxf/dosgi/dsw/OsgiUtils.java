@@ -28,12 +28,11 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.ws.policy.spring.PolicyNamespaceHandler;
@@ -49,14 +48,11 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
-import org.springframework.context.ApplicationContext;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 public final class OsgiUtils {
-
-    // TODO: cleanup old code fragments !!!
     
-    private static final Logger LOG = Logger.getLogger(OsgiUtils.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(OsgiUtils.class);
 
     private static final String REMOTE_SERVICES_HEADER_NAME = "Remote-Service";
     private static final String REMOTE_SERVICES_DIRECTORY = "OSGI-INF/remote-service";

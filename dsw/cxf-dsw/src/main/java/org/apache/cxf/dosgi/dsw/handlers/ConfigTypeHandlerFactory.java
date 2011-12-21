@@ -23,13 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.osgi.framework.BundleContext;
 
 public final class ConfigTypeHandlerFactory {
 
-    private static final Logger LOG = Logger.getLogger(ConfigTypeHandlerFactory.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(ConfigTypeHandlerFactory.class);
     private static final ConfigTypeHandlerFactory FACTORY = new ConfigTypeHandlerFactory();
 
     private ConfigTypeHandlerFactory() {

@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
@@ -37,7 +38,7 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
-    private static final Logger LOG = Logger.getLogger(PojoConfigurationTypeHandler.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(PojoConfigurationTypeHandler.class);
 
     public PojoConfigurationTypeHandler(BundleContext dswBC, Map<String, Object> handlerProps) {
         super(dswBC, handlerProps);

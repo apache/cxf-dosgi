@@ -20,25 +20,24 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Dictionary;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
-import org.apache.cxf.endpoint.Server;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
     private static final String CONFIGURATION_TYPE = "wsdl";
-    private static final Logger LOG = Logger.getLogger(WsdlConfigurationTypeHandler.class.getName());
+    private static final Logger LOG = LogUtils.getL7dLogger(WsdlConfigurationTypeHandler.class);
     
     public WsdlConfigurationTypeHandler(BundleContext dswBC,
                                

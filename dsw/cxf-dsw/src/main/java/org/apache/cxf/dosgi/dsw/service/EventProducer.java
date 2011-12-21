@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.dsw.service;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -32,11 +33,10 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener;
 
 public class EventProducer {
 
+    private final static Logger LOG = LogUtils.getL7dLogger(EventProducer.class);
     private BundleContext bctx;
     private EventAdminHelper eaHelper;
 
-    private Logger LOG = Logger.getLogger(EventProducer.class.getName());
-    
     public EventProducer(BundleContext bc) {
         bctx = bc;
         eaHelper = new EventAdminHelper(bctx);
