@@ -18,11 +18,9 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.util.Dictionary;
 import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
-import org.apache.cxf.endpoint.Server;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;

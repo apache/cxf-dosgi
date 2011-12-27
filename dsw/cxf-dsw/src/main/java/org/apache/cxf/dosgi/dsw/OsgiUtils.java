@@ -399,17 +399,14 @@ public final class OsgiUtils {
             Thread.currentThread().setContextClassLoader(PolicyNamespaceHandler.class.getClassLoader());
             
             LOG.fine("Loading Intent map from "+springIntentLocations);
-            System.out.println("Loading Intent map from "+springIntentLocations);
             OsgiBundleXmlApplicationContext ctx = new OsgiBundleXmlApplicationContext(springIntentLocations
                 .toArray(new String[] {}));
             ctx.setPublishContextAsService(false);
             ctx.setBundleContext(bundleContext);
             ctx.refresh();
             LOG.fine("application context: " + ctx);
-            System.out.println("application context: " + ctx);
             IntentMap im = (IntentMap)ctx.getBean("intentMap");
             LOG.fine("retrieved intent map: " + im);
-            System.out.println("retrieved intent map: " + im);
             // switch back 
             Thread.currentThread().setContextClassLoader(RemoteServiceAdminCore.class.getClassLoader());
             
