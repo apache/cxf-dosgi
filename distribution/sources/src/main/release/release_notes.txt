@@ -1,3 +1,34 @@
+Apache CXF Distributed OSGi 1.3 Release Notes
+=============================================
+
+
+The following modules have been removed from the destribution:
+
+* org.apache.cxf.dosgi:cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper
+
+  Zookeeper 3.3.1 bundle is now available. See DOSGI-100 for more information.
+
+* org.apache.cxf.dosgi:cxf-dosgi-remote-service-admin-interfaces
+
+  org.osgi:org.osgi.enterprize:4.2.0 artifact is now available. See DOSGI-104 for more information.
+
+Many dependencies have been updated, including the update to CXF 2.5.1. See also DOSGI-96.
+
+Additionally, a number of bugs has been fixed including:
+
+DOSGI-97    Automatically unregister HTTP servlets/resources if exported service goes down 	
+DOSGI-75    CXF Distributed OSGi isn't using org.apache.cxf.common.logging.LogUtils 
+DOSGI-102   DOSGI RI can not map invocation exceptions to custom exceptions on the client side
+DOSGI-91    DOSGI RS Proxies ignore ResponseExceptionMapper providers
+DOSGI-76    EndpointListener.endpointRemoved
+DOSGI-94    Enhancement to deal with registered services that might have been proxied
+DOSGI-103   Improve multi-bundle distro configuration for Felix
+DOSGI-77    NullPointerException from Distributed OSGI when bundle with wanted properties is started.
+DOSGI-79    RemoteServiceAdmin.getImportedEndpoints() returns collection of incorrect type
+DOSGI-85    Unable to export services started after Topology manager
+DOSGI-105   Update greeter_rest demo to use OSGI HttpService 	 
+
+
 Apache CXF Distributed OSGi 1.2 Release Notes
 =============================================
 
