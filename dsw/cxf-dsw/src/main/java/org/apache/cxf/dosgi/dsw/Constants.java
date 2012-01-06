@@ -39,7 +39,9 @@ public class Constants {
     public static final String WSDL_CONFIG_TYPE = "wsdl";
     public static final String WSDL_CONFIG_PREFIX = "osgi.remote.configuration" + "." + WSDL_CONFIG_TYPE;
     public static final String SERVICE_NAMESPACE = WSDL_CONFIG_PREFIX + ".service.ns";
-    
+    public static final String SERVICE_NAME = WSDL_CONFIG_PREFIX + ".service.name";
+    public static final String PORT_NAME = WSDL_CONFIG_PREFIX + ".port.name";
+    public static final String WSDL_LOCATION = WSDL_CONFIG_PREFIX + ".location";
     // Provider prefix
     public static final String PROVIDER_PREFIX = "org.apache.cxf";
     

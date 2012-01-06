@@ -28,14 +28,19 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
+public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
     private static final String CONFIGURATION_TYPE = "wsdl";
     private static final Logger LOG = LogUtils.getL7dLogger(WsdlConfigurationTypeHandler.class);
     
@@ -77,9 +82,16 @@ public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
             serviceNs = PackageUtils.getNamespace(
                             PackageUtils.getPackageName(iClass));
         }
-        QName serviceQname = new QName(serviceNs, iClass.getSimpleName());
+        String serviceName = OsgiUtils.getProperty(sd, Constants.SERVICE_NAME);
+        if (serviceName == null) {
+        	serviceName = iClass.getSimpleName();	
+        }
+        QName serviceQname = getServiceQName(iClass, sd.getProperties());
+        QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd.getProperties());
         Service service = createWebService(wsdlAddress, serviceQname);
-        Object proxy = getProxy(service.getPort(iClass), iClass);
+        Object proxy = getProxy(
+            portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass), 
+        	iClass);
         //MARC: FIXME !!!! getDistributionProvider().addRemoteService(serviceReference);
         return proxy;
         
@@ -90,6 +102,27 @@ public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
         return Service.create(wsdlAddress, serviceQname);
     }
 
+    private QName getServiceQName(Class<?> iClass, Map sd) {
+    	String serviceNs = OsgiUtils.getProperty(sd, Constants.SERVICE_NAMESPACE);
+        if (serviceNs == null) {
+            serviceNs = PackageUtils.getNamespace(
+                            PackageUtils.getPackageName(iClass));
+        }
+        String serviceName = OsgiUtils.getProperty(sd, Constants.SERVICE_NAME);
+        if (serviceName == null) {
+        	serviceName = iClass.getSimpleName();	
+        }
+        return new QName(serviceNs, serviceName);
+    }
+    
+    private QName getPortQName(String ns, Map sd) {
+    	String portName = OsgiUtils.getProperty(sd, Constants.PORT_NAME);
+        if (portName == null) {
+        	return null;	
+        }
+        return new QName(ns, portName);
+    }
+    
     public void createServer(ExportRegistrationImpl exportRegistration,
                                BundleContext dswContext,
                                BundleContext callingContext,
@@ -97,8 +130,67 @@ public class WsdlConfigurationTypeHandler extends AbstractConfigurationHandler {
                                Class<?> iClass, 
                                Object serviceBean) {
         
-        throw new UnsupportedOperationException("No WSDL configuration is currently supported for"
-                  + " creating service endpoints");
+    	String location = OsgiUtils.getProperty(sd, Constants.WSDL_LOCATION);
+    	if (location == null) {
+    		LOG.warning("WSDL location is unavailable");
+            exportRegistration.setException(new Throwable("WSDL location is unavailable"));
+            return;
+    	}
+        URL wsdlURL = dswContext.getBundle().getResource(location);
+        if (wsdlURL == null) {
+    		LOG.warning("WSDL resource is unavailable");
+            exportRegistration.setException(new Throwable("WSDL resource is unavailable"));
+            return;
+    	}
+        
+    	String address = getPojoAddress(sd, iClass);
+        if (address == null) {
+            LOG.warning("Remote address is unavailable");
+            exportRegistration.setException(new Throwable("Remote address is unavailable"));
+            return;
+        }
+
+        LOG.info("Creating a " + iClass.getName() + " endpoint from CXF PublishHook, address is " + address);
+
+        DataBinding databinding = new JAXBDataBinding();
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+
+        factory.setServiceClass(iClass);
+        factory.setAddress(address);
+        factory.getServiceFactory().setDataBinding(databinding);
+        factory.setServiceBean(serviceBean);
+
+        QName serviceQname = getServiceQName(iClass, sd);
+        factory.setServiceName(serviceQname);
+        
+        QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd);
+        if (portQname != null) {
+        	factory.setEndpointName(portQname);
+        }
+        
+        factory.setWsdlURL(wsdlURL.toString());
+        
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
+
+            // The properties for the EndpointDescription
+            Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, address,intents);
+            
+            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
+            Server server = factory.create();
+
+            exportRegistration.setServer(server);
+            
+            //  add the information on the new Endpoint to the export registration
+            EndpointDescription ed = new EndpointDescription(endpointProps);
+            exportRegistration.setEndpointdescription(ed);
+            
+        } catch (IntentUnsatifiedException iue) {
+            exportRegistration.setException(iue);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldClassLoader);
+        }
     }
     
     private String getWsdlAddress(EndpointDescription sd, Class<?> iClass) {

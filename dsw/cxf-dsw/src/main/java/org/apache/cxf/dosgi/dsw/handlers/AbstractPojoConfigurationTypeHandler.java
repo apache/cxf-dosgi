@@ -226,5 +226,51 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return intentMap;
     }    
 
-
+    protected String getPojoAddress(Map sd, Class<?> iClass) {
+        String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
+        if(address == null && sd.get(RemoteConstants.ENDPOINT_ID)!=null ){
+            LOG.severe("Could not use address property " + RemoteConstants.ENDPOINT_ID );
+            return null;
+        }
+        
+        
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
+        }
+        if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY)!=null ){
+            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
+            return null;
+        }
+        
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);
+        }
+        if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY_OLD)!=null ){
+            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
+            return null;
+        }
+        
+        if (address == null) {
+            address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
+        }
+        if(address == null && sd.get(Constants.RS_ADDRESS_PROPERTY)!=null ){
+            LOG.severe("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
+            return null;
+        }
+        
+        
+        if (address == null) {
+            String port = null;
+            Object p = sd.get(Constants.WS_PORT_PROPERTY);
+            if (p instanceof String) {
+                port = (String) p;
+            }
+            
+            address = getDefaultAddress(iClass, port);
+            if (address != null) {
+                LOG.info("Using a default address : " + address);
+            }
+        }
+        return address;
+    }
 }
