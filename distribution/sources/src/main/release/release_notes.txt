@@ -16,6 +16,7 @@ Many dependencies have been updated, including the update to CXF 2.5.1. See also
 
 Additionally, a number of bugs has been fixed including:
 
+DOSGI-107   Better support for a wsdl configuration type 	
 DOSGI-97    Automatically unregister HTTP servlets/resources if exported service goes down 	
 DOSGI-75    CXF Distributed OSGi isn't using org.apache.cxf.common.logging.LogUtils 
 DOSGI-102   DOSGI RI can not map invocation exceptions to custom exceptions on the client side
