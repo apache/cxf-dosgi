@@ -60,7 +60,7 @@ public class AggregatedActivatorTest extends TestCase {
     public void testReadResourcesFile() throws Exception {        
         String[] expected = {
             "org.apache.felix.cm.impl.ConfigurationManager",
-            "org.apache.felix.fileinstall.FileInstall",
+            "org.apache.felix.fileinstall.internal.FileInstall",
             "org.ops4j.pax.web.service.internal.Activator",
             "org.apache.cxf.dosgi.discovery.local.internal.Activator",
             "org.apache.cxf.dosgi.dsw.Activator",
