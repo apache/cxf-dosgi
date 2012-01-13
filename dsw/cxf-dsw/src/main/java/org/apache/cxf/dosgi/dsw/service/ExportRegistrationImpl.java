@@ -87,6 +87,10 @@ public class ExportRegistrationImpl implements ExportRegistration {
         rsaCore.removeExportRegistration(this);
         
         parent.instanceClosed();
+        if (server != null) {
+        	server.stop();
+        	server = null;
+        }
     }
 
     private synchronized void instanceClosed() {
