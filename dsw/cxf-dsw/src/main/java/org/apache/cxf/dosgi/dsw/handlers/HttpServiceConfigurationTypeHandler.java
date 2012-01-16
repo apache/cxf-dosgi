@@ -36,8 +36,6 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.endpoint.ServerLifeCycleListener;
-import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -130,18 +128,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             return;
         }
 
-        CXFNonSpringServlet cxf = new CXFNonSpringServlet();
-        HttpService httpService = getHttpService();
-        try {
-            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), 
-                                       getHttpContext(dswContext, httpService));
-            registerUnexportHook(exportRegistration, contextRoot);
-            
-            LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
-        } catch (Exception e) {
-            throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
-        }
-        Bus bus = cxf.getBus();
+        Bus bus = registerServletAndGetBus(contextRoot, dswContext, exportRegistration);
         final ServiceReference sref = exportRegistration.getExportedService();
         DataBinding databinding;
         String dataBindingImpl = (String)exportRegistration.getExportedService()
@@ -181,9 +168,6 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
             
-            // TODO: does this still make sense ?!? 
-            registerStopHook(bus, httpService, server, contextRoot, Constants.WS_HTTP_SERVICE_CONTEXT);
-            
             endpdDesc = new EndpointDescription(endpointProps);
             exportRegistration.setServer(server);
      
@@ -197,11 +181,21 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         
      
     }
-
-    protected Map<String, String> registerPublication(Server server, String[] intents, String address) {
-        Map<String, String> publicationProperties = super.registerPublication(server, intents);
-        publicationProperties.put(Constants.WS_ADDRESS_PROPERTY, address);
-        return publicationProperties;
+    
+    protected Bus registerServletAndGetBus(String contextRoot, BundleContext dswContext,
+    		ExportRegistrationImpl exportRegistration) {
+    	CXFNonSpringServlet cxf = new CXFNonSpringServlet();
+        HttpService httpService = getHttpService();
+        try {
+            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), 
+                                       getHttpContext(dswContext, httpService));
+            registerUnexportHook(exportRegistration, contextRoot);
+            
+            LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
+        } catch (Exception e) {
+            throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
+        }
+        return cxf.getBus();
     }
 
     protected String constructAddress(BundleContext ctx, String contextRoot) {
@@ -238,9 +232,12 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     }
 
     protected String getServletContextRoot(Map sd, Class<?> iClass) {
-        String context = OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT);
+    	String context = OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT);
         if (context == null) {
             context = OsgiUtils.getProperty(sd, Constants.WS_HTTP_SERVICE_CONTEXT_OLD);
+        }
+        if (context == null) {
+            context = OsgiUtils.getProperty(sd, Constants.WSDL_HTTP_SERVICE_CONTEXT);
         }
 
         if (context == null) {
@@ -249,29 +246,6 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         }
         return context;
     }
-
-    protected void registerStopHook(Bus bus, final HttpService httpService, Server theServer,
-                                    final String contextRoot, final String propertyName) {
-        if (bus != null) {
-            theServer.getEndpoint().put(propertyName, contextRoot);
-            ServerLifeCycleListener stopHook = new ServerLifeCycleListener() {
-                public void stopServer(Server s) {
-                    Object contextProperty = s.getEndpoint().get(propertyName);
-                    if (contextProperty != null && contextProperty.equals(contextRoot)) {
-                        httpService.unregister(contextRoot);
-                    }
-                }
-
-                public void startServer(Server s) {
-                }
-            };
-            ServerLifeCycleManager mgr = bus.getExtension(ServerLifeCycleManager.class);
-            if (mgr != null) {
-                mgr.registerListener(stopHook);
-            }
-        }
-    }
-
 
     protected HttpContext getHttpContext(BundleContext bundleContext, HttpService httpService) {
 

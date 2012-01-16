@@ -42,6 +42,7 @@ public class Constants {
     public static final String SERVICE_NAME = WSDL_CONFIG_PREFIX + ".service.name";
     public static final String PORT_NAME = WSDL_CONFIG_PREFIX + ".port.name";
     public static final String WSDL_LOCATION = WSDL_CONFIG_PREFIX + ".location";
+    public static final String WSDL_HTTP_SERVICE_CONTEXT = WSDL_CONFIG_PREFIX + ".httpservice.context";
     // Provider prefix
     public static final String PROVIDER_PREFIX = "org.apache.cxf";
     

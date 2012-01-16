@@ -147,17 +147,17 @@
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-spi</artifactId>
-      <version>1.0.8</version>
+      <version>${pax.web.version}</version>
     </dependency>
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-runtime</artifactId>
-      <version>1.0.8</version>
+      <version>${pax.web.version}</version>
     </dependency>
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-jetty</artifactId>
-      <version>1.0.8</version>
+      <version>${pax.web.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>

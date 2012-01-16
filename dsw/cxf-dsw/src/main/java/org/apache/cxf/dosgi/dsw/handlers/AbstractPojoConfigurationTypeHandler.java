@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +35,6 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
-import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -73,17 +71,6 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
       } else {
         return new ServerFactoryBean();
       }
-    }
-
-    Map<String, String> registerPublication(Server server, String[] intents) {
-        Map<String, String> publicationProperties = new HashMap<String, String>();
-        publicationProperties.put(Constants.EXPORTED_CONFIGS, Constants.WS_CONFIG_TYPE);
-
-        String intentsValue = OsgiUtils.formatIntents(intents);
-        if (intentsValue.length() > 0) {
-            publicationProperties.put(Constants.INTENTS, intentsValue);
-        }
-        return publicationProperties;
     }
 
     String [] applyIntents(BundleContext dswContext,

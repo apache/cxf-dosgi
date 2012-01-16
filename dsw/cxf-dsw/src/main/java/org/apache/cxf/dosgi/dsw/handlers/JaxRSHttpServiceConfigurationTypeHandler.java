@@ -18,11 +18,8 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -34,22 +31,14 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.UserResource;
-import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.HttpService;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigurationTypeHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(JaxRSHttpServiceConfigurationTypeHandler.class);
 
-    Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
-
     protected JaxRSHttpServiceConfigurationTypeHandler(BundleContext dswBC,
-
-    Map<String, Object> handlerProps) {
+                                                       Map<String, Object> handlerProps) {
         super(dswBC, handlerProps);
     }
 
@@ -63,17 +52,7 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             return;
         }
 
-        CXFNonSpringServlet cxf = new CXFNonSpringServlet();
-        HttpService httpService = getHttpService();
-        try {
-            HttpContext httpContext = getHttpContext(dswContext, httpService);
-            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), httpContext);
-            registerUnexportHook(exportRegistration, contextRoot);
-            LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
-        } catch (Exception e) {
-            throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
-        }
-        Bus bus = cxf.getBus();
+        Bus bus = registerServletAndGetBus(contextRoot, dswContext, exportRegistration);
 
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
         factory.setBus(bus);
@@ -95,8 +74,6 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
 
         String address = constructAddress(dswContext, contextRoot);
 
-        
-
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             String[] intents = new String[] {
@@ -112,7 +89,6 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            registerStopHook(bus, httpService, server, contextRoot, Constants.RS_HTTP_SERVICE_CONTEXT);
 
             endpdDesc = new EndpointDescription(endpointProps);
             exportRegistration.setServer(server);

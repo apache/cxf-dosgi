@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
@@ -40,7 +41,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
+public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHandler {
     private static final String CONFIGURATION_TYPE = "wsdl";
     private static final Logger LOG = LogUtils.getL7dLogger(WsdlConfigurationTypeHandler.class);
     
@@ -144,19 +145,28 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     	}
         
     	String address = getPojoAddress(sd, iClass);
+    	String contextRoot = null;
         if (address == null) {
-            LOG.warning("Remote address is unavailable");
+        	contextRoot = getServletContextRoot(sd, iClass);
+            if (contextRoot == null) {
+                LOG.warning("Remote address is unavailable");
+            }
             exportRegistration.setException(new Throwable("Remote address is unavailable"));
             return;
         }
 
         LOG.info("Creating a " + iClass.getName() + " endpoint from CXF PublishHook, address is " + address);
 
+        Bus bus = null;
+        if (contextRoot != null) {
+        	bus = registerServletAndGetBus(contextRoot, dswContext, exportRegistration);
+        }
+        
         DataBinding databinding = new JAXBDataBinding();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
 
         factory.setServiceClass(iClass);
-        factory.setAddress(address);
+        factory.setAddress(address != null ? address : "/");
         factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
 
@@ -169,6 +179,9 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         }
         
         factory.setWsdlURL(wsdlURL.toString());
+        if (bus != null) {
+        	factory.setBus(bus);
+        }
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {

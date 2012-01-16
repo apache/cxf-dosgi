@@ -120,10 +120,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
     }
     
     public EndpointDescription getEndpointDescription() {
-        if (!closed)
-            return endpointDescription;
-        else
-            return null;
+        return endpointDescription;
     }
 
     public Throwable getException() {
@@ -183,10 +180,12 @@ public class ExportRegistrationImpl implements ExportRegistration {
     }
 
     public ExportReference getExportReference() {
-        if(exportReference==null){
-            exportReference = new ExportReferenceImpl(this);
-        }
-        return exportReference;
+    	synchronized (this) {
+	        if(exportReference==null){
+	            exportReference = new ExportReferenceImpl(this);
+	        }
+	        return exportReference;
+    	}
     }
 
     protected EndpointDescription getEndpointDescriptionAlways() {

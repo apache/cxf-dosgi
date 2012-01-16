@@ -366,7 +366,9 @@ public class TopologyManager {
             for (ExportRegistration exReg : exportRegistrations) {
 
                 // FIXME!!!!!!!!!!!!! There needs to be a better way ?!?!?!
-                Map props = exReg.getExportReference().getExportedEndpoint().getProperties();
+            	ExportReference ref = exReg.getExportReference(); 
+            	EndpointDescription endpoint = ref.getExportedEndpoint(); 
+                Map props = endpoint.getProperties();
                 Dictionary d = new Hashtable(props);
 
                 for (Filter filter : filters) {
