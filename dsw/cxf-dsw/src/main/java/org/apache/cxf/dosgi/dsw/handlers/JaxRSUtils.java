@@ -22,12 +22,12 @@ package org.apache.cxf.dosgi.dsw.handlers;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.dosgi.dsw.ClassUtils;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.AegisElementProvider;
@@ -63,19 +63,11 @@ public class JaxRSUtils {
         if ("aegis".equals(sd.get(org.apache.cxf.dosgi.dsw.Constants.RS_DATABINDING_PROP_KEY))) {
             providers.add(new AegisElementProvider());
         }
-        Object serviceProviders = sd.get(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY);
-        if (serviceProviders != null) {
-            if (serviceProviders.getClass().isArray()) {
-                if (serviceProviders.getClass().getComponentType() == String.class) {
-                    loadProviders(callingContext, providers, (String[])serviceProviders);
-                } else {
-                    providers.addAll(Arrays.asList((Object[])serviceProviders));
-                }
-            } else {
-                String[] classNames = serviceProviders.toString().split(",");
-                loadProviders(callingContext, providers, classNames);
-            }
-        }
+        
+        providers.addAll(
+        		ClassUtils.loadProviderClasses(callingContext, 
+                                               sd, 
+                                               org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY));
 
         Object globalQueryProp = sd.get(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_GLOBAL_PROP_KEY);
         boolean globalQueryRequired = globalQueryProp == null || OsgiUtils.toBoolean(globalQueryProp);
@@ -105,21 +97,7 @@ public class JaxRSUtils {
         return providers;
     }
 
-    private static void loadProviders(BundleContext callingContext, List<Object> providers,
-                                      String[] classNames) {
-        for (String className : classNames) {
-            try {
-                String realName = className.trim();
-                if (realName.length() > 0) {
-                    Class<?> pClass = callingContext.getBundle().loadClass(realName);
-                    providers.add(pClass.newInstance());
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                LOG.warning("JAXRS Provider " + className.trim() + " can not be loaded or created");
-            }
-        }
-    }
+    
 
     public static List<UserResource> getModel(BundleContext callingContext, Class<?> iClass) {
         String classModel = MODEL_FOLDER + iClass.getSimpleName() + "-model.xml";

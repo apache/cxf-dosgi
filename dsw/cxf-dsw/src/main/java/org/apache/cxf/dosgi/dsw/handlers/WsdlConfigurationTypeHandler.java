@@ -78,17 +78,18 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         LOG.info("Creating a " + sd.getInterfaces().toArray()[0] + " client, wsdl address is "
                  + OsgiUtils.getProperty(sd, Constants.WSDL_CONFIG_PREFIX));
         
-        String serviceNs = OsgiUtils.getProperty(sd, Constants.SERVICE_NAMESPACE);
+        String serviceNs = OsgiUtils.getProperty(sd, Constants.WSDL_SERVICE_NAMESPACE);
         if (serviceNs == null) {
             serviceNs = PackageUtils.getNamespace(
                             PackageUtils.getPackageName(iClass));
         }
-        String serviceName = OsgiUtils.getProperty(sd, Constants.SERVICE_NAME);
+        String serviceName = OsgiUtils.getProperty(sd, Constants.WSDL_SERVICE_NAME);
         if (serviceName == null) {
         	serviceName = iClass.getSimpleName();	
         }
-        QName serviceQname = getServiceQName(iClass, sd.getProperties());
-        QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd.getProperties());
+        QName serviceQname = getServiceQName(iClass, sd.getProperties(),
+        		Constants.WSDL_SERVICE_NAMESPACE, Constants.WSDL_SERVICE_NAME);
+        QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd.getProperties(), Constants.WSDL_PORT_NAME);
         Service service = createWebService(wsdlAddress, serviceQname);
         Object proxy = getProxy(
             portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass), 
@@ -103,27 +104,6 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         return Service.create(wsdlAddress, serviceQname);
     }
 
-    private QName getServiceQName(Class<?> iClass, Map sd) {
-    	String serviceNs = OsgiUtils.getProperty(sd, Constants.SERVICE_NAMESPACE);
-        if (serviceNs == null) {
-            serviceNs = PackageUtils.getNamespace(
-                            PackageUtils.getPackageName(iClass));
-        }
-        String serviceName = OsgiUtils.getProperty(sd, Constants.SERVICE_NAME);
-        if (serviceName == null) {
-        	serviceName = iClass.getSimpleName();	
-        }
-        return new QName(serviceNs, serviceName);
-    }
-    
-    private QName getPortQName(String ns, Map sd) {
-    	String portName = OsgiUtils.getProperty(sd, Constants.PORT_NAME);
-        if (portName == null) {
-        	return null;	
-        }
-        return new QName(ns, portName);
-    }
-    
     public void createServer(ExportRegistrationImpl exportRegistration,
                                BundleContext dswContext,
                                BundleContext callingContext,
@@ -170,10 +150,11 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
 
-        QName serviceQname = getServiceQName(iClass, sd);
+        QName serviceQname = getServiceQName(iClass, sd,
+        		Constants.WSDL_SERVICE_NAMESPACE, Constants.WSDL_SERVICE_NAME);
         factory.setServiceName(serviceQname);
         
-        QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd);
+        QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd, Constants.WSDL_PORT_NAME);
         if (portQname != null) {
         	factory.setEndpointName(portQname);
         }

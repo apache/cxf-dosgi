@@ -65,6 +65,11 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
             JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
             bean.setAddress(address);
 
+            addInterceptors(bean, callingContext, sd.getProperties(), Constants.RS_IN_INTERCEPTORS_PROP_KEY);
+            addInterceptors(bean, callingContext, sd.getProperties(), Constants.RS_OUT_INTERCEPTORS_PROP_KEY);
+            addFeatures(bean, callingContext, sd.getProperties(), Constants.RS_FEATURES_PROP_KEY);
+            addContextProperties(bean, callingContext, sd.getProperties(), Constants.RS_CONTEXT_PROPS_PROP_KEY);
+            
             List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
             if (resources != null) {
                 bean.setModelBeansWithServiceClass(resources, iClass);
@@ -119,7 +124,16 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
             factory.setProviders(providers);
         }
 
+        addInterceptors(factory, callingContext, sd, Constants.RS_IN_INTERCEPTORS_PROP_KEY);
+        addInterceptors(factory, callingContext, sd, Constants.RS_OUT_INTERCEPTORS_PROP_KEY);
+        addFeatures(factory, callingContext, sd, Constants.RS_FEATURES_PROP_KEY);
+        addContextProperties(factory, callingContext, sd, Constants.RS_CONTEXT_PROPS_PROP_KEY);
 
+        String location = OsgiUtils.getProperty(sd, Constants.RS_WADL_LOCATION);
+    	if (location != null) {
+    		factory.setDocLocation(location);
+    	}
+        
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             String[] intents = new String[] {

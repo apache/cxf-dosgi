@@ -65,13 +65,17 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             factory.setServiceClass(iClass);
             factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
         }
-
+        
         factory.setAddress("/");
         List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd);
         if (providers != null && providers.size() > 0) {
             factory.setProviders(providers);
         }
-
+        addInterceptors(factory, callingContext, sd, Constants.RS_IN_INTERCEPTORS_PROP_KEY);
+        addInterceptors(factory, callingContext, sd, Constants.RS_OUT_INTERCEPTORS_PROP_KEY);
+        addFeatures(factory, callingContext, sd, Constants.RS_FEATURES_PROP_KEY);
+        addContextProperties(factory, callingContext, sd, Constants.RS_CONTEXT_PROPS_PROP_KEY);
+        
         String address = constructAddress(dswContext, contextRoot);
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();

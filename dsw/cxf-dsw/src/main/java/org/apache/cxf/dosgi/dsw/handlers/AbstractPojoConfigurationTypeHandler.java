@@ -18,6 +18,7 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,8 +30,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.dosgi.dsw.ClassUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
@@ -38,6 +43,8 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
@@ -102,6 +109,82 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return appliedIntents.toArray(new String[0]);
     }
 
+    protected void setWsdlProperties(ServerFactoryBean factory, BundleContext dswContext, 
+    		Map sd) {
+    	String location = OsgiUtils.getProperty(sd, Constants.WS_WSDL_LOCATION);
+    	if (location != null) {
+    		URL wsdlURL = dswContext.getBundle().getResource(location);
+	        if (wsdlURL != null) {
+	            factory.setWsdlURL(wsdlURL.toString());
+	        }
+	        QName serviceName = getServiceQName(null, sd, 
+	        		Constants.WS_WSDL_SERVICE_NAMESPACE, Constants.WS_WSDL_SERVICE_NAME);
+	        if (serviceName != null) {
+	        	factory.setServiceName(serviceName);
+	            QName portName = getPortQName(serviceName.getNamespaceURI(), sd, Constants.WS_WSDL_PORT_NAME);
+	            if (portName != null) {
+	            	factory.setEndpointName(portName);
+	            }
+	        }
+    	}
+    }
+    
+    protected QName getServiceQName(Class<?> iClass, Map sd, String nsPropName, String namePropName) {
+    	String serviceNs = OsgiUtils.getProperty(sd, nsPropName);
+    	String serviceName = OsgiUtils.getProperty(sd, namePropName);
+    	if (iClass == null && (serviceNs == null || serviceName == null)) {
+    		return null;
+    	}
+    	if (serviceNs == null) {
+            serviceNs = PackageUtils.getNamespace(
+                            PackageUtils.getPackageName(iClass));
+        }
+        if (serviceName == null) {
+        	serviceName = iClass.getSimpleName();	
+        }
+        return new QName(serviceNs, serviceName);
+    }
+    
+    protected QName getPortQName(String ns, Map sd, String propName) {
+    	String portName = OsgiUtils.getProperty(sd, propName);
+        if (portName == null) {
+        	return null;	
+        }
+        return new QName(ns, portName);
+    }
+    
+    protected void addInterceptors(AbstractEndpointFactory factory, BundleContext callingContext, 
+    		Map sd, String propName) {
+
+        List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName); 
+        boolean in = propName.contains("in.interceptors");
+        for (int i = 0; i < providers.size(); i++) {
+        	Interceptor<?> interceptor = (Interceptor<?>)providers.get(i);  
+	        if (in) {
+	        	factory.getInInterceptors().add(interceptor);
+	        } else {
+	        	factory.getOutInterceptors().add(interceptor);
+	        }
+        }
+    }
+    
+    protected void addFeatures(AbstractEndpointFactory factory, BundleContext callingContext, 
+    		Map sd, String propName) {
+
+        List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName); 
+        if (providers.size() > 0) {
+        	factory.getFeatures().addAll(CastUtils.cast(providers, AbstractFeature.class));
+        }
+    }
+    
+    protected void addContextProperties(AbstractEndpointFactory factory, BundleContext callingContext, 
+    		Map sd, String propName) {
+    	Map<String, Object> props = (Map<String, Object>)sd.get(propName);
+        if (props != null) {
+        	factory.getProperties(true).putAll(props);
+        }
+    }
+    
     private boolean processIntent(Set<String> appliedIntents,
                                   List<AbstractFeature> features,
                                   AbstractEndpointFactory factory, String intentName,

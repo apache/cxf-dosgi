@@ -18,8 +18,20 @@
   */
 package org.apache.cxf.dosgi.dsw;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
+import org.osgi.framework.BundleContext;
+
 public final class ClassUtils {
-    private ClassUtils() {}
+	private static final Logger LOG = LogUtils.getL7dLogger(ClassUtils.class);
+	
+	private ClassUtils() {}
     
     public static Class<?> getInterfaceClass(Object service, String interfaceName) {
         return getInterfaceClass(service.getClass(), interfaceName);
@@ -79,5 +91,42 @@ public final class ClassUtils {
 		    }
 		}
     	return null;
+    }
+    
+public static List<Object> loadProviderClasses(BundleContext callingContext, Map sd, String propName) {
+    	
+    	Object serviceProviders = sd.get(propName);
+        if (serviceProviders != null) {
+            if (serviceProviders.getClass().isArray()) {
+                if (serviceProviders.getClass().getComponentType() == String.class) {
+                	return loadProviders(callingContext, (String[])serviceProviders);
+                } else {
+                    return Arrays.asList((Object[])serviceProviders);
+                }
+            } else {
+                String[] classNames = serviceProviders.toString().split(",");
+                return loadProviders(callingContext, classNames);
+            }
+        } else {
+        	return Collections.emptyList();
+        }
+    }
+    
+    private static List<Object> loadProviders(BundleContext callingContext,
+                                      String[] classNames) {
+    	List<Object> providers = new ArrayList<Object>();
+        for (String className : classNames) {
+            try {
+                String realName = className.trim();
+                if (realName.length() > 0) {
+                    Class<?> pClass = callingContext.getBundle().loadClass(realName);
+                    providers.add(pClass.newInstance());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                LOG.warning("Provider " + className.trim() + " can not be loaded or created");
+            }
+        }
+        return providers;
     }
 }
