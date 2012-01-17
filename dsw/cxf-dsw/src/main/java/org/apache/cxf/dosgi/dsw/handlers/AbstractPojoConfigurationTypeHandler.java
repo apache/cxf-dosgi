@@ -41,6 +41,7 @@ import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.helpers.CastUtils;
@@ -110,18 +111,63 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     }
 
     protected void setWsdlProperties(ServerFactoryBean factory, BundleContext dswContext, 
-    		Map sd) {
-    	String location = OsgiUtils.getProperty(sd, Constants.WS_WSDL_LOCATION);
+    		Map sd, boolean wsdlType) {
+    	String location = OsgiUtils.getProperty(sd, wsdlType ? Constants.WSDL_LOCATION : Constants.WS_WSDL_LOCATION);
     	if (location != null) {
     		URL wsdlURL = dswContext.getBundle().getResource(location);
 	        if (wsdlURL != null) {
 	            factory.setWsdlURL(wsdlURL.toString());
 	        }
 	        QName serviceName = getServiceQName(null, sd, 
-	        		Constants.WS_WSDL_SERVICE_NAMESPACE, Constants.WS_WSDL_SERVICE_NAME);
+	        		wsdlType ? Constants.WSDL_SERVICE_NAMESPACE : Constants.WS_WSDL_SERVICE_NAMESPACE, 
+	        		wsdlType ? Constants.WSDL_SERVICE_NAME : Constants.WS_WSDL_SERVICE_NAME);
 	        if (serviceName != null) {
 	        	factory.setServiceName(serviceName);
-	            QName portName = getPortQName(serviceName.getNamespaceURI(), sd, Constants.WS_WSDL_PORT_NAME);
+	            QName portName = getPortQName(serviceName.getNamespaceURI(), sd, 
+	            		wsdlType ? Constants.WSDL_PORT_NAME : Constants.WS_WSDL_PORT_NAME);
+	            if (portName != null) {
+	            	factory.setEndpointName(portName);
+	            }
+	        }
+    	}
+    }
+    
+    protected void addWsInterceptorsFeaturesProps(
+    		AbstractEndpointFactory factory, BundleContext callingContext, Map sd) {
+    	addInterceptors(factory, callingContext, sd, Constants.WS_IN_INTERCEPTORS_PROP_KEY);
+        addInterceptors(factory, callingContext, sd, Constants.WS_OUT_INTERCEPTORS_PROP_KEY);
+        addInterceptors(factory, callingContext, sd, Constants.WS_OUT_FAULT_INTERCEPTORS_PROP_KEY);
+        addInterceptors(factory, callingContext, sd, Constants.WS_IN_FAULT_INTERCEPTORS_PROP_KEY);
+        addFeatures(factory, callingContext, sd, Constants.WS_FEATURES_PROP_KEY);
+        addContextProperties(factory, callingContext, sd, Constants.WS_CONTEXT_PROPS_PROP_KEY);
+    }
+    
+    protected void addRsInterceptorsFeaturesProps(
+    		AbstractEndpointFactory factory, BundleContext callingContext, Map sd) {
+    	addInterceptors(factory, callingContext, sd, Constants.RS_IN_INTERCEPTORS_PROP_KEY);
+        addInterceptors(factory, callingContext, sd, Constants.RS_OUT_INTERCEPTORS_PROP_KEY);
+        addInterceptors(factory, callingContext, sd, Constants.RS_OUT_FAULT_INTERCEPTORS_PROP_KEY);
+        addInterceptors(factory, callingContext, sd, Constants.RS_IN_FAULT_INTERCEPTORS_PROP_KEY);
+        addFeatures(factory, callingContext, sd, Constants.RS_FEATURES_PROP_KEY);
+        addContextProperties(factory, callingContext, sd, Constants.RS_CONTEXT_PROPS_PROP_KEY);
+    }
+        
+    
+    protected void setClientWsdlProperties(ClientFactoryBean factory, BundleContext dswContext, 
+    		Map sd, boolean wsdlType) {
+    	String location = OsgiUtils.getProperty(sd, wsdlType ? Constants.WSDL_LOCATION : Constants.WS_WSDL_LOCATION);
+    	if (location != null) {
+    		URL wsdlURL = dswContext.getBundle().getResource(location);
+	        if (wsdlURL != null) {
+	            factory.setWsdlURL(wsdlURL.toString());
+	        }
+	        QName serviceName = getServiceQName(null, sd, 
+	        		wsdlType ? Constants.WSDL_SERVICE_NAMESPACE : Constants.WS_WSDL_SERVICE_NAMESPACE, 
+	        		wsdlType ? Constants.WSDL_SERVICE_NAME : Constants.WS_WSDL_SERVICE_NAME);
+	        if (serviceName != null) {
+	        	factory.setServiceName(serviceName);
+	            QName portName = getPortQName(serviceName.getNamespaceURI(), sd, 
+	            		wsdlType ? Constants.WSDL_PORT_NAME : Constants.WS_WSDL_PORT_NAME);
 	            if (portName != null) {
 	            	factory.setEndpointName(portName);
 	            }
@@ -158,16 +204,24 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
         List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName); 
         boolean in = propName.contains("in.interceptors");
+        boolean out = propName.contains("out.interceptors");
+        boolean in_fault = propName.contains("in.fault.interceptors");
+        boolean out_fault = propName.contains("out.fault.interceptors");
         for (int i = 0; i < providers.size(); i++) {
         	Interceptor<?> interceptor = (Interceptor<?>)providers.get(i);  
 	        if (in) {
 	        	factory.getInInterceptors().add(interceptor);
-	        } else {
+	        } else if (out) {
 	        	factory.getOutInterceptors().add(interceptor);
+	        } else if (in_fault) {
+	        	factory.getInFaultInterceptors().add(interceptor);
+	        } else if (out_fault) {
+	        	factory.getOutFaultInterceptors().add(interceptor);
 	        }
         }
     }
     
+       
     protected void addFeatures(AbstractEndpointFactory factory, BundleContext callingContext, 
     		Map sd, String propName) {
 

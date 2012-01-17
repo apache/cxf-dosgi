@@ -93,7 +93,7 @@ public final class ClassUtils {
     	return null;
     }
     
-public static List<Object> loadProviderClasses(BundleContext callingContext, Map sd, String propName) {
+    public static List<Object> loadProviderClasses(BundleContext callingContext, Map sd, String propName) {
     	
     	Object serviceProviders = sd.get(propName);
         if (serviceProviders != null) {
@@ -103,9 +103,11 @@ public static List<Object> loadProviderClasses(BundleContext callingContext, Map
                 } else {
                     return Arrays.asList((Object[])serviceProviders);
                 }
-            } else {
+            } else if (serviceProviders.getClass() == String.class) {
                 String[] classNames = serviceProviders.toString().split(",");
                 return loadProviders(callingContext, classNames);
+            } else {
+            	return Arrays.asList(serviceProviders);
             }
         } else {
         	return Collections.emptyList();

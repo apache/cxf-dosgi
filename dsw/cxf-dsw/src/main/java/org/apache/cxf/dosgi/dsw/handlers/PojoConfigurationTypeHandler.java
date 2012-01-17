@@ -72,10 +72,8 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             factory.setAddress(address);
             factory.getServiceFactory().setDataBinding(databinding);
 
-            addInterceptors(factory.getClientFactoryBean(), callingContext, sd.getProperties(), Constants.WS_IN_INTERCEPTORS_PROP_KEY);
-            addInterceptors(factory.getClientFactoryBean(), callingContext, sd.getProperties(), Constants.WS_OUT_INTERCEPTORS_PROP_KEY);
-            addFeatures(factory.getClientFactoryBean(), callingContext, sd.getProperties(), Constants.WS_OUT_INTERCEPTORS_PROP_KEY);
-            addContextProperties(factory.getClientFactoryBean(), callingContext, sd.getProperties(), Constants.WS_FEATURES_PROP_KEY);
+            addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd.getProperties());
+            setClientWsdlProperties(factory.getClientFactoryBean(), dswContext, sd.getProperties(), false);
             
             applyIntents(dswContext, callingContext, factory.getFeatures(), factory.getClientFactoryBean(),
                          sd.getProperties());
@@ -120,11 +118,8 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
 
-        addInterceptors(factory, callingContext, sd, Constants.WS_IN_INTERCEPTORS_PROP_KEY);
-        addInterceptors(factory, callingContext, sd, Constants.WS_OUT_INTERCEPTORS_PROP_KEY);
-        addFeatures(factory, callingContext, sd, Constants.WS_FEATURES_PROP_KEY);
-        addContextProperties(factory, callingContext, sd, Constants.WS_CONTEXT_PROPS_PROP_KEY);
-        setWsdlProperties(factory, dswContext, sd);
+        addWsInterceptorsFeaturesProps(factory, callingContext, sd);
+        setWsdlProperties(factory, dswContext, sd, false);
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);

@@ -150,21 +150,9 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
 
-        addInterceptors(factory, callingContext, sd, Constants.WS_IN_INTERCEPTORS_PROP_KEY);
-        addInterceptors(factory, callingContext, sd, Constants.WS_OUT_INTERCEPTORS_PROP_KEY);
-        addFeatures(factory, callingContext, sd, Constants.WS_FEATURES_PROP_KEY);
-        addContextProperties(factory, callingContext, sd, Constants.WS_CONTEXT_PROPS_PROP_KEY);
+        addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         
-        QName serviceQname = getServiceQName(iClass, sd,
-        		Constants.WSDL_SERVICE_NAMESPACE, Constants.WSDL_SERVICE_NAME);
-        factory.setServiceName(serviceQname);
-        
-        QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd, Constants.WSDL_PORT_NAME);
-        if (portQname != null) {
-        	factory.setEndpointName(portQname);
-        }
-        
-        factory.setWsdlURL(wsdlURL.toString());
+        setWsdlProperties(factory, dswContext, sd, true);
         if (bus != null) {
         	factory.setBus(bus);
         }

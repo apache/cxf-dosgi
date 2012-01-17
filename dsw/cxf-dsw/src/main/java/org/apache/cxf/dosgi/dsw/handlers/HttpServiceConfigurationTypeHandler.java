@@ -102,10 +102,9 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             }
             String frontEndImpl = (String)serviceReference.getProperty(Constants.WS_FRONTEND_PROP_KEY);
             ClientProxyFactoryBean factory = createClientProxyFactoryBean(frontEndImpl);
-            addInterceptors(factory.getClientFactoryBean(), callingContext, sd.getProperties(), Constants.WS_IN_INTERCEPTORS_PROP_KEY);
-            addInterceptors(factory.getClientFactoryBean(), callingContext, sd.getProperties(), Constants.WS_OUT_INTERCEPTORS_PROP_KEY);
-            addFeatures(factory.getClientFactoryBean(), callingContext, sd.getProperties(), Constants.WS_FEATURES_PROP_KEY);
-            addContextProperties(factory.getClientFactoryBean(), callingContext, sd.getProperties(), Constants.WS_CONTEXT_PROPS_PROP_KEY);
+            addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd.getProperties());
+            setClientWsdlProperties(factory.getClientFactoryBean(), dswContext, sd.getProperties(), false);
+            
             factory.setServiceClass(iClass);
             factory.setAddress(address);
             factory.getServiceFactory().setDataBinding(databinding);
@@ -155,12 +154,10 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         factory.setAddress("/");
         factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
-
-        addInterceptors(factory, callingContext, sd, Constants.WS_IN_INTERCEPTORS_PROP_KEY);
-        addInterceptors(factory, callingContext, sd, Constants.WS_OUT_INTERCEPTORS_PROP_KEY);
-        addFeatures(factory, callingContext, sd, Constants.WS_FEATURES_PROP_KEY);
-        addContextProperties(factory, callingContext, sd, Constants.WS_CONTEXT_PROPS_PROP_KEY);
-        setWsdlProperties(factory, dswContext, sd);
+        
+        addWsInterceptorsFeaturesProps(factory, callingContext, sd);
+        
+        setWsdlProperties(factory, dswContext, sd, false);
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {

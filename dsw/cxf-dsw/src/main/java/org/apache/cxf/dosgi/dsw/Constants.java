@@ -54,6 +54,8 @@ public class Constants {
     public static final String WS_FRONTEND_PROP_KEY = WS_CONFIG_TYPE + ".frontend";
     public static final String WS_IN_INTERCEPTORS_PROP_KEY = WS_CONFIG_TYPE + ".in.interceptors";
     public static final String WS_OUT_INTERCEPTORS_PROP_KEY = WS_CONFIG_TYPE + ".out.interceptors";
+    public static final String WS_OUT_FAULT_INTERCEPTORS_PROP_KEY = WS_CONFIG_TYPE + ".out.fault.interceptors";
+    public static final String WS_IN_FAULT_INTERCEPTORS_PROP_KEY = WS_CONFIG_TYPE + ".in.fault.interceptors";
     public static final String WS_CONTEXT_PROPS_PROP_KEY = WS_CONFIG_TYPE + ".context.properties";
     public static final String WS_FEATURES_PROP_KEY = WS_CONFIG_TYPE + ".features";
     public static final String WS_DATABINDING_PROP_KEY = WS_CONFIG_TYPE + ".databinding";
@@ -68,6 +70,8 @@ public class Constants {
     public static final String RS_DATABINDING_PROP_KEY = RS_CONFIG_TYPE + ".databinding";
     public static final String RS_IN_INTERCEPTORS_PROP_KEY = RS_CONFIG_TYPE + ".in.interceptors";
     public static final String RS_OUT_INTERCEPTORS_PROP_KEY = RS_CONFIG_TYPE + ".out.interceptors";
+    public static final String RS_IN_FAULT_INTERCEPTORS_PROP_KEY = RS_CONFIG_TYPE + ".in.fault.interceptors";
+    public static final String RS_OUT_FAULT_INTERCEPTORS_PROP_KEY = RS_CONFIG_TYPE + ".out.fault.interceptors";
     public static final String RS_CONTEXT_PROPS_PROP_KEY = RS_CONFIG_TYPE + ".context.properties";
     public static final String RS_FEATURES_PROP_KEY = RS_CONFIG_TYPE + ".features";
     public static final String RS_PROVIDER_PROP_KEY = RS_CONFIG_TYPE + ".provider";
