@@ -77,10 +77,11 @@ public class TopologyManager {
      * 
      * </pre>
      */
-    private final HashMap<ServiceReference, HashMap<RemoteServiceAdmin, Collection<ExportRegistration>>> exportedServices = new LinkedHashMap<ServiceReference, HashMap<RemoteServiceAdmin, Collection<ExportRegistration>>>();
+    private final Map<ServiceReference, 
+                      Map<RemoteServiceAdmin, Collection<ExportRegistration>>> exportedServices = 
+        new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<ExportRegistration>>>();
 
     private BundleContext bctx;
-    // private List<RemoteServiceAdmin> remoteServiceAdmins = new ArrayList<RemoteServiceAdmin>();
 
     private ServiceTracker stEndpointListeners;
 
@@ -109,7 +110,7 @@ public class TopologyManager {
 
             private void notify(ServiceReference reference) {
                 synchronized (exportedServices) {
-                    for (HashMap<RemoteServiceAdmin, Collection<ExportRegistration>> exports : exportedServices
+                    for (Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports : exportedServices
                         .values()) {
                         for (Collection<ExportRegistration> regs : exports.values()) {
                             if (regs != null)
@@ -126,7 +127,7 @@ public class TopologyManager {
 
     protected void removeRemoteServiceAdmin(RemoteServiceAdmin rsa) {
         synchronized (exportedServices) {
-            for (Map.Entry<ServiceReference, HashMap<RemoteServiceAdmin, Collection<ExportRegistration>>> exports : exportedServices
+            for (Map.Entry<ServiceReference, Map<RemoteServiceAdmin, Collection<ExportRegistration>>> exports : exportedServices
                 .entrySet()) {
                 if (exports.getValue().containsKey(rsa)) {
                     // service was handled by this RemoteServiceAdmin
@@ -149,11 +150,11 @@ public class TopologyManager {
         }
     }
 
-    protected void triggerExportImportForRemoteSericeAdmin(RemoteServiceAdmin rsa) {
+    protected void triggerExportImportForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
         LOG.info("TopologyManager: triggerExportImportForRemoteSericeAdmin()");
 
         synchronized (exportedServices) {
-            for (Map.Entry<ServiceReference, HashMap<RemoteServiceAdmin, Collection<ExportRegistration>>> exports : exportedServices
+            for (Map.Entry<ServiceReference, Map<RemoteServiceAdmin, Collection<ExportRegistration>>> exports : exportedServices
                 .entrySet()) {
                 if (exports.getValue().containsKey(rsa)) {
                     // already handled....
@@ -408,7 +409,7 @@ public class TopologyManager {
         if (sref != null) {
             synchronized (exportedServices) {
 
-                HashMap<RemoteServiceAdmin, Collection<ExportRegistration>> ex = exportedServices.get(sref);
+                Map<RemoteServiceAdmin, Collection<ExportRegistration>> ex = exportedServices.get(sref);
                 if (ex != null) {
                     EndpointDescription ep = exportRegistration.getExportReference().getExportedEndpoint();
                     for (Map.Entry<RemoteServiceAdmin, Collection<ExportRegistration>> export : ex.entrySet()) {

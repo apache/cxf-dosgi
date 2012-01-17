@@ -33,7 +33,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointPermission;
-import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
@@ -46,8 +45,7 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
     private boolean closed = false;
 
     private List<ImportRegistration> importedServices = new ArrayList<ImportRegistration>();
-    private List<ExportRegistration> exportedServices = new ArrayList<ExportRegistration>();
-
+    
     public RemoteServiceAdminInstance(BundleContext bc, RemoteServiceAdminCore core) {
         bctx = bc;
         rsaCore = core;
@@ -74,12 +72,7 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
                 if (closed)
                     return Collections.EMPTY_LIST;
 
-                synchronized (exportedServices) {
-                    List er = rsaCore.exportService(refFinal, propertiesFinal);
-                    if (er != null)
-                        exportedServices.addAll(er);
-                    return er;
-                }
+                 return rsaCore.exportService(refFinal, propertiesFinal);
             }
         });
     }
@@ -145,13 +138,6 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
             for (ImportRegistration ir : importedServices) {
                 LOG.finest("Closing ImportRegistration " + ir);
                 ir.close();
-            }
-        }
-        synchronized (exportedServices) {
-            LOG.info("Removing all services exported by this RSA instance");
-            for (ExportRegistration er : exportedServices) {
-                LOG.finest("Closing ExportRegistration " + er);
-                er.close();
             }
         }
     }

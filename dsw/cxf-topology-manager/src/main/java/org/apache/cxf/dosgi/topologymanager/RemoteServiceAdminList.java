@@ -52,7 +52,7 @@ public class RemoteServiceAdminList extends ArrayList<RemoteServiceAdmin>{
                 }
                 LOG.info("enlisted RemoteEventAdmins: " + this.size());
 
-                triggerExportImportForRemoteSericeAdmin(rsa);
+                triggerExportImportForRemoteServiceAdmin(rsa);
 
                 return super.addingService(reference);
             }
@@ -84,9 +84,9 @@ public class RemoteServiceAdminList extends ArrayList<RemoteServiceAdmin>{
     }
 
 
-    protected void triggerExportImportForRemoteSericeAdmin(RemoteServiceAdmin rsa) {
-        topManager.triggerExportImportForRemoteSericeAdmin(rsa);
-        topManagerImport.triggerExportImportForRemoteSericeAdmin(rsa);
+    protected void triggerExportImportForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
+        topManager.triggerExportImportForRemoteServiceAdmin(rsa);
+        topManagerImport.triggerExportImportForRemoteServiceAdmin(rsa);
     }
 
 

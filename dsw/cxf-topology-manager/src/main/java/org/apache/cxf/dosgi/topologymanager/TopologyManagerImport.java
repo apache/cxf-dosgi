@@ -339,7 +339,7 @@ public class TopologyManagerImport {
         }
     }
 
-    public void triggerExportImportForRemoteSericeAdmin(RemoteServiceAdmin rsa) {
+    public void triggerExportImportForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
         LOG.fine("New RSA detected trying to import services with it");
         synchronized (importPossibilities) {
             Set<Map.Entry<String, List<EndpointDescription>>> entries = importPossibilities.entrySet();

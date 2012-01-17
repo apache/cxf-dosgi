@@ -53,10 +53,10 @@ public class RemoteServiceAdminListTest {
         tm.removeRemoteServiceAdmin(EasyMock.eq(rsa));
         EasyMock.expectLastCall().once();
         
-        tm.triggerExportImportForRemoteSericeAdmin(EasyMock.eq(rsa));
+        tm.triggerExportImportForRemoteServiceAdmin(EasyMock.eq(rsa));
         EasyMock.expectLastCall().once();
         
-        tmi.triggerExportImportForRemoteSericeAdmin(EasyMock.eq(rsa));
+        tmi.triggerExportImportForRemoteServiceAdmin(EasyMock.eq(rsa));
         EasyMock.expectLastCall().once();
         
         bc.addServiceListener((ServiceListener)EasyMock.anyObject(),(String)EasyMock.anyObject()); 

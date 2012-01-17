@@ -159,11 +159,6 @@ public class ExportRegistrationImpl implements ExportRegistration {
                 r += entry.getKey() + "  => " + entry.getValue() + "\n";
             }
         }
-        r += "\n";
-        r += "*** Exception: " + exception + " **** \n";
-        r += "*** isClosed : " + closed + " ****\n";
-        r += "\n";
-
         return r;
     }
 
@@ -221,7 +216,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
         serviceTracker = new ServiceTracker(bctx, f, new ServiceTrackerCustomizer() {
             
             public void removedService(ServiceReference sr, Object s) {
-                LOG.info("Service ["+sid+"] has ben unregistered: Removing service export");
+                LOG.info("Service ["+sid+"] has been unregistered: Removing service export");
                 close();
             }
             

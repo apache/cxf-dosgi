@@ -62,7 +62,7 @@ public class TopologyManagerImportTest {
         
         rsaList.add(rsa);
         
-        tm.triggerExportImportForRemoteSericeAdmin(rsa);
+        tm.triggerExportImportForRemoteServiceAdmin(rsa);
         
         assertTrue(sema.tryAcquire(10, TimeUnit.SECONDS));
         
