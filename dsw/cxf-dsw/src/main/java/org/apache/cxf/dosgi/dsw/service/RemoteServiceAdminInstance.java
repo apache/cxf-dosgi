@@ -20,7 +20,6 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -44,8 +43,6 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
     private boolean closed = false;
 
-    private List<ImportRegistration> importedServices = new ArrayList<ImportRegistration>();
-    
     public RemoteServiceAdminInstance(BundleContext bc, RemoteServiceAdminCore core) {
         bctx = bc;
         rsaCore = core;
@@ -120,26 +117,13 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
                 if (closed)
                     return null;
 
-                synchronized (importedServices) {
-                    ImportRegistration ir = rsaCore.importService(epd);
-                    if (ir != null)
-                        importedServices.add(ir);
-                    return ir;
-                }
+                return rsaCore.importService(epd);
             }
         });
     }
 
     public void close() {
         closed = true;
-
-        synchronized (importedServices) {
-            LOG.info("Removing all services imported by this RSA instance");
-            for (ImportRegistration ir : importedServices) {
-                LOG.finest("Closing ImportRegistration " + ir);
-                ir.close();
-            }
-        }
     }
 
 }
