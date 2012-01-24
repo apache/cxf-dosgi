@@ -56,7 +56,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-Name>${pom.name}</Bundle-Name>
+            <Bundle-Name>${project.name}</Bundle-Name>
             <Bundle-Description>This bundle contains the client-side implementation of the Distributed OSGi Discovery sample.</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Activator>org.apache.cxf.dosgi.samples.discovery.consumer.Activator</Bundle-Activator>

@@ -63,7 +63,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-Name>${pom.name}</Bundle-Name>
+            <Bundle-Name>${project.name}</Bundle-Name>
             <Bundle-Description>This bundle contains an example Distributed OSGi endpoint that passes requests through a security filter.</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Private-Package>org.apache.cxf.dosgi.samples.security</Private-Package>
