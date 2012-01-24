@@ -26,13 +26,13 @@
     <name>Distributed OSGI Reference Implementation</name>  
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/dosgi/tags/cxf-dosgi-ri-1.1</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/dosgi/tags/cxf-dosgi-ri-1.1</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/dosgi/trunk</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/dosgi/trunk</developerConnection>
     </scm>
 
     <issueManagement>
         <system>jira</system>
-        <url>https://issues.apache.org/jira/browse/CXF</url>
+        <url>https://issues.apache.org/jira/browse/DOSGI</url>
     </issueManagement>
 
     <prerequisites>
