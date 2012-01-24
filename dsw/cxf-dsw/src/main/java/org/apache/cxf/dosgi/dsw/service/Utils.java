@@ -40,9 +40,15 @@ public class Utils {
 
         if (object instanceof String) {
             String s = (String)object;
-            String[] ret = new String[1];
-            ret[0] = s;
-            return ret;
+            String[] values = s.split(",");
+            List<String> list = new ArrayList<String>();
+            for (String val : values) {
+            	String actualValue = val.trim();
+            	if (actualValue.length() > 0) {
+            		list.add(actualValue);
+            	}
+            }
+            return list.toArray(new String[0]);
         }
 
         if (object instanceof String[]) {

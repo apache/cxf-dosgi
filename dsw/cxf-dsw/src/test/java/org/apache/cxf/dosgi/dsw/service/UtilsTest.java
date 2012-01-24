@@ -18,23 +18,27 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Properties;
 
-import org.osgi.framework.Constants;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
-
 import org.junit.Test;
+import org.osgi.framework.Constants;
 
 public class UtilsTest {
 
+	@Test
+	public void testSplitString() {
+		String[] values = Utils.normalizeStringPlus("1, 2");
+		assertEquals(2, values.length);
+		assertEquals(values[0], "1");
+		assertEquals(values[1], "2");
+	}
+	
     @Test
     public void testNormalizeStringPlus() {
 
