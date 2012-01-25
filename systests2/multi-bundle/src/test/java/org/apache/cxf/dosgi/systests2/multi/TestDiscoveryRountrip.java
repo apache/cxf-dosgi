@@ -54,7 +54,6 @@ public class TestDiscoveryRountrip extends AbstractTestDiscoveryRoundtrip {
         // This property sets the start level for equinox
         opts.add(CoreOptions.systemProperty("osgi.startLevel").value("" + startLevel));
 
-        opts.add(CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject());
         for(Map.Entry<Integer, String> entry : bundles.entrySet()) {
             opts.add(CoreOptions.bundle(entry.getValue()).startLevel(entry.getKey()));
         }

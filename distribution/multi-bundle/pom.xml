@@ -335,24 +335,6 @@
               <outputDirectory>${project.build.directory}/distribution_bundles</outputDirectory>
             </configuration>
           </execution>
-          <execution>
-            <id>copy</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.apache.felix</groupId>
-                  <artifactId>org.osgi.compendium</artifactId>
-                  <version>1.2.0</version>
-                  <type>jar</type>
-                  <outputDirectory>target/deps</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
 

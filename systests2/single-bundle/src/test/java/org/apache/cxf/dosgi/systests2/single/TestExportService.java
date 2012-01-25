@@ -40,7 +40,6 @@ public class TestExportService extends AbstractTestExportService {
                 // Run this one in Felix
                 CoreOptions.frameworks(CoreOptions.felix()),
                 
-                CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
                 CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi").artifactId("cxf-dosgi-ri-singlebundle-distribution").versionAsInProject(),
                 
                 // The following two bundles start the greeter demo which registers a remote service 

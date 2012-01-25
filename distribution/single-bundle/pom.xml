@@ -364,31 +364,7 @@
         </configuration>
       </plugin> 
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.osgi</groupId>
-                  <artifactId>org.osgi.compendium</artifactId>
-                  <version>${osgi.version}</version>
-                  <type>jar</type>
-                  <outputDirectory>target/deps</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
+      
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -404,18 +380,13 @@
                 </fileset>
                 <pathconvert pathsep="" property="bundle" refid="single.bundle" />
 
-                <fileset dir="target/deps" id="felix.dep.bundles">
-                  <include name="*.jar" />
-                </fileset>
-                <pathconvert pathsep=" file:/" property="felix.deps" refid="felix.dep.bundles" />
-
                 <!-- config.properties file for Felix -->
                 <echo file="target/felix.config.properties.append">
 org.ops4j.pax.web.session.timeout=30
 org.osgi.framework.startlevel=2
 felix.auto.start.2=
                 </echo>
-                <echo message="file:/${felix.deps} file:/${bundle}" file="target/felix.config.properties.append" append="true" />
+                <echo message="file:/${bundle}" file="target/felix.config.properties.append" append="true" />
                 <replace file="target/felix.config.properties.append" token="\" value="/" />
 
                 <!-- config.ini file for Equinox -->

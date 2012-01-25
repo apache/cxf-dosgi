@@ -45,7 +45,6 @@ public class TestDiscoveryRountrip extends AbstractTestDiscoveryRoundtrip {
                 // Run this one in Felix
                 CoreOptions.frameworks(CoreOptions.felix()),
 
-                CoreOptions.mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
                 CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi").artifactId("cxf-dosgi-ri-singlebundle-distribution").versionAsInProject(),
                 
                 CoreOptions.mavenBundle().groupId("org.apache.log4j").artifactId("com.springsource.org.apache.log4j").versionAsInProject(),

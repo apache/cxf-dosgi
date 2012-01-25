@@ -41,9 +41,8 @@
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
+            <artifactId>org.osgi.enterprise</artifactId>
             <version>${osgi.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency> 
