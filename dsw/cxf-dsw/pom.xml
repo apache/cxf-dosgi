@@ -48,9 +48,9 @@
     
     <dependencies>
         <dependency>
-            <groupId>org.apache.cxf.dosgi</groupId>
-            <artifactId>cxf-dosgi-remote-service-admin-interfaces</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.enterprise</artifactId>
+            <version>${osgi.version}</version>
         </dependency>
 
         <dependency>
