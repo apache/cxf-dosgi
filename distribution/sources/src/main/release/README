@@ -41,7 +41,7 @@ If you need more help, or want to provide any feedback, please feel free
 to drop us a note on the CXF dev or users list[4].
  
 If you trip over any problems with dOSGi, don't hesitate to submit an issue
-to the CXF JIRA[5] with the component set to "Distributed-OSGi".
+to the CXF Distributed OSGI JIRA[5].
 
 
 Thanks for using dOSGi!
@@ -54,4 +54,4 @@ The CXF dOSGi team.
 [2] http://cxf.apache.org/distributed-osgi.html#DistributedOSGi-GettingStarted
 [3] http://cxf.apache.org/distributed-osgi-greeter-demo-walkthrough.htm
 [4] http://cxf.apache.org/mailing-lists.html
-[5] https://issues.apache.org/jira/browse/CXF
+[5] https://issues.apache.org/jira/browse/DOSGI

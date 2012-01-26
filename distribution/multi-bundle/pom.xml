@@ -308,6 +308,17 @@
       <artifactId>cxf-dosgi-ri-discovery-distributed</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <groupId>org.apache.cxf.dosgi</groupId>
+        <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-server</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf.dosgi</groupId>
+        <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-server-config</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    
   </dependencies>        
   
 
