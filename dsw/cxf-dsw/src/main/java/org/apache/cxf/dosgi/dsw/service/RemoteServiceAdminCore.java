@@ -1,20 +1,20 @@
-/** 
- * Licensed to the Apache Software Foundation (ASF) under one 
- * or more contributor license agreements. See the NOTICE file 
- * distributed with this work for additional information 
- * regarding copyright ownership. The ASF licenses this file 
- * to you under the Apache License, Version 2.0 (the 
- * "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, 
- * software distributed under the License is distributed on an 
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
- * KIND, either express or implied. See the License for the 
- * specific language governing permissions and limitations 
- * under the License. 
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.dosgi.dsw.service;
 
@@ -42,6 +42,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ImportReference;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
@@ -71,7 +72,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE);
         supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
     }
-    
+
     protected final static String DEFAULT_CONFIGURATION = Constants.WS_CONFIG_TYPE;
 
     public RemoteServiceAdminCore(BundleContext bc) {
@@ -114,8 +115,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return Collections.EMPTY_LIST;
             }
 
-            
-            
+
+
             Properties serviceProperties = new Properties();
 
             {// gather properties from sRef
@@ -217,10 +218,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
             }
 
-            // enlist initial export Registrations in global list of exprtRegistrations
-            exportedServices
-                .put(serviceReference, new ArrayList<ExportRegistrationImpl>(exportRegs.values()));
-
             // FIXME: move out of synchronized ... -> blocks until publication is finished
             for (String iface : interfaces) {
                 LOG.info("creating server for interface " + iface);
@@ -246,7 +243,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
                     handler.createServer(exportRegistration, bctx, callingContext, serviceProperties,
                                          interfaceClass, serviceObject);
-                    
+
                     if(exportRegistration.getException()==null){
                         LOG.info("created server for interface " + iface);
 
@@ -255,13 +252,15 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                         LOG.warning("server creation for interface " + iface + "  failed!");
                         // Fire event happens at the end
                     }
-                    
+
 
                 }
             }
 
-            List<ExportRegistrationImpl> lExpReg = new ArrayList<ExportRegistrationImpl>(exportRegs.values());
+            // enlist initial export Registrations in global list of exportRegistrations
+            exportedServices.put(serviceReference, new ArrayList<ExportRegistrationImpl>(exportRegs.values()));
 
+            List<ExportRegistrationImpl> lExpReg = new ArrayList<ExportRegistrationImpl>(exportRegs.values());
             eventProducer.publishNotifcation(lExpReg);
 
             return lExpReg;
@@ -299,9 +298,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     public Collection getExportedServices() {
         synchronized (exportedServices) {
-            List<ExportRegistrationImpl> ers = new ArrayList<ExportRegistrationImpl>();
+            List<ExportReference> ers = new ArrayList<ExportReference>();
             for (Collection<ExportRegistrationImpl> exportRegistrations : exportedServices.values()) {
-                ers.addAll(exportRegistrations);
+                for (ExportRegistrationImpl er : exportRegistrations) {
+                    ers.add(new ExportReferenceImpl(er));
+                }
             }
             return Collections.unmodifiableCollection(ers);
         }
@@ -338,8 +339,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     /**
      * Importing form here ....
      */
-    public ImportRegistration importService(EndpointDescription endpoint) {    
-        
+    public ImportRegistration importService(EndpointDescription endpoint) {
+
         LOG.info("importService() Endpoint: " + endpoint.getProperties());
 
         synchronized (importedServices) {
@@ -500,5 +501,4 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             eventProducer.notifyRemoval(iri);
         }
     }
-
 }

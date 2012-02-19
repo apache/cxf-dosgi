@@ -1,20 +1,20 @@
-/** 
-  * Licensed to the Apache Software Foundation (ASF) under one 
-  * or more contributor license agreements. See the NOTICE file 
-  * distributed with this work for additional information 
-  * regarding copyright ownership. The ASF licenses this file 
-  * to you under the Apache License, Version 2.0 (the 
-  * "License"); you may not use this file except in compliance 
-  * with the License. You may obtain a copy of the License at 
-  * 
-  * http://www.apache.org/licenses/LICENSE-2.0 
-  * 
-  * Unless required by applicable law or agreed to in writing, 
-  * software distributed under the License is distributed on an 
-  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
-  * KIND, either express or implied. See the License for the 
-  * specific language governing permissions and limitations 
-  * under the License. 
+/**
+  * Licensed to the Apache Software Foundation (ASF) under one
+  * or more contributor license agreements. See the NOTICE file
+  * distributed with this work for additional information
+  * regarding copyright ownership. The ASF licenses this file
+  * to you under the Apache License, Version 2.0 (the
+  * "License"); you may not use this file except in compliance
+  * with the License. You may obtain a copy of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing,
+  * software distributed under the License is distributed on an
+  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  * KIND, either express or implied. See the License for the
+  * specific language governing permissions and limitations
+  * under the License.
   */
 package org.apache.cxf.dosgi.dsw.service;
 
@@ -37,11 +37,11 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 
 
-/// *************************** FIXME: some old methods might be in here **** 
+/// *************************** FIXME: some old methods might be in here ****
 public class ExportRegistrationImpl implements ExportRegistration {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ExportRegistrationImpl.class);
-    
+
     private Server server;
     private boolean closed = false;
     private ServiceReference serviceReference = null;
@@ -52,12 +52,12 @@ public class ExportRegistrationImpl implements ExportRegistration {
     private int instanceCount = 1;
 
     private RemoteServiceAdminCore rsaCore;
-    
+
     private ExportReference exportReference;
-    
+
     private ServiceTracker serviceTracker;
-    
-    // provide a clone of the provided exp.Reg that is linked to this instance 
+
+    // provide a clone of the provided exp.Reg that is linked to this instance
     public ExportRegistrationImpl(ExportRegistrationImpl exportRegistration) {
 
         parent = exportRegistration;
@@ -85,7 +85,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
         closed = true;
 
         rsaCore.removeExportRegistration(this);
-        
+
         parent.instanceClosed();
         if (server != null) {
         	server.stop();
@@ -100,9 +100,9 @@ public class ExportRegistrationImpl implements ExportRegistration {
             // TODO close it and remove from management structure .... !
 
             LOG.fine("really closing ExportRegistartion now! ");
-            
-            
-            
+
+
+
             if (server != null) {
                 // FIXME: is this done like this ?
                 server.stop();
@@ -110,17 +110,11 @@ public class ExportRegistrationImpl implements ExportRegistration {
         }
     }
 
-    private void closeAll() {
-        if(parent!=this){
-            parent.closeAll();
-            return;
-        }
-        // FIXME: close all clients !!!! 
-        close();
-    }
-    
     public EndpointDescription getEndpointDescription() {
-        return endpointDescription;
+        if (!closed)
+            return endpointDescription;
+        else
+            return null;
     }
 
     public Throwable getException() {
@@ -133,7 +127,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
     protected ServiceReference getServiceReference() {
         return serviceReference;
     }
-    
+
     public ServiceReference getExportedService() throws IllegalStateException {
         if (!closed)
             return serviceReference;
@@ -188,22 +182,22 @@ public class ExportRegistrationImpl implements ExportRegistration {
     }
 
     /**
-     * Start the service tracker that monitors the osgi service that 
+     * Start the service tracker that monitors the osgi service that
      * is exported by this exportRegistration
      * */
     public void startServiceTracker(BundleContext bctx) {
-        
+
         // only the parent should do this
         if(parent!=this){
             parent.startServiceTracker(bctx);
             return;
         }
-        
+
         // do it only once
         if(serviceTracker!=null){
             return;
         }
-        
+
         Filter f;
         final Long sid = (Long)serviceReference.getProperty(Constants.SERVICE_ID);
         try {
@@ -214,17 +208,17 @@ public class ExportRegistrationImpl implements ExportRegistration {
             return;
         }
         serviceTracker = new ServiceTracker(bctx, f, new ServiceTrackerCustomizer() {
-            
+
             public void removedService(ServiceReference sr, Object s) {
                 LOG.info("Service ["+sid+"] has been unregistered: Removing service export");
                 close();
             }
-            
+
             public void modifiedService(ServiceReference sr, Object s) {
                 // FIXME:
                 LOG.warning("Service modifications after the service is exported are currently not supported. The export is not modified!");
             }
-            
+
             public Object addingService(ServiceReference sr) {
                 return sr;
             }
@@ -239,5 +233,5 @@ public class ExportRegistrationImpl implements ExportRegistration {
     public RemoteServiceAdminCore getRsaCore() {
         return rsaCore;
     }
-    
+
 }
