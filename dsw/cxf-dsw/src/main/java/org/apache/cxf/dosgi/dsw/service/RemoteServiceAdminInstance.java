@@ -1,20 +1,20 @@
-/** 
- * Licensed to the Apache Software Foundation (ASF) under one 
- * or more contributor license agreements. See the NOTICE file 
- * distributed with this work for additional information 
- * regarding copyright ownership. The ASF licenses this file 
- * to you under the Apache License, Version 2.0 (the 
- * "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, 
- * software distributed under the License is distributed on an 
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
- * KIND, either express or implied. See the License for the 
- * specific language governing permissions and limitations 
- * under the License. 
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.dosgi.dsw.service;
 
@@ -53,16 +53,16 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission("*", EndpointPermission.EXPORT);
-        
-        
+
+
         if (sm != null) {
             sm.checkPermission(epp);
         }
-        
-        
+
+
         final ServiceReference refFinal = ref;
         final Map propertiesFinal = properties;
-        
+
         return AccessController.doPrivileged(new PrivilegedAction<List>() {
             public List run() {
 
@@ -75,26 +75,26 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
     }
 
     public Collection getExportedServices() {
-        
+
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
         if (sm != null) {
             sm.checkPermission(epp);
         }
-        
+
         if (closed)
             return null;
         return rsaCore.getExportedServices();
     }
 
     public Collection getImportedEndpoints() {
-        
+
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
         if (sm != null) {
             sm.checkPermission(epp);
         }
-        
+
         if (closed)
             return null;
         return rsaCore.getImportedEndpoints();
@@ -124,6 +124,7 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
     public void close() {
         closed = true;
-    }
 
+        rsaCore.removeExportRegistrations(bctx);
+    }
 }

@@ -24,9 +24,11 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -38,6 +40,7 @@ import org.apache.cxf.dosgi.dsw.handlers.ClientServiceFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -465,7 +468,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
      * when the export Registration is closed
      */
     protected void removeExportRegistration(ExportRegistrationImpl eri) {
-
         synchronized (exportedServices) {
             Collection<ExportRegistrationImpl> exRegs = exportedServices.get(eri.getServiceReference());
             if (exRegs != null && exRegs.contains(eri)) {
@@ -481,6 +483,26 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             eventProducer.notifyRemoval(eri);
         }
 
+    }
+
+    // Remove all export registrations associated with the given bundle
+    protected void removeExportRegistrations(BundleContext exportingBundleCtx) {
+        Bundle exportingBundle = exportingBundleCtx.getBundle();
+
+        // Work on a copy as the map gets modified as part of the behaviour by underlying methods
+        HashMap<ServiceReference, Collection<ExportRegistrationImpl>> exportCopy = new HashMap<ServiceReference, Collection<ExportRegistrationImpl>>(exportedServices);
+
+        for (Iterator<Map.Entry<ServiceReference, Collection<ExportRegistrationImpl>>> it = exportCopy.entrySet().iterator(); it.hasNext(); ) {
+            Entry<ServiceReference, Collection<ExportRegistrationImpl>> entry = it.next();
+            Bundle regBundle = entry.getKey().getBundle();
+            if (exportingBundle.equals(regBundle)) {
+                // Again work on a copy, as the value gets modified by the behaviour inside export.close()
+                for (ExportRegistrationImpl export : new ArrayList<ExportRegistrationImpl>(entry.getValue())) {
+                    // This will remove the registration from the real map of exports
+                    export.close();
+                }
+            }
+        }
     }
 
     protected void removeImportRegistration(ImportRegistrationImpl iri) {
