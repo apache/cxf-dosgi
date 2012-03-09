@@ -49,7 +49,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
     private Throwable exception = null;
 
     private ExportRegistrationImpl parent = null;
-    private int instanceCount = 1;
+    private volatile int instanceCount = 1;
 
     private RemoteServiceAdminCore rsaCore;
 
@@ -68,7 +68,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
         parent.instanceAdded();
     }
 
-    private synchronized void instanceAdded() {
+    private void instanceAdded() {
         ++instanceCount;
     }
 
@@ -93,7 +93,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
         }
     }
 
-    private synchronized void instanceClosed() {
+    private void instanceClosed() {
         --instanceCount;
         if (instanceCount <= 0) {
             // really close the ExReg
@@ -101,11 +101,12 @@ public class ExportRegistrationImpl implements ExportRegistration {
 
             LOG.fine("really closing ExportRegistartion now! ");
 
-
-
-            if (server != null) {
-                // FIXME: is this done like this ?
-                server.stop();
+            synchronized (this) {
+                if (server != null) {
+                    // FIXME: is this done like this ?
+                    server.stop();
+                    server = null;
+                }
             }
         }
     }
