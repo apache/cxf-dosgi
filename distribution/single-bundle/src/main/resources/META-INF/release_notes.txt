@@ -1,3 +1,13 @@
+Apache CXF Distributed OSGi 1.3.1 Release Notes
+===============================================
+
+Fixes needed in order to pass the OSGi 4.3 Remote Service Admin TCK.
+* Fixed exports from Single Bundle Distro
+* Fixed deadlock
+* Fixed cleanup
+* Fixed ExportReferenceImpl.equals() and hashCode()
+* Fixed RemoteServiceAdminCore.exportService()
+
 Apache CXF Distributed OSGi 1.3 Release Notes
 =============================================
 
@@ -29,6 +39,7 @@ DOSGI-79    RemoteServiceAdmin.getImportedEndpoints() returns collection of inco
 DOSGI-77    NullPointerException from Distributed OSGI when bundle with wanted properties is started.
 DOSGI-76    EndpointListener.endpointRemoved
 DOSGI-75    CXF Distributed OSGi isn't using org.apache.cxf.common.logging.LogUtils 
+
 
 Apache CXF Distributed OSGi 1.2 Release Notes
 =============================================

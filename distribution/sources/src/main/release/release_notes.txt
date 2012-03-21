@@ -1,6 +1,15 @@
+Apache CXF Distributed OSGi 1.3.1 Release Notes
+===============================================
+
+Fixes needed in order to pass the OSGi 4.3 Remote Service Admin TCK.
+* Fixed exports from Single Bundle Distro
+* Fixed deadlock
+* Fixed cleanup
+* Fixed ExportReferenceImpl.equals() and hashCode()
+* Fixed RemoteServiceAdminCore.exportService()
+
 Apache CXF Distributed OSGi 1.3 Release Notes
 =============================================
-
 
 The following modules have been removed from the destribution:
 
