@@ -22,12 +22,12 @@
   <artifactId>cxf-dosgi-ri-samples-spring-dm-impl</artifactId>
   <packaging>bundle</packaging>
   <name>Distributed OSGI Spring-DM Sample Implementation Bundle</name>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.3.1</version>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-bundles-spring-dm-parent</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.3.1</version>
   </parent>
 
   <dependencies>
