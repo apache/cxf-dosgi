@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-felix</artifactId>
-    <version>1.3.1</version>
+    <version>1.4-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>Distributed OSGi Temporary Private Felix Framework Build</name>
@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
         <artifactId>cxf-dosgi-ri-parent</artifactId>
-        <version>1.3.1</version>
+        <version>1.4-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     
