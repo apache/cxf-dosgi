@@ -27,12 +27,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.apache.cxf.dosgi.dsw.Activator;
+import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class AggregatedActivator implements BundleActivator {
+	private static final Logger LOG = LogUtils.getL7dLogger(AggregatedActivator.class);
+	
     static final String HTTP_PORT_PROPERTY = "org.osgi.service.http.port";
     static final String HTTPS_PORT_PROPERTY = "org.osgi.service.http.port.secure";
     static final String HTTPS_ENABLED_PROPERTY = "org.osgi.service.http.secure.enabled";
@@ -64,19 +67,19 @@ public class AggregatedActivator implements BundleActivator {
         if (port == null || port.length() == 0) {
             port = tryPortFree(DEFAULT_HTTP_PORT);
             if (port == null) {
-                System.out.print("Port " + DEFAULT_HTTP_PORT + " is not available. ");
+                LOG.info("Port " + DEFAULT_HTTP_PORT + " is not available. ");
                 port = tryPortFree("0");
             }
-            System.out.println("Setting HttpService port to: " + port);
+            LOG.info("Setting HttpService port to: " + port);
             
             String prop = https ? HTTPS_PORT_PROPERTY : HTTP_PORT_PROPERTY;
             System.setProperty(prop, port);
         } else {
             if (tryPortFree(port) == null) {
-                System.out.println("The system is configured to use HttpService port " 
+            	LOG.info("The system is configured to use HttpService port " 
                     + port + ". However this port is already in use.");
             } else {
-                System.out.println("HttpService using port: " + port);
+            	LOG.info("HttpService using port: " + port);
             }
         }
     }
@@ -134,7 +137,11 @@ public class AggregatedActivator implements BundleActivator {
 
     void stopEmbeddedActivators(BundleContext ctx) throws Exception {
         for (BundleActivator ba : activators) {
-            ba.stop(ctx);
+        	try {
+                ba.stop(ctx);
+        	} catch (Throwable ex) {
+        		LOG.warning("BundleActivator " + ba.getClass().getName() + " can not be stopped");
+        	}
         }
     }
     
