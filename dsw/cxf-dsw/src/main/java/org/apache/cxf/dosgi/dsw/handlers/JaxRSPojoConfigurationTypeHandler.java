@@ -31,7 +31,9 @@ import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.ProxyClassLoader;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.osgi.framework.BundleContext;
@@ -62,33 +64,53 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-            bean.setAddress(address);
-
-            addRsInterceptorsFeaturesProps(bean, callingContext, sd.getProperties());
-            
-            List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
-            if (resources != null) {
-                bean.setModelBeansWithServiceClass(resources, iClass);
-            } else {
-                bean.setServiceClass(iClass);
-            }
-            List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd.getProperties());
-            if (providers != null && providers.size() > 0) {
-                bean.setProviders(providers);
-            }
-            Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
-            Object proxy = getProxy(bean.create(), iClass);
-            return proxy;
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "proxy creation failed", e);
-        } finally {
+            return createJaxrsProxy(address, callingContext, dswContext, iClass, null, sd);
+        } catch (Throwable e) {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
+        
+        try {
+        	ProxyClassLoader cl = new ProxyClassLoader();
+        	cl.addLoader(iClass.getClassLoader());
+        	cl.addLoader(Client.class.getClassLoader());
+            return createJaxrsProxy(address, callingContext, dswContext, iClass, cl, sd);
+        } catch (Throwable e) {
+            LOG.log(Level.WARNING, "proxy creation failed", e);
+        }
+        
         return null;
 
     }
 
+    protected Object createJaxrsProxy(String address, 
+    		                          BundleContext dswContext,
+                                      BundleContext callingContext,
+                                      Class<?> iClass,
+                                      ClassLoader loader,
+                                      EndpointDescription sd) {
+    	JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+        if (loader != null) {
+        	bean.setClassLoader(loader);
+        }
+        
+        addRsInterceptorsFeaturesProps(bean, callingContext, sd.getProperties());
+        
+        List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
+        if (resources != null) {
+            bean.setModelBeansWithServiceClass(resources, iClass);
+        } else {
+            bean.setServiceClass(iClass);
+        }
+        List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd.getProperties());
+        if (providers != null && providers.size() > 0) {
+            bean.setProviders(providers);
+        }
+        Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
+        Object proxy = getProxy(bean.create(), iClass);
+        return proxy;
+    }
+    
     @Override
     public void createServer(ExportRegistrationImpl exportRegistration, BundleContext dswContext,
                              BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean)
