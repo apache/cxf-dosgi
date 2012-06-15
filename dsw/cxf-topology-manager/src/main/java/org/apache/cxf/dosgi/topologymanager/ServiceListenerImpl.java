@@ -61,7 +61,7 @@ public class ServiceListenerImpl implements ServiceListener {
         if (event.getType() == ServiceEvent.REGISTERED) {
             LOG.fine("Registered");
             if (analyzeService(sref)) {
-                LOG.info("calling TopologyManager -> registered service");
+                LOG.fine("calling TopologyManager -> registered service");
                 topManager.exportService(sref);
             }
         } else if (event.getType() == ServiceEvent.UNREGISTERING) {

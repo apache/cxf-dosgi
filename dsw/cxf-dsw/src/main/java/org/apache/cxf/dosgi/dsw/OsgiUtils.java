@@ -292,9 +292,9 @@ public final class OsgiUtils {
         try {
             return bc.createFilter(filterValue);
         } catch (InvalidSyntaxException ex) {
-            System.out.println("Invalid filter expression " + filterValue);
+            LOG.warning("Invalid filter expression " + filterValue);
         } catch (Exception ex) {
-            System.out.println("Problem creating a Filter from " + filterValue);
+            LOG.warning("Problem creating a Filter from " + filterValue);
         }
         return null;
     }

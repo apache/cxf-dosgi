@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -204,7 +205,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
         try {
             f = bctx.createFilter("("+Constants.SERVICE_ID+"="+sid+")");
         } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, e.getMessage(), e);
             LOG.warning("Service tracker could not be started. The service will not be automatically unexported.");
             return;
         }

@@ -55,7 +55,7 @@ public class Activator implements BundleActivator {
     }
     
     public void start(BundleContext bc) throws Exception {
-        LOG.info("TopologyManager: start()");
+        LOG.fine("TopologyManager: start()");
         remoteServiceAdminList = createRemoteServiceAdminList(bc);
         topManager = createTopologyManager(bc,remoteServiceAdminList);
         topManagerImport = createTopologyManagerImport(bc,remoteServiceAdminList);
@@ -77,7 +77,7 @@ public class Activator implements BundleActivator {
     }
 
     public void stop(BundleContext bc) throws Exception {
-        LOG.info("TopologyManager: stop()");
+        LOG.fine("TopologyManager: stop()");
         topManager.stop();
         topManagerImport.stop();
         remoteServiceAdminList.stop();

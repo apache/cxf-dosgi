@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,31 +58,36 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
     }
 
     public Object addingService(ServiceReference sref) {
-        LOG.fine("addingService: " + sref);
+        LOG.info("addingService: " + sref);
         handleEndpointListener(sref);
         return sref;
     }
 
     public void modifiedService(ServiceReference sref, Object service) {
-        LOG.fine("modifiedService: " + sref);
+        LOG.info("modifiedService: " + sref);
         handleEndpointListener(sref);
     }
 
     private void handleEndpointListener(ServiceReference sref) {
-        for (String key : sref.getPropertyKeys()) {
-            LOG.finest("modifiedService: property: " + key + " => " + sref.getProperty(key));
+        if (LOG.isLoggable(Level.FINEST)) {
+            for (String key : sref.getPropertyKeys()) {
+                LOG.finest("modifiedService: property: " + key + " => " + sref.getProperty(key));
+            }
         }
 
-        if("true".equals(sref.getProperty(EndpointListenerFactory.DISCOVERY_ZOOKEEPER_ID))){
+        if (Boolean.parseBoolean(String.valueOf(
+                sref.getProperty(EndpointListenerFactory.DISCOVERY_ZOOKEEPER_ID)))) {
             LOG.finest("found my own endpointListener ... skipping it");
             return;
         }
         
         String[] scopes = Util.getScopes(sref);
         
-        LOG.info("trying to discover services for scopes[" + scopes.length + "]: ");
-        if(scopes!=null) for (String scope : scopes) {
-            LOG.info("Scope: "+scope);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("trying to discover services for scopes[" + scopes.length + "]: ");
+            for (String scope : scopes) {
+                LOG.fine("Scope: "+scope);
+            }
         }
         if (scopes.length > 0) {
             for (String scope : scopes) {

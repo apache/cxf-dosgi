@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.topologymanager;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,25 +69,27 @@ public class ListenerHookImpl implements ListenerHook {
     }
 
     public void added(Collection listeners) {
-        LOG.fine("ListenerHookImpl: added() " + listeners);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("ListenerHookImpl: added() " + listeners);
+        }
         for (Object li : listeners) {
             ListenerInfo listenerInfo = (ListenerInfo)li;
-            LOG.info("*** Filter: " + listenerInfo.getFilter());
+            LOG.fine("*** Filter: " + listenerInfo.getFilter());
 
             String className = getClassNameFromFilter(listenerInfo.getFilter());
 
             if (listenerInfo.getBundleContext().getBundle().equals(bctx.getBundle())) {
-                LOG.info("ListenerHookImpl: skipping request from myself");
+                LOG.fine("ListenerHookImpl: skipping request from myself");
                 continue;
             }
 
             if (listenerInfo.getFilter() == null) {
-                LOG.info("ListenerHookImpl: skipping empty filter");
+                LOG.fine("ListenerHookImpl: skipping empty filter");
                 continue;
             }
 
             if (isClassExcluded(className)) {
-                LOG.info("ListenerHookImpl: skipping import request for excluded classs ["
+                LOG.fine("ListenerHookImpl: skipping import request for excluded classs ["
                                    + className + "]");
                 continue;
             }
@@ -98,11 +101,13 @@ public class ListenerHookImpl implements ListenerHook {
     }
 
     public void removed(Collection listeners) {
-        LOG.info("ListenerHookImpl: removed: " + listeners);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("ListenerHookImpl: removed: " + listeners);
+        }
 
         for (Object li : listeners) {
             ListenerInfo listenerInfo = (ListenerInfo)li;
-            LOG.info(listenerInfo.getFilter());
+            LOG.fine("*** Filter: " + listenerInfo.getFilter());
 
             // TODO: determine if service was handled ? 
 

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.osgi.framework.BundleActivator;
@@ -53,7 +54,8 @@ public class Activator implements BundleActivator, ManagedService {
     }
 
     public synchronized void updated(Dictionary configuration) throws ConfigurationException {
-        LOG.info("Received configuration update for Zookeeper Discovery: " + configuration);
+        if (LOG.isLoggable(Level.FINE))
+            LOG.fine("Received configuration update for Zookeeper Discovery: " + configuration);
         if (configuration == null)
             return;
 
@@ -68,8 +70,10 @@ public class Activator implements BundleActivator, ManagedService {
         }
 
         if (zkProperties.equals(effective)) {
-            LOG.info("properties haven't changed ...");
+            LOG.info("Update called, but actual settings haven't changed ...");
             return;
+        } else if (LOG.isLoggable(Level.INFO)) {
+            LOG.info("Updating configuration for Zookeeper Discovery: " + configuration);
         }
 
         zkProperties = effective;
@@ -84,7 +88,7 @@ public class Activator implements BundleActivator, ManagedService {
         try {
             zkd.start();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Failed to start the Zookeeper Discovery component.", e);
         }
 
     }

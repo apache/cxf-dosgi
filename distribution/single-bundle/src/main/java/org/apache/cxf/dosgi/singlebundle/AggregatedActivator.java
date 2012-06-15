@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -34,8 +35,8 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class AggregatedActivator implements BundleActivator {
-	private static final Logger LOG = LogUtils.getL7dLogger(AggregatedActivator.class);
-	
+    private static final Logger LOG = LogUtils.getL7dLogger(AggregatedActivator.class);
+    
     static final String HTTP_PORT_PROPERTY = "org.osgi.service.http.port";
     static final String HTTPS_PORT_PROPERTY = "org.osgi.service.http.port.secure";
     static final String HTTPS_ENABLED_PROPERTY = "org.osgi.service.http.secure.enabled";
@@ -67,7 +68,7 @@ public class AggregatedActivator implements BundleActivator {
         if (port == null || port.length() == 0) {
             port = tryPortFree(DEFAULT_HTTP_PORT);
             if (port == null) {
-                LOG.info("Port " + DEFAULT_HTTP_PORT + " is not available. ");
+                LOG.fine("Port " + DEFAULT_HTTP_PORT + " is not available. ");
                 port = tryPortFree("0");
             }
             LOG.info("Setting HttpService port to: " + port);
@@ -76,10 +77,10 @@ public class AggregatedActivator implements BundleActivator {
             System.setProperty(prop, port);
         } else {
             if (tryPortFree(port) == null) {
-            	LOG.info("The system is configured to use HttpService port " 
+                LOG.warning("The system is configured to use HttpService port " 
                     + port + ". However this port is already in use.");
             } else {
-            	LOG.info("HttpService using port: " + port);
+                LOG.info("HttpService using port: " + port);
             }
         }
     }
@@ -119,7 +120,7 @@ public class AggregatedActivator implements BundleActivator {
                         ba.start(ctx);
                     }
                 } catch (Throwable th) {
-                    th.printStackTrace();
+                    LOG.log(Level.SEVERE, "Failed to start Activator " + s, th);
                 }
             }
 

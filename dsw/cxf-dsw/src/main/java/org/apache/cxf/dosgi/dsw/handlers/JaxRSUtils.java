@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -75,8 +76,8 @@ public class JaxRSUtils {
             return providers;
         }
 
-        boolean cxfProvidersOnly = OsgiUtils
-            .getBooleanProperty(sd, org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_EXPECTED_PROP_KEY);
+        boolean cxfProvidersOnly = OsgiUtils.getBooleanProperty(sd,
+                org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_EXPECTED_PROP_KEY);
 
         try {
             ServiceReference[] refs = callingContext.getServiceReferences((String)null, PROVIDERS_FILTER);
@@ -91,8 +92,7 @@ public class JaxRSUtils {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
-            LOG.fine("Problems finding JAXRS providers " + ex.getMessage());
+            LOG.log(Level.FINE, "Problems finding JAXRS providers " + ex.getMessage(), ex);
         }
         return providers;
     }

@@ -64,7 +64,7 @@ public final class ConfigTypeHandlerFactory {
             return new WsdlConfigurationTypeHandler(dswBC, props);
         }
 
-        LOG.info("None of the configuration types in " + configurationTypes + " is supported.");
+        LOG.warning("None of the configuration types in " + configurationTypes + " is supported.");
 
         return null;
     }

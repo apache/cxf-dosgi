@@ -191,7 +191,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
             // if no interface is to be exported return null
             if (interfaces.size() == 0) {
-                LOG.info("no interfaces to be exported");
+                LOG.warning("no interfaces to be exported");
                 // TODO: publish error event ? not sure
                 return Collections.EMPTY_LIST;
             }
@@ -344,7 +344,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
      */
     public ImportRegistration importService(EndpointDescription endpoint) {
 
-        LOG.info("importService() Endpoint: " + endpoint.getProperties());
+        LOG.fine("importService() Endpoint: " + endpoint.getProperties());
 
         synchronized (importedServices) {
             if (importedServices.containsKey(endpoint) && importedServices.get(endpoint).size() > 0) {
@@ -395,7 +395,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             // ?
             List<String> matchingInterfaces = endpoint.getInterfaces();
 
-            LOG.info("Interfaces: " + matchingInterfaces);
+            LOG.info("Matching Interfaces for import: " + matchingInterfaces);
 
             if (matchingInterfaces.size() == 1) {
                 LOG.info("Proxifying interface : " + matchingInterfaces.get(0));

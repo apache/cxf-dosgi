@@ -155,7 +155,6 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             return null;
         }
         
-        
         if (address == null) {
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
         }

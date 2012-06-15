@@ -21,7 +21,6 @@ package org.apache.cxf.dosgi.topologymanager;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -93,8 +92,7 @@ public class TopologyManager {
         stEndpointListeners = new ServiceTracker(ctx, EndpointListener.class.getName(), null) {
             @Override
             public Object addingService(ServiceReference reference) {
-                LOG
-                    .info("TopologyManager: new EndpointListener that wants to be informed about wants going on ... ");
+                LOG.fine("TopologyManager: new EndpointListener that wants to be informed about whats going on ... ");
 
                 notify(reference);
 
@@ -103,15 +101,14 @@ public class TopologyManager {
 
             @Override
             public void modifiedService(ServiceReference reference, Object service) {
-                LOG.info("TopologyManager: EndpointListener changed ... ");
+                LOG.fine("TopologyManager: EndpointListener changed ... ");
                 notify(reference);
                 super.modifiedService(reference, service);
             }
 
             private void notify(ServiceReference reference) {
                 synchronized (exportedServices) {
-                    for (Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports : exportedServices
-                        .values()) {
+                    for (Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports : exportedServices.values()) {
                         for (Collection<ExportRegistration> regs : exports.values()) {
                             if (regs != null)
                                 notifyListenerOfAddingIfAppropriate(reference, regs);
@@ -136,11 +133,13 @@ public class TopologyManager {
 
                     try {
                         ServiceReference[] refs = Utils.getEndpointListeners(bctx);
-                        for (ServiceReference sref : refs) {
-                            notifyListenersOfRemovalIfAppropriate(sref, endpoints);
+                        if (refs != null) {
+                            for (ServiceReference sref : refs) {
+                                notifyListenersOfRemovalIfAppropriate(sref, endpoints);
+                            }
                         }
                     } catch (InvalidSyntaxException e) {
-                        e.printStackTrace();
+                        LOG.log(Level.SEVERE, e.getMessage(), e);
                     }
 
                     // remove all management information for the RemoteServiceAdmin
@@ -151,19 +150,19 @@ public class TopologyManager {
     }
 
     protected void triggerExportImportForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
-        LOG.info("TopologyManager: triggerExportImportForRemoteSericeAdmin()");
+        LOG.finer("TopologyManager: triggerExportImportForRemoteSericeAdmin()");
 
         synchronized (exportedServices) {
             for (Map.Entry<ServiceReference, Map<RemoteServiceAdmin, Collection<ExportRegistration>>> exports : exportedServices
                 .entrySet()) {
                 if (exports.getValue().containsKey(rsa)) {
                     // already handled....
-                    LOG.info("TopologyManager: service from bundle "
+                    LOG.fine("TopologyManager: service from bundle "
                              + exports.getKey().getBundle().getSymbolicName()
                              + "is already handled by this RSA");
                 } else {
                     // trigger export of this service....
-                    LOG.info("TopologyManager: service from bundle "
+                    LOG.fine("TopologyManager: service from bundle "
                              + exports.getKey().getBundle().getSymbolicName()
                              + " is to be exported by this RSA");
                     triggerExport(exports.getKey());
@@ -181,7 +180,7 @@ public class TopologyManager {
         try {
             checkExistingServices();
         } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINER, "Failed to check existing services.", e);
         }
     }
 
@@ -222,8 +221,7 @@ public class TopologyManager {
 
         // add to local list of services that should/are be exported
         synchronized (exportedServices) {
-            LOG
-                .info("TopologyManager: adding service to exportedServices list to export it --- from bundle:  "
+            LOG.info("TopologyManager: adding service to exportedServices list to export it --- from bundle:  "
                       + sref.getBundle().getSymbolicName());
             exportedServices.put(sref,
                                  new LinkedHashMap<RemoteServiceAdmin, Collection<ExportRegistration>>());
@@ -238,7 +236,7 @@ public class TopologyManager {
         execService.execute(new Runnable() {
             @SuppressWarnings("unchecked")
             public void run() {
-                LOG.info("TopologyManager: exporting service ...");
+                LOG.finer("TopologyManager: exporting service ...");
 
                 Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports = null;
 
@@ -260,15 +258,15 @@ public class TopologyManager {
 
                             if (exports.containsKey(remoteServiceAdmin)) {
                                 // already handled by this remoteServiceAdmin
-                                LOG.info("TopologyManager: already handled by this remoteServiceAdmin -> skipping");
+                                LOG.fine("TopologyManager: already handled by this remoteServiceAdmin -> skipping");
                             } else {
                                 // TODO: additional parameter Map ?
-                                LOG.info("TopologyManager: exporting ...");
+                                LOG.fine("TopologyManager: exporting ...");
                                 Collection<ExportRegistration> endpoints = remoteServiceAdmin
                                     .exportService(sref, null);
                                 if (endpoints == null) {
                                     // TODO export failed -> What should be done here?
-                                    LOG.info("TopologyManager: export failed");
+                                    LOG.severe("TopologyManager: export failed");
                                     exports.put(remoteServiceAdmin, null);
                                 } else {
                                     LOG.info("TopologyManager: export sucessful Endpoints:" + endpoints);
@@ -299,7 +297,7 @@ public class TopologyManager {
             }
 
         } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, e.getMessage(), e);
         }
 
     }
@@ -321,7 +319,7 @@ public class TopologyManager {
 
         EndpointListener epl = (EndpointListener)bctx.getService(sref);
 
-        LOG.info("TopologyManager: notifyListenerOfAddingIfAppropriate() ");
+        LOG.finer("TopologyManager: notifyListenerOfAddingIfAppropriate() ");
 
         try {
 
@@ -333,23 +331,24 @@ public class TopologyManager {
                 Map props = exReg.getExportReference().getExportedEndpoint().getProperties();
                 Dictionary d = new Hashtable(props);
 
-                for (Filter filter : filters) {
-                    LOG.info("Matching: " + filter + "  against " + d);
+                if (LOG.isLoggable(Level.FINE)) {
+                    for (Filter filter : filters) {
+                        LOG.fine("Matching: " + filter + "  against " + d);
+                    }
                 }
 
                 for (Filter filter : filters) {
                     if (filter.match(d)) {
-                        LOG.info("Listener mached one of the Endpoints !!!!: " + epl);
+                        LOG.fine("Listener mached one of the Endpoints !!!!: " + epl);
 
-                        epl
-                            .endpointAdded(exReg.getExportReference().getExportedEndpoint(), filter
+                        epl.endpointAdded(exReg.getExportReference().getExportedEndpoint(), filter
                                 .toString());
                     }
                 }
             }
 
         } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -358,7 +357,7 @@ public class TopologyManager {
 
         EndpointListener epl = (EndpointListener)bctx.getService(sref);
 
-        LOG.info("TopologyManager: notifyListenerOfREMOVALIfAppropriate() ");
+        LOG.finer("TopologyManager: notifyListenerOfREMOVALIfAppropriate() ");
 
         List<Filter> filters;
         try {
@@ -372,13 +371,15 @@ public class TopologyManager {
                 Map props = endpoint.getProperties();
                 Dictionary d = new Hashtable(props);
 
-                for (Filter filter : filters) {
-                    LOG.info("Matching: " + filter + "  against " + d);
+                if (LOG.isLoggable(Level.FINE)) {
+                    for (Filter filter : filters) {
+                        LOG.fine("Matching: " + filter + "  against " + d);
+                    }
                 }
 
                 for (Filter filter : filters) {
                     if (filter.match(d)) {
-                        LOG.info("Listener matched one of the Endpoints !!!! --> calling removed() ...");
+                        LOG.fine("Listener matched one of the Endpoints !!!! --> calling removed() ...");
 
                         epl.endpointRemoved(exReg.getExportReference().getExportedEndpoint(), filter
                             .toString());
@@ -386,8 +387,7 @@ public class TopologyManager {
                 }
             }
         } catch (InvalidSyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, e.getMessage(), e);
         }
 
     }

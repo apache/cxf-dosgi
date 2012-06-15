@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.Dictionary;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -114,7 +115,7 @@ public class EventAdminHelper {
         try {
             refs = bctx.getAllServiceReferences(EventAdmin.class.getName(), null);
         } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Failed to get EventAdmin: " + e.getMessage(), e);
         }
 
         if (refs == null)

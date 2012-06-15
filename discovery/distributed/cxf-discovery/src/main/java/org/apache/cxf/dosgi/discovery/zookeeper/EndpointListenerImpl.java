@@ -79,7 +79,7 @@ public class EndpointListenerImpl implements EndpointListener {
                 for (String name : interfaces) {
                     String path = Util.getZooKeeperPath(name);
                     String fullPath = path + '/' + endpointKey;
-                    LOG.info("Creating ZooKeeper node: " + fullPath);
+                    LOG.fine("Creating ZooKeeper node: " + fullPath);
 
                     ensurePath(path, zk);
                     zk.create(fullPath, getData(endpoint), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);

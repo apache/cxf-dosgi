@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -76,7 +77,7 @@ public class EventProducer {
             }
 
         } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 

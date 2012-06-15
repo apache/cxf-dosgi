@@ -120,7 +120,8 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                                 break;
                             }
                         } catch (InvalidSyntaxException e) {
-                            e.printStackTrace();
+                            LOG.log(Level.SEVERE, "Currentscope [" + currentScope + "] resulted in"
+                                    + " a bad filter!", e);
                         }
                     }
                 }
@@ -142,7 +143,7 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
 
         List<String> children;
         try {
-            LOG.info("Processing the children of " + znode);
+            LOG.fine("Processing the children of " + znode);
             children = zookeeper.getChildren(znode, false);
 
             boolean foundANode = false;
@@ -187,7 +188,7 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
                 return null;
             }
             byte[] data = zookeeper.getData(node, false, null);
-            LOG.info("Child: " + node);
+            LOG.fine("Child: " + node);
 
             List<Element> elements = LocalDiscoveryUtils.getElements(new ByteArrayInputStream(data));
             EndpointDescription epd = null;
@@ -224,7 +225,7 @@ public class InterfaceDataMonitorListenerImpl implements DataMonitorListener {
 
     private void notifyListeners(EndpointDescription epd, boolean isRemoval) {
 
-        System.out.println("****************  notifyListeners("+epd+"  ,  "+isRemoval+")");
+        LOG.fine("****************  notifyListeners("+epd+"  ,  "+isRemoval+")");
         
         for (ServiceReference sref : discoveredServiceTracker.relatedServiceListeners) {
             if (bctx.getService(sref) instanceof EndpointListener) {

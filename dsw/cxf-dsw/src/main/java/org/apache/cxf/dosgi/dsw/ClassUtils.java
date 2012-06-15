@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -125,7 +126,7 @@ public final class ClassUtils {
                     providers.add(pClass.newInstance());
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOG.log(Level.FINE, "Failed to load provider, org ex: " + ex.getMessage(), ex);
                 LOG.warning("Provider " + className.trim() + " can not be loaded or created");
             }
         }

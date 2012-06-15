@@ -60,7 +60,7 @@ public class EndpointListenerImpl implements EndpointListener {
             return;
         
         
-        LOG.info("EndpointListener: extending scope by " + filter);
+        LOG.fine("EndpointListener: extending scope by " + filter);
 
         synchronized (filters) {
             filters.add(filter);
@@ -75,7 +75,7 @@ public class EndpointListenerImpl implements EndpointListener {
             return;
         
         
-        LOG.info("EndpointListener: reducing scope by " + filter);
+        LOG.fine("EndpointListener: reducing scope by " + filter);
         synchronized (filters) {
             filters.remove(filter);
         }
@@ -86,7 +86,7 @@ public class EndpointListenerImpl implements EndpointListener {
         Properties p = new Properties();
 
         synchronized (filters) {
-            LOG.info("EndpointListener: current filter: " + filters);
+            LOG.finer("EndpointListener: current filter: " + filters);
             // TODO: make a copy of the filter list
             p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, filters);
         }
@@ -95,14 +95,14 @@ public class EndpointListenerImpl implements EndpointListener {
     }
 
     private void updateRegistration() {
-
-        LOG.info("EndpointListenerImpl: filters: " + filters);
+        // This tends to be verbose.
+        LOG.finer("EndpointListenerImpl: filters: " + filters);
 
         serviceRegistration.setProperties(getRegistrationProperties());
     }
 
     public void endpointAdded(EndpointDescription epd, String filter) {
-        LOG.info("EndpointListenerImpl: EndpointAdded() filter:"+filter+"  EndpointDesc:"+epd);
+        LOG.fine("EndpointListenerImpl: EndpointAdded() filter:"+filter+"  EndpointDesc:"+epd);
         
         if(filter==null){
             LOG.severe("Endpoint is not handled because no matching filter was provided! Filter: "+filter);
@@ -115,7 +115,7 @@ public class EndpointListenerImpl implements EndpointListener {
     }
 
     public void endpointRemoved(EndpointDescription epd, String filter) {
-        LOG.info("EndpointListenerImpl: EndpointRemoved() -> "+epd);
+        LOG.fine("EndpointListenerImpl: EndpointRemoved() -> "+epd);
         topManager.removeImportableService(filter, epd);
     }
 

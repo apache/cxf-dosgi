@@ -29,7 +29,10 @@ import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.servicemix.specs.locator.OsgiLocator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -40,6 +43,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 
 public class SPIActivator implements BundleActivator, SynchronousBundleListener {
+    private static final Logger LOG = LogUtils.getL7dLogger(SPIActivator.class);
     private ConcurrentMap<Long, Map<String, Callable<Class>>> factories = new ConcurrentHashMap<Long, Map<String, Callable<Class>>>();
 
     public synchronized void start(BundleContext bundleContext) throws Exception {
@@ -70,7 +74,7 @@ public class SPIActivator implements BundleActivator, SynchronousBundleListener 
                 v.add(r.getURL());
             }
         } catch (IOException e1) {
-            e1.printStackTrace();
+            LOG.log(Level.SEVERE, "Failed to resolve service resources", e1);
         }
 
         Enumeration<URL> e = v.elements();
