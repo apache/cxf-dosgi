@@ -1,20 +1,20 @@
-/** 
- * Licensed to the Apache Software Foundation (ASF) under one 
- * or more contributor license agreements. See the NOTICE file 
- * distributed with this work for additional information 
- * regarding copyright ownership. The ASF licenses this file 
- * to you under the Apache License, Version 2.0 (the 
- * "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, 
- * software distributed under the License is distributed on an 
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
- * KIND, either express or implied. See the License for the 
- * specific language governing permissions and limitations 
- * under the License. 
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
@@ -24,33 +24,53 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
+import org.osgi.util.tracker.ServiceTracker;
 
 public class EndpointListenerImpl implements EndpointListener {
+    private final Logger LOG = Logger.getLogger(EndpointListenerImpl.class.getName());
 
-    private Logger LOG = Logger.getLogger(EndpointListenerImpl.class.getName());
-
-    private ZooKeeperDiscovery discovery;
-    private BundleContext bctx;
-
-    private List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
-
+    private final ZooKeeperDiscovery discovery;
+    private final List<DiscoveryPlugin> discoveryPlugins = new CopyOnWriteArrayList<DiscoveryPlugin>();
+    private final ServiceTracker discoveryPluginTracker;
+    private final List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
     private boolean closed = false;
 
     public EndpointListenerImpl(ZooKeeperDiscovery zooKeeperDiscovery, BundleContext bctx) {
-        this.bctx = bctx;
         discovery = zooKeeperDiscovery;
+
+        discoveryPluginTracker = new ServiceTracker(bctx, DiscoveryPlugin.class.getName(), null) {
+            @Override
+            public Object addingService(ServiceReference reference) {
+                Object svc = super.addingService(reference);
+                if (svc instanceof DiscoveryPlugin) {
+                    discoveryPlugins.add((DiscoveryPlugin) svc);
+                }
+                return svc;
+            }
+
+            @Override
+            public void removedService(ServiceReference reference, Object service) {
+                discoveryPlugins.remove(service);
+                super.removedService(reference, service);
+            }
+        };
+        discoveryPluginTracker.open();
     }
 
     private ZooKeeper getZooKeeper() {
@@ -77,12 +97,17 @@ public class EndpointListenerImpl implements EndpointListener {
 
                 ZooKeeper zk = getZooKeeper();
                 for (String name : interfaces) {
+                    Map<String, Object> props = new HashMap<String, Object>(endpoint.getProperties());
+                    for (DiscoveryPlugin plugin : discoveryPlugins) {
+                        endpointKey = plugin.process(props, endpointKey);
+                    }
+
                     String path = Util.getZooKeeperPath(name);
+                    ensurePath(path, zk);
+
                     String fullPath = path + '/' + endpointKey;
                     LOG.fine("Creating ZooKeeper node: " + fullPath);
-
-                    ensurePath(path, zk);
-                    zk.create(fullPath, getData(endpoint), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+                    zk.create(fullPath, getData(props), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
                 }
 
                 endpoints.add(endpoint);
@@ -146,9 +171,9 @@ public class EndpointListenerImpl implements EndpointListener {
         }
     }
 
-    static byte[] getData(EndpointDescription sr) throws IOException {
-       String s = LocalDiscoveryUtils.getEndpointDescriptionXML(sr.getProperties());
-       return s.getBytes();
+    static byte[] getData(Map<String, Object> props) throws IOException {
+        String s = LocalDiscoveryUtils.getEndpointDescriptionXML(props);
+        return s.getBytes();
     }
 
     static String getKey(String endpoint) throws UnknownHostException, URISyntaxException {
@@ -176,6 +201,6 @@ public class EndpointListenerImpl implements EndpointListener {
             }
             endpoints.clear();
         }
+        discoveryPluginTracker.close();
     }
-
 }
