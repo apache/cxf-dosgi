@@ -18,6 +18,7 @@
   */
 package org.apache.cxf.dosgi.dsw.service;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -152,7 +153,9 @@ public class ExportRegistrationImpl implements ExportRegistration {
         } else {
             Set<Map.Entry<String,Object>> props = endpointDescription.getProperties().entrySet();
             for (Map.Entry entry : props) {
-                r += entry.getKey() + "  => " + entry.getValue() + "\n";
+                Object value = entry.getValue();
+                r += entry.getKey() + "  => " +
+                    (value.getClass().isArray() ? Arrays.toString((Object []) value) : value) + "\n";
             }
         }
         return r;
