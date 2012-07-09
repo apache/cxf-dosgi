@@ -155,7 +155,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
             for (Map.Entry entry : props) {
                 Object value = entry.getValue();
                 r += entry.getKey() + "  => " +
-                    (value.getClass().isArray() ? Arrays.toString((Object []) value) : value) + "\n";
+                    (value instanceof Object[] ? Arrays.toString((Object []) value) : value) + "\n";
             }
         }
         return r;
