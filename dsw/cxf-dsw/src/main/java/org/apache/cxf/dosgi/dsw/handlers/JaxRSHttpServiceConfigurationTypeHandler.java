@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -72,7 +73,14 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             factory.setProviders(providers);
         }
         addRsInterceptorsFeaturesProps(factory, callingContext, sd);
-        
+        String location = OsgiUtils.getProperty(sd, Constants.RS_WADL_LOCATION);
+    	if (location != null) {
+    		URL wadlURL = callingContext.getBundle().getResource(location);
+                if (wadlURL != null) {
+	            factory.setDocLocation(wadlURL.toString());
+                }
+    	}        
+
         String address = constructAddress(dswContext, contextRoot);
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();

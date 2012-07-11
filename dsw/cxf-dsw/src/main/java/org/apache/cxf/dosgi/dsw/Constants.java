@@ -62,7 +62,7 @@ public class Constants {
     public static final String WS_WSDL_SERVICE_NAMESPACE =  WS_CONFIG_TYPE + ".service.ns";
     public static final String WS_WSDL_SERVICE_NAME =  WS_CONFIG_TYPE + ".service.name";
     public static final String WS_WSDL_PORT_NAME =  WS_CONFIG_TYPE + ".port.name";
-    public static final String WS_WSDL_LOCATION =  WS_CONFIG_TYPE + ".location";
+    public static final String WS_WSDL_LOCATION =  WS_CONFIG_TYPE + ".wsdl.location";
     // Rest
     public static final String RS_CONFIG_TYPE = PROVIDER_PREFIX + ".rs";
     public static final String RS_ADDRESS_PROPERTY = RS_CONFIG_TYPE + ".address";

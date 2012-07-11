@@ -119,7 +119,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         factory.setServiceBean(serviceBean);
 
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
-        setWsdlProperties(factory, dswContext, sd, false);
+        setWsdlProperties(factory, callingContext, sd, false);
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);

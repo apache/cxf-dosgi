@@ -152,7 +152,7 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
 
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         
-        setWsdlProperties(factory, dswContext, sd, true);
+        setWsdlProperties(factory, callingContext, sd, true);
         if (bus != null) {
         	factory.setBus(bus);
         }

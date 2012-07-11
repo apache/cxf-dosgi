@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -147,7 +148,10 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
 
         String location = OsgiUtils.getProperty(sd, Constants.RS_WADL_LOCATION);
     	if (location != null) {
-    		factory.setDocLocation(location);
+    		URL wadlURL = callingContext.getBundle().getResource(location);
+                if (wadlURL != null) {
+	            factory.setDocLocation(wadlURL.toString());
+                }
     	}
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();

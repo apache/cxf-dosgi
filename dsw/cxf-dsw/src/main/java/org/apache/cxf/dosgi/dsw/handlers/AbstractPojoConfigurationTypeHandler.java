@@ -110,12 +110,13 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return appliedIntents.toArray(new String[0]);
     }
 
-    protected void setWsdlProperties(ServerFactoryBean factory, BundleContext dswContext, 
-    		Map sd, boolean wsdlType) {
+    protected void setWsdlProperties(ServerFactoryBean factory,
+                                     BundleContext callingContext,  
+                                     Map sd, boolean wsdlType) {
     	String location = OsgiUtils.getProperty(sd, wsdlType ? Constants.WSDL_LOCATION : Constants.WS_WSDL_LOCATION);
     	if (location != null) {
-    		URL wsdlURL = dswContext.getBundle().getResource(location);
-	        if (wsdlURL != null) {
+    		URL wsdlURL = callingContext.getBundle().getResource(location);
+                if (wsdlURL != null) {
 	            factory.setWsdlURL(wsdlURL.toString());
 	        }
 	        QName serviceName = getServiceQName(null, sd, 

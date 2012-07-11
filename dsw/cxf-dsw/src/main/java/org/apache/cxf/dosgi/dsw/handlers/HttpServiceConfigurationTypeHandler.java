@@ -157,7 +157,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         
-        setWsdlProperties(factory, dswContext, sd, false);
+        setWsdlProperties(factory, callingContext, sd, false);
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
