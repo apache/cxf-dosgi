@@ -48,7 +48,7 @@ public class TestDiscoveryRountrip extends AbstractTestDiscoveryRoundtrip {
                 CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi").artifactId("cxf-dosgi-ri-singlebundle-distribution").versionAsInProject(),
                 
                 CoreOptions.mavenBundle().groupId("org.apache.log4j").artifactId("com.springsource.org.apache.log4j").versionAsInProject(),
-                CoreOptions.mavenBundle().groupId("org.apache.hadoop").artifactId("zookeeper").versionAsInProject(),
+                CoreOptions.mavenBundle().groupId("org.apache.zookeeper").artifactId("zookeeper").versionAsInProject(),
                 CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi").artifactId("cxf-dosgi-ri-discovery-distributed-zookeeper-server").versionAsInProject(),
                 
                 // This bundle contains the common system testing code
