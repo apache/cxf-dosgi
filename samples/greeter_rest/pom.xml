@@ -36,6 +36,7 @@
     <modules>    
       <module>interface</module>
       <module>impl</module>
+      <module>impl2</module>
       <module>client</module>
     </modules> 
 

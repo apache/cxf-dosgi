@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.common.logging.LogUtils;
@@ -148,16 +150,21 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         
         ServerFactoryBean factory = 
         	createServerFactoryBean(frontEndImpl != null ? frontEndImpl : frontEndImpl2);
-        String address = constructAddress(dswContext, contextRoot);
+        
         factory.setBus(bus);
         factory.setServiceClass(iClass);
-        factory.setAddress("/");
+        
+        String relativeEndpointAddress = getRelativeEndpointAddress(sd);
+        factory.setAddress(relativeEndpointAddress);
         factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
         
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         
         setWsdlProperties(factory, callingContext, sd, false);
+        
+        String completeEndpointAddress = 
+        		constructAddress(dswContext, contextRoot, relativeEndpointAddress);
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -166,7 +173,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             // The properties for the EndpointDescription
             Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {
                 Constants.WS_CONFIG_TYPE
-            }, address,intents);
+            }, completeEndpointAddress, intents);
             EndpointDescription endpdDesc = null;
             
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
@@ -202,7 +209,8 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         return cxf.getBus();
     }
 
-    protected String constructAddress(BundleContext ctx, String contextRoot) {
+    protected String constructAddress(BundleContext ctx, String contextRoot, 
+    		                          String relativeEndpointAddress) {
         String port = null;
         boolean https = false;
         if ("true".equalsIgnoreCase(ctx.getProperty("org.osgi.service.http.secure.enabled"))) {
@@ -221,8 +229,13 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         } catch (UnknownHostException e) {
             hostName = "localhost";
         }
-
-        return getAddress(https ? "https" : "http", hostName, port, contextRoot);
+        
+        String address = getAddress(https ? "https" : "http", hostName, port, contextRoot);
+        if (!StringUtils.isEmpty(relativeEndpointAddress) 
+        	&& !relativeEndpointAddress.equals("/")) {
+        	address += relativeEndpointAddress;
+        }
+        return address;
     }
 
     protected HttpService getHttpService() {
@@ -355,4 +368,18 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         }
     }
 
+    protected String getRelativeEndpointAddress(Map sd) {
+        String address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
+        if (address != null) {
+        	if (URI.create(address).isAbsolute()) {
+        		LOG.info("Ignoring an absolute endpoint address, the value of " 
+        				 + Constants.RS_ADDRESS_PROPERTY + " property can only be a relative URI"
+        				 + " when " + Constants.RS_HTTP_SERVICE_CONTEXT 
+        				 + " property is set");
+        	} else {
+        		return address;
+        	}
+        }
+        return "/";
+    }
 }

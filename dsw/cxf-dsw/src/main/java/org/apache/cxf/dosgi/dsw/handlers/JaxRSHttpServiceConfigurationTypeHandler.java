@@ -67,7 +67,9 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
         }
         
-        factory.setAddress("/");
+        String relativeEndpointAddress = getRelativeEndpointAddress(sd);
+        factory.setAddress(relativeEndpointAddress);
+        
         List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd);
         if (providers != null && providers.size() > 0) {
             factory.setProviders(providers);
@@ -81,7 +83,8 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
                 }
     	}        
 
-        String address = constructAddress(dswContext, contextRoot);
+    	String completeEndpointAddress = 
+        		constructAddress(dswContext, contextRoot, relativeEndpointAddress);
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -92,7 +95,7 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             // The properties for the EndpointDescription
             Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {
                 Constants.RS_CONFIG_TYPE
-            }, address,intents);
+            }, completeEndpointAddress, intents);
             EndpointDescription endpdDesc = null;
             
             
@@ -123,5 +126,4 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
         }
         return context;
     }
-
 }
