@@ -32,13 +32,11 @@ import org.osgi.framework.ServiceRegistration;
 public class RemoteServiceadminFactory implements ServiceFactory {
 
     private static final Logger LOG = LogUtils.getL7dLogger(RemoteServiceadminFactory.class);
-    private BundleContext bctx;
     private List<RemoteServiceAdminInstance> rsaServiceInstances = new ArrayList<RemoteServiceAdminInstance>();
 
     private RemoteServiceAdminCore rsaCore;
 
     public RemoteServiceadminFactory(BundleContext bc) {
-        bctx = bc;
         rsaCore = new RemoteServiceAdminCore(bc);
     }
 

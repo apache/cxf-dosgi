@@ -43,7 +43,7 @@ public class EventProducer {
         eaHelper = new EventAdminHelper(bctx);
     }
 
-    protected void publishNotifcation(List<ExportRegistrationImpl> erl) {
+    protected void publishNotifcation(List<ExportRegistration> erl) {
         for (ExportRegistration exportRegistration : erl) {
             publishNotifcation(exportRegistration);
         }

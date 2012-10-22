@@ -21,12 +21,16 @@ package org.apache.cxf.dosgi.dsw.service;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
+import org.osgi.service.remoteserviceadmin.ExportRegistration;
 
 public class ExportReferenceImpl implements ExportReference {
     private final ExportRegistrationImpl exportRegistration;
 
-    public ExportReferenceImpl(ExportRegistrationImpl exportRegistrationImpl) {
-        exportRegistration = exportRegistrationImpl;
+    public ExportReferenceImpl(ExportRegistration exportRegistration) {
+    	if (!(exportRegistration instanceof ExportRegistrationImpl)) {
+    		throw new IllegalArgumentException("Can only create a reference from ExportRegistrationImpl");	
+    	}
+        this.exportRegistration = (ExportRegistrationImpl) exportRegistration;
     }
 
     public EndpointDescription getExportedEndpoint() {

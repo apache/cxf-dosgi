@@ -95,15 +95,6 @@ public class Activator implements ManagedService,BundleContextAware {
         return OsgiUtils.getIntentMap(bc);
     }
 
-    private Object getHeader(String key) {
-        Object value = bc.getBundle().getHeaders().get(key);
-        if (value == null) {
-            return "";
-        } else {
-            return value;
-        }
-    }
-
     public void stop() {
         LOG.fine("RemoteServiceAdmin Implementation is shutting down now");
         
@@ -121,7 +112,8 @@ public class Activator implements ManagedService,BundleContextAware {
         // unregister other registered services (ManagedService + Hooks)
     }
 
-    public synchronized void updated(Dictionary props) throws ConfigurationException {
+    @SuppressWarnings("rawtypes")
+	public synchronized void updated(Dictionary props) throws ConfigurationException {
         if (props != null && CONFIG_SERVICE_PID.equals(props.get(Constants.SERVICE_PID))) {
             // topManager.updated(props);
         }

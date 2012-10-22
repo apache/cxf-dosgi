@@ -36,7 +36,8 @@ public class Utils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(Utils.class);
     
-    public static String[] normalizeStringPlus(Object object) {
+    @SuppressWarnings("rawtypes")
+	public static String[] normalizeStringPlus(Object object) {
 
         if (object instanceof String) {
             String s = (String)object;
@@ -98,7 +99,8 @@ public class Utils {
     }
     
     
-    public static String[] getAllRequiredIntents(Map serviceProperties){
+    @SuppressWarnings("rawtypes")
+	public static String[] getAllRequiredIntents(Map serviceProperties){
         // Get the intents that need to be supported by the RSA
         String[] requiredIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
         if(requiredIntents==null){
@@ -116,7 +118,8 @@ public class Utils {
         return requiredIntents;
     }
 
-    public static String[] getInetntsImplementedByTheService(Map serviceProperties){
+    @SuppressWarnings("rawtypes")
+	public static String[] getInetntsImplementedByTheService(Map serviceProperties){
         // Get the Intents that are implemented by the service 
         String[] serviceIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_INTENTS));
         
@@ -143,7 +146,8 @@ public class Utils {
     }
     
     
-    public static void overlayProperties(Properties serviceProperties, Map additionalProperties) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void overlayProperties(Properties serviceProperties, Map additionalProperties) {
         Enumeration<Object> keys = serviceProperties.keys();
         // Maps lower case key to original key
         HashMap<String,String> keysLowerCase = new HashMap<String, String>();

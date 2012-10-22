@@ -64,118 +64,11 @@ public final class OsgiUtils {
 
     private static final String SERVICE_DESCRIPTION_ELEMENT = "service-description";
 
-//    private static final String PROVIDE_INTERFACE_ELEMENT = "provide";
-//    private static final String PROVIDE_INTERFACE_NAME_ATTRIBUTE = "interface";
-
-//    private static final String PROPERTY_ELEMENT = "property";
-//    private static final String PROPERTY_NAME_ATTRIBUTE = "name";
-//    private static final String PROPERTY_VALUE_ATTRIBUTE = "value";
-//    private static final String PROPERTY_INTERFACE_ATTRIBUTE = "interface";
-
-//    private static final String INTERFACE_WILDCARD = "*";
-//    private static final String INTERFACE_SEPARATOR = ":";
-
     private OsgiUtils() {
     }
 
-//    // Used by PublishHook
-//    public static ServiceEndpointDescription getRemoteReference(ServiceReference sref, boolean matchAllNames) {
-//
-//        String[] names = (String[])sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS);
-//        if (names == null || names.length == 0) {
-//            return null;
-//        }
-//
-//        Map<String, Object> userProperties = new HashMap<String, Object>();
-//        for (String key : sref.getPropertyKeys()) {
-//            userProperties.put(key, sref.getProperty(key));
-//        }
-//        List<ServiceEndpointDescription> srefs = getRemoteReferences(sref.getBundle(), names, userProperties,
-//                                                                     matchAllNames);
-//        setAdditionalProperties(sref, userProperties);
-//
-//        if (srefs.isEmpty()) {
-//            return new ServiceEndpointDescriptionImpl(Arrays.asList(names), userProperties);
-//        }
-//
-//        return srefs.get(0);
-//    }
 
-//    @SuppressWarnings("unchecked")
-//    public static List<ServiceEndpointDescription> getRemoteReferences(Bundle b, String[] names,
-//                                                                       Map<String, Object> userProperties,
-//                                                                       boolean matchAllNames) {
-//
-//        List<Element> references = getAllDescriptionElements(b);
-//
-//        List<ServiceEndpointDescription> srefs = new ArrayList<ServiceEndpointDescription>();
-//        Namespace ns = Namespace.getNamespace(REMOTE_SERVICES_NS);
-//        for (Element ref : references) {
-//            List<String> iNames = getProvidedInterfaces(ref.getChildren(PROVIDE_INTERFACE_ELEMENT, ns));
-//            if (!serviceNamesMatch(names, iNames, matchAllNames)) {
-//                continue;
-//            }
-//
-//            Map<String, Object> remoteProps = new HashMap<String, Object>(userProperties);
-//            addProperties(remoteProps, ref.getChildren(PROPERTY_ELEMENT, ns));
-//            srefs.add(new ServiceEndpointDescriptionImpl(iNames, remoteProps));
-//        }
-//        return srefs;
-//
-//    }
-
-//    public static ServiceEndpointDescription[] flattenServiceDescription(ServiceEndpointDescription sd) {
-//        ServiceEndpointDescription[] list = null;
-//        int interfaceNameCount = sd.getProvidedInterfaces().size();
-//        if (sd.getProvidedInterfaces() == null || interfaceNameCount <= 1) {
-//            list = new ServiceEndpointDescription[] {
-//                sd
-//            };
-//        } else {
-//            String[] iNames = (String[])sd.getProvidedInterfaces().toArray(new String[interfaceNameCount]);
-//            list = new ServiceEndpointDescription[iNames.length];
-//            for (int i = 0; i < iNames.length; i++) {
-//                Map<String, Object> props = excludeProperty(sd.getProperties(),
-//                                                            Constants.EXPORTED_INTERFACES,
-//                                                            Constants.EXPORTED_INTERFACES_OLD,
-//                                                            Constants.RS_PROVIDER_GLOBAL_PROP_KEY,
-//                                                            Constants.RS_PROVIDER_EXPECTED_PROP_KEY,
-//                                                            Constants.RS_PROVIDER_PROP_KEY);
-//
-//                String keys[] = props.keySet().toArray(new String[props.size()]);
-//                for (int j = 0; j < keys.length; j++) {
-//                    int sep = keys[j].indexOf(INTERFACE_SEPARATOR);
-//                    if (sep > -1) {
-//                        String value = (String)props.remove(keys[j]);
-//                        String root = keys[j].substring(0, sep);
-//                        String iface = sep + INTERFACE_SEPARATOR.length() < keys[j].length() ? keys[j]
-//                            .substring(sep + INTERFACE_SEPARATOR.length()) : "";
-//                        if (iNames[i].equals(iface)) {
-//                            props.put(root, value);
-//                        }
-//                    }
-//                }
-//                list[i] = new ServiceEndpointDescriptionImpl(iNames[i], props);
-//            }
-//        }
-//        return list;
-//    }
-
-//    private static Map<String, Object> excludeProperty(Map properties, String... excludes) {
-//        Collection<String> exList = Arrays.asList(excludes);
-//
-//        Map<String, Object> pruned = new HashMap<String, Object>();
-//        for (Object key : properties.keySet()) {
-//            if (exList.contains(key)) {
-//                // exclude
-//            } else {
-//                pruned.put((String)key, properties.get(key));
-//            }
-//        }
-//        return pruned;
-//    }
-
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static List<Element> getAllDescriptionElements(Bundle b) {
         Object directory = null;
 
@@ -206,82 +99,6 @@ public final class OsgiUtils {
         }
         return elements;
     }
-
-//    private static void setAdditionalProperties(ServiceReference sref, Map<String, Object> props) {
-//        BundleContext bc = sref.getBundle().getBundleContext();
-//        ServiceReference[] refs;
-//        try {
-//            refs = bc.getServiceReferences(ServiceDecorator.class.getName(), null);
-//        } catch (InvalidSyntaxException e) {
-//            // should never happen, filter is null
-//            return;
-//        }
-//        if (refs == null) {
-//            return;
-//        }
-//
-//        for (ServiceReference ref : refs) {
-//            Object svc = bc.getService(ref);
-//            if (svc instanceof ServiceDecorator) {
-//                ((ServiceDecorator)svc).decorate(sref, props);
-//            }
-//        }
-//    }
-
-//    private static boolean serviceNamesMatch(String[] names, List<String> iNames, boolean matchAllNames) {
-//        if (names == null || names.length == 0) {
-//            return false;
-//        }
-//        if (matchAllNames) {
-//            for (String name : names) {
-//                if (!iNames.contains(name)) {
-//                    return false;
-//                }
-//            }
-//            return true;
-//        } else {
-//            for (String name : names) {
-//                if (iNames.contains(name)) {
-//                    return true;
-//                }
-//            }
-//            return false;
-//        }
-//    }
-
-    /*
-     * // TODO : consider creating a new List rather than modifyiing the existing one public static void
-     * matchServiceDescriptions(List<ServiceEndpointDescription> sds, String interfaceName, Filter filter,
-     * boolean matchAll) { for (Iterator<ServiceEndpointDescription> it = sds.iterator(); it.hasNext();) {
-     * ServiceEndpointDescription sd = it.next(); if (filter != null && !OsgiUtils.matchAgainstFilter(sd,
-     * interfaceName, filter, matchAll)) { it.remove(); } } }
-     * @SuppressWarnings("unchecked") public static boolean matchAgainstFilter(ServiceEndpointDescription sd,
-     * String interfaceName, Filter filter, boolean matchAll) { Dictionary props = new Hashtable(); for
-     * (Object key : sd.getPropertyKeys()) { if (matchAll ||
-     * key.toString().startsWith(DistributionConstants.REMOTE)) { props.put(key,
-     * sd.getProperty(key.toString())); } } String[] interfaceNames = getProvidedInterfaces(sd,
-     * interfaceName); if (interfaceNames != null) { props.put(org.osgi.framework.Constants.OBJECTCLASS,
-     * interfaceNames); } return filter.match(props); }
-     */
-
-//    public static String[] getProvidedInterfaces(ServiceEndpointDescription sd, String interfaceName) {
-//
-//        int interfaceNameCount = sd.getProvidedInterfaces().size();
-//        String[] interfaceNames = (String[])sd.getProvidedInterfaces()
-//            .toArray(new String[interfaceNameCount]);
-//        if (interfaceName == null) {
-//            return interfaceNames;
-//        }
-//
-//        for (String s : interfaceNames) {
-//            if (s.equals(interfaceName)) {
-//                return new String[] {
-//                    s
-//                };
-//            }
-//        }
-//        return null;
-//    }
 
     public static Filter createFilter(BundleContext bc, String filterValue) {
 
@@ -317,43 +134,7 @@ public final class OsgiUtils {
         return sb.toString();
     }
 
-//    private static Map<String, Object> getProperties(List<Element> elements) {
-//        Map<String, Object> props = new HashMap<String, Object>();
-//        addProperties(props, elements);
-//        return props;
-//    }
-
-//    private static void addProperties(Map<String, Object> props, List<Element> elements) {
-//        for (Element p : elements) {
-//            String key = p.getAttributeValue(PROPERTY_NAME_ATTRIBUTE);
-//            String value = p.getAttributeValue(PROPERTY_VALUE_ATTRIBUTE);
-//            if (value == null) {
-//                value = p.getTextTrim();
-//            }
-//
-//            String iface = p.getAttributeValue(PROPERTY_INTERFACE_ATTRIBUTE);
-//            if (key != null) {
-//                props.put(iface == null || iface.length() == 0 ? key : key + INTERFACE_SEPARATOR + iface,
-//                          value);
-//            }
-//        }
-//    }
-
-//    private static List<String> getProvidedInterfaces(List<Element> elements) {
-//
-//        List<String> names = new ArrayList<String>();
-//
-//        for (Element p : elements) {
-//            String name = p.getAttributeValue(PROVIDE_INTERFACE_NAME_ATTRIBUTE);
-//            if (name != null) {
-//                names.add(name);
-//            }
-//        }
-//
-//        return names;
-//    }
-
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> OsgiService<T> getOsgiService(BundleContext bc, Class<T> serviceClass) {
         try {
             ServiceReference sr = bc.getServiceReference(serviceClass.getName());
@@ -417,27 +198,10 @@ public final class OsgiUtils {
         }
     }
 
-    // Eg. "(&(" + Constants.OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))"
-    public static Filter createFilterFromProperties(BundleContext bc, Dictionary properties) {
-
-        if (properties == null || properties.isEmpty()) {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("(&");
-        for (Enumeration keys = properties.keys(); keys.hasMoreElements();) {
-            String key = keys.nextElement().toString();
-            String value = properties.get(key).toString();
-            sb.append('(').append(key).append('=').append(value).append(')');
-        }
-        sb.append(')');
-        return createFilter(bc, sb.toString());
-    }
-
     // TODO : move these property helpers into PropertyUtils ?
 
-    public static boolean getBooleanProperty(Map sd, String name) {
+    @SuppressWarnings("rawtypes")
+	public static boolean getBooleanProperty(Map sd, String name) {
         Object value = sd.get(name);
         return toBoolean(value);
     }
@@ -473,7 +237,8 @@ public final class OsgiUtils {
 
     }
 
-    public static String getProperty(Map dict, String name) {
+    @SuppressWarnings("rawtypes")
+	public static String getProperty(Map dict, String name) {
         Object o = dict.get(name);
 
         if (o != null && o instanceof String) {
@@ -481,79 +246,6 @@ public final class OsgiUtils {
         }
         return null;
     }
-
-//    @SuppressWarnings("unchecked")
-//    public static <T> T getProperty(ServiceEndpointDescription sd, String name, Class<T> type, T defaultValue) {
-//        Object o = sd.getProperty(name);
-//        if (o == null) {
-//            return defaultValue;
-//        }
-//        return type.isAssignableFrom(o.getClass()) ? (T)o : null;
-//    }
-//
-//    public static String[] getPublishableInterfaces(ServiceEndpointDescription sd, ServiceReference sref) {
-//        Collection<String> publishProperty = getMultiValueProperty(sd
-//            .getProperty(Constants.EXPORTED_INTERFACES));
-//        if (publishProperty == null) {
-//            publishProperty = getMultiValueProperty(sd.getProperty(Constants.EXPORTED_INTERFACES_OLD));
-//        }
-//
-//        String[] actualInterfaces = (String[])sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS);
-//        String[] publishableInterfaces = null;
-//
-//        if (actualInterfaces != null && actualInterfaces.length > 0 && publishProperty != null) {
-//
-//            if (publishProperty.size() == 1 && INTERFACE_WILDCARD.equals(publishProperty.iterator().next())) {
-//                // wildcard indicates all interfaces should be published
-//                //
-//                publishableInterfaces = actualInterfaces;
-//            } else {
-//                String[] requestedInterfaces;
-//                if (publishProperty.size() == 0) {
-//                    requestedInterfaces = null;
-//                } else if (publishProperty.size() == 1) {
-//                    requestedInterfaces = tokenize(publishProperty.iterator().next(), ",");
-//                } else {
-//                    requestedInterfaces = publishProperty.toArray(new String[publishProperty.size()]);
-//                }
-//
-//                ArrayList<String> publishableList = new ArrayList<String>();
-//                for (int i = 0; requestedInterfaces != null && i < requestedInterfaces.length; i++) {
-//                    if (contains(actualInterfaces, requestedInterfaces[i])) {
-//                        publishableList.add(requestedInterfaces[i]);
-//                    } else {
-//                        // simply ignore non-exposed interfaces
-//                        //
-//                        LOG.warning("ignoring publish interface, " + requestedInterfaces[i]
-//                                    + ", not exposed by service");
-//                    }
-//                }
-//
-//                if (publishableList.size() > 0) {
-//                    publishableInterfaces = publishableList.toArray(new String[publishableList.size()]);
-//                }
-//            }
-//        }
-//
-//        return publishableInterfaces;
-//    }
-
-//    private static String[] tokenize(String str, String delim) {
-//        StringTokenizer tokenizer = new StringTokenizer(str, delim);
-//        String[] tokens = new String[tokenizer.countTokens()];
-//        for (int i = 0; tokenizer.hasMoreTokens(); i++) {
-//            tokens[i] = tokenizer.nextToken();
-//        }
-//        return tokens;
-//    }
-//
-//    private static boolean contains(String[] list, String member) {
-//        boolean found = false;
-//        for (int i = 0; i < list.length && !found; i++) {
-//            found = member.equals(list[i]);
-//        }
-//        return found;
-//    }
 
     /**
      * Tries to retrieve the version of iClass via the PackageAdmin
@@ -601,7 +293,6 @@ public final class OsgiUtils {
         return "0.0.0";
     }
 
-    
     public static String getUUID(BundleContext bc) {
         synchronized ("org.osgi.framework.uuid") {
             String uuid = bc.getProperty("org.osgi.framework.uuid");

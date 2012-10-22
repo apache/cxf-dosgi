@@ -37,9 +37,6 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-
-
-/// *************************** FIXME: some old methods might be in here ****
 public class ExportRegistrationImpl implements ExportRegistration {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ExportRegistrationImpl.class);
@@ -152,7 +149,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
             r += "---> NULL <---- \n";
         } else {
             Set<Map.Entry<String,Object>> props = endpointDescription.getProperties().entrySet();
-            for (Map.Entry entry : props) {
+            for (Map.Entry<String,Object> entry : props) {
                 Object value = entry.getValue();
                 r += entry.getKey() + "  => " +
                     (value instanceof Object[] ? Arrays.toString((Object []) value) : value) + "\n";

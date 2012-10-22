@@ -80,7 +80,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     static List<Element> getDecorationElements(Bundle bundle) {
         Enumeration entries = bundle.findEntries("OSGI-INF/remote-service", "*.xml", false);
         if (entries == null) {

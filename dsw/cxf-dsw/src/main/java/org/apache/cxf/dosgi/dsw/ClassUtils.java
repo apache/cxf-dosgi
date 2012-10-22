@@ -94,7 +94,8 @@ public final class ClassUtils {
     	return null;
     }
     
-    public static List<Object> loadProviderClasses(BundleContext callingContext, Map sd, String propName) {
+    @SuppressWarnings("rawtypes")
+	public static List<Object> loadProviderClasses(BundleContext callingContext, Map sd, String propName) {
     	
     	Object serviceProviders = sd.get(propName);
         if (serviceProviders != null) {

@@ -43,11 +43,10 @@ public class EventAdminHelper {
         bctx = bc;
     }
 
-    private Event createEvent(Properties p, String t) {
+    @SuppressWarnings("rawtypes")
+	private Event createEvent(Properties props, String type) {
 
-        String topic = "org/osgi/service/remoteserviceadmin/" + t;
-        Dictionary props = p;
-
+        String topic = "org/osgi/service/remoteserviceadmin/" + type;
         props.put("bundle", bctx.getBundle());
         props.put("bundle.id", bctx.getBundle().getBundleId());
         props.put("bundle.symbolicname", bctx.getBundle().getSymbolicName());
@@ -63,7 +62,7 @@ public class EventAdminHelper {
         
         setIfNotNull(props, "bundle.version", v);
 
-        return new Event(topic, props);
+        return new Event(topic, (Dictionary)props);
     }
 
     public void notifyEventAdmin(RemoteServiceAdminEvent rsae) {
@@ -105,7 +104,8 @@ public class EventAdminHelper {
 
     }
 
-    private void setIfNotNull(Dictionary props, String key, Object o) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private void setIfNotNull(Dictionary props, String key, Object o) {
         if (o != null)
             props.put(key, o);
     }

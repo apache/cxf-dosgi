@@ -24,20 +24,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointPermission;
+import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
 public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
-    private static final Logger LOG = LogUtils.getL7dLogger(RemoteServiceAdminInstance.class);
-
     private BundleContext bctx;
     private RemoteServiceAdminCore rsaCore;
 
@@ -48,7 +45,8 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
         rsaCore = core;
     }
 
-    public List /* ExportRegistration */exportService(ServiceReference ref, Map properties)
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List /* ExportRegistration */exportService(ServiceReference ref, Map properties)
         throws IllegalArgumentException, UnsupportedOperationException {
 
         SecurityManager sm = System.getSecurityManager();
@@ -64,17 +62,18 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
         final Map propertiesFinal = properties;
 
         return AccessController.doPrivileged(new PrivilegedAction<List>() {
-            public List run() {
+            public List<ExportRegistration> run() {
 
                 if (closed)
-                    return Collections.EMPTY_LIST;
+                    return Collections.emptyList();
 
                  return rsaCore.exportService(refFinal, propertiesFinal);
             }
         });
     }
 
-    public Collection getExportedServices() {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public Collection getExportedServices() {
 
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
@@ -87,7 +86,8 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
         return rsaCore.getExportedServices();
     }
 
-    public Collection getImportedEndpoints() {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public Collection getImportedEndpoints() {
 
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
