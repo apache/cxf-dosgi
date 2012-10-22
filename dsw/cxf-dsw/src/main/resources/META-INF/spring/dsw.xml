@@ -21,6 +21,10 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
+  <!--
+  	The spring config is currently needed as dsw loads the intent file using spring and we need to make sure the spring extender is loaded at this point.
+  	See https://issues.apache.org/jira/browse/DOSGI-66 
+   -->
   <bean name="dsw" class="org.apache.cxf.dosgi.dsw.Activator"
         init-method="start" 
         destroy-method="stop" 
