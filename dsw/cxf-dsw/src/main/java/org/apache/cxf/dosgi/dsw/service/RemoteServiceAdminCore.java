@@ -33,13 +33,15 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.dosgi.dsw.ClassUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.handlers.ClientServiceFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
+import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
+import org.apache.cxf.dosgi.dsw.util.ClassUtils;
+import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
+import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -60,8 +62,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private final LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices = new LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>>();
 
     private BundleContext bctx;
-
     private EventProducer eventProducer;
+    private IntentMap intentMap;
 
     private volatile boolean useMasterMap = true;
     private volatile String defaultPort;
@@ -79,9 +81,10 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     protected final static String DEFAULT_CONFIGURATION = Constants.WS_CONFIG_TYPE;
 
-    public RemoteServiceAdminCore(BundleContext bc) {
+    public RemoteServiceAdminCore(BundleContext bc, IntentMap intentMap) {
         bctx = bc;
         eventProducer = new EventProducer(bctx);
+        this.intentMap = intentMap;
     }
 
     @SuppressWarnings("rawtypes")
@@ -136,19 +139,17 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
 
             if (additionalProperties != null) {// overlay properties with the additionalProperies
-                Utils.overlayProperties(serviceProperties,additionalProperties);
+                OsgiUtils.overlayProperties(serviceProperties,additionalProperties);
             }
 
             // Get the intents that need to be supported by the RSA
-            String[] requiredIntents = Utils.getAllRequiredIntents(serviceProperties);
+            String[] requiredIntents = IntentUtils.getAllRequiredIntents(serviceProperties);
 
             {
-                IntentMap im = OsgiUtils.getIntentMap(bctx);
-
                 List<String> unsupportedIntents = new ArrayList<String>();
 
                 for (String ri : requiredIntents) {
-                    if (!im.getIntents().containsKey(ri)) {
+                    if (!intentMap.getIntents().containsKey(ri)) {
                         unsupportedIntents.add(ri);
                     }
                 }

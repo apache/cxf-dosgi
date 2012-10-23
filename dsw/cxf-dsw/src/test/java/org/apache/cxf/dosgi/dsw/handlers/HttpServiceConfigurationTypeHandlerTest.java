@@ -26,6 +26,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
@@ -143,7 +144,8 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         final ServerFactoryBean sfb = createMockServerFactoryBean();
         
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        IntentMap intentMap = new IntentMap();
+		RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap );
         Map<String, Object> handlerProps = new HashMap<String, Object>();
         HttpServiceConfigurationTypeHandler h = 
             new HttpServiceConfigurationTypeHandler(dswContext,  handlerProps) {
@@ -216,7 +218,8 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         final ServerFactoryBean sfb = createMockServerFactoryBean();
         
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        IntentMap intentMap = new IntentMap();
+		RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap);
         Map<String, Object> handlerProps = new HashMap<String, Object>();
         HttpServiceConfigurationTypeHandler h = 
             new HttpServiceConfigurationTypeHandler(dswContext,  handlerProps) {

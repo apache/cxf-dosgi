@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
@@ -36,8 +37,8 @@ public class RemoteServiceadminFactory implements ServiceFactory {
 
     private RemoteServiceAdminCore rsaCore;
 
-    public RemoteServiceadminFactory(BundleContext bc) {
-        rsaCore = new RemoteServiceAdminCore(bc);
+    public RemoteServiceadminFactory(BundleContext bc, IntentMap intentMap) {
+    	this.rsaCore = new RemoteServiceAdminCore(bc, intentMap);
     }
 
     public Object getService(Bundle b, ServiceRegistration sr) {

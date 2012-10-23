@@ -367,7 +367,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap);
         AbstractPojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext,  handlerProps) {
             @Override
             IntentMap getIntentMap(BundleContext callingContext) {
@@ -403,7 +403,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap);
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext,  handlerProps) {
             @Override
             IntentMap getIntentMap(BundleContext callingContext) {
@@ -439,7 +439,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap);
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext,  handlerProps) {
             @Override
             IntentMap getIntentMap(BundleContext callingContext) {
@@ -477,7 +477,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
         
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap);
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext,  handlerProps) {
             @Override
             IntentMap getIntentMap(BundleContext callingContext) {
@@ -521,7 +521,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
         
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap);
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext,  handlerProps) {
             @Override
             IntentMap getIntentMap(BundleContext callingContext) {
@@ -560,7 +560,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
         
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap);
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext,  handlerProps) {
             @Override
             IntentMap getIntentMap(BundleContext callingContext) {
@@ -634,7 +634,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, masterIntentMap);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", requestedIntents);
@@ -683,7 +683,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
         
-        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, masterIntentMap);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "B A");

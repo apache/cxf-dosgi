@@ -32,8 +32,8 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.service.Utils;
+import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
+import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
@@ -134,7 +134,7 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
         }
         
         {
-            String[] allIntents = Utils.mergeArrays(intents, Utils.getInetntsImplementedByTheService(sd));
+            String[] allIntents = IntentUtils.mergeArrays(intents, IntentUtils.getInetntsImplementedByTheService(sd));
             props.put(RemoteConstants.SERVICE_INTENTS, allIntents);
         }
 

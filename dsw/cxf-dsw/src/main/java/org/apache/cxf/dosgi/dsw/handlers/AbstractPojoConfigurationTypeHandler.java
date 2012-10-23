@@ -35,10 +35,11 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.dosgi.dsw.ClassUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
+import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
+import org.apache.cxf.dosgi.dsw.util.ClassUtils;
+import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ClientFactoryBean;
@@ -305,7 +306,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     }
 
     IntentMap getIntentMap(BundleContext callingContext) {
-        return OsgiUtils.getIntentMap(callingContext);
+        return IntentUtils.getIntentMap(callingContext);
     }
 
     public String getType() {
@@ -314,11 +315,11 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     private static String[] getRequestedIntents(Map sd) {
         Collection<String> intents = Arrays.asList(
-            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));        
+            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));        
         Collection<String> extraIntents = Arrays.asList(
-            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));
+            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));
         Collection<String> oldIntents = Arrays.asList(
-            OsgiUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_OLD))); 
+            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_OLD))); 
         
         Set<String> allIntents = new HashSet<String>(intents.size() + extraIntents.size() + oldIntents.size());
         allIntents.addAll(intents);

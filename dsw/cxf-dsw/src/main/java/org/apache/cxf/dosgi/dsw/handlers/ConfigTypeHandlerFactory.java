@@ -25,7 +25,8 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.OsgiUtils;
+import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
+import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.osgi.framework.BundleContext;
 
 public final class ConfigTypeHandlerFactory {
@@ -79,7 +80,7 @@ public final class ConfigTypeHandlerFactory {
             String intentsProperty = OsgiUtils.getProperty(serviceProperties, Constants.EXPORTED_INTENTS);
             boolean hasHttpIntent = false, hasSoapIntent = false;
             if (intentsProperty != null) {
-                String[] intents = OsgiUtils.parseIntents(intentsProperty);
+                String[] intents = IntentUtils.parseIntents(intentsProperty);
                 for (int i = 0; i < intents.length; i++) {
                     if (intents[i].indexOf("SOAP") > -1) {
                         hasSoapIntent = true;

@@ -16,13 +16,14 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.dsw;
+package org.apache.cxf.dosgi.dsw.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import junit.framework.TestCase;
 

@@ -67,7 +67,7 @@ public class EventAdminHelper {
 
     public void notifyEventAdmin(RemoteServiceAdminEvent rsae) {
 
-        String topic = Utils.remoteServiceAdminEventTypeToString(rsae.getType());
+        String topic = remoteServiceAdminEventTypeToString(rsae.getType());
 
         Properties props = new Properties();
         setIfNotNull(props, "cause", rsae.getException());
@@ -129,6 +129,29 @@ public class EventAdminHelper {
         }
 
         return eas;
+    }
+
+    static String remoteServiceAdminEventTypeToString(int type){
+        switch (type) {
+        case RemoteServiceAdminEvent.EXPORT_ERROR:
+            return "EXPORT_ERROR";
+        case RemoteServiceAdminEvent.EXPORT_REGISTRATION:
+            return "EXPORT_REGISTRATION";
+        case RemoteServiceAdminEvent.EXPORT_UNREGISTRATION:
+            return "EXPORT_UNREGISTRATION";
+        case RemoteServiceAdminEvent.EXPORT_WARNING:
+            return "EXPORT_WARNING";
+        case RemoteServiceAdminEvent.IMPORT_ERROR:
+            return "IMPORT_ERROR";
+        case RemoteServiceAdminEvent.IMPORT_REGISTRATION:
+            return "IMPORT_REGISTRATION";
+        case RemoteServiceAdminEvent.IMPORT_UNREGISTRATION:
+            return "IMPORT_UNREGISTRATION";
+        case RemoteServiceAdminEvent.IMPORT_WARNING:
+            return "IMPORT_WARNING";    
+        default:
+            return "UNKNOWN_EVENT";
+        }
     }
 
 }

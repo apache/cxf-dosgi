@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
 import org.osgi.framework.Bundle;
@@ -59,7 +60,8 @@ public class RemoteServiceAdminCoreTest {
         ServiceReference sref = c.createMock(ServiceReference.class);
         EasyMock.expect(sref.getBundle()).andReturn(b).anyTimes();
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc);
+        IntentMap IntentMap = new IntentMap();
+		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, IntentMap );
 
         c.replay();
 
@@ -90,7 +92,8 @@ public class RemoteServiceAdminCoreTest {
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(b.getSymbolicName()).andReturn("BundleName").anyTimes();
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc) {
+        IntentMap intentMap = new IntentMap();
+		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentMap ) {
             @Override
             protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
                                                     ConfigurationTypeHandler handler,
@@ -155,7 +158,8 @@ public class RemoteServiceAdminCoreTest {
 
         c.replay();
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc);
+        IntentMap IntentMap = new IntentMap();
+		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, IntentMap );
 
         Properties serviceProperties = new Properties();
 
@@ -178,7 +182,8 @@ public class RemoteServiceAdminCoreTest {
 
         c.replay();
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc);
+        IntentMap intentMap = new IntentMap();
+		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentMap );
 
         Properties serviceProperties = new Properties();
 

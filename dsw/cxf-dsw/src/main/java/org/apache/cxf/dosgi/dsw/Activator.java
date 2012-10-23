@@ -28,6 +28,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
+import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -65,7 +66,8 @@ public class Activator implements ManagedService,BundleContextAware {
     }
 
     private RemoteServiceadminFactory registerRemoteServiceAdminService() {
-        RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(bc);
+    	IntentMap intentMap = IntentUtils.getIntentMap(bc);
+        RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(bc, intentMap);
         Hashtable<String, Object> props = new Hashtable<String, Object>();
 
         // TODO .... RemoteAdminService.XXX
@@ -73,8 +75,8 @@ public class Activator implements ManagedService,BundleContextAware {
         // props.put(DistributionProvider.PRODUCT_VERSION, getHeader("Bundle-Version"));
         // props.put(DistributionProvider.VENDOR_NAME, getHeader("Bundle-Vendor"));
 
-        String[] supportedIntents = getIntentMap().getIntents().keySet().toArray(new String[] {});
-        String siString = OsgiUtils.formatIntents(supportedIntents);
+        String[] supportedIntents = intentMap.getIntents().keySet().toArray(new String[] {});
+        String siString = IntentUtils.formatIntents(supportedIntents);
         props.put("remote.intents.supported", siString);
 
         // // TODO make this a little smarter
@@ -89,10 +91,6 @@ public class Activator implements ManagedService,BundleContextAware {
 
         rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
         return rsaf;
-    }
-
-    IntentMap getIntentMap() {
-        return OsgiUtils.getIntentMap(bc);
     }
 
     public void stop() {

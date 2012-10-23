@@ -19,11 +19,9 @@
 -->
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
     <packaging>bundle</packaging>
     <name>Distributed OSGi Distribution Software Bundle</name>
-    <version>1.4-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>

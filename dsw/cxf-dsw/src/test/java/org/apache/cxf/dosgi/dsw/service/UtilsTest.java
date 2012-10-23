@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 
+import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
+import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.junit.Test;
 import org.osgi.framework.Constants;
 
@@ -78,7 +80,7 @@ public class UtilsTest {
 
         { // nothing should change here
             Properties overload = new Properties();
-            Utils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy,overload);
 
             assertEquals(original.size(), copy.size());
             for (Object key : Collections.list(original.keys())) {
@@ -93,7 +95,7 @@ public class UtilsTest {
             Properties overload = new Properties();
             overload.put("new", "prop");
             
-            Utils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy,overload);
 
             assertEquals(original.size()+1, copy.size());
             for (Object key : Collections.list(original.keys())) {
@@ -111,7 +113,7 @@ public class UtilsTest {
             overload.put("new", "prop");
             overload.put("NEW", "prop");
             
-            Utils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy,overload);
 
             assertEquals(original.size()+1, copy.size());
             for (Object key : Collections.list(original.keys())) {
@@ -128,7 +130,7 @@ public class UtilsTest {
             Properties overload = new Properties();
             overload.put(Constants.OBJECTCLASS, "assd");
             overload.put(Constants.SERVICE_ID, "asasdasd");
-            Utils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy,overload);
 
             assertEquals(original.size(), copy.size());
             for (Object key : Collections.list(original.keys())) {
@@ -142,7 +144,7 @@ public class UtilsTest {
         { // overwrite own prop
             Properties overload = new Properties();
             overload.put("MyProp", "newValue");
-            Utils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy,overload);
 
             assertEquals(original.size(), copy.size());
             for (Object key : Collections.list(original.keys())) {
@@ -158,7 +160,7 @@ public class UtilsTest {
         { // overwrite own prop in different case
             Properties overload = new Properties();
             overload.put("MYPROP", "newValue");
-            Utils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy,overload);
 
             assertEquals(original.size(), copy.size());
             for (Object key : Collections.list(original.keys())) {

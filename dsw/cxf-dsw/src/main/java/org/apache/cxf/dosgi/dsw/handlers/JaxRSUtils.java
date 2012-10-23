@@ -28,8 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.dosgi.dsw.ClassUtils;
-import org.apache.cxf.dosgi.dsw.OsgiUtils;
+import org.apache.cxf.dosgi.dsw.util.ClassUtils;
+import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
