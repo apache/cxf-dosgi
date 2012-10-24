@@ -21,14 +21,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.cxf.dosgi.systests</groupId>
   <artifactId>cxf-dosgi-ri-systests-common</artifactId>
-  <version>1.3-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <name>Distributed OSGI RI System Test Common Classes</name>
 
   <parent>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-parent</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
     <relativePath>../../parent/pom.xml</relativePath>  
   </parent>
 
