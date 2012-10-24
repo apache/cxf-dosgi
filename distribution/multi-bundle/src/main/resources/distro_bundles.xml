@@ -12,8 +12,8 @@
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-beans-${spring.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-context-${spring.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/com.springsource.org.aopalliance-1.0.0.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/com.springsource.slf4j.api-1.5.10.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/com.springsource.slf4j.jcl-1.5.10.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/slf4j-api-${slf4j.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/slf4j-jcl-${slf4j.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-aop-${spring.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-asm-${spring.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-expression-${spring.version}.jar</bundle>

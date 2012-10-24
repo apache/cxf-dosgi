@@ -112,13 +112,11 @@
     </dependency>  
     <dependency>  
         <groupId>org.slf4j</groupId>  
-        <artifactId>com.springsource.slf4j.api</artifactId>  
-        <version>1.5.10</version> 
+        <artifactId>slf4j-api</artifactId>  
     </dependency>
     <dependency>  
         <groupId>org.slf4j</groupId>  
-        <artifactId>com.springsource.slf4j.jcl</artifactId>  
-        <version>1.5.10</version> 
+        <artifactId>slf4j-jcl</artifactId>  
     </dependency>
     <dependency>
       <groupId>org.apache.log4j</groupId>  
