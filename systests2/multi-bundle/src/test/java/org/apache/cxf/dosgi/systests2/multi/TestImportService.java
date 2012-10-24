@@ -59,7 +59,11 @@ public class TestImportService extends AbstractTestImportService {
         opts.add(CoreOptions.provision(getTestClientBundle()));
         opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));
 
-        opts.add(CoreOptions.systemProperty("java.util.logging.config.file").value(System.getProperty("java.util.logging.config.file")));
+        String loggingConfigFile = System.getProperty("java.util.logging.config.file");
+        if (loggingConfigFile != null) {
+            // When running from eclipse junit the loggingConfigFile will not be set
+            opts.add(CoreOptions.systemProperty("java.util.logging.config.file").value(loggingConfigFile));
+        }
 
         // For debugging...
         final String debugPort = System.getProperty("org.apache.cxf.dosgi.test.debug.port");
