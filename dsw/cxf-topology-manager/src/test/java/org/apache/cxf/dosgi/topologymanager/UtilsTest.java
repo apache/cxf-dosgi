@@ -18,130 +18,23 @@
   */
 package org.apache.cxf.dosgi.topologymanager;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-
 
 import org.easymock.classextension.EasyMock;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-import org.junit.Test;
-
 public class UtilsTest {
-
-    @Test
-    public void testNomalizeScopeForSingleString() {
-
-        try {
-            ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-            EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
-                .andReturn("Filterstring");
-
-            Filter f = EasyMock.createNiceMock(Filter.class);
-            
-            BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-            EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f);
-
-            EasyMock.replay(sr);
-            EasyMock.replay(bc);
-
-            List<Filter> res = Utils.normalizeScope(sr, bc);
-
-            assertEquals(1, res.size());
-            assertEquals(f, res.get(0));
-
-            EasyMock.verify(sr);
-            EasyMock.verify(bc);
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    
-    @Test
-    public void testNomalizeScopeForStringArray() {
-
-        try {
-            
-            String[] filterStrings = {"f1","f2","f3"};
-            
-            ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-            EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
-                .andReturn(filterStrings);
-
-            Filter f = EasyMock.createNiceMock(Filter.class);
-            
-            
-            BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-            EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f).times(filterStrings.length);
-
-            EasyMock.replay(sr);
-            EasyMock.replay(bc);
-
-            List<Filter> res = Utils.normalizeScope(sr, bc);
-
-            assertEquals(filterStrings.length, res.size());
-            assertEquals(f, res.get(0));
-
-            EasyMock.verify(sr);
-            EasyMock.verify(bc);
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    
-    
-    @Test
-    public void testNomalizeScopeForCollection() {
-
-        try {
-            
-            
-            Collection<String> collection = new ArrayList<String>();
-            collection.add("f1");
-            collection.add("f2");
-            collection.add("f3");
-            
-            ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-            EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
-                .andReturn(collection);
-
-            Filter f = EasyMock.createNiceMock(Filter.class);
-            
-            
-            BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-            EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f).times(collection.size());
-
-            EasyMock.replay(sr);
-            EasyMock.replay(bc);
-
-            List<Filter> res = Utils.normalizeScope(sr, bc);
-
-            assertEquals(collection.size(), res.size());
-            assertEquals(f, res.get(0));
-
-            EasyMock.verify(sr);
-            EasyMock.verify(bc);
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
-    }
-    
     
     @Test
     public void testGetNewUUID(){
@@ -155,9 +48,7 @@ public class UtilsTest {
         
         EasyMock.verify(bc);
     }
-     
-    
-    
+
     @Test
     public void testGetExistingUUID(){
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
@@ -170,7 +61,6 @@ public class UtilsTest {
         EasyMock.verify(bc);
     }
 
-    
     @Test
     public void testUUIDFilterExtension() throws InvalidSyntaxException{
         String filter = "(a=b)";
@@ -184,7 +74,7 @@ public class UtilsTest {
         
         Filter f = FrameworkUtil.createFilter(filter);
         
-        Dictionary m = new Hashtable();
+        Dictionary<String, String> m = new Hashtable<String, String>();
         m.put("a", "b");
         
         assertTrue(filter+" filter must match as uuid is missing",f.match(m));      

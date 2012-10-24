@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.topologymanager;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -131,15 +132,9 @@ public class TopologyManager {
                     Collection<ExportRegistration> endpoints = exports.getValue().get(rsa);
                     // TODO for each notify discovery......
 
-                    try {
-                        ServiceReference[] refs = Utils.getEndpointListeners(bctx);
-                        if (refs != null) {
-                            for (ServiceReference sref : refs) {
-                                notifyListenersOfRemovalIfAppropriate(sref, endpoints);
-                            }
-                        }
-                    } catch (InvalidSyntaxException e) {
-                        LOG.log(Level.SEVERE, e.getMessage(), e);
+                    ServiceReference[] refs = getEndpointListeners(bctx);
+                    for (ServiceReference sref : refs) {
+                        notifyListenersOfRemovalIfAppropriate(sref, endpoints);
                     }
 
                     // remove all management information for the RemoteServiceAdmin
@@ -227,14 +222,12 @@ public class TopologyManager {
                                  new LinkedHashMap<RemoteServiceAdmin, Collection<ExportRegistration>>());
         }
 
-        // trigger the export
         triggerExport(sref);
 
     }
 
     private void triggerExport(final ServiceReference sref) {
         execService.execute(new Runnable() {
-            @SuppressWarnings("unchecked")
             public void run() {
                 LOG.finer("TopologyManager: exporting service ...");
 
@@ -273,8 +266,7 @@ public class TopologyManager {
                                     // enqueue in local list of endpoints
                                     exports.put(remoteServiceAdmin, endpoints);
 
-                                    // publish to endpoint listeners
-                                    nofifyListeners(endpoints);
+                                    nofifyEndpointListenersOfAdding(endpoints);
                                 }
                             }
                         }
@@ -285,21 +277,28 @@ public class TopologyManager {
         });
     }
 
-    protected void nofifyListeners(Collection<ExportRegistration> exportRegistrations) {
+    protected void nofifyEndpointListenersOfAdding(Collection<ExportRegistration> exportRegistrations) {
+        ServiceReference[] epListeners = getEndpointListeners(bctx);
+        for (ServiceReference sref : epListeners) {
+            notifyListenerOfAddingIfAppropriate(sref, exportRegistrations);
+        }
+    }
+
+     /** 
+      * Find all EndpointListeners; They must have the Scope property otherwise they have to be ignored
+      * @param bctx
+      * @return
+      * @throws InvalidSyntaxException
+      */
+    protected static ServiceReference[] getEndpointListeners(BundleContext bctx) {
+        ServiceReference[] result = null;
         try {
-            // Find all EndpointListeners; They must have the Scope property otherwise they have to be ignored
-            ServiceReference[] refs = Utils.getEndpointListeners(bctx);
-
-            if (refs != null) {
-                for (ServiceReference sref : refs) {
-                    notifyListenerOfAddingIfAppropriate(sref, exportRegistrations);
-                }
-            }
-
+            String filter = "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*)";
+            result = bctx.getServiceReferences(EndpointListener.class.getName(), filter);
         } catch (InvalidSyntaxException e) {
             LOG.log(Level.SEVERE, e.getMessage(), e);
         }
-
+        return (result == null) ? new ServiceReference[]{} : result;
     }
 
     /**
@@ -311,91 +310,84 @@ public class TopologyManager {
     protected void notifyListenerOfAddingIfAppropriate(ServiceReference sref,
                                                        Collection<ExportRegistration> exportRegistrations) {
 
-        // if (sref.getBundle().equals(bctx.getBundle())) {
-        // LOG
-        // .info("TopologyManager: notifyListenerOfAddingIfAppropriate() called for own listener -> skipping ");
-        // return;
-        // }
-
         EndpointListener epl = (EndpointListener)bctx.getService(sref);
-
         LOG.finer("TopologyManager: notifyListenerOfAddingIfAppropriate() ");
+        List<Filter> filters = getFiltersFromEndpointListenerScope(sref, bctx);
 
-        try {
-
-            List<Filter> filters = Utils.normalizeScope(sref, bctx);
-
-            for (ExportRegistration exReg : exportRegistrations) {
-
-                // FIXME!!!!!!!!!!!!! There needs to be a better way ?!?!?!
-                Map props = exReg.getExportReference().getExportedEndpoint().getProperties();
-                Dictionary d = new Hashtable(props);
-
-                if (LOG.isLoggable(Level.FINE)) {
-                    for (Filter filter : filters) {
-                        LOG.fine("Matching: " + filter + "  against " + d);
-                    }
-                }
-
-                for (Filter filter : filters) {
-                    if (filter.match(d)) {
-                        LOG.fine("Listener mached one of the Endpoints !!!!: " + epl);
-
-                        epl.endpointAdded(exReg.getExportReference().getExportedEndpoint(), filter
-                                .toString());
-                    }
-                }
+        for (ExportRegistration exReg : exportRegistrations) {
+            EndpointDescription endpoint = getExportedEndpoint(exReg);
+            List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
+            for (Filter filter : matchingFilters) {
+                epl.endpointAdded(endpoint, filter.toString());
             }
-
-        } catch (InvalidSyntaxException e) {
-            LOG.log(Level.SEVERE, e.getMessage(), e);
         }
+
     }
 
     protected void notifyListenersOfRemovalIfAppropriate(ServiceReference sref,
-                                                         Collection<ExportRegistration> exportRegistrations) {
+            Collection<ExportRegistration> exportRegistrations) {
 
-        EndpointListener epl = (EndpointListener)bctx.getService(sref);
-
+        EndpointListener epl = (EndpointListener) bctx.getService(sref);
         LOG.finer("TopologyManager: notifyListenerOfREMOVALIfAppropriate() ");
+        List<Filter> filters = getFiltersFromEndpointListenerScope(sref, bctx);
 
-        List<Filter> filters;
+        for (ExportRegistration exReg : exportRegistrations) {
+            EndpointDescription endpoint = getExportedEndpoint(exReg);
+            List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
+            for (Filter filter : matchingFilters) {
+                epl.endpointRemoved(endpoint, filter.toString());
+            }
+        }
+    }
+    
+    static List<Filter> getFiltersFromEndpointListenerScope(ServiceReference sref,BundleContext bctx) {
+        List<Filter> filters = new ArrayList<Filter>();
         try {
-            filters = Utils.normalizeScope(sref, bctx);
-
-            for (ExportRegistration exReg : exportRegistrations) {
-
-                // FIXME!!!!!!!!!!!!! There needs to be a better way ?!?!?!
-            	ExportReference ref = exReg.getExportReference(); 
-            	EndpointDescription endpoint = ref.getExportedEndpoint(); 
-                Map props = endpoint.getProperties();
-                Dictionary d = new Hashtable(props);
-
-                if (LOG.isLoggable(Level.FINE)) {
-                    for (Filter filter : filters) {
-                        LOG.fine("Matching: " + filter + "  against " + d);
-                    }
+            Object fo = sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE);
+            if (fo instanceof String) {
+                filters.add(bctx.createFilter((String) fo));
+            } else if (fo instanceof String[]) {
+                String[] foArray = (String[]) fo;
+                for (String f : foArray) {
+                    filters.add(bctx.createFilter(f));
                 }
-
-                for (Filter filter : filters) {
-                    if (filter.match(d)) {
-                        LOG.fine("Listener matched one of the Endpoints !!!! --> calling removed() ...");
-
-                        epl.endpointRemoved(exReg.getExportReference().getExportedEndpoint(), filter
-                            .toString());
+            } else if (fo instanceof Collection) {
+                @SuppressWarnings("rawtypes")
+                Collection c = (Collection) fo;
+                for (Object o : c) {
+                    if (o instanceof String) {
+                        filters.add(bctx.createFilter((String) o));
+                    } else {
+                        LOG.warning("Component of a filter is not a string -> skipped !");
                     }
                 }
             }
         } catch (InvalidSyntaxException e) {
             LOG.log(Level.SEVERE, e.getMessage(), e);
         }
+        return filters;
+    }
 
+    private List<Filter> getMatchingFilters(List<Filter> filters,
+            EndpointDescription endpoint) {
+        List<Filter> matchingFilters = new ArrayList<Filter>();
+        Dictionary<String, Object> d = getEndpointProperties(endpoint);
+
+        for (Filter filter : filters) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Matching: " + filter + "  against " + d);
+            }
+            if (filter.match(d)) {
+                LOG.fine("Listener matched one of the Endpoints !!!! --> calling removed() ...");
+                matchingFilters.add(filter);
+            }
+        }
+        return matchingFilters;
     }
 
     private void checkExistingServices() throws InvalidSyntaxException {
-        ServiceReference[] references = bctx
-            .getServiceReferences(null, "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)");
-        // + "("+org.apache.cxf.dosgi.dsw.Constants.EXPORTED_INTERFACES_OLD + "=*))");
+        String filter = "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)";
+        ServiceReference[] references = bctx.getServiceReferences(null, filter);
 
         if (references != null) {
             for (ServiceReference sref : references) {
@@ -411,7 +403,6 @@ public class TopologyManager {
 
                 Map<RemoteServiceAdmin, Collection<ExportRegistration>> ex = exportedServices.get(sref);
                 if (ex != null) {
-                    EndpointDescription ep = exportRegistration.getExportReference().getExportedEndpoint();
                     for (Map.Entry<RemoteServiceAdmin, Collection<ExportRegistration>> export : ex.entrySet()) {
                         export.getValue().contains(exportRegistration);
                     }
@@ -432,4 +423,27 @@ public class TopologyManager {
         // LOG.severe("NOT implemented !!!");
     }
 
+    /**
+     * Retrieve exported Endpoint while handling null
+     * @param exReg
+     * @return exported Endpoint or null if not present
+     */
+    private EndpointDescription getExportedEndpoint(ExportRegistration exReg) {
+        ExportReference ref = (exReg == null) ? null : exReg.getExportReference();
+        return (ref == null) ? null : ref.getExportedEndpoint(); 
+    }
+    
+    /**
+     * Retrieve endpoint properties as Dictionary
+     * 
+     * @param ep
+     * @return endpoint properties (will never return null) 
+     */
+    private Dictionary<String, Object> getEndpointProperties(EndpointDescription ep) {
+        if (ep == null || ep.getProperties() == null) {
+            return new Hashtable<String, Object>();
+        } else {
+            return new Hashtable<String, Object>(ep.getProperties());
+        }
+    }
 }

@@ -18,7 +18,10 @@
   */
 package org.apache.cxf.dosgi.topologymanager;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,12 +59,12 @@ public class TopologyManagerTest {
         ExportReference exRef2 = c.createMock(ExportReference.class);
         
         
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         String[] oc = new String[1];
         oc[0] = "myClass";
         props.put("objectClass", oc);
         
-        Map props2 = new HashMap();
+        Map<String, Object> props2 = new HashMap<String, Object>();
         oc = new String[1];
         oc[0] = "notMyClass";
         props2.put("objectClass", oc);
@@ -106,4 +109,100 @@ public class TopologyManagerTest {
 
     }
 
+    @Test
+    public void testNomalizeScopeForSingleString() {
+
+        try {
+            ServiceReference sr = EasyMock.createMock(ServiceReference.class);
+            EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
+                .andReturn("Filterstring");
+
+            Filter f = EasyMock.createNiceMock(Filter.class);
+            
+            BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+            EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f);
+
+            EasyMock.replay(sr);
+            EasyMock.replay(bc);
+
+            List<Filter> res = TopologyManager.getFiltersFromEndpointListenerScope(sr, bc);
+
+            assertEquals(1, res.size());
+            assertEquals(f, res.get(0));
+
+            EasyMock.verify(sr);
+            EasyMock.verify(bc);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    @Test
+    public void testNomalizeScopeForStringArray() {
+
+        try {
+            
+            String[] filterStrings = {"f1","f2","f3"};
+            
+            ServiceReference sr = EasyMock.createMock(ServiceReference.class);
+            EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
+                .andReturn(filterStrings);
+
+            Filter f = EasyMock.createNiceMock(Filter.class);
+            
+            
+            BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+            EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f).times(filterStrings.length);
+
+            EasyMock.replay(sr);
+            EasyMock.replay(bc);
+
+            List<Filter> res = TopologyManager.getFiltersFromEndpointListenerScope(sr, bc);
+
+            assertEquals(filterStrings.length, res.size());
+            assertEquals(f, res.get(0));
+
+            EasyMock.verify(sr);
+            EasyMock.verify(bc);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testNomalizeScopeForCollection() {
+
+        try {
+            
+            
+            Collection<String> collection = new ArrayList<String>();
+            collection.add("f1");
+            collection.add("f2");
+            collection.add("f3");
+            
+            ServiceReference sr = EasyMock.createMock(ServiceReference.class);
+            EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
+                .andReturn(collection);
+
+            Filter f = EasyMock.createNiceMock(Filter.class);
+            
+            
+            BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+            EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f).times(collection.size());
+
+            EasyMock.replay(sr);
+            EasyMock.replay(bc);
+
+            List<Filter> res = TopologyManager.getFiltersFromEndpointListenerScope(sr, bc);
+
+            assertEquals(collection.size(), res.size());
+            assertEquals(f, res.get(0));
+
+            EasyMock.verify(sr);
+            EasyMock.verify(bc);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 }

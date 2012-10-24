@@ -18,57 +18,14 @@
   */
 package org.apache.cxf.dosgi.topologymanager;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 
 public class Utils {
 
-    private static final Logger LOG = Logger.getLogger(Utils.class.getName());
-    
-    protected static ServiceReference[] getEndpointListeners(BundleContext bctx) throws InvalidSyntaxException {
-        ServiceReference[] refs = bctx
-            .getServiceReferences(EndpointListener.class.getName(),
-                                  "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*)");
-        return refs;
-    }
-
-    public static List<Filter> normalizeScope(ServiceReference sref,BundleContext bctx) throws InvalidSyntaxException {
-        List<Filter> filters = new ArrayList<Filter>();
-    
-        Object fo = sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE);
-        if (fo instanceof String) {
-            filters.add(bctx.createFilter((String)fo));
-        } else if (fo instanceof String[]) {
-            String[] foArray = (String[])fo;
-            for (String f : foArray) {
-                filters.add(bctx.createFilter(f));
-            }
-        } else if (fo instanceof Collection) {
-            Collection c = (Collection)fo;
-            for (Object o : c) {
-                if (o instanceof String) {
-                    filters.add(bctx.createFilter((String)o));
-                } else {
-                    LOG.info("Component of a filter is not a string -> skipped !");
-                }
-            }
-        }
-    
-        return filters;
-    }
-
-    
     public static String getUUID(BundleContext bctx) {
         synchronized ("org.osgi.framework.uuid") {
             String uuid = bctx.getProperty("org.osgi.framework.uuid");
