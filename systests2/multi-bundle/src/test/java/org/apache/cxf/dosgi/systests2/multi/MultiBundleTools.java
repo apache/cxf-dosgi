@@ -97,6 +97,9 @@ public class MultiBundleTools {
                 break;
             }
         }
+        if (pomVersion == null) {
+            throw new RuntimeException("Failed to retrieved version from pom file " + mdPom);
+        }
         return pomVersion;
     }
 }
