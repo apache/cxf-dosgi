@@ -38,6 +38,7 @@
     </properties>
 
     <modules>
+      <module>features</module>
       <module>multi-bundle</module>
       <module>single-bundle</module>
       <module>sources</module>

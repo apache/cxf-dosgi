@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/2.7.0/xml/features</repository>
+
+    <feature name="cxf-dosgi-core" version="${project.version}">
+        <feature>cxf</feature>
+        <bundle>mvn:org.osgi/org.osgi.enterprise/4.2.0</bundle>        
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/1.1_3</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-topology-manager/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-dsw-cxf/${project.version}</bundle>
+    </feature>
+    
+    <feature name="cxf-dosgi-discovery-local" version="${project.version}">
+        <feature>cxf-dosgi-core</feature>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-discovery-local/${project.version}</bundle>
+    </feature>
+
+    <feature name="cxf-dosgi-discovery-distributed" version="${project.version}">
+        <feature>cxf-dosgi-core</feature>
+        <bundle>mvn:org.apache.zookeeper/zookeeper/3.3.1</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-discovery-local/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-discovery-distributed/${project.version}</bundle>
+    </feature>
+    
+    <feature name="cxf-dosgi-zookeeper-server">
+        <bundle>mvn:org.apache.zookeeper/zookeeper/3.3.1</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-discovery-distributed-zookeeper-server/${project.version}</bundle>
+    </feature>
+</features>
