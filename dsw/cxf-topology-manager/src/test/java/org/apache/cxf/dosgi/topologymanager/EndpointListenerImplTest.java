@@ -104,7 +104,7 @@ public class EndpointListenerImplTest {
         EasyMock.replay(tm);
         EasyMock.replay(sr);
         
-        EndpointListenerImpl endpointListener = new EndpointListenerImpl(bc, tm);
+        EndpointListenerManager endpointListener = new EndpointListenerManager(bc, tm);
                 
         endpointListener.start();
 

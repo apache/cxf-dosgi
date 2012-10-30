@@ -20,38 +20,37 @@ package org.apache.cxf.dosgi.topologymanager;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 
-// TODO: realize as ServiceFactory ! 
-public class EndpointListenerImpl implements EndpointListener {
+/**
+ * Manages an EndpointListener add adjusts its scope according to requested service filters
+ */
+public class EndpointListenerManager {
 
-    private static final Logger LOG = Logger.getLogger(EndpointListenerImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(EndpointListenerManager.class.getName());
     
     private final BundleContext bctx;
     private ServiceRegistration serviceRegistration;
     private List<String> filters = new ArrayList<String>();
-    private TopologyManagerImport topManager;
+    private EndpointListener endpointListener;
 
-    protected EndpointListenerImpl(BundleContext bc, TopologyManagerImport tm) {
-        bctx = bc;
-        topManager = tm;
+    protected EndpointListenerManager(BundleContext bc, EndpointListener endpointListener) {
+        this.bctx = bc;
+        this.endpointListener = endpointListener;
     }
 
     protected void start() {
-        serviceRegistration = bctx.registerService(EndpointListener.class.getName(), this,
+        serviceRegistration = bctx.registerService(EndpointListener.class.getName(), endpointListener,
                                                    getRegistrationProperties());
     }
-
-
-
-    protected void stop() {
+    
+    public void stop() {
         serviceRegistration.unregister();
     }
 
@@ -68,8 +67,6 @@ public class EndpointListenerImpl implements EndpointListener {
         updateRegistration();
     }
 
-   
-
     protected void reduceScope(String filter) {
         if (filter == null)
             return;
@@ -82,8 +79,8 @@ public class EndpointListenerImpl implements EndpointListener {
         updateRegistration();
     }
 
-    private Dictionary getRegistrationProperties() {
-        Properties p = new Properties();
+    private Dictionary<String, Object> getRegistrationProperties() {
+        Dictionary<String, Object> p = new Hashtable<String, Object>();
 
         synchronized (filters) {
             LOG.finer("EndpointListener: current filter: " + filters);
@@ -97,26 +94,7 @@ public class EndpointListenerImpl implements EndpointListener {
     private void updateRegistration() {
         // This tends to be verbose.
         LOG.finer("EndpointListenerImpl: filters: " + filters);
-
         serviceRegistration.setProperties(getRegistrationProperties());
-    }
-
-    public void endpointAdded(EndpointDescription epd, String filter) {
-        LOG.fine("EndpointListenerImpl: EndpointAdded() filter:"+filter+"  EndpointDesc:"+epd);
-        
-        if(filter==null){
-            LOG.severe("Endpoint is not handled because no matching filter was provided! Filter: "+filter);
-            return;
-        }
-        // Decide if it is worth it ? 
-        
-        topManager.addImportableService(filter,epd);
-        
-    }
-
-    public void endpointRemoved(EndpointDescription epd, String filter) {
-        LOG.fine("EndpointListenerImpl: EndpointRemoved() -> "+epd);
-        topManager.removeImportableService(filter, epd);
     }
 
 }

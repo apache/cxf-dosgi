@@ -34,14 +34,14 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-public class UtilsTest {
+public class ListenerHookImplTest {
     
     @Test
     public void testGetNewUUID(){
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn(null).atLeastOnce();
         EasyMock.replay(bc);
-        String uuid = Utils.getUUID(bc);
+        String uuid = ListenerHookImpl.getUUID(bc);
         assertNotNull(uuid);
         
         assertEquals(System.getProperty("org.osgi.framework.uuid"),uuid );
@@ -54,7 +54,7 @@ public class UtilsTest {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("MyUUID").atLeastOnce();
         EasyMock.replay(bc);
-        String uuid = Utils.getUUID(bc);
+        String uuid = ListenerHookImpl.getUUID(bc);
         
         assertEquals("MyUUID",uuid );
         
@@ -70,7 +70,7 @@ public class UtilsTest {
         EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("MyUUID").atLeastOnce();
         EasyMock.replay(bc);
         
-        filter = Utils.extendFilter(filter, bc);
+        filter = ListenerHookImpl.extendFilter(filter, bc);
         
         Filter f = FrameworkUtil.createFilter(filter);
         

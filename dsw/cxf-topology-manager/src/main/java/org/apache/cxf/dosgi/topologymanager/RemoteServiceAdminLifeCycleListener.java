@@ -18,28 +18,12 @@
   */
 package org.apache.cxf.dosgi.topologymanager;
 
-import java.util.UUID;
+import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
-
-
-public class Utils {
-
-    public static String getUUID(BundleContext bctx) {
-        synchronized ("org.osgi.framework.uuid") {
-            String uuid = bctx.getProperty("org.osgi.framework.uuid");
-            if(uuid==null){
-                uuid = UUID.randomUUID().toString();
-                System.setProperty("org.osgi.framework.uuid", uuid);
-            }
-            return uuid;
-        }
-    }
-    
-    
-    public static  String extendFilter(String filter,BundleContext bctx) {
-        return "(&"+filter+"(!("+RemoteConstants.ENDPOINT_FRAMEWORK_UUID+"="+Utils.getUUID(bctx)+")))";
-    }
-    
+/**
+ * Callback interface to be notified of RemoteServiceAdmin services that are added or removed
+ */
+public interface RemoteServiceAdminLifeCycleListener {
+    void added(RemoteServiceAdmin rsa);
+    void removed(RemoteServiceAdmin rsa);
 }

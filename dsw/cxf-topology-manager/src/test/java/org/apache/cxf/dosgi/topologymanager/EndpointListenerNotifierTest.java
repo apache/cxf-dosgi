@@ -41,7 +41,7 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 
 import org.junit.Test;
 
-public class TopologyManagerTest {
+public class EndpointListenerNotifierTest {
 
     @Test
     public void testNotifyListenersOfRemovalIfAppropriate() throws InvalidSyntaxException {
@@ -92,17 +92,20 @@ public class TopologyManagerTest {
         epl.endpointRemoved(EasyMock.eq(epd), EasyMock.eq("(objectClass=myClass)"));
         EasyMock.expectLastCall().once();
         
+        ExportRepository exportRepository = EasyMock.createMock(ExportRepository.class);
+        
         c.replay();
         EasyMock.replay(epl);
         
-        TopologyManager tm = new TopologyManager(bc, null);
+        
+        EndpointListenerNotifier tm = new EndpointListenerNotifier(bc, exportRepository);
 
 
         List<ExportRegistration> exRegs = new ArrayList<ExportRegistration>();
         exRegs.add(exReg);
         exRegs.add(exReg2);
 
-        tm.notifyListenersOfRemovalIfAppropriate(sref, exRegs);
+        tm.notifyListenersOfRemoval(sref, exRegs);
 
         c.verify();
         EasyMock.verify(epl);
@@ -125,7 +128,7 @@ public class TopologyManagerTest {
             EasyMock.replay(sr);
             EasyMock.replay(bc);
 
-            List<Filter> res = TopologyManager.getFiltersFromEndpointListenerScope(sr, bc);
+            List<Filter> res = EndpointListenerNotifier.getFiltersFromEndpointListenerScope(sr, bc);
 
             assertEquals(1, res.size());
             assertEquals(f, res.get(0));
@@ -158,7 +161,7 @@ public class TopologyManagerTest {
             EasyMock.replay(sr);
             EasyMock.replay(bc);
 
-            List<Filter> res = TopologyManager.getFiltersFromEndpointListenerScope(sr, bc);
+            List<Filter> res = EndpointListenerNotifier.getFiltersFromEndpointListenerScope(sr, bc);
 
             assertEquals(filterStrings.length, res.size());
             assertEquals(f, res.get(0));
@@ -194,7 +197,7 @@ public class TopologyManagerTest {
             EasyMock.replay(sr);
             EasyMock.replay(bc);
 
-            List<Filter> res = TopologyManager.getFiltersFromEndpointListenerScope(sr, bc);
+            List<Filter> res = EndpointListenerNotifier.getFiltersFromEndpointListenerScope(sr, bc);
 
             assertEquals(collection.size(), res.size());
             assertEquals(f, res.get(0));

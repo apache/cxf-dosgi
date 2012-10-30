@@ -16,11 +16,9 @@
     -->
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-topology-manager</artifactId>
     <packaging>bundle</packaging>
     <name>Distributed OSGi Topology Manager implementation</name>
-    <version>1.4-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
@@ -36,7 +34,7 @@
             *
         </bundle.import.package>
         <bundle.export.package>
-            org.apache.cxf.dosgi.*;version="${project.version}"
+            !*
         </bundle.export.package>
     </properties>
 
@@ -65,7 +63,6 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
-            <version>2.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -92,11 +89,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/TestUtils*</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </build>

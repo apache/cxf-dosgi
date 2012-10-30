@@ -24,64 +24,29 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
-
     private static final Logger LOG = Logger.getLogger(Activator.class.getName());
 
     private TopologyManager topManager;
     private TopologyManagerImport topManagerImport;
 
-    private RemoteServiceAdminList remoteServiceAdminList;
-    
-    protected RemoteServiceAdminListenerImpl remoteServiceAdminListener;
-    
-    // separated for testing
-    protected TopologyManager createTopologyManager(BundleContext bc,RemoteServiceAdminList rl) {
-        return new TopologyManager(bc,rl);
-    }
+    private RemoteServiceAdminTracker rsaTracker;
 
- // separated for testing
-    protected TopologyManagerImport createTopologyManagerImport(BundleContext bc,RemoteServiceAdminList rl) {
-        return new TopologyManagerImport(bc,rl);
-    }
-    
- // separated for testing
-    protected RemoteServiceAdminList createRemoteServiceAdminList(BundleContext bc) {
-        return new RemoteServiceAdminList(bc);
-    }
-
-    // separated for testing
-    protected RemoteServiceAdminListenerImpl createRemoteServiceAdminListenerImpl(BundleContext bc,TopologyManager topManager,TopologyManagerImport topManagerImport) {
-        return new RemoteServiceAdminListenerImpl(bc, topManager, topManagerImport);
-    }
-    
     public void start(BundleContext bc) throws Exception {
         LOG.fine("TopologyManager: start()");
-        remoteServiceAdminList = createRemoteServiceAdminList(bc);
-        topManager = createTopologyManager(bc,remoteServiceAdminList);
-        topManagerImport = createTopologyManagerImport(bc,remoteServiceAdminList);
+        rsaTracker = new RemoteServiceAdminTracker(bc);
+        topManager = new TopologyManager(bc, rsaTracker);
+        topManagerImport = new TopologyManagerImport(bc, rsaTracker);
 
-        remoteServiceAdminList.setTopologyManager(topManager);
-        remoteServiceAdminList.setTopologyManagerImport(topManagerImport);
-        
-        remoteServiceAdminListener = createRemoteServiceAdminListenerImpl(bc, topManager, topManagerImport);        
-        
-        remoteServiceAdminListener.start();
-        
+        rsaTracker.open();
         topManager.start();
-        
-        remoteServiceAdminList.start();
-        
         topManagerImport.start();
-        
-        
     }
 
     public void stop(BundleContext bc) throws Exception {
         LOG.fine("TopologyManager: stop()");
         topManager.stop();
         topManagerImport.stop();
-        remoteServiceAdminList.stop();
-        remoteServiceAdminListener.stop();
+        rsaTracker.close();
     }
 
 }

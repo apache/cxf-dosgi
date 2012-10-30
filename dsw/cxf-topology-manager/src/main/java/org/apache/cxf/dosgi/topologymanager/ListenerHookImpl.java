@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.topologymanager;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -28,14 +29,17 @@ import java.util.regex.Pattern;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.hooks.service.ListenerHook;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
+/**
+ * Listens for service listeners and informs ServiceInterestListener about added and removed interest
+ * in services
+ */
 public class ListenerHookImpl implements ListenerHook {
     private static final Logger LOG = Logger.getLogger(ListenerHookImpl.class.getName());
     private BundleContext bctx;
-    private ServiceRegistration serviceRegistrations;
-    private TopologyManagerImport tm;
+    private ServiceInterestListener serviceInterestListener;
 
     private final static String CLASS_NAME_EXPRESSION = ".*\\(" + Constants.OBJECTCLASS
                                                         + "=([a-zA-Z_0-9.]+)\\).*";
@@ -54,21 +58,13 @@ public class ListenerHookImpl implements ListenerHook {
         SYSTEM_PACKAGES.add("java.net.ContentHandler");
     }
 
-    public ListenerHookImpl(BundleContext bc, TopologyManagerImport tm) {
+    public ListenerHookImpl(BundleContext bc, ServiceInterestListener serviceInterestListener) {
         bctx = bc;
-        this.tm = tm;
+        this.serviceInterestListener = serviceInterestListener;
     }
 
-    protected void start() {
-        // TODO: properties ?
-        serviceRegistrations = bctx.registerService(ListenerHook.class.getName(), this, null);
-    }
-
-    protected void stop() {
-        serviceRegistrations.unregister();
-    }
-
-    public void added(Collection listeners) {
+    @SuppressWarnings("rawtypes")
+    public void added(Collection/* <ListenerInfo> */ listeners) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("ListenerHookImpl: added() " + listeners);
         }
@@ -93,14 +89,15 @@ public class ListenerHookImpl implements ListenerHook {
                                    + className + "]");
                 continue;
             }
-
-            tm.addServiceInterest(listenerInfo.getFilter());
+            String exFilter = extendFilter(listenerInfo.getFilter(), bctx);
+            serviceInterestListener.addServiceInterest(exFilter);
 
         }
 
     }
 
-    public void removed(Collection listeners) {
+    @SuppressWarnings("rawtypes")
+    public void removed(Collection/* <ListenerInfo> */ listeners) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("ListenerHookImpl: removed: " + listeners);
         }
@@ -110,8 +107,8 @@ public class ListenerHookImpl implements ListenerHook {
             LOG.fine("*** Filter: " + listenerInfo.getFilter());
 
             // TODO: determine if service was handled ? 
-
-            tm.removeServiceInterest(listenerInfo.getFilter());
+            String exFilter = extendFilter(listenerInfo.getFilter(), bctx);
+            serviceInterestListener.removeServiceInterest(exFilter);
 
         }
 
@@ -134,11 +131,25 @@ public class ListenerHookImpl implements ListenerHook {
 
         for (String p : SYSTEM_PACKAGES) {
             if (className.startsWith(p)) {
-                LOG.fine("Lookup for " + className + " is ignored");
                 return true;
             }
         }
         return false;
+    }
+
+    static String getUUID(BundleContext bctx) {
+        synchronized ("org.osgi.framework.uuid") {
+            String uuid = bctx.getProperty("org.osgi.framework.uuid");
+            if(uuid==null){
+                uuid = UUID.randomUUID().toString();
+                System.setProperty("org.osgi.framework.uuid", uuid);
+            }
+            return uuid;
+        }
+    }
+    
+    static String extendFilter(String filter, BundleContext bctx) {
+        return "(&" + filter + "(!(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID + "=" + getUUID(bctx) + ")))";
     }
 
 }
