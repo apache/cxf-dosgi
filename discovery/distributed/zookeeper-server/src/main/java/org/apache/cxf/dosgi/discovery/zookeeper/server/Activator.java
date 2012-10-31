@@ -17,33 +17,26 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper.server;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.Constants;
 
 public class Activator implements BundleActivator {
-    ManagedService ms;
-    ServiceRegistration reg;
+    ZookeeperStarter zkStarter;
 
     public void start(BundleContext context) throws Exception {
-        ms = new ManagedService(context);
-        Hashtable<String, Object> props = new Hashtable<String, Object>();
-        ms.setDefaults(props);
-
-        // cannot use the org.osgi.service.cm.ManagedService class object directly from 
-        // Activator because we have an optional dependency on it...
-        reg = context.registerService(org.osgi.service.cm.ManagedService.class.getName(), ms, props);
-        ms.setRegistration(reg);
+        zkStarter = new ZookeeperStarter(context);
+        Dictionary<String, Object> props = new Hashtable<String, Object>();
+        props.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper.server");
+        context.registerService(org.osgi.service.cm.ManagedService.class.getName(), zkStarter, props );
 	}
     
 	public void stop(BundleContext context) throws Exception {
-	    if (reg != null) {
-	        reg.unregister();
-	    }
-	    if (ms != null) {
-	        ms.shutdown();
+	    if (zkStarter != null) {
+	        zkStarter.shutdown();
 	    }
 	}
 }
