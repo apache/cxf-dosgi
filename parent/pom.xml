@@ -295,18 +295,6 @@
         </repository>
 
         <repository>
-            <id>repository.opensaml</id>
-            <name>Open SAML repository</name>
-            <url>http://ws.zones.apache.org/repository2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
             <id>spring-osgified-artifacts</id>
             <name>Springframework Maven OSGified Artifacts Repository</name>
             <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
