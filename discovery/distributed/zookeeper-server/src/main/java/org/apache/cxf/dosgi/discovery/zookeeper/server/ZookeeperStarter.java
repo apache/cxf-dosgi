@@ -19,8 +19,10 @@ package org.apache.cxf.dosgi.discovery.zookeeper.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Level;
@@ -59,13 +61,33 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    public void setDefaults(Dictionary dict) throws IOException {
+    public void setDefaults(Dictionary<String, Object> dict) throws IOException {
+        removeEmptyValues(dict);
         setDefault(dict, "tickTime", "2000");
         setDefault(dict, "initLimit", "10");
         setDefault(dict, "syncLimit", "5");
         setDefault(dict, "clientPort", "2181");
         setDefault(dict, "dataDir", new File(bundleContext.getDataFile(""), "zkdata").getCanonicalPath());
+    }
+
+    /**
+     * Remove empty values to avoid NumberFormatExceptions
+     * 
+     * @param dict
+     */
+    private void removeEmptyValues(Dictionary<String, Object> dict) {
+        List<String> keysToRemove = new ArrayList<String>();
+        Enumeration<String> keys = dict.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            Object value = dict.get(key);
+            if (value != null && value instanceof String && "".equals(value)) {
+                keysToRemove.add(key);
+            }
+        }
+        for (String key : keysToRemove) {
+            dict.remove(key);
+        }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -75,7 +97,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
         }
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public synchronized void updated(Dictionary dict) throws ConfigurationException {
         shutdown();
         if (dict == null) {
