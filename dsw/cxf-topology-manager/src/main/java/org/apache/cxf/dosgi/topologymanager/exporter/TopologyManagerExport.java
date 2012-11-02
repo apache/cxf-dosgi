@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations 
  * under the License. 
  */
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.exporter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +31,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminLifeCycleListener;
+import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
@@ -46,9 +48,9 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
  * <li>This class keeps a list of currently imported and exported endpoints <li>It requests the import/export
  * from RemoteAdminServices
  */
-public class TopologyManager implements ExportRepository {
+public class TopologyManagerExport implements ExportRepository {
 
-    private final static Logger LOG = Logger.getLogger(TopologyManager.class.getName());
+    private final static Logger LOG = Logger.getLogger(TopologyManagerExport.class.getName());
 
     private final BundleContext bctx;
     private final EndpointListenerNotifier epListenerNotifier;
@@ -77,7 +79,7 @@ public class TopologyManager implements ExportRepository {
                       Map<RemoteServiceAdmin, Collection<ExportRegistration>>> exportedServices = 
         new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<ExportRegistration>>>();
 
-    public TopologyManager(BundleContext ctx, RemoteServiceAdminTracker rsaTracker) {
+    public TopologyManagerExport(BundleContext ctx, RemoteServiceAdminTracker rsaTracker) {
         execService = new ThreadPoolExecutor(5, 10, 50, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         bctx = ctx;
         this.remoteServiceAdminTracker = rsaTracker;

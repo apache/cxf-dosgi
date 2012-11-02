@@ -16,11 +16,13 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.importer;
 
 import java.util.Dictionary;
 import java.util.List;
 
+import org.apache.cxf.dosgi.topologymanager.importer.EndpointListenerManager;
+import org.apache.cxf.dosgi.topologymanager.importer.TopologyManagerImport;
 import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
 import org.osgi.framework.BundleContext;

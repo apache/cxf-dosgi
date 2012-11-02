@@ -16,12 +16,14 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.rsatracker;
 
-public interface ServiceInterestListener {
+import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
-    public abstract void addServiceInterest(String filter);
-
-    public abstract void removeServiceInterest(String filter);
-
+/**
+ * Callback interface to be notified of RemoteServiceAdmin services that are added or removed
+ */
+public interface RemoteServiceAdminLifeCycleListener {
+    void added(RemoteServiceAdmin rsa);
+    void removed(RemoteServiceAdmin rsa);
 }

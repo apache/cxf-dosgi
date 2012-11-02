@@ -16,7 +16,7 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.exporter;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.dosgi.topologymanager.exporter.EndpointListenerNotifier;
+import org.apache.cxf.dosgi.topologymanager.exporter.ExportRepository;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;

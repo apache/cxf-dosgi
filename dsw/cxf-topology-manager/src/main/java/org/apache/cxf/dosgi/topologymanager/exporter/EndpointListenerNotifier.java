@@ -16,7 +16,7 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.exporter;
 
 import java.util.ArrayList;
 import java.util.Collection;

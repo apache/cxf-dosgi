@@ -16,14 +16,12 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.exporter;
 
-import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
+import java.util.Collection;
 
-/**
- * Callback interface to be notified of RemoteServiceAdmin services that are added or removed
- */
-public interface RemoteServiceAdminLifeCycleListener {
-    void added(RemoteServiceAdmin rsa);
-    void removed(RemoteServiceAdmin rsa);
+import org.osgi.service.remoteserviceadmin.ExportRegistration;
+
+public interface ExportRepository {
+    Collection<ExportRegistration> getAllExportRegistrations();
 }

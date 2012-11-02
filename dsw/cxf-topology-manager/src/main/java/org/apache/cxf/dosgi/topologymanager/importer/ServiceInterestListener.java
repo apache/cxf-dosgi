@@ -16,12 +16,12 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.importer;
 
-import java.util.Collection;
+public interface ServiceInterestListener {
 
-import org.osgi.service.remoteserviceadmin.ExportRegistration;
+    public abstract void addServiceInterest(String filter);
 
-public interface ExportRepository {
-    Collection<ExportRegistration> getAllExportRegistrations();
+    public abstract void removeServiceInterest(String filter);
+
 }

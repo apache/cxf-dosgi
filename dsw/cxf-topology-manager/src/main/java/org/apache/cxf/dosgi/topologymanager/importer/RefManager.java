@@ -16,7 +16,7 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.importer;
 
 import java.util.HashMap;
 import java.util.Map;

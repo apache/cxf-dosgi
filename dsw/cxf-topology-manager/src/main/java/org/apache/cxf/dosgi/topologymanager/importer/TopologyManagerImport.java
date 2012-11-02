@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations 
  * under the License. 
  */
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.importer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminLifeCycleListener;
+import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -44,7 +46,8 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener;
 
 /**
  * Listens for remote endpoints using the EndpointListener interface and the EndpointListenerManager.
- * Listens for local service interests using the ServiceInterestListener interface. 
+ * Listens for local service interests using the ListenerHookImpl that calls back through the 
+ * ServiceInterestListener interface. 
  * Manages local creation and destruction of service imports using the available RemoteServiceAdmin services. 
  */
 public class TopologyManagerImport implements EndpointListener, RemoteServiceAdminListener, ServiceInterestListener {
@@ -59,8 +62,9 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
 
     /**
      * If set to false only one service is imported for each import interest even it multiple services are
-     * available. If set to true, all available services are imported. TODO: Make this available as a
-     * configuration option
+     * available. If set to true, all available services are imported. 
+     * 
+     * TODO: Make this available as a configuration option
      */
     private boolean importAllAvailable = true;
 
@@ -73,9 +77,13 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     private final RefManager importInterests = new RefManager();
 
     /**
-     * FIXME: Document me .... !
+     * List of Endpoints by matched filter that were reported by the EndpointListener and can be imported
      */
     private final Map<String /* filter */, List<EndpointDescription>> importPossibilities = new HashMap<String, List<EndpointDescription>>();
+    
+    /**
+     * List of already imported Endpoints by their matched filter
+     */
     private final Map<String /* filter */, List<ImportRegistration>> importedServices = new HashMap<String, List<ImportRegistration>>();
 
     public TopologyManagerImport(BundleContext bc, RemoteServiceAdminTracker rsaTracker) {
@@ -92,7 +100,6 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
         endpointListenerManager = new EndpointListenerManager(bctx, this);
         execService = new ThreadPoolExecutor(5, 10, 50, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         listenerHook = new ListenerHookImpl(bc, this);
-        
     }
 
     public void start() {
@@ -235,8 +242,12 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
      */
     private void importServices(String filter) {        
         List<ImportRegistration> importRegistrations = getImportedServices(filter);
-        for (EndpointDescription epd : importPossibilities.get(filter)) {
-            if (!importRegistrations.contains(epd)) {
+        List<EndpointDescription> possibilities = importPossibilities.get(filter);
+        if (possibilities == null) {
+            return;
+        }
+        for (EndpointDescription epd : possibilities) {
+            if (!alreadyImported(epd, importRegistrations)) {
                 // service not imported yet -> import it now
                 ImportRegistration ir = importService(epd);
                 if (ir != null) {
@@ -248,6 +259,15 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
                 }
             }
         }
+    }
+
+    private boolean alreadyImported(EndpointDescription epd, List<ImportRegistration> importRegistrations) {
+        for (ImportRegistration ir : importRegistrations) {
+            if (epd.equals(ir.getImportReference().getImportedEndpoint())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

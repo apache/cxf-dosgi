@@ -1,4 +1,4 @@
-package org.apache.cxf.dosgi.topologymanager;
+package org.apache.cxf.dosgi.topologymanager.importer;
 
 import static org.junit.Assert.assertTrue;
 
@@ -7,6 +7,9 @@ import java.util.Dictionary;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.cxf.dosgi.topologymanager.importer.TopologyManagerImport;
+import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminLifeCycleListener;
+import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
@@ -39,7 +42,7 @@ public class TopologyManagerImportTest {
         EndpointDescription epd = c.createMock(EndpointDescription.class);
         RemoteServiceAdmin rsa  = c.createMock(RemoteServiceAdmin.class);
         final ImportRegistration ireg = c.createMock(ImportRegistration.class);
-        EasyMock.expect(ireg.getException()).andReturn(null);
+        EasyMock.expect(ireg.getException()).andReturn(null).anyTimes();
         ImportReference iref = c.createMock(ImportReference.class);
         
         rsaTracker.addListener(EasyMock.<RemoteServiceAdminLifeCycleListener>anyObject());
@@ -64,7 +67,6 @@ public class TopologyManagerImportTest {
         tm.triggerImportsForRemoteServiceAdmin(rsa);
         assertTrue("importService should have been called on RemoteServiceAdmin", sema.tryAcquire(100, TimeUnit.SECONDS));
         tm.stop();
-        
         c.verify();
         
     }
