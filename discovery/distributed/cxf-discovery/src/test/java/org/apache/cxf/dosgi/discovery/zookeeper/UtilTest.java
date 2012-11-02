@@ -64,6 +64,7 @@ public class UtilTest extends TestCase {
     }
     
     
+    @SuppressWarnings("unchecked")
     public void testGetStringPlusProperty() {
         Object in = "MyString";
         String[] out = Util.getStringPlusProperty(in);

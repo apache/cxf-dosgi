@@ -23,14 +23,12 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.easymock.IAnswer;
+import org.apache.zookeeper.ZooKeeper;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class EndpointListenerFactoryTest extends TestCase {
 
@@ -38,42 +36,21 @@ public class EndpointListenerFactoryTest extends TestCase {
         IMocksControl c = EasyMock.createNiceControl();
 
         BundleContext ctx = c.createMock(BundleContext.class);
-        ZooKeeperDiscovery zkd = c.createMock(ZooKeeperDiscovery.class);
+        ZooKeeper zk = c.createMock(ZooKeeper.class);
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
         
-        EndpointListenerFactory eplf = new EndpointListenerFactory(zkd, ctx);
+        PublishingEndpointListenerFactory eplf = new PublishingEndpointListenerFactory(zk, ctx);
 
         EasyMock.expect(
                         ctx.registerService(EasyMock.eq(EndpointListener.class.getName()), EasyMock.eq(eplf),
                                             (Properties)EasyMock.anyObject())).andReturn(sreg).once();
-
-        
-        sreg.setProperties((Properties)EasyMock.anyObject());
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            public Object answer() throws Throwable {
-                Properties p = (Properties)EasyMock.getCurrentArguments()[0];
-                assertNotNull(p);
-                String scope = (String)p.get(EndpointListener.ENDPOINT_LISTENER_SCOPE);
-                assertNotNull(scope);
-                assertEquals("(&(" + Constants.OBJECTCLASS + "=*)(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID
-                             + "=myUUID))", scope);
-                return null;
-            }
-        }).once();
-
         
         EasyMock.expect(ctx.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("myUUID")
             .anyTimes();
-
-        
-        
         
         c.replay();
         eplf.start();
         c.verify();
-
-        
         
         c.reset();
         sreg.unregister();
@@ -89,37 +66,20 @@ public class EndpointListenerFactoryTest extends TestCase {
         IMocksControl c = EasyMock.createNiceControl();
         
         BundleContext ctx = c.createMock(BundleContext.class);
-        ZooKeeperDiscovery zkd = c.createMock(ZooKeeperDiscovery.class);
+        ZooKeeper zk = c.createMock(ZooKeeper.class);
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
         
-        EndpointListenerFactory eplf = new EndpointListenerFactory(zkd, ctx);
+        PublishingEndpointListenerFactory eplf = new PublishingEndpointListenerFactory(zk, ctx);
 
         EasyMock.expect(
                         ctx.registerService(EasyMock.eq(EndpointListener.class.getName()), EasyMock.eq(eplf),
                                             (Properties)EasyMock.anyObject())).andReturn(sreg).once();
 
         
-        sreg.setProperties((Properties)EasyMock.anyObject());
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            public Object answer() throws Throwable {
-                Properties p = (Properties)EasyMock.getCurrentArguments()[0];
-                assertNotNull(p);
-                String scope = (String)p.get(EndpointListener.ENDPOINT_LISTENER_SCOPE);
-                assertNotNull(scope);
-                assertEquals("(&(" + Constants.OBJECTCLASS + "=*)(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID
-                             + "=myUUID))", scope);
-                return null;
-            }
-        }).once();
-
-        
         EasyMock.expect(ctx.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("myUUID")
             .anyTimes();
 
-        
-
-        EndpointListenerImpl eli = c.createMock(EndpointListenerImpl.class);
+        PublishingEndpointListener eli = c.createMock(PublishingEndpointListener.class);
         eli.close();
         EasyMock.expectLastCall().once();
         
@@ -131,7 +91,7 @@ public class EndpointListenerFactoryTest extends TestCase {
         assertNotNull(service);
         assertTrue(service instanceof EndpointListener);
 
-        List<EndpointListenerImpl> listeners = eplf.getListeners();
+        List<PublishingEndpointListener> listeners = eplf.getListeners();
         assertEquals(1, listeners.size());
         assertEquals(service, listeners.get(0));
         

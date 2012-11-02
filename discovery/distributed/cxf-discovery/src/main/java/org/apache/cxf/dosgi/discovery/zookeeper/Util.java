@@ -65,6 +65,7 @@ public class Util {
         }
 
         if (property instanceof Collection) {
+            @SuppressWarnings("rawtypes")
             Collection col = (Collection)property;
             // System.out.println("Collection: size "+col.size());
             String[] ret = new String[col.size()];
@@ -83,8 +84,9 @@ public class Util {
         String[] scopes = Util.getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
         ArrayList<String> normalizedScopes = new ArrayList<String>(scopes.length);
         for (String scope : scopes) {
-            if(scope!=null && !"".equals(scope))
+            if (scope != null && !"".equals(scope)) {
                 normalizedScopes.add(scope);
+            }
         }
         return normalizedScopes.toArray(new String[normalizedScopes.size()]);
     }

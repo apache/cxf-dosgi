@@ -18,92 +18,26 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
-import java.io.IOException;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
-public class Activator implements BundleActivator, ManagedService {
-    private static final Logger LOG = Logger.getLogger(Activator.class.getName());
-
+public class Activator implements BundleActivator {
     private ZooKeeperDiscovery zkd;
-    private Dictionary zkProperties;
-    private BundleContext bctx;
-    ServiceRegistration cmReg;
 
     public synchronized void start(BundleContext bc) throws Exception {
-        bctx = bc;
-        zkProperties = getCMDefaults();
-        zkd = createZooKeeperDiscovery();
-
-        cmReg = bc.registerService(ManagedService.class.getName(), this, zkProperties);
+        zkd = new ZooKeeperDiscovery(bc);
+        Dictionary<String, String> props = new Hashtable<String, String>();
+        props.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper");
+        bc.registerService(ManagedService.class.getName(), zkd, props);
     }
 
     public synchronized void stop(BundleContext bc) throws Exception {
-        cmReg.unregister();
         zkd.stop();
-    }
-
-    public synchronized void updated(Dictionary configuration) throws ConfigurationException {
-        if (LOG.isLoggable(Level.FINE))
-            LOG.fine("Received configuration update for Zookeeper Discovery: " + configuration);
-        if (configuration == null)
-            return;
-
-        Dictionary effective = getCMDefaults();
-        // apply all values on top of the defaults
-        for (Enumeration e = configuration.keys(); e.hasMoreElements();) {
-            Object key = e.nextElement();
-            if (key != null) {
-                Object val = configuration.get(key);
-                effective.put(key, val);
-            }
-        }
-
-        if (zkProperties.equals(effective)) {
-            LOG.info("Update called, but actual settings haven't changed ...");
-            return;
-        } else if (LOG.isLoggable(Level.INFO)) {
-            LOG.info("Updating configuration for Zookeeper Discovery: " + configuration);
-        }
-
-        zkProperties = effective;
-        cmReg.setProperties(zkProperties);
-
-        synchronized (this) {
-            zkd.stop();
-            zkd = createZooKeeperDiscovery();
-        }
-
-        // call start in any case
-        try {
-            zkd.start();
-        } catch (IOException e) {
-            LOG.log(Level.SEVERE, "Failed to start the Zookeeper Discovery component.", e);
-        }
-
-    }
-
-    private Dictionary getCMDefaults() {
-        Dictionary props = new Hashtable();
-        props.put("zookeeper.timeout", "3000");
-        props.put("zookeeper.port", "2181");
-        props.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper");
-        return props;
-    }
-
-    // for testing
-    protected ZooKeeperDiscovery createZooKeeperDiscovery() {
-        return new ZooKeeperDiscovery(bctx, zkProperties);
     }
 
 }

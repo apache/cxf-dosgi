@@ -48,12 +48,7 @@ public class EndpointListenerImplTest extends TestCase {
         IMocksControl c = EasyMock.createNiceControl();
 
         BundleContext ctx = c.createMock(BundleContext.class);
-        ZooKeeperDiscovery zkd = c.createMock(ZooKeeperDiscovery.class);
-
         ZooKeeper zk = c.createMock(ZooKeeper.class);
-
-        EasyMock.expect(zkd.getZookeeper()).andReturn(zk).anyTimes();
-
 
         String path = "/osgi/service_registry/myClass/google.de#80##test";
         EasyMock.expect(
@@ -66,7 +61,7 @@ public class EndpointListenerImplTest extends TestCase {
 
         c.replay();
 
-        EndpointListenerImpl eli = new EndpointListenerImpl(zkd, ctx);
+        PublishingEndpointListener eli = new PublishingEndpointListener(zk, ctx);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.OBJECTCLASS, new String[] {
@@ -134,18 +129,12 @@ public class EndpointListenerImplTest extends TestCase {
         String expectedFullPath = "/osgi/service_registry/org/foo/myClass/some.machine#9876##test";
         EasyMock.expect(zk.create(
                 EasyMock.eq(expectedFullPath),
-                EasyMock.aryEq(EndpointListenerImpl.getData(expectedProps)),
+                EasyMock.aryEq(PublishingEndpointListener.getData(expectedProps)),
                 EasyMock.eq(Ids.OPEN_ACL_UNSAFE),
                 EasyMock.eq(CreateMode.EPHEMERAL))).andReturn("");
         EasyMock.replay(zk);
-        ZooKeeperDiscovery zkd = new ZooKeeperDiscovery(ctx, null) {
-            @Override
-            protected ZooKeeper getZookeeper() {
-                return zk;
-            }
-        };
 
-        EndpointListenerImpl eli = new EndpointListenerImpl(zkd, ctx);
+        PublishingEndpointListener eli = new PublishingEndpointListener(zk, ctx);
 
         List<EndpointDescription> endpointList = getEndpointsList(eli);
         assertEquals("Precondition", 0, endpointList.size());
@@ -157,7 +146,7 @@ public class EndpointListenerImplTest extends TestCase {
 
 
     @SuppressWarnings("unchecked")
-    private List<EndpointDescription> getEndpointsList(EndpointListenerImpl eli) throws Exception {
+    private List<EndpointDescription> getEndpointsList(PublishingEndpointListener eli) throws Exception {
         Field field = eli.getClass().getDeclaredField("endpoints");
         field.setAccessible(true);
         return (List<EndpointDescription>) field.get(eli);
@@ -168,12 +157,7 @@ public class EndpointListenerImplTest extends TestCase {
         IMocksControl c = EasyMock.createNiceControl();
 
         BundleContext ctx = c.createMock(BundleContext.class);
-        ZooKeeperDiscovery zkd = c.createMock(ZooKeeperDiscovery.class);
-
         ZooKeeper zk = c.createMock(ZooKeeper.class);
-
-        EasyMock.expect(zkd.getZookeeper()).andReturn(zk).anyTimes();
-
 
         String path = "/osgi/service_registry/myClass/google.de#80##test";
         EasyMock.expect(
@@ -186,7 +170,7 @@ public class EndpointListenerImplTest extends TestCase {
 
         c.replay();
 
-        EndpointListenerImpl eli = new EndpointListenerImpl(zkd, ctx);
+        PublishingEndpointListener eli = new PublishingEndpointListener(zk, ctx);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.OBJECTCLASS, new String[] {
@@ -208,7 +192,7 @@ public class EndpointListenerImplTest extends TestCase {
 
     public void testGetKey() throws Exception {
         assertEquals("somehost#9090##org#example#TestEndpoint",
-            EndpointListenerImpl.getKey("http://somehost:9090/org/example/TestEndpoint"));
+            PublishingEndpointListener.getKey("http://somehost:9090/org/example/TestEndpoint"));
     }
 
 }

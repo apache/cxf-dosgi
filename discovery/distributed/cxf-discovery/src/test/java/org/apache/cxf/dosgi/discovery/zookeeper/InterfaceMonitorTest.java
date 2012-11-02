@@ -18,74 +18,52 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
-import java.util.Collection;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+
 import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.dosgi.discovery.zookeeper.EndpointListenerTrackerCustomizer.Interest;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
+import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.remoteserviceadmin.EndpointListener;
 
 public class InterfaceMonitorTest extends TestCase {
 
     public void testInterfaceMonitor() throws KeeperException, InterruptedException {
 
-        IMocksControl c = EasyMock.createNiceControl();
+        IMocksControl c = EasyMock.createControl();
 
         BundleContext ctx = c.createMock(BundleContext.class);
-        ZooKeeperDiscovery zkd = c.createMock(ZooKeeperDiscovery.class);
-
         ZooKeeper zk = c.createMock(ZooKeeper.class);
-        EasyMock.expect(zk.getState()).andReturn(ZooKeeper.States.CONNECTED).anyTimes();
-
-        EasyMock.expect(zkd.getZookeeper()).andReturn(zk).anyTimes();
-
-        EndpointListenerTrackerCustomizer.Interest interest = new EndpointListenerTrackerCustomizer.Interest();
+        expect(zk.getState()).andReturn(ZooKeeper.States.CONNECTED).anyTimes();
 
         String scope = "(myProp=test)";
         String interf = "es.schaaf.test";
         String node = Util.getZooKeeperPath(interf);
 
-        final InterfaceDataMonitorListenerImpl idmli = c.createMock(InterfaceDataMonitorListenerImpl.class);
-
-        InterfaceMonitor im = new InterfaceMonitor(zk, interf, interest, scope, ctx) {
-            @Override
-            protected InterfaceDataMonitorListenerImpl createInterfaceDataMonitorListener(ZooKeeper zk,
-                                                                                          String intf,
-                                                                                          Interest zkd,
-                                                                                          String scope,
-                                                                                          BundleContext bctx) {
-                return idmli;
-            }
-        };
-
-        idmli.change();
+        EndpointListener epListener = c.createMock(EndpointListener.class);
+        InterfaceMonitor im = new InterfaceMonitor(zk, interf, epListener, scope, ctx);
+        zk.exists(eq(node), eq(im), eq(im), EasyMock.anyObject());
         EasyMock.expectLastCall().once();
 
-        zk.exists(EasyMock.eq(node), EasyMock.eq(im), EasyMock.eq(im), EasyMock.anyObject());
-        EasyMock.expectLastCall().once();
-
-        EasyMock.expect(zk.exists(EasyMock.eq(node), EasyMock.eq(false))).andReturn(new Stat()).anyTimes();
-
-        EasyMock.expect(zk.getChildren(EasyMock.eq(node), EasyMock.eq(im))).andReturn(Collections.EMPTY_LIST)
-            .once();
+        expect(zk.exists(eq(node), eq(false))).andReturn(new Stat()).anyTimes();
+        expect(zk.getChildren(eq(node), eq(false))).andReturn(Collections.<String> emptyList()).once();
+        expect(zk.getChildren(eq(node), eq(im))).andReturn(Collections.<String> emptyList()).once();
 
         c.replay();
-
         im.start();
-
         // simulate a zk callback
         WatchedEvent we = new WatchedEvent(EventType.NodeCreated, KeeperState.SyncConnected, node);
         im.process(we);
-
         c.verify();
     }
 }

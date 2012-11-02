@@ -20,111 +20,98 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.io.IOException;
 import java.util.Dictionary;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class ZooKeeperDiscovery implements Watcher {
+public class ZooKeeperDiscovery implements Watcher, ManagedService {
 
     private static final Logger LOG = Logger.getLogger(ZooKeeperDiscovery.class.getName());
 
-    private boolean started = false;
-    
-    private BundleContext bctx;
-    private ZooKeeper zooKeeper;
-    private Dictionary properties = null;
+    private final BundleContext bctx;
 
-    private EndpointListenerFactory endpointListenerFactory;
+    private PublishingEndpointListenerFactory endpointListenerFactory;
     private ServiceTracker endpointListenerTracker;
 
-    private String zkHost;
-    private String zkPort;
-    private int zkTimeout;
+    private InterfaceMonitorManager imManager;
 
-    public ZooKeeperDiscovery(BundleContext bctx, Dictionary initialProps) {
+    private ZooKeeper zooKeeper;
+
+    @SuppressWarnings("rawtypes")
+    private Dictionary curConfiguration;
+
+    public ZooKeeperDiscovery(BundleContext bctx) {
         this.bctx = bctx;
-        endpointListenerFactory = new EndpointListenerFactory(this, bctx);
-        properties = initialProps;
-
-        endpointListenerTracker = new ServiceTracker(bctx, EndpointListener.class.getName(),
-                                                     new EndpointListenerTrackerCustomizer(this, bctx));
+        this.curConfiguration = null;
     }
 
-    public synchronized void start() throws IOException, ConfigurationException {
-        if(started) return;
-        started = true;
-        createZooKeeper(properties);
-        
-        // Wait up to 10 seconds for the connection to be established and only register 
-        // the listeners once the connection is established
-        int loops = 100;
-        
-        while(loops>0){
-            if(zooKeeper.getState()==ZooKeeper.States.CONNECTED){
-                break;
-            }
-            --loops;
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {}
+    @SuppressWarnings("rawtypes")
+    public synchronized void updated(Dictionary configuration) throws ConfigurationException {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Received configuration update for Zookeeper Discovery: " + configuration);
         }
-        
-        if(zooKeeper.getState()!=ZooKeeper.States.CONNECTED){
-            throw new IOException("Connection to ZookeeperServer failed !");
+
+        synchronized (this) {
+            stop();
         }
-        
+
+        if (configuration == null) {
+            return;
+        }
+        curConfiguration = configuration;
+        try {
+            zooKeeper = createZooKeeper(configuration);
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, "Failed to start the Zookeeper Discovery component.", e);
+        }
+    }
+
+    private void startModules() {
+        endpointListenerFactory = new PublishingEndpointListenerFactory(zooKeeper, bctx);
         endpointListenerFactory.start();
+        imManager = new InterfaceMonitorManager(bctx, zooKeeper);
+        EndpointListenerTrackerCustomizer customizer = new EndpointListenerTrackerCustomizer(bctx, imManager);
+        endpointListenerTracker = new ServiceTracker(bctx, EndpointListener.class.getName(), customizer);
         endpointListenerTracker.open();
     }
 
     public synchronized void stop() {
-        if(!started) return;
-        started = false;
-        endpointListenerFactory.stop();
-        endpointListenerTracker.close();
+        if (endpointListenerFactory != null) {
+            endpointListenerFactory.stop();
+        }
+        if (imManager != null) {
+            imManager.close();
+        }
+        if (endpointListenerTracker != null) {
+            endpointListenerTracker.close();
+        }
+        if (zooKeeper != null) {
+            try {
+                zooKeeper.close();
+            } catch (InterruptedException e) {
+                LOG.log(Level.SEVERE, "Error closing zookeeper", e);
+            }
+        }
     }
 
-
-    private void createZooKeeper(Dictionary props) throws IOException, ConfigurationException {
-        zkHost = getProp(props, "zookeeper.host");
-        zkPort = getProp(props, "zookeeper.port");
-        zkTimeout = Integer.parseInt(getProp(props, "zookeeper.timeout", "3000"));
-
-        zooKeeper = createZooKeeper();
-    }
-
-    // separated for testing
-    ZooKeeper createZooKeeper() throws IOException {
+    @SuppressWarnings("rawtypes")
+    private ZooKeeper createZooKeeper(Dictionary props) throws IOException {
+        String zkHost = getProp(props, "zookeeper.host", "localhost");
+        String zkPort = getProp(props, "zookeeper.port", "2181");
+        int zkTimeout = Integer.parseInt(getProp(props, "zookeeper.timeout", "3000"));
         return new ZooKeeper(zkHost + ":" + zkPort, zkTimeout, this);
     }
 
-    private <T> boolean hasChanged(T orig, T nw) {
-        if (orig == nw) {
-            return false;
-        }
-
-        if (orig == null) {
-            return true;
-        }
-
-        return !orig.equals(nw);
-    }
-
-    private static String getProp(Dictionary props, String key) throws ConfigurationException {
-        String val = getProp(props, key, null);
-        if (val != null) {
-            return val;
-        } else {
-            throw new ConfigurationException(key, "The property " + key + " requires a value");
-        }
-    }
-
+    @SuppressWarnings("rawtypes")
     private static String getProp(Dictionary props, String key, String def) {
         Object val = props.get(key);
         String rv;
@@ -139,13 +126,20 @@ public class ZooKeeperDiscovery implements Watcher {
     }
 
     /* Callback for ZooKeeper */
-    public void process(WatchedEvent arg0) {
-        // TODO Auto-generated method stub
-
+    public void process(WatchedEvent event) {
+        KeeperState state = event.getState();
+        if (state == KeeperState.SyncConnected) {
+            LOG.info("Connection to zookeeper established");
+            startModules();
+        }
+        if (state == KeeperState.Expired) {
+            LOG.info("Connection to zookeeper expired. Trying to create a new connection");
+            stop();
+            try {
+                zooKeeper = createZooKeeper(curConfiguration);
+            } catch (IOException e) {
+                LOG.log(Level.SEVERE, "Failed to start the Zookeeper Discovery component.", e);
+            }
+        }
     }
-
-    protected ZooKeeper getZookeeper() {
-        return zooKeeper;
-    }
-
 }

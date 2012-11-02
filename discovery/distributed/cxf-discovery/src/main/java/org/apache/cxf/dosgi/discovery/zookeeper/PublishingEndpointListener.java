@@ -42,17 +42,20 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class EndpointListenerImpl implements EndpointListener {
-    private final Logger LOG = Logger.getLogger(EndpointListenerImpl.class.getName());
+/**
+ * Listens for local Endpoints and publishes them to Zookeeper
+ */
+public class PublishingEndpointListener implements EndpointListener {
+    private final Logger LOG = Logger.getLogger(PublishingEndpointListener.class.getName());
 
-    private final ZooKeeperDiscovery discovery;
+    private final ZooKeeper zookeeper;
     private final List<DiscoveryPlugin> discoveryPlugins = new CopyOnWriteArrayList<DiscoveryPlugin>();
     private final ServiceTracker discoveryPluginTracker;
     private final List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
     private boolean closed = false;
 
-    public EndpointListenerImpl(ZooKeeperDiscovery zooKeeperDiscovery, BundleContext bctx) {
-        discovery = zooKeeperDiscovery;
+    public PublishingEndpointListener(ZooKeeper zooKeeper, BundleContext bctx) {
+        this.zookeeper = zooKeeper;
 
         discoveryPluginTracker = new ServiceTracker(bctx, DiscoveryPlugin.class.getName(), null) {
             @Override
@@ -73,12 +76,8 @@ public class EndpointListenerImpl implements EndpointListener {
         discoveryPluginTracker.open();
     }
 
-    private ZooKeeper getZooKeeper() {
-        return discovery.getZookeeper();
-    }
-
     public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
-        LOG.info("endpointDescription added: " + endpoint);
+        LOG.info("Local endpointDescription added: " + endpoint);
 
         if (closed)
             return;
@@ -95,7 +94,6 @@ public class EndpointListenerImpl implements EndpointListener {
                 Collection<String> interfaces = endpoint.getInterfaces();
                 String endpointKey = getKey(endpoint.getId());
 
-                ZooKeeper zk = getZooKeeper();
                 for (String name : interfaces) {
                     Map<String, Object> props = new HashMap<String, Object>(endpoint.getProperties());
                     for (DiscoveryPlugin plugin : discoveryPlugins) {
@@ -103,11 +101,11 @@ public class EndpointListenerImpl implements EndpointListener {
                     }
 
                     String path = Util.getZooKeeperPath(name);
-                    ensurePath(path, zk);
+                    ensurePath(path, zookeeper);
 
                     String fullPath = path + '/' + endpointKey;
                     LOG.fine("Creating ZooKeeper node: " + fullPath);
-                    zk.create(fullPath, getData(props), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+                    zookeeper.create(fullPath, getData(props), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
                 }
 
                 endpoints.add(endpoint);
@@ -119,7 +117,7 @@ public class EndpointListenerImpl implements EndpointListener {
     }
 
     public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
-        LOG.info("endpointDescription removed: " + endpoint);
+        LOG.info("Local endpointDescription removed: " + endpoint);
 
         if (closed)
             return;
@@ -145,12 +143,11 @@ public class EndpointListenerImpl implements EndpointListener {
         Collection<String> interfaces = endpoint.getInterfaces();
         String endpointKey = getKey(endpoint.getId());
 
-        ZooKeeper zk = getZooKeeper();
         for (String name : interfaces) {
             String path = Util.getZooKeeperPath(name);
             String fullPath = path + '/' + endpointKey;
             LOG.fine("Removing ZooKeeper node: " + fullPath);
-            zk.delete(fullPath, -1);
+            zookeeper.delete(fullPath, -1);
         }
     }
 

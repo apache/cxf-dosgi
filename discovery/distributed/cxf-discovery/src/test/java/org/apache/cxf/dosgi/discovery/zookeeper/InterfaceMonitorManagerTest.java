@@ -23,28 +23,26 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.dosgi.discovery.zookeeper.EndpointListenerTrackerCustomizer.Interest;
+import org.apache.zookeeper.ZooKeeper;
 import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.remoteserviceadmin.EndpointListener;
 
-public class EndpointListenerTrackerCustomizerTest extends TestCase{
+public class InterfaceMonitorManagerTest extends TestCase {
     
     public void testEndpointListenerTrackerCustomizer(){
         
         IMocksControl c = EasyMock.createNiceControl();
         
         BundleContext ctx = c.createMock(BundleContext.class);
-        ZooKeeperDiscovery zkd = c.createMock(ZooKeeperDiscovery.class);
+        ZooKeeper zk = c.createMock(ZooKeeper.class);
         
         ServiceReference sref = c.createMock(ServiceReference.class);
         ServiceReference sref2 = c.createMock(ServiceReference.class);
         
         final Properties p = new Properties(); 
-        
         
         EasyMock.expect(sref.getPropertyKeys()).andAnswer(new IAnswer<String[]>() {
             public String[] answer() throws Throwable {
@@ -75,8 +73,8 @@ public class EndpointListenerTrackerCustomizerTest extends TestCase{
         
         final ArrayList<IMocksControl> controls = new ArrayList<IMocksControl>();
         
-        EndpointListenerTrackerCustomizer eltc = new EndpointListenerTrackerCustomizer(zkd,ctx){
-            protected InterfaceMonitor createInterfaceMonitor(String scope, String objClass, Interest interest){
+        InterfaceMonitorManager eltc = new InterfaceMonitorManager(ctx, zk){
+            protected InterfaceMonitor createInterfaceMonitor(String scope, String objClass, Interest interest) {
                 IMocksControl lc = EasyMock.createNiceControl();
                 InterfaceMonitor im = lc.createMock(InterfaceMonitor.class);
                 im.start();
@@ -91,29 +89,29 @@ public class EndpointListenerTrackerCustomizerTest extends TestCase{
         
         c.replay();
         
-        eltc.addingService(sref); // sref has no scope -> nothing should happen
+        // sref has no scope -> nothing should happen
         
         assertEquals(0, eltc.getHandledEndpointlisteners().size());
         assertEquals(0, eltc.getInterestingScopes().size());
         
-        p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(objectClass=mine)");
+        //p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, );
         
-        eltc.addingService(sref); 
-        
-        assertEquals(1, eltc.getHandledEndpointlisteners().size());
-        assertEquals(1, eltc.getHandledEndpointlisteners().get(sref).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref).get(0));
-        assertEquals(1, eltc.getInterestingScopes().size());
-        
-        
-        eltc.addingService(sref); 
+        eltc.addInterest(sref, "(objectClass=mine)", "mine"); 
         
         assertEquals(1, eltc.getHandledEndpointlisteners().size());
         assertEquals(1, eltc.getHandledEndpointlisteners().get(sref).size());
         assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
         
-        eltc.addingService(sref2); 
+        
+        eltc.addInterest(sref, "(objectClass=mine)", "mine");
+        
+        assertEquals(1, eltc.getHandledEndpointlisteners().size());
+        assertEquals(1, eltc.getHandledEndpointlisteners().get(sref).size());
+        assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref).get(0));
+        assertEquals(1, eltc.getInterestingScopes().size());
+        
+        eltc.addInterest(sref2, "(objectClass=mine)", "mine");
         
         assertEquals(2, eltc.getHandledEndpointlisteners().size());
         assertEquals(1, eltc.getHandledEndpointlisteners().get(sref).size());
@@ -123,22 +121,21 @@ public class EndpointListenerTrackerCustomizerTest extends TestCase{
         assertEquals(1, eltc.getInterestingScopes().size());
         
         
-        eltc.removedService(sref, null);
+        eltc.removeInterest(sref);
         
         assertEquals(1, eltc.getHandledEndpointlisteners().size());
         assertEquals(1, eltc.getHandledEndpointlisteners().get(sref2).size());
         assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref2).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
         
-        eltc.removedService(sref, null);
+        eltc.removeInterest(sref);
         
         assertEquals(1, eltc.getHandledEndpointlisteners().size());
         assertEquals(1, eltc.getHandledEndpointlisteners().get(sref2).size());
         assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref2).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
         
-        
-        eltc.removedService(sref2, null);
+        eltc.removeInterest(sref2);
         
         assertEquals(0, eltc.getHandledEndpointlisteners().size());
         assertEquals(0, eltc.getInterestingScopes().size());

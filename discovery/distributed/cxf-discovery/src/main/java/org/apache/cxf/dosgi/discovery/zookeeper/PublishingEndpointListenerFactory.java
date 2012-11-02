@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -31,25 +32,27 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-public class EndpointListenerFactory implements ServiceFactory {
-
+/**
+ * Creates local Endpointlisteners that publish to Zookeeper 
+ */
+public class PublishingEndpointListenerFactory implements ServiceFactory {
     public static final String DISCOVERY_ZOOKEEPER_ID = "org.apache.cxf.dosgi.discovery.zookeeper";
-    
-    private Logger LOG = Logger.getLogger(EndpointListenerFactory.class.getName());
+    private static final Logger LOG = Logger.getLogger(PublishingEndpointListenerFactory.class.getName());
+
     private BundleContext bctx;
-    private ZooKeeperDiscovery discovery;
-    private List<EndpointListenerImpl> listeners = new ArrayList<EndpointListenerImpl>();
+    private ZooKeeper zookeeper;
+    private List<PublishingEndpointListener> listeners = new ArrayList<PublishingEndpointListener>();
     private ServiceRegistration serviceRegistartion;
 
-    public EndpointListenerFactory(ZooKeeperDiscovery zooKeeperDiscovery, BundleContext bctx) {
+    public PublishingEndpointListenerFactory(ZooKeeper zooKeeper, BundleContext bctx) {
         this.bctx = bctx;
-        discovery = zooKeeperDiscovery;
+        this.zookeeper = zooKeeper;
     }
 
     public Object getService(Bundle b, ServiceRegistration sr) {
         LOG.fine("new EndpointListener from factory");
         synchronized (listeners) {
-            EndpointListenerImpl epl = new EndpointListenerImpl(discovery, bctx);
+            PublishingEndpointListener epl = new PublishingEndpointListener(zookeeper, bctx);
             listeners.add(epl);
             return epl;
         }
@@ -59,7 +62,7 @@ public class EndpointListenerFactory implements ServiceFactory {
         LOG.fine("remove EndpointListener");
         synchronized (listeners) {
             if (listeners.contains(s)) {
-                EndpointListenerImpl epl = (EndpointListenerImpl)s;
+                PublishingEndpointListener epl = (PublishingEndpointListener)s;
                 epl.close();
                 listeners.remove(epl);
             }
@@ -67,22 +70,18 @@ public class EndpointListenerFactory implements ServiceFactory {
     }
 
     public synchronized void start() {
-        serviceRegistartion = bctx.registerService(EndpointListener.class.getName(), this, null);
-        updateServiceRegistration();
-    }
-
-    private void updateServiceRegistration() {
         Properties props = new Properties();
         props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(&(" + Constants.OBJECTCLASS + "=*)("+RemoteConstants.ENDPOINT_FRAMEWORK_UUID+"="+Util.getUUID(bctx)+"))");
         props.put(DISCOVERY_ZOOKEEPER_ID, "true");
-        serviceRegistartion.setProperties(props);
+        serviceRegistartion = bctx.registerService(EndpointListener.class.getName(), this, props);
     }
 
     public synchronized void stop() {
-        if (serviceRegistartion != null)
+        if (serviceRegistartion != null) {
             serviceRegistartion.unregister();
+        }
         
-        for (EndpointListenerImpl epl : listeners) {
+        for (PublishingEndpointListener epl : listeners) {
             epl.close();
         }
     }
@@ -90,7 +89,7 @@ public class EndpointListenerFactory implements ServiceFactory {
     /**
      * only for the test case !
      */
-    protected List<EndpointListenerImpl> getListeners(){
+    protected List<PublishingEndpointListener> getListeners(){
         return listeners;
     }
     
