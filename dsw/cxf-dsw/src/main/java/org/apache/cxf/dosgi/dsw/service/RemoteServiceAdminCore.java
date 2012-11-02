@@ -302,7 +302,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
     private boolean isCreatedByThisRSA(ServiceReference sref) {
-        return sref.getBundle().equals(bctx.getBundle());
+        return (sref.getBundle() != null ) && sref.getBundle().equals(bctx.getBundle());
     }
 
     public Collection<ExportReference> getExportedServices() {
