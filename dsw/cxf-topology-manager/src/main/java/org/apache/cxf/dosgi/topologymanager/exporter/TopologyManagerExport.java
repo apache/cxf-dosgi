@@ -90,8 +90,6 @@ public class TopologyManagerExport implements ExportRepository {
             }
 
             public void removed(RemoteServiceAdmin rsa) {
-                // TODO: remove service exports from management structure and notify
-                // discovery stuff...
                 removeRemoteServiceAdmin(rsa);
             }
         });
@@ -123,19 +121,18 @@ public class TopologyManagerExport implements ExportRepository {
         return false;
     }
 
+    /**
+     * Remove all services exported by the given rsa and notify listeners
+     * @param rsa
+     */
     protected void removeRemoteServiceAdmin(RemoteServiceAdmin rsa) {
         synchronized (exportedServices) {
-            for (Map.Entry<ServiceReference, Map<RemoteServiceAdmin, Collection<ExportRegistration>>> exports : exportedServices
-                .entrySet()) {
-                if (exports.getValue().containsKey(rsa)) {
-                    // service was handled by this RemoteServiceAdmin
-                    Collection<ExportRegistration> endpoints = exports.getValue().get(rsa);
-                    // TODO for each notify discovery......
-
+            for (Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports : exportedServices
+                .values()) {
+                if (exports.containsKey(rsa)) {
+                    Collection<ExportRegistration> endpoints = exports.get(rsa);
                     this.epListenerNotifier.notifyAllListenersOfRemoval(endpoints);
-
-                    // remove all management information for the RemoteServiceAdmin
-                    exports.getValue().remove(rsa);
+                    exports.remove(rsa);
                 }
             }
         }
