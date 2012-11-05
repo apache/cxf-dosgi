@@ -43,53 +43,92 @@ public class ExportRegistrationImpl implements ExportRegistration {
 
     private Server server;
     private boolean closed = false;
-    
     private Throwable exception = null;
 
     private ExportRegistrationImpl parent = null;
+    private volatile int instanceCount = 1;
 
     private RemoteServiceAdminCore rsaCore;
 
-    private ExportReference exportReference;
+    private ExportReferenceImpl exportReference;
 
     private ServiceTracker serviceTracker;
 
-    public ExportRegistrationImpl(ExportReference exportReference, RemoteServiceAdminCore remoteServiceAdminCore) {
-        this.exportReference = exportReference;
+    // provide a clone of the provided exp.Reg that is linked to this instance
+    public ExportRegistrationImpl(ExportRegistrationImpl exportRegistration) {
+
+        parent = exportRegistration;
+        exportReference = new ExportReferenceImpl(parent.getExportReference());
+        exception = parent.getException();
+        rsaCore = parent.getRsaCore();
+        parent.instanceAdded();
+    }
+
+    private void instanceAdded() {
+        ++instanceCount;
+    }
+
+    public ExportRegistrationImpl(ServiceReference sref, EndpointDescription endpoint, RemoteServiceAdminCore remoteServiceAdminCore) {
+        exportReference = new ExportReferenceImpl(sref, endpoint);
         parent = this;
         rsaCore = remoteServiceAdminCore;
     }
 
     public synchronized void close() {
-        if (closed) {
+        if (closed)
             return;
-        }
         closed = true;
 
         rsaCore.removeExportRegistration(this);
 
+        parent.instanceClosed();
         if (server != null) {
         	server.stop();
         	server = null;
         }
-        exportReference = null;
-        exception = null;
+        exportReference.close();
+    }
+
+    private void instanceClosed() {
+        --instanceCount;
+        if (instanceCount <= 0) {
+            // really close the ExReg
+            // TODO close it and remove from management structure .... !
+
+            LOG.fine("really closing ExportRegistartion now! ");
+
+            synchronized (this) {
+                if (server != null) {
+                    // FIXME: is this done like this ?
+                    server.stop();
+                    server = null;
+                }
+            }
+        }
     }
 
     public Throwable getException() {
-        return exception;
+        if (!closed)
+            return exception;
+        else
+            return null;
     }
 
     @Override
     public String toString() {
-        String r = "Endpoint Desctiption for ServiceReference " + getExportReference().getExportedService();
+        if (exportReference == null) {
+            return "Exportregistration closed";
+        }
+        EndpointDescription endpointDescription = getExportReference().getExportedEndpoint();
+        ServiceReference serviceReference = getExportReference().getExportedService();
+        String r = "Endpoint Desctiption for ServiceReference " + serviceReference;
         r += "\n";
 
         r += "*** EndpointDescription: **** \n";
-        if (getExportReference().getExportedService() == null) {
+        if (endpointDescription == null) {
             r += "---> NULL <---- \n";
         } else {
-            Set<Map.Entry<String,Object>> props = getExportReference().getExportedEndpoint().getProperties().entrySet();
+            Set<Map.Entry<String,Object>> props = endpointDescription.getProperties().entrySet();
             for (Map.Entry<String,Object> entry : props) {
                 Object value = entry.getValue();
                 r += entry.getKey() + "  => " +
@@ -103,16 +142,16 @@ public class ExportRegistrationImpl implements ExportRegistration {
         this.server = server;
     }
 
+    public Server getServer() {
+        return server;
+    }
+
     public void setException(Throwable ex) {
         exception = ex;
     }
 
     public ExportReference getExportReference() {
-        return exportReference;
-    }
-
-    protected EndpointDescription getEndpointDescriptionAlways() {
-        return getExportReference().getExportedEndpoint();
+    	return exportReference;
     }
 
     /**
@@ -164,4 +203,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
         this.rsaCore = rsaCore;
     }
 
+    public RemoteServiceAdminCore getRsaCore() {
+        return rsaCore;
+    }
 }

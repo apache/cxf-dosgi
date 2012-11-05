@@ -23,12 +23,17 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 
 public class ExportReferenceImpl implements ExportReference {
-    private final ServiceReference serviceReference;
-    private final EndpointDescription endpointDescription;
+    private ServiceReference serviceReference;
+    private EndpointDescription endpointDescription;
 
     public ExportReferenceImpl(ServiceReference serviceReference, EndpointDescription endpointDescription) {
         this.serviceReference = serviceReference;
         this.endpointDescription = endpointDescription;
+    }
+
+    public ExportReferenceImpl(ExportReference exportReference) {
+        this.serviceReference = exportReference.getExportedService();
+        this.endpointDescription = exportReference.getExportedEndpoint();
     }
 
     public EndpointDescription getExportedEndpoint() {
@@ -70,5 +75,8 @@ public class ExportReferenceImpl implements ExportReference {
         return true;
     }
 
-
+    synchronized void close() {
+        this.endpointDescription = null;
+        this.serviceReference = null;
+    }
 }

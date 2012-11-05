@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -111,7 +110,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 		// create one copy for each distinct endpoint description
                 		if (!copiedEndpoints.contains(epd)) {
                 			copiedEndpoints.add(epd);
-                			copy.add(exportRegistration);
+                			copy.add(new ExportRegistrationImpl(exportRegistrationImpl));
                 		}
                 	}
                 }
@@ -215,7 +214,16 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return Collections.emptyList();
             }
 
-            LinkedHashMap<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>();
+            LinkedHashMap<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>(
+                                                                                                                         1);
+
+            for (String iface : interfaces) {
+                LOG.info("creating initial ExportDescription for interface " + iface
+                         + "  with configuration types " + configurationTypes);
+
+                // create initial ExportRegistartion
+
+            }
 
             // FIXME: move out of synchronized ... -> blocks until publication is finished
             for (String iface : interfaces) {
@@ -238,25 +246,22 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 Class<?> interfaceClass = ClassUtils.getInterfaceClass(serviceObject, interfaceName);
 
                 if (interfaceClass != null) {
-                    ExportRegistrationImpl exportRegistration = null;
                     try {
-                        ExportResult exportResult = handler.createServer(serviceReference, bctx, 
-                                callingContext, serviceProperties, interfaceClass, serviceObject);
-                        EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
-                        ExportReference exportRef = new ExportReferenceImpl(serviceReference, epd);
-                        exportRegistration = new ExportRegistrationImpl(exportRef , this);
-                        exportRegistration.setServer(exportResult.getServer());
+                        ExportResult  exportResult = handler.createServer(serviceReference, bctx, callingContext, serviceProperties,
+                                             interfaceClass, serviceObject);
                         LOG.info("created server for interface " + iface);
+
+                        EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
+                        ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
                         exportRegistration.startServiceTracker(bctx);
+                        exportRegs.put(iface, exportRegistration);
                     } catch (Exception e) {
-                        EndpointDescription epd = new EndpointDescription(null);
-                        ExportReference exportRef = new ExportReferenceImpl(serviceReference, epd);
-                        exportRegistration = new ExportRegistrationImpl(exportRef , this);
+                        LOG.warning("server creation for interface " + iface + "  failed!");
+                        EndpointDescription epd = new EndpointDescription(new HashMap<String, Object>());
+                        ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
                         exportRegistration.setException(e);
-                        LOG.log(Level.WARNING, "Server creation for interface " + iface + "  failed!", e);
-                        // Fire event happens at the end
+                        exportRegs.put(iface, exportRegistration);
                     }
-                    exportRegs.put(iface, exportRegistration);
                 }
             }
 
@@ -301,16 +306,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     public Collection<ExportReference> getExportedServices() {
         synchronized (exportedServices) {
-            List<ExportReference> eRefs = new ArrayList<ExportReference>();
+            List<ExportReference> ers = new ArrayList<ExportReference>();
             for (Collection<ExportRegistration> exportRegistrations : exportedServices.values()) {
                 for (ExportRegistration er : exportRegistrations) {
-                    ExportReference eRef = er.getExportReference();
-                    if (eRef != null) {
-                        eRefs.add(eRef);
-                    }
+                    ers.add(new ExportReferenceImpl(er.getExportReference()));
                 }
             }
-            return Collections.unmodifiableCollection(eRefs);
+            return Collections.unmodifiableCollection(ers);
         }
     }
 
@@ -375,8 +377,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
 
             if (usableConfigurationTypes.size() == 0) {
-                LOG
-                    .severe("the supplied endpoint has no compatible configuration type. Supported types are: "
+                LOG.severe("the supplied endpoint has no compatible configuration type. Supported types are: "
                             + supportedConfigurationTypes
                             + "    Types needed by the endpoint: "
                             + remoteConfigurationTypes);
@@ -470,21 +471,20 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
      * Removes the provided Export Registration from the internal management structures -> intended to be used
      * when the export Registration is closed
      */
-    protected void removeExportRegistration(ExportRegistration eri) {
+    protected void removeExportRegistration(ExportRegistrationImpl eri) {
         synchronized (exportedServices) {
-            Collection<ExportRegistration> exRegs = exportedServices.get(eri.getExportReference().getExportedService());
+            ServiceReference sref = eri.getExportReference().getExportedService();
+            Collection<ExportRegistration> exRegs = exportedServices.get(sref);
             if (exRegs != null && exRegs.contains(eri)) {
+                eventProducer.notifyRemoval(eri);
                 exRegs.remove(eri);
             } else {
                 LOG.severe("An exportRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
             }
             if (exRegs == null || exRegs.size() == 0) {
-                exportedServices.remove(eri.getExportReference().getExportedService());
+                exportedServices.remove(sref);
             }
-
-            eventProducer.notifyRemoval(eri);
         }
-
     }
 
     // Remove all export registrations associated with the given bundle
