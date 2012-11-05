@@ -97,11 +97,9 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         props.put(Constants.WS_HTTP_SERVICE_CONTEXT, "/myRunnable");
         //ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
         
-        ExportRegistrationImpl exReg = new ExportRegistrationImpl(sr,null,null);
-        
         //        assertEquals("Precondition failed", 0, dp.getExposedServices().size());
         assertEquals("Precondition failed", "", sfb.getAddress());
-        h.createServer(exReg, dswContext, callingContext, props, Runnable.class, myService);
+        ExportResult exportResult = h.createServer(sr, dswContext, callingContext, props, Runnable.class, myService);
         assertEquals("The address should be set to '/'. The Servlet context dictates the actual location.", "/", sfb.getAddress());
         //assertEquals(1, dp.getExposedServices().size());
         //assertSame(sr, dp.getExposedServices().iterator().next());
@@ -113,7 +111,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
             hostName = "localhost";
         }
         
-        Map edProps = exReg.getEndpointDescription().getProperties();
+        Map edProps = exportResult.getEndpointProps();
         
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
         assertEquals(1, ((String[])edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS)).length);
@@ -177,10 +175,8 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         Map<String, Object> props = new HashMap<String, Object>();
         //ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
         
-        ExportRegistrationImpl exReg = new ExportRegistrationImpl(sr,null,null);
-        
         //assertEquals("Precondition failed", 0, dp.getExposedServices().size());
-        h.createServer(exReg, dswContext, callingContext, props, Runnable.class, myService);
+        ExportResult exportResult = h.createServer(sr, dswContext, callingContext, props, Runnable.class, myService);
         //assertEquals(1, dp.getExposedServices().size());
         //assertSame(sr, dp.getExposedServices().iterator().next());
         
@@ -191,7 +187,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
             hostname = "localhost";
         }
         
-        Map edProps = exReg.getEndpointDescription().getProperties();
+        Map edProps = exportResult.getEndpointProps();
         
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
         assertEquals(1, ((String[])edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS)).length);
@@ -253,10 +249,8 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         props.put(Constants.WS_HTTP_SERVICE_CONTEXT, "/myRunnable");
         //ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Runnable.class.getName(), props);
         
-        ExportRegistrationImpl exReg = new ExportRegistrationImpl(sr,null,null);
-        
         //assertEquals("Precondition failed", 0, dp.getExposedServices().size());
-        h.createServer(exReg, dswContext, callingContext, props, Runnable.class, myService);
+        ExportResult exportResult = h.createServer(sr, dswContext, callingContext, props, Runnable.class, myService);
         //assertEquals(1, dp.getExposedServices().size());
         //assertSame(sr, dp.getExposedServices().iterator().next());
         
@@ -266,7 +260,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         } catch (Exception e) {
             hostName = "localhost";
         }
-        Map edProps = exReg.getEndpointDescription().getProperties();
+        Map edProps = exportResult.getEndpointProps();
         
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
         assertEquals(1, ((String[])edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS)).length);

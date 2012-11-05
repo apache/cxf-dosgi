@@ -18,20 +18,26 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.util.Map;
+
 import org.apache.cxf.endpoint.Server;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-public interface CXFExportRegistration {
+public class ExportResult {
+    private final Map<String, Object> endpointProps;
+    private final Server server;
 
-    ServiceReference getExportedService() throws IllegalStateException;
+    public ExportResult(Map<String, Object> endpointProps, Server server) {
+        super();
+        this.endpointProps = endpointProps;
+        this.server = server;
+    }
 
-    void setEndpointdescription(EndpointDescription epd);
+    public Map<String, Object> getEndpointProps() {
+        return endpointProps;
+    }
 
-    void setServer(Server server);
-
-    Server getServer();
-
-    void setException(Throwable ex);
-
+    public Server getServer() {
+        return server;
+    }
+    
 }

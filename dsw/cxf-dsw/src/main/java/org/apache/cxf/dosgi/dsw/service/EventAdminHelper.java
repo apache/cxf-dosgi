@@ -78,7 +78,7 @@ public class EventAdminHelper {
             epd = ((ImportReferenceImpl)rsae.getImportReference()).getImportedEndpointAlways();
             setIfNotNull(props, "import.registration", epd);
         } else if (rsae.getExportReference() != null) {
-            epd = ((ExportReferenceImpl)rsae.getExportReference()).getExportedEndpointAlways();
+            epd = ((ExportReferenceImpl)rsae.getExportReference()).getExportedEndpoint();
             setIfNotNull(props, "export.registration", epd);
         }
 

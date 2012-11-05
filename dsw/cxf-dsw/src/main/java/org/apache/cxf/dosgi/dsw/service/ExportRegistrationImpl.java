@@ -25,7 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.dosgi.dsw.handlers.CXFExportRegistration;
 import org.apache.cxf.endpoint.Server;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -38,18 +37,16 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-public class ExportRegistrationImpl implements ExportRegistration, CXFExportRegistration {
+public class ExportRegistrationImpl implements ExportRegistration {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ExportRegistrationImpl.class);
 
     private Server server;
     private boolean closed = false;
-    private ServiceReference serviceReference = null;
-    private EndpointDescription endpointDescription;
+    
     private Throwable exception = null;
 
     private ExportRegistrationImpl parent = null;
-    private volatile int instanceCount = 1;
 
     private RemoteServiceAdminCore rsaCore;
 
@@ -57,105 +54,42 @@ public class ExportRegistrationImpl implements ExportRegistration, CXFExportRegi
 
     private ServiceTracker serviceTracker;
 
-    // provide a clone of the provided exp.Reg that is linked to this instance
-    public ExportRegistrationImpl(ExportRegistrationImpl exportRegistration) {
-
-        parent = exportRegistration;
-        serviceReference = parent.getExportedService();
-        endpointDescription = parent.getEndpointDescription();
-        exception = parent.getException();
-        rsaCore = parent.getRsaCore();
-        parent.instanceAdded();
-    }
-
-    private void instanceAdded() {
-        ++instanceCount;
-    }
-
-    public ExportRegistrationImpl(ServiceReference sref, EndpointDescription endpoint, RemoteServiceAdminCore remoteServiceAdminCore) {
-        serviceReference = sref;
-        endpointDescription = endpoint;
+    public ExportRegistrationImpl(ExportReference exportReference, RemoteServiceAdminCore remoteServiceAdminCore) {
+        this.exportReference = exportReference;
         parent = this;
         rsaCore = remoteServiceAdminCore;
     }
 
     public synchronized void close() {
-        if (closed)
+        if (closed) {
             return;
+        }
         closed = true;
 
         rsaCore.removeExportRegistration(this);
 
-        parent.instanceClosed();
         if (server != null) {
         	server.stop();
         	server = null;
         }
-    }
-
-    private void instanceClosed() {
-        --instanceCount;
-        if (instanceCount <= 0) {
-            // really close the ExReg
-            // TODO close it and remove from management structure .... !
-
-            LOG.fine("really closing ExportRegistartion now! ");
-
-            synchronized (this) {
-                if (server != null) {
-                    // FIXME: is this done like this ?
-                    server.stop();
-                    server = null;
-                }
-            }
-        }
-    }
-
-    public EndpointDescription getEndpointDescription() {
-        if (!closed)
-            return endpointDescription;
-        else
-            return null;
+        exportReference = null;
+        exception = null;
     }
 
     public Throwable getException() {
-        if (!closed)
-            return exception;
-        else
-            return null;
-    }
-
-    protected ServiceReference getServiceReference() {
-        return serviceReference;
-    }
-
-    /* (non-Javadoc)
-     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#getExportedService()
-     */
-    public ServiceReference getExportedService() throws IllegalStateException {
-        if (!closed)
-            return serviceReference;
-        else
-            return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#setEndpointdescription(org.osgi.service.remoteserviceadmin.EndpointDescription)
-     */
-    public void setEndpointdescription(EndpointDescription epd) {
-        endpointDescription = epd;
+        return exception;
     }
 
     @Override
     public String toString() {
-        String r = "Endpoint Desctiption for ServiceReference " + serviceReference;
+        String r = "Endpoint Desctiption for ServiceReference " + getExportReference().getExportedService();
         r += "\n";
 
         r += "*** EndpointDescription: **** \n";
-        if (endpointDescription == null) {
+        if (getExportReference().getExportedService() == null) {
             r += "---> NULL <---- \n";
         } else {
-            Set<Map.Entry<String,Object>> props = endpointDescription.getProperties().entrySet();
+            Set<Map.Entry<String,Object>> props = getExportReference().getExportedEndpoint().getProperties().entrySet();
             for (Map.Entry<String,Object> entry : props) {
                 Object value = entry.getValue();
                 r += entry.getKey() + "  => " +
@@ -165,38 +99,20 @@ public class ExportRegistrationImpl implements ExportRegistration, CXFExportRegi
         return r;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#setServer(org.apache.cxf.endpoint.Server)
-     */
     public void setServer(Server server) {
         this.server = server;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#getServer()
-     */
-    public Server getServer() {
-        return server;
-    }
-
-    /* (non-Javadoc)
-     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#setException(java.lang.Throwable)
-     */
     public void setException(Throwable ex) {
         exception = ex;
     }
 
     public ExportReference getExportReference() {
-    	synchronized (this) {
-	        if(exportReference==null){
-	            exportReference = new ExportReferenceImpl(this);
-	        }
-	        return exportReference;
-    	}
+        return exportReference;
     }
 
     protected EndpointDescription getEndpointDescriptionAlways() {
-        return endpointDescription;
+        return getExportReference().getExportedEndpoint();
     }
 
     /**
@@ -217,7 +133,7 @@ public class ExportRegistrationImpl implements ExportRegistration, CXFExportRegi
         }
 
         Filter f;
-        final Long sid = (Long)serviceReference.getProperty(Constants.SERVICE_ID);
+        final Long sid = (Long)getExportReference().getExportedService().getProperty(Constants.SERVICE_ID);
         try {
             f = bctx.createFilter("("+Constants.SERVICE_ID+"="+sid+")");
         } catch (InvalidSyntaxException e) {
@@ -248,7 +164,4 @@ public class ExportRegistrationImpl implements ExportRegistration, CXFExportRegi
         this.rsaCore = rsaCore;
     }
 
-    public RemoteServiceAdminCore getRsaCore() {
-        return rsaCore;
-    }
 }

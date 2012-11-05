@@ -124,27 +124,23 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         return null;
     }
 
-    public void createServer(CXFExportRegistration exportRegistration, BundleContext dswContext,
+    public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
                              BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean) {
         final String contextRoot = getServletContextRoot(sd, iClass);
         if (contextRoot == null) {
-            LOG.warning("Remote address is unavailable");
-            return;
+            throw new RuntimeException("Remote address is unavailable");
         }
 
-        Bus bus = registerServletAndGetBus(contextRoot, dswContext, exportRegistration);
-        final ServiceReference sref = exportRegistration.getExportedService();
+        Bus bus = registerServletAndGetBus(contextRoot, dswContext, sref);
         DataBinding databinding;
-        String dataBindingImpl = (String)exportRegistration.getExportedService()
-            .getProperty(Constants.WS_DATABINDING_PROP_KEY);
+        String dataBindingImpl = (String)sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
         String dataBindingImpl2 = (String) sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
         if ("jaxb".equals(dataBindingImpl) || "jaxb".equals(dataBindingImpl2)) {
             databinding = new JAXBDataBinding();
         } else {
             databinding = new AegisDatabinding();
         }
-        String frontEndImpl = (String)exportRegistration.getExportedService()
-            .getProperty(Constants.WS_FRONTEND_PROP_KEY);
+        String frontEndImpl = (String)sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
         String frontEndImpl2 = (String) sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
         
         ServerFactoryBean factory = 
@@ -173,33 +169,24 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {
                 Constants.WS_CONFIG_TYPE
             }, completeEndpointAddress, intents);
-            EndpointDescription endpdDesc = null;
-            
+
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            
-            endpdDesc = new EndpointDescription(endpointProps);
-            exportRegistration.setServer(server);
-     
-            // add the information on the new Endpoint to the export registration
-            exportRegistration.setEndpointdescription(endpdDesc);
-        } catch (IntentUnsatifiedException iue) {
-            exportRegistration.setException(iue);
+
+            return new ExportResult(endpointProps, server);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
-        
-     
     }
     
     protected Bus registerServletAndGetBus(String contextRoot, BundleContext dswContext,
-    		CXFExportRegistration exportRegistration) {
+    		ServiceReference sref) {
     	CXFNonSpringServlet cxf = new CXFNonSpringServlet();
         HttpService httpService = getHttpService();
         try {
             httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), 
                                        getHttpContext(dswContext, httpService));
-            registerUnexportHook(exportRegistration, contextRoot);
+            registerUnexportHook(sref, contextRoot);
             
             LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
         } catch (Exception e) {
@@ -311,8 +298,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
      * @param reference The service reference to track
      * @param alias The HTTP servlet context alias
      */
-    protected void registerUnexportHook(CXFExportRegistration export, String alias) {
-    	final ServiceReference sref = export.getExportedService();
+    protected void registerUnexportHook(ServiceReference sref, String alias) {
         final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
         LOG.log(Level.FINE, "Registering service listener for service with ID {0}", sid);
      

@@ -27,7 +27,7 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 public interface ConfigurationTypeHandler {
     String getType();
     
-    void createServer(CXFExportRegistration serviceReference,
+    ExportResult createServer(ServiceReference serviceReference,
                         BundleContext dswContext,
                         BundleContext callingContext, 
                         Map sd, 

@@ -95,7 +95,7 @@ public class EventProducer {
         eaHelper.notifyEventAdmin(rsae);
     }
 
-    public void notifyRemoval(ExportRegistrationImpl eri) {
+    public void notifyRemoval(ExportRegistration eri) {
         RemoteServiceAdminEvent rsae = null;
         rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_UNREGISTRATION, bctx.getBundle(), eri.getExportReference(), eri.getException());
         

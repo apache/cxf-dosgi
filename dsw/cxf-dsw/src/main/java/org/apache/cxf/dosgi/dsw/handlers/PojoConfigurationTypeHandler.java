@@ -88,28 +88,24 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return null;
     }
 
-    public void createServer(CXFExportRegistration exportRegistration, BundleContext dswContext,
+    public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
                              BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean)
         throws IntentUnsatifiedException {
         String address = getPojoAddress(sd, iClass);
         if (address == null) {
-            LOG.warning("Remote address is unavailable");
-            exportRegistration.setException(new Throwable("Remote address is unavailable"));
-            return;
+            throw new RuntimeException("Remote address is unavailable");
         }
 
         LOG.info("Creating a " + iClass.getName() + " endpoint from CXF PublishHook, address is " + address);
 
         DataBinding databinding;
-        String dataBindingImpl = (String)exportRegistration.getExportedService()
-            .getProperty(Constants.WS_DATABINDING_PROP_KEY);
+        String dataBindingImpl = (String)sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
         if ("jaxb".equals(dataBindingImpl)) {
             databinding = new JAXBDataBinding();
         } else {
             databinding = new AegisDatabinding();
         }
-        String frontEndImpl = (String)exportRegistration.getExportedService()
-            .getProperty(Constants.WS_FRONTEND_PROP_KEY);
+        String frontEndImpl = (String)sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
         ServerFactoryBean factory = createServerFactoryBean(frontEndImpl);
 
         factory.setServiceClass(iClass);
@@ -129,23 +125,11 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
 
-            exportRegistration.setServer(server);
-            
-            //  add the information on the new Endpoint to the export registration
-            EndpointDescription ed = new EndpointDescription(endpointProps);
-            exportRegistration.setEndpointdescription(ed);
-            
-        } catch (IntentUnsatifiedException iue) {
-            exportRegistration.setException(iue);
+            return new ExportResult(endpointProps, server);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
-
-        
     }
-
-    
-    
 
     protected String getPojoAddress(Map sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);

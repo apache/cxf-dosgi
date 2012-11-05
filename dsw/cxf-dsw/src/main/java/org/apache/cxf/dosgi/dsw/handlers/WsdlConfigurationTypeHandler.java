@@ -103,7 +103,8 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         return Service.create(wsdlAddress, serviceQname);
     }
 
-    public void createServer(CXFExportRegistration exportRegistration,
+    @Override
+    public ExportResult createServer(ServiceReference sref,
                                BundleContext dswContext,
                                BundleContext callingContext,
                                Map sd, 
@@ -112,33 +113,27 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         
     	String location = OsgiUtils.getProperty(sd, Constants.WSDL_LOCATION);
     	if (location == null) {
-    		LOG.warning("WSDL location is unavailable");
-            exportRegistration.setException(new Throwable("WSDL location is unavailable"));
-            return;
+    	    throw new RuntimeException("WSDL location property is unavailable");
     	}
         URL wsdlURL = dswContext.getBundle().getResource(location);
         if (wsdlURL == null) {
-    		LOG.warning("WSDL resource is unavailable");
-            exportRegistration.setException(new Throwable("WSDL resource is unavailable"));
-            return;
+            throw new RuntimeException("WSDL resource at " + location + " is unavailable");
     	}
         
     	String address = getPojoAddress(sd, iClass);
     	String contextRoot = null;
         if (address == null) {
         	contextRoot = getServletContextRoot(sd, iClass);
-            if (contextRoot == null) {
-                LOG.warning("Remote address is unavailable");
-            }
-            exportRegistration.setException(new Throwable("Remote address is unavailable"));
-            return;
+        	if (contextRoot == null) {
+        	    throw new RuntimeException("Remote address is unavailable");
+        	}
         }
 
         LOG.info("Creating a " + iClass.getName() + " endpoint from CXF PublishHook, address is " + address);
 
         Bus bus = null;
         if (contextRoot != null) {
-        	bus = registerServletAndGetBus(contextRoot, dswContext, exportRegistration);
+        	bus = registerServletAndGetBus(contextRoot, dswContext, sref);
         }
         
         DataBinding databinding = new JAXBDataBinding();
@@ -166,14 +161,7 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
 
-            exportRegistration.setServer(server);
-            
-            //  add the information on the new Endpoint to the export registration
-            EndpointDescription ed = new EndpointDescription(endpointProps);
-            exportRegistration.setEndpointdescription(ed);
-            
-        } catch (IntentUnsatifiedException iue) {
-            exportRegistration.setException(iue);
+            return new ExportResult(endpointProps, server);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }

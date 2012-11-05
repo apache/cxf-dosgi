@@ -287,13 +287,11 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.WS_ADDRESS_PROPERTY, "http://alternate_host:80/myString");
-        
-        ExportRegistrationImpl exReg = new ExportRegistrationImpl(sr,null,null);
-        
-        p.createServer(exReg, dswContext, callingContext, props, String.class, myService);
+
+        ExportResult exportResult = p.createServer(sr, dswContext, callingContext, props, String.class, myService);
         
         
-        Map edProps = exReg.getEndpointDescription().getProperties();
+        Map edProps = exportResult.getEndpointProps();
 
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
         assertEquals(1, ((String[])edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS)).length);

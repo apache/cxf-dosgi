@@ -21,33 +21,31 @@ package org.apache.cxf.dosgi.dsw.service;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
-import org.osgi.service.remoteserviceadmin.ExportRegistration;
 
 public class ExportReferenceImpl implements ExportReference {
-    private final ExportRegistrationImpl exportRegistration;
+    private final ServiceReference serviceReference;
+    private final EndpointDescription endpointDescription;
 
-    public ExportReferenceImpl(ExportRegistration exportRegistration) {
-    	if (!(exportRegistration instanceof ExportRegistrationImpl)) {
-    		throw new IllegalArgumentException("Can only create a reference from ExportRegistrationImpl");	
-    	}
-        this.exportRegistration = (ExportRegistrationImpl) exportRegistration;
+    public ExportReferenceImpl(ServiceReference serviceReference, EndpointDescription endpointDescription) {
+        this.serviceReference = serviceReference;
+        this.endpointDescription = endpointDescription;
     }
 
     public EndpointDescription getExportedEndpoint() {
-        return exportRegistration.getEndpointDescription();
+        return endpointDescription;
     }
 
     public ServiceReference getExportedService() {
-        return exportRegistration.getExportedService();
-    }
-
-    protected EndpointDescription getExportedEndpointAlways() {
-        return exportRegistration.getEndpointDescriptionAlways();
+        return serviceReference;
     }
 
     @Override
     public int hashCode() {
-        return 31 * 1 + ((exportRegistration == null) ? 0 : exportRegistration.hashCode());
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((endpointDescription == null) ? 0 : endpointDescription.hashCode());
+        result = prime * result + ((serviceReference == null) ? 0 : serviceReference.hashCode());
+        return result;
     }
 
     @Override
@@ -59,12 +57,18 @@ public class ExportReferenceImpl implements ExportReference {
         if (getClass() != obj.getClass())
             return false;
         ExportReferenceImpl other = (ExportReferenceImpl) obj;
-        if (exportRegistration == null) {
-            if (other.exportRegistration != null)
+        if (endpointDescription == null) {
+            if (other.endpointDescription != null)
                 return false;
-        } else if (!exportRegistration.equals(other.exportRegistration))
+        } else if (!endpointDescription.equals(other.endpointDescription))
+            return false;
+        if (serviceReference == null) {
+            if (other.serviceReference != null)
+                return false;
+        } else if (!serviceReference.equals(other.serviceReference))
             return false;
         return true;
     }
+
 
 }

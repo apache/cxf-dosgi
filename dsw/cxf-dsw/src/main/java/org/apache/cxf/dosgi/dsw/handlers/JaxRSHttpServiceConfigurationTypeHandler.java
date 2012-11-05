@@ -32,6 +32,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigurationTypeHandler {
@@ -43,16 +44,15 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
     }
 
     @Override
-    public void createServer(CXFExportRegistration exportRegistration, BundleContext dswContext,
+    public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
                              BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean) {
 
         String contextRoot = getServletContextRoot(sd, iClass);
         if (contextRoot == null) {
-            LOG.warning("Remote address is unavailable");
-            return;
+            throw new RuntimeException("Remote address is unavailable");
         }
 
-        Bus bus = registerServletAndGetBus(contextRoot, dswContext, exportRegistration);
+        Bus bus = registerServletAndGetBus(contextRoot, dswContext, sref);
 
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
         factory.setBus(bus);
@@ -95,24 +95,12 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
             Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {
                 Constants.RS_CONFIG_TYPE
             }, completeEndpointAddress, intents);
-            EndpointDescription endpdDesc = null;
-            
-            
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-
-            endpdDesc = new EndpointDescription(endpointProps);
-            exportRegistration.setServer(server);
-            
-            // add the information on the new Endpoint to the export registration
-            exportRegistration.setEndpointdescription(endpdDesc);
-        } catch (IntentUnsatifiedException iue) {
-            exportRegistration.setException(iue);
+            return new ExportResult(endpointProps, server);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
-
-
     }
 
     @Override

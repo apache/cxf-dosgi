@@ -112,15 +112,13 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
     }
     
     @Override
-    public void createServer(CXFExportRegistration exportRegistration, BundleContext dswContext,
+    public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
                              BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean)
         throws IntentUnsatifiedException {
 
         String address = getPojoAddress(sd, iClass);
         if (address == null) {
-            LOG.warning("Remote address is unavailable");
-            exportRegistration.setException(new Throwable("Remote address is unavailable"));
-            return;
+            throw new RuntimeException("Remote address is unavailable");
         }
 
         LOG.info("Creating a " + iClass.getName()
@@ -167,13 +165,9 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
 
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            exportRegistration.setServer(server);
-            endpdDesc = new EndpointDescription(endpointProps);
 
             // add the information on the new Endpoint to the export registration
-            exportRegistration.setEndpointdescription(endpdDesc);
-        } catch (IntentUnsatifiedException iue) {
-            exportRegistration.setException(iue);
+            return new ExportResult(endpointProps, server);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
