@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.dsw.handlers;
+package org.apache.cxf.dosgi.dsw.service;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -24,7 +24,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.dosgi.dsw.service.ImportRegistrationImpl;
+import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.handlers.IntentUnsatifiedException;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;

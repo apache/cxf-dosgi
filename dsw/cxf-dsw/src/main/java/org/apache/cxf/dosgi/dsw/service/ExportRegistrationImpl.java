@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.dosgi.dsw.handlers.CXFExportRegistration;
 import org.apache.cxf.endpoint.Server;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -37,7 +38,7 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-public class ExportRegistrationImpl implements ExportRegistration {
+public class ExportRegistrationImpl implements ExportRegistration, CXFExportRegistration {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ExportRegistrationImpl.class);
 
@@ -128,6 +129,9 @@ public class ExportRegistrationImpl implements ExportRegistration {
         return serviceReference;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#getExportedService()
+     */
     public ServiceReference getExportedService() throws IllegalStateException {
         if (!closed)
             return serviceReference;
@@ -135,6 +139,9 @@ public class ExportRegistrationImpl implements ExportRegistration {
             return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#setEndpointdescription(org.osgi.service.remoteserviceadmin.EndpointDescription)
+     */
     public void setEndpointdescription(EndpointDescription epd) {
         endpointDescription = epd;
     }
@@ -158,14 +165,23 @@ public class ExportRegistrationImpl implements ExportRegistration {
         return r;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#setServer(org.apache.cxf.endpoint.Server)
+     */
     public void setServer(Server server) {
         this.server = server;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#getServer()
+     */
     public Server getServer() {
         return server;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.cxf.dosgi.dsw.service.CXFExportRegistration#setException(java.lang.Throwable)
+     */
     public void setException(Throwable ex) {
         exception = ex;
     }

@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -113,7 +112,7 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
     }
     
     @Override
-    public void createServer(ExportRegistrationImpl exportRegistration, BundleContext dswContext,
+    public void createServer(CXFExportRegistration exportRegistration, BundleContext dswContext,
                              BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean)
         throws IntentUnsatifiedException {
 

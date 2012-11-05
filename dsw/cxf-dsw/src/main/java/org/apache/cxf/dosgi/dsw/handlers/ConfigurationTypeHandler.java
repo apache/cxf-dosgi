@@ -20,7 +20,6 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.Map;
 
-import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -28,7 +27,7 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 public interface ConfigurationTypeHandler {
     String getType();
     
-    void createServer(ExportRegistrationImpl serviceReference,
+    void createServer(CXFExportRegistration serviceReference,
                         BundleContext dswContext,
                         BundleContext callingContext, 
                         Map sd, 

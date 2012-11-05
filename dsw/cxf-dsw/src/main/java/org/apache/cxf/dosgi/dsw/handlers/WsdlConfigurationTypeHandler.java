@@ -31,7 +31,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -104,7 +103,7 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         return Service.create(wsdlAddress, serviceQname);
     }
 
-    public void createServer(ExportRegistrationImpl exportRegistration,
+    public void createServer(CXFExportRegistration exportRegistration,
                                BundleContext dswContext,
                                BundleContext callingContext,
                                Map sd, 

@@ -35,7 +35,6 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
@@ -125,7 +124,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         return null;
     }
 
-    public void createServer(ExportRegistrationImpl exportRegistration, BundleContext dswContext,
+    public void createServer(CXFExportRegistration exportRegistration, BundleContext dswContext,
                              BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean) {
         final String contextRoot = getServletContextRoot(sd, iClass);
         if (contextRoot == null) {
@@ -194,7 +193,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     }
     
     protected Bus registerServletAndGetBus(String contextRoot, BundleContext dswContext,
-    		ExportRegistrationImpl exportRegistration) {
+    		CXFExportRegistration exportRegistration) {
     	CXFNonSpringServlet cxf = new CXFNonSpringServlet();
         HttpService httpService = getHttpService();
         try {
@@ -312,7 +311,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
      * @param reference The service reference to track
      * @param alias The HTTP servlet context alias
      */
-    protected void registerUnexportHook(ExportRegistrationImpl export, String alias) {
+    protected void registerUnexportHook(CXFExportRegistration export, String alias) {
     	final ServiceReference sref = export.getExportedService();
         final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
         LOG.log(Level.FINE, "Registering service listener for service with ID {0}", sid);

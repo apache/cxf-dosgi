@@ -26,7 +26,6 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
@@ -89,7 +88,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return null;
     }
 
-    public void createServer(ExportRegistrationImpl exportRegistration, BundleContext dswContext,
+    public void createServer(CXFExportRegistration exportRegistration, BundleContext dswContext,
                              BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean)
         throws IntentUnsatifiedException {
         String address = getPojoAddress(sd, iClass);

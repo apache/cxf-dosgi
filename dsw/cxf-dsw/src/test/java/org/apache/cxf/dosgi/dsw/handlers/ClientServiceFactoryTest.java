@@ -23,6 +23,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.dsw.service.ClientServiceFactory;
 import org.apache.cxf.dosgi.dsw.service.ImportRegistrationImpl;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
