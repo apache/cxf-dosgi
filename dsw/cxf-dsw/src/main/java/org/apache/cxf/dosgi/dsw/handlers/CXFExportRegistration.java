@@ -24,14 +24,14 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public interface CXFExportRegistration {
 
-    public abstract ServiceReference getExportedService() throws IllegalStateException;
+    ServiceReference getExportedService() throws IllegalStateException;
 
-    public abstract void setEndpointdescription(EndpointDescription epd);
+    void setEndpointdescription(EndpointDescription epd);
 
-    public abstract void setServer(Server server);
+    void setServer(Server server);
 
-    public abstract Server getServer();
+    Server getServer();
 
-    public abstract void setException(Throwable ex);
+    void setException(Throwable ex);
 
 }
