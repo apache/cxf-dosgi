@@ -24,9 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
@@ -39,9 +37,11 @@ import org.apache.cxf.jaxrs.model.UserResource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHandler {
-    private static final Logger LOG = LogUtils.getL7dLogger(JaxRSPojoConfigurationTypeHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRSPojoConfigurationTypeHandler.class);
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
 
@@ -58,7 +58,7 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
 
         String address = getPojoAddress(sd, iClass);
         if (address == null) {
-            LOG.warning("Remote address is unavailable");
+            LOG.warn("Remote address is unavailable");
             return null;
         }
 
@@ -75,7 +75,7 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
         	cl.addLoader(Client.class.getClassLoader());
             return createJaxrsProxy(address, callingContext, dswContext, iClass, cl, sd);
         } catch (Throwable e) {
-            LOG.log(Level.WARNING, "proxy creation failed", e);
+            LOG.warn("proxy creation failed", e);
         }
         
         return null;

@@ -20,19 +20,18 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RemoteServiceadminFactory implements ServiceFactory {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(RemoteServiceadminFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RemoteServiceadminFactory.class);
     private List<RemoteServiceAdminInstance> rsaServiceInstances = new ArrayList<RemoteServiceAdminInstance>();
 
     private RemoteServiceAdminCore rsaCore;
@@ -42,16 +41,14 @@ public class RemoteServiceadminFactory implements ServiceFactory {
     }
 
     public Object getService(Bundle b, ServiceRegistration sr) {
-        LOG.log(Level.FINEST, "new RemoteServiceAdmin ServiceInstance created for Bundle {0}",
-                b.getSymbolicName());
+        LOG.debug("new RemoteServiceAdmin ServiceInstance created for Bundle {}", b.getSymbolicName());
         RemoteServiceAdminInstance rsai = new RemoteServiceAdminInstance(b.getBundleContext(),rsaCore);
         rsaServiceInstances.add(rsai);
         return rsai;
     }
 
     public void ungetService(Bundle b, ServiceRegistration sr, Object serviceObject) {
-        LOG.log(Level.FINEST, "RemoteServiceAdmin ServiceInstance removed for Bundle {0}",
-                b.getSymbolicName());
+        LOG.debug("RemoteServiceAdmin ServiceInstance removed for Bundle {}", b.getSymbolicName());
         if (serviceObject instanceof RemoteServiceAdminInstance) {
             RemoteServiceAdminInstance rsai = (RemoteServiceAdminInstance)serviceObject;
             rsai.close();

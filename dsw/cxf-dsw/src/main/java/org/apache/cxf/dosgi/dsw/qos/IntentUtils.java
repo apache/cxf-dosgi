@@ -4,16 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.apache.cxf.ws.policy.spring.PolicyNamespaceHandler;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 public class IntentUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(IntentUtils.class);
+
     private static final String[] INTENT_MAP = {
         "/OSGI-INF/cxf/intents/intent-map.xml"
     };
@@ -40,7 +43,7 @@ public class IntentUtils {
 	    IntentMap im = IntentUtils.readIntentMap(bundleContext);
 	    if (im == null) {
 	        // Couldn't read an intent map
-	        OsgiUtils.LOG.log(Level.FINE, "Using default intent map");
+	        LOG.debug("Using default intent map");
 	        im = new IntentMap();
 	        im.setIntents(new HashMap<String, Object>());
 	    }
@@ -63,21 +66,21 @@ public class IntentUtils {
 	    	ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 	        Thread.currentThread().setContextClassLoader(PolicyNamespaceHandler.class.getClassLoader());
 	        
-	        OsgiUtils.LOG.fine("Loading Intent map from "+springIntentLocations);
+	        LOG.debug("Loading Intent map from {}", springIntentLocations);
 	        OsgiBundleXmlApplicationContext ctx = new OsgiBundleXmlApplicationContext(springIntentLocations
 	            .toArray(new String[] {}));
 	        ctx.setPublishContextAsService(false);
 	        ctx.setBundleContext(bundleContext);
 	        ctx.refresh();
-	        OsgiUtils.LOG.fine("application context: " + ctx);
+	        LOG.debug("application context: {}", ctx);
 	        IntentMap im = (IntentMap)ctx.getBean("intentMap");
-	        OsgiUtils.LOG.fine("retrieved intent map: " + im);
+	        LOG.debug("retrieved intent map: {}", im);
 	
 	        Thread.currentThread().setContextClassLoader(oldClassLoader);
 	
 	        return im;
 	    } catch (Throwable t) {
-	        OsgiUtils.LOG.log(Level.WARNING, "Intent map load failed: ", t);
+	        LOG.warn("Intent map load failed: ", t);
 	        return null;
 	    }
 	}

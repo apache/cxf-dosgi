@@ -21,9 +21,7 @@ package org.apache.cxf.dosgi.dsw.service;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.IntentUnsatifiedException;
 import org.osgi.framework.Bundle;
@@ -31,10 +29,12 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientServiceFactory implements ServiceFactory {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(ClientServiceFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClientServiceFactory.class);
 
     private BundleContext dswContext;
     private Class<?> iClass;
@@ -59,7 +59,7 @@ public class ClientServiceFactory implements ServiceFactory {
         String interfaceName = sd.getInterfaces() != null && sd.getInterfaces().size() > 0 ? (String)sd
             .getInterfaces().toArray()[0] : null;
 
-        LOG.fine("getService() from serviceFactory for " + interfaceName);
+        LOG.debug("getService() from serviceFactory for {}", interfaceName);
 
         try {
             Object proxy = AccessController.doPrivileged(new PrivilegedAction<Object>() {
@@ -77,7 +77,7 @@ public class ClientServiceFactory implements ServiceFactory {
             LOG.info("Did not create proxy for " + interfaceName + " because intent " + iue.getIntent()
                      + " could not be satisfied");
         } catch (Exception ex) {
-            LOG.log(Level.WARNING, "Problem creating a remote proxy for " + interfaceName
+            LOG.warn("Problem creating a remote proxy for " + interfaceName
                                    + " from CXF FindHook: ", ex);
         }
 
@@ -99,7 +99,7 @@ public class ClientServiceFactory implements ServiceFactory {
 
         synchronized (this) {
             --serviceCounter;
-            LOG.fine("Services still provided by this ServiceFactory: " + serviceCounter);
+            LOG.debug("Services still provided by this ServiceFactory: {}", serviceCounter);
 
             if (serviceCounter <= 0 && closeable)
                 remove();

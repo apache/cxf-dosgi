@@ -24,24 +24,22 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class OsgiUtils {
     
-    public static final Logger LOG = LogUtils.getL7dLogger(OsgiUtils.class);
+    public static final Logger LOG = LoggerFactory.getLogger(OsgiUtils.class);
 
     private OsgiUtils() {
     }
@@ -115,25 +113,27 @@ public final class OsgiUtils {
                         + ". Falling back to 0.0.0");
                 return "0.0.0";
             }
-            LOG.finest("Interface source bundle: " + b.getSymbolicName());
+            LOG.debug("Interface source bundle: {}", b.getSymbolicName());
 
             ExportedPackage[] ep = pa.getExportedPackages(b);
-            LOG.finest("Exported Packages of the source bundle: " + ep);
+            LOG.debug("Exported Packages of the source bundle: {}", ep);
 
             String pack = iClass.getPackage().getName();
-            LOG.finest("Looking for Package: " + pack);
+            LOG.debug("Looking for Package: {}", pack);
             if (ep != null) {
 	            for (ExportedPackage p : ep) {
 	            	if (p != null) {
 		                if (pack.equals(p.getName())) {
-		                    LOG.fine("found package -> Version: " + p.getVersion());
+		                    if (LOG.isDebugEnabled()) {
+		                        LOG.debug("found package -> Version: {}", p.getVersion());
+		                    }
 		                    return p.getVersion().toString();
 		                }
 	            	}
 	            }
             }
         } else {
-            LOG.severe("Was unable to obtain the package admin service -> can't resolve interface versions");
+            LOG.error("Was unable to obtain the package admin service -> can't resolve interface versions");
         }
 
         LOG.info("Unable to find interface version for interface " + iClass.getName()
@@ -179,7 +179,7 @@ public final class OsgiUtils {
                 }else if(keysLowerCase.containsKey(key)){
                     String origKey = keysLowerCase.get(key);
                     serviceProperties.put(origKey, e.getValue());
-                    LOG.fine("Overwriting property [" + origKey + "]  with value [" + e.getValue() + "]");
+                    LOG.debug("Overwriting property [{}]  with value [{}]", origKey, e.getValue());
                 }else{
                     serviceProperties.put(e.getKey(), e.getValue());
                     keysLowerCase.put(e.getKey().toString().toLowerCase(), e.getKey().toString());

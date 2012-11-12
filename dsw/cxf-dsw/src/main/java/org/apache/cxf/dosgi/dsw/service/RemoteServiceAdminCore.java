@@ -30,9 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
@@ -53,10 +51,12 @@ import org.osgi.service.remoteserviceadmin.ImportReference;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(RemoteServiceAdminCore.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RemoteServiceAdminCore.class);
 
     private final LinkedHashMap<ServiceReference, Collection<ExportRegistration>> exportedServices = new LinkedHashMap<ServiceReference, Collection<ExportRegistration>>();
     private final LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices = new LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>>();
@@ -91,12 +91,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 	public List<ExportRegistration> exportService(ServiceReference serviceReference, Map additionalProperties)
         throws IllegalArgumentException, UnsupportedOperationException {
 
-        LOG.fine("RemoteServiceAdmin: exportService: " + serviceReference.getClass().getName());
+        String ifaceName = serviceReference.getClass().getName();
+        LOG.debug("RemoteServiceAdmin: exportService: {}", ifaceName);
 
         synchronized (exportedServices) {
             // check if it is already exported ....
             if (exportedServices.containsKey(serviceReference)) {
-                LOG.fine("already exported ...  " + serviceReference.getClass().getName());
+                LOG.debug("already exported ...  {} ", ifaceName);
                 Collection<ExportRegistration> regs = exportedServices.get(serviceReference);
 
                 List<EndpointDescription> copiedEndpoints = new ArrayList<EndpointDescription>();
@@ -122,7 +123,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
 
             if (isCreatedByThisRSA(serviceReference)) {
-                LOG.fine("proxy provided by this bundle ...  " + serviceReference.getClass().getName());
+                LOG.debug("proxy provided by this bundle ...  {} ", ifaceName);
                 // TODO: publish error event ? Not sure
                 return Collections.emptyList();
             }
@@ -156,8 +157,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 }
 
                 if (unsupportedIntents.size() > 0) {
-                    LOG
-                        .severe("service cannot be exported because the following intents are not supported by this RSA: "
+                    LOG.error("service cannot be exported because the following intents are not supported by this RSA: "
                                 + unsupportedIntents);
                     // TODO: publish error event
                     return Collections.emptyList();
@@ -173,8 +173,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 String[] allowedInterfaces = Utils.normalizeStringPlus(serviceProperties
                     .get(RemoteConstants.SERVICE_EXPORTED_INTERFACES));
                 if (providedInterfaces == null || allowedInterfaces == null) {
-                    LOG
-                        .severe("export failed: no provided service interfaces found or service_exported_interfaces is null !!");
+                    LOG.error("export failed: no provided service interfaces found or service_exported_interfaces is null !!");
                     // TODO: publish error event ? not sure
                     return Collections.emptyList();
                 }
@@ -198,7 +197,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
             // if no interface is to be exported return null
             if (interfaces.size() == 0) {
-                LOG.warning("no interfaces to be exported");
+                LOG.warn("no interfaces to be exported");
                 // TODO: publish error event ? not sure
                 return Collections.emptyList();
             }
@@ -256,7 +255,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                         exportRegistration.startServiceTracker(bctx);
                         exportRegs.put(iface, exportRegistration);
                     } catch (Exception e) {
-                        LOG.warning("server creation for interface " + iface + "  failed!");
+                        LOG.warn("server creation for interface {} failed!", iface);
                         EndpointDescription epd = new EndpointDescription(new HashMap<String, Object>());
                         ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
                         exportRegistration.setException(e);
@@ -349,11 +348,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
      */
     public ImportRegistration importService(EndpointDescription endpoint) {
 
-        LOG.fine("importService() Endpoint: " + endpoint.getProperties());
+        LOG.debug("importService() Endpoint: {}", endpoint.getProperties());
 
         synchronized (importedServices) {
             if (importedServices.containsKey(endpoint) && importedServices.get(endpoint).size() > 0) {
-                LOG.fine("creating copy of existing import registrations");
+                LOG.debug("creating copy of existing import registrations");
                 Collection<ImportRegistrationImpl> imRegs = importedServices.get(endpoint);
                 ImportRegistrationImpl irParent = imRegs.iterator().next();
                 ImportRegistrationImpl ir = new ImportRegistrationImpl(irParent);
@@ -365,7 +364,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             List<String> remoteConfigurationTypes = endpoint.getConfigurationTypes();
 
             if (remoteConfigurationTypes == null) {
-                LOG.severe("the supplied endpoint has no configuration type");
+                LOG.error("the supplied endpoint has no configuration type");
                 return null;
             }
 
@@ -377,7 +376,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
 
             if (usableConfigurationTypes.size() == 0) {
-                LOG.severe("the supplied endpoint has no compatible configuration type. Supported types are: "
+                LOG.error("the supplied endpoint has no compatible configuration type. Supported types are: "
                             + supportedConfigurationTypes
                             + "    Types needed by the endpoint: "
                             + remoteConfigurationTypes);
@@ -389,11 +388,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                                                           emptyProps);
 
             if (handler == null) {
-                LOG.severe("no handler found");
+                LOG.error("no handler found");
                 return null;
             }
 
-            LOG.fine("Handler: " + handler);
+            LOG.debug("Handler: {}", handler);
 
             // // TODO: somehow select the interfaces that should be imported ----> job of the TopologyManager
             // ?
@@ -462,7 +461,10 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                                                                   + interfaceName));
             }
         } catch (ClassNotFoundException ex) {
-            LOG.warning("No class can be found for " + interfaceName);
+            if (LOG.isDebugEnabled()) {
+                // Only logging at debug level as this might be written to the log at the TopologyManager
+                LOG.debug("No class can be found for " + interfaceName, ex);
+            }
             imReg.setException(ex);
         }
     }
@@ -479,7 +481,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 eventProducer.notifyRemoval(eri);
                 exRegs.remove(eri);
             } else {
-                LOG.severe("An exportRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
+                LOG.error("An exportRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
             }
             if (exRegs == null || exRegs.size() == 0) {
                 exportedServices.remove(sref);
@@ -509,14 +511,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     protected void removeImportRegistration(ImportRegistrationImpl iri) {
         synchronized (importedServices) {
-            LOG.finest("Removing importRegistration " + iri);
+            LOG.debug("Removing importRegistration {}", iri);
 
             Collection<ImportRegistrationImpl> imRegs = importedServices.get(iri.getImportedEndpointAlways());
             if (imRegs!=null && imRegs.contains(iri)) {
                 imRegs.remove(iri);
             } else {
-                LOG
-                    .severe("An importRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
+                LOG.error("An importRegistartion was intended to be removed form internal management structure but couldn't be found in it !! ");
             }
             if (imRegs == null || imRegs.size() == 0) {
                 importedServices.remove(iri.getImportedEndpointAlways());

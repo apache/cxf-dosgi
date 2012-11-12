@@ -23,14 +23,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ClassUtils {
-	private static final Logger LOG = LogUtils.getL7dLogger(ClassUtils.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ClassUtils.class);
 	
 	private ClassUtils() {}
     
@@ -127,8 +126,7 @@ public final class ClassUtils {
                     providers.add(pClass.newInstance());
                 }
             } catch (Exception ex) {
-                LOG.log(Level.FINE, "Failed to load provider, org ex: " + ex.getMessage(), ex);
-                LOG.warning("Provider " + className.trim() + " can not be loaded or created");
+                LOG.warn("Provider " + className.trim() + " can not be loaded or created " + ex.getMessage(), ex);
             }
         }
         return providers;

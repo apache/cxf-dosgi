@@ -21,13 +21,11 @@ package org.apache.cxf.dosgi.dsw.handlers;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
@@ -39,10 +37,12 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHandler {
     private static final String CONFIGURATION_TYPE = "wsdl";
-    private static final Logger LOG = LogUtils.getL7dLogger(WsdlConfigurationTypeHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WsdlConfigurationTypeHandler.class);
     
     public WsdlConfigurationTypeHandler(BundleContext dswBC,
                                
@@ -62,7 +62,7 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         
         String wsdlAddressProp = getWsdlAddress(sd, iClass);
         if (wsdlAddressProp == null) {
-            LOG.warning("WSDL address is unavailable");
+            LOG.warn("WSDL address is unavailable");
             return null;
         }
         
@@ -70,7 +70,7 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         try {
             wsdlAddress = new URL(wsdlAddressProp);
         } catch (MalformedURLException ex) {
-            LOG.warning("WSDL address is malformed");
+            LOG.warn("WSDL address is malformed");
             return null;
         }
         

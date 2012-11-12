@@ -27,12 +27,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
@@ -53,9 +51,11 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
-    private static final Logger LOG = LogUtils.getL7dLogger(HttpServiceConfigurationTypeHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpServiceConfigurationTypeHandler.class);
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
     Map<Long, String> exportedAliases = Collections.synchronizedMap(new HashMap<Long, String>());
@@ -85,7 +85,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
                               BundleContext callingContext, Class<?> iClass, EndpointDescription sd) {
         String address = getHttpServiceAddress(sd.getProperties(), iClass);
         if (address == null) {
-            LOG.warning("Remote address is unavailable");
+            LOG.warn("Remote address is unavailable");
             // TODO: fire Event
             return null;
         }
@@ -117,7 +117,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             Object proxy = getProxy(factory.create(), iClass);
             return proxy;
         } catch (Exception e) {
-            LOG.log(Level.WARNING, "proxy creation failed", e);
+            LOG.warn("proxy creation failed", e);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
@@ -259,7 +259,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     protected String getHttpServiceAddress(Map sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
         if(address == null && sd.get(RemoteConstants.ENDPOINT_ID)!=null ){
-            LOG.severe("Could not use address property " + RemoteConstants.ENDPOINT_ID );
+            LOG.error("Could not use address property " + RemoteConstants.ENDPOINT_ID );
             return null;
         }
         
@@ -268,7 +268,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
         }
         if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY)!=null ){
-            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
+            LOG.error("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
             return null;
         }
         
@@ -276,7 +276,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);
         }
         if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY_OLD)!=null ){
-            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
+            LOG.error("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
             return null;
         }
         
@@ -284,7 +284,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
         }
         if(address == null && sd.get(Constants.RS_ADDRESS_PROPERTY)!=null ){
-            LOG.severe("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
+            LOG.error("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
             return null;
         }
 
@@ -300,11 +300,11 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
      */
     protected void registerUnexportHook(ServiceReference sref, String alias) {
         final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
-        LOG.log(Level.FINE, "Registering service listener for service with ID {0}", sid);
+        LOG.debug("Registering service listener for service with ID {}", sid);
      
         String previous = exportedAliases.put(sid, alias);
         if(previous != null) {
-            LOG.log(Level.WARNING, "Overwriting service export for service with ID {0}", sid);
+            LOG.warn("Overwriting service export for service with ID {}", sid);
         }
         
         try {
@@ -321,35 +321,32 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
                             final String alias = exportedAliases.remove(sid);
 
                             if(alias != null) {
-                                LOG.log(Level.FINE, "Unexporting HTTP servlet for alias ''{0}''...", alias);
+                                LOG.debug("Unexporting HTTP servlet for alias ''{}''...", alias);
                                 HttpService http = getHttpService();
 
                                 if(http != null) {
                                     try {
                                         http.unregister(alias);
                                     } catch(Exception e) {
-                                        LOG.log(Level.WARNING,
-                                                "An exception occurred while unregistering service for HTTP servlet alias '"
+                                        LOG.warn("An exception occurred while unregistering service for HTTP servlet alias '"
                                                 + alias + "'", e);
                                     }
                                 } else {
-                                    LOG.log(Level.WARNING,
-                                            "Unable to unexport HTTP servlet for alias ''{0}'': no HTTP service available",
+                                    LOG.warn("Unable to unexport HTTP servlet for alias ''{}'': no HTTP service available",
                                             alias);
                                 }
                             } else {
-                                LOG.log(Level.WARNING,
-                                        "Unable to unexport HTTP servlet for service class ''{0}'', service-id {1}: no servlet alias found",
+                                LOG.warn("Unable to unexport HTTP servlet for service class ''{0}'', service-id {1}: no servlet alias found",
                                         new Object[] {sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid});
                             }
                         }
                     }
                 }, f.toString());
             } else {
-                LOG.warning("Service listener could not be started. The service will not be automatically unexported.");
+                LOG.warn("Service listener could not be started. The service will not be automatically unexported.");
             }
         } catch (InvalidSyntaxException e) {
-            LOG.log(Level.WARNING, "Service listener could not be started. The service will not be automatically unexported.", e);
+            LOG.warn("Service listener could not be started. The service will not be automatically unexported.", e);
         }
     }
 

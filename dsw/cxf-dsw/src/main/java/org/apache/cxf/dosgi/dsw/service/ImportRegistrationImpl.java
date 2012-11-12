@@ -20,19 +20,19 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ImportReference;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // *************************** FIXME: some old methods might be in here ****
 public class ImportRegistrationImpl implements ImportRegistration {
 
-    private final static Logger LOG = LogUtils.getL7dLogger(ImportRegistrationImpl.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ImportRegistrationImpl.class);
 
     private Throwable exception;
     private ServiceRegistration importedService;
@@ -85,7 +85,7 @@ public class ImportRegistrationImpl implements ImportRegistration {
     }
 
     public synchronized void close() {
-        LOG.finest("close() called ");
+        LOG.debug("close() called ");
 
         if (isFailure())
             return;
@@ -107,7 +107,7 @@ public class ImportRegistrationImpl implements ImportRegistration {
         if (childs.isEmpty() && !detatched && closed) {
             detatched = true; 
             
-            LOG.fine("really closing ImportRegistartion now! ");
+            LOG.debug("really closing ImportRegistartion now! ");
 
             if (clientServiceFactory != null)
                 clientServiceFactory.setCloseable(true);

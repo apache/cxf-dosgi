@@ -21,9 +21,7 @@ package org.apache.cxf.dosgi.dsw.service;
 import java.util.Dictionary;
 import java.util.Properties;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -32,10 +30,12 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EventAdminHelper {
 
-    private final static Logger LOG = LogUtils.getL7dLogger(EventAdminHelper.class);
+    private final static Logger LOG = LoggerFactory.getLogger(EventAdminHelper.class);
     
     private BundleContext bctx;
 
@@ -96,7 +96,7 @@ public class EventAdminHelper {
 
         EventAdmin[] eas = getEventAdmins();
         if (eas != null) {
-            LOG.fine("Publishing event to "+eas.length+" EventAdmins;  Topic:["+topic+"]");
+            LOG.debug("Publishing event to {} EventAdmins;  Topic:[{}]", eas.length, topic);
             for (EventAdmin eventAdmin : eas) {
                 eventAdmin.postEvent(ev);
             }
@@ -115,7 +115,7 @@ public class EventAdminHelper {
         try {
             refs = bctx.getAllServiceReferences(EventAdmin.class.getName(), null);
         } catch (InvalidSyntaxException e) {
-            LOG.log(Level.SEVERE, "Failed to get EventAdmin: " + e.getMessage(), e);
+            LOG.error("Failed to get EventAdmin: " + e.getMessage(), e);
         }
 
         if (refs == null)

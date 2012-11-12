@@ -21,10 +21,7 @@ package org.apache.cxf.dosgi.dsw.service;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Server;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -36,10 +33,12 @@ import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExportRegistrationImpl implements ExportRegistration {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(ExportRegistrationImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExportRegistrationImpl.class);
 
     private Server server;
     private boolean closed = false;
@@ -94,7 +93,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
             // really close the ExReg
             // TODO close it and remove from management structure .... !
 
-            LOG.fine("really closing ExportRegistartion now! ");
+            LOG.debug("really closing ExportRegistartion now! ");
 
             synchronized (this) {
                 if (server != null) {
@@ -173,10 +172,9 @@ public class ExportRegistrationImpl implements ExportRegistration {
         Filter f;
         final Long sid = (Long)getExportReference().getExportedService().getProperty(Constants.SERVICE_ID);
         try {
-            f = bctx.createFilter("("+Constants.SERVICE_ID+"="+sid+")");
+            f = bctx.createFilter("(" + Constants.SERVICE_ID + "=" + sid + ")");
         } catch (InvalidSyntaxException e) {
-            LOG.log(Level.FINE, e.getMessage(), e);
-            LOG.warning("Service tracker could not be started. The service will not be automatically unexported.");
+            LOG.warn("Service tracker could not be started. The service will not be automatically unexported " + e.getMessage(), e);
             return;
         }
         serviceTracker = new ServiceTracker(bctx, f, new ServiceTrackerCustomizer() {
@@ -188,7 +186,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
 
             public void modifiedService(ServiceReference sr, Object s) {
                 // FIXME:
-                LOG.warning("Service modifications after the service is exported are currently not supported. The export is not modified!");
+                LOG.warn("Service modifications after the service is exported are currently not supported. The export is not modified!");
             }
 
             public Object addingService(ServiceReference sr) {

@@ -19,13 +19,13 @@
 package org.apache.cxf.dosgi.dsw.qos;
 
 import java.util.Map;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class IntentMap {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(IntentMap.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IntentMap.class);
 
     private Map<String, Object> intents; 
 

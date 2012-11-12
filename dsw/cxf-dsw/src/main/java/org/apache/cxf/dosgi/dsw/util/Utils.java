@@ -21,13 +21,13 @@ package org.apache.cxf.dosgi.dsw.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Utils {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(Utils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
     
     @SuppressWarnings("rawtypes")
 	public static String[] normalizeStringPlus(Object object) {
@@ -56,7 +56,7 @@ public class Utils {
                     String s = (String)o;
                     ar.add(s);
                 }else{
-                    LOG.warning("stringPlus contained non string element in list ! Element was skipped");
+                    LOG.warn("stringPlus contained non string element in list ! Element was skipped");
                 }
             }
             return ar.toArray(new String[ar.size()]);

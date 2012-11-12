@@ -21,17 +21,17 @@ package org.apache.cxf.dosgi.dsw.handlers;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ConfigTypeHandlerFactory {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(ConfigTypeHandlerFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
     private static final ConfigTypeHandlerFactory FACTORY = new ConfigTypeHandlerFactory();
 
     private ConfigTypeHandlerFactory() {
@@ -65,7 +65,7 @@ public final class ConfigTypeHandlerFactory {
             return new WsdlConfigurationTypeHandler(dswBC, props);
         }
 
-        LOG.warning("None of the configuration types in " + configurationTypes + " is supported.");
+        LOG.warn("None of the configuration types in " + configurationTypes + " is supported.");
 
         return null;
     }

@@ -28,12 +28,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.BindingConfiguration;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
@@ -51,9 +49,11 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractPojoConfigurationTypeHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractPojoConfigurationTypeHandler.class);
     private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
     private static final String CONFIGURATION_TYPE = "org.apache.cxf.ws";
     
@@ -326,14 +326,14 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         allIntents.addAll(extraIntents);
         allIntents.addAll(oldIntents);
         
-        LOG.fine("Intents asserted: " + allIntents);
+        LOG.debug("Intents asserted: " + allIntents);
         return allIntents.toArray(new String[allIntents.size()]);
     }
     
     private IntentMap mergeWithMaster(BundleContext dswContext, IntentMap intentMap) {
         synchronized (this) {
             if (masterMap == null) {
-                LOG.fine("Loading master intent map");
+                LOG.debug("Loading master intent map");
                 masterMap = getIntentMap(dswContext);
             }
         }
@@ -342,10 +342,10 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
             while (masterKeys.hasNext()) {
                 String masterKey = masterKeys.next();
                 if (intentMap.get(masterKey) == null) {
-                    LOG.fine("Merging in master intent map entry: " + masterKey);
+                    LOG.debug("Merging in master intent map entry: " + masterKey);
                     intentMap.getIntents().put(masterKey, masterMap.get(masterKey));
                 } else {
-                    LOG.fine("Overridden master intent map entry: " + masterKey);
+                    LOG.debug("Overridden master intent map entry: " + masterKey);
                 }
             }
         }
@@ -355,7 +355,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     protected String getPojoAddress(Map sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
         if(address == null && sd.get(RemoteConstants.ENDPOINT_ID)!=null ){
-            LOG.severe("Could not use address property " + RemoteConstants.ENDPOINT_ID );
+            LOG.error("Could not use address property " + RemoteConstants.ENDPOINT_ID );
             return null;
         }
         
@@ -364,7 +364,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
         }
         if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY)!=null ){
-            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
+            LOG.error("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
             return null;
         }
         
@@ -372,7 +372,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);
         }
         if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY_OLD)!=null ){
-            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
+            LOG.error("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
             return null;
         }
         
@@ -380,7 +380,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
             address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
         }
         if(address == null && sd.get(Constants.RS_ADDRESS_PROPERTY)!=null ){
-            LOG.severe("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
+            LOG.error("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
             return null;
         }
         

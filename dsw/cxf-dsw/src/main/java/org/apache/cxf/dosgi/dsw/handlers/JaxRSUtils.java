@@ -24,10 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.jaxrs.model.UserResource;
@@ -36,10 +33,12 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JaxRSUtils {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(JaxRSUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRSUtils.class);
 
     public final static String MODEL_FOLDER = "/OSGI-INF/cxf/jaxrs/";
     public final static String DEFAULT_MODEL = "/OSGI-INF/cxf/jaxrs/model.xml";
@@ -92,7 +91,7 @@ public class JaxRSUtils {
                 }
             }
         } catch (Exception ex) {
-            LOG.log(Level.FINE, "Problems finding JAXRS providers " + ex.getMessage(), ex);
+            LOG.debug("Problems finding JAXRS providers " + ex.getMessage(), ex);
         }
         return providers;
     }

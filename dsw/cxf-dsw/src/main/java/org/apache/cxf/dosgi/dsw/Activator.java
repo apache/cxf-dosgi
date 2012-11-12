@@ -20,11 +20,9 @@ package org.apache.cxf.dosgi.dsw;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
@@ -36,13 +34,15 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.BundleContextAware;
 
 
 // registered as spring bean -> start / stop called accordingly 
 public class Activator implements ManagedService,BundleContextAware {
 
-    private final static Logger LOG = LogUtils.getL7dLogger(Activator.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Activator.class);
 
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
     private BundleContext bc;
@@ -94,7 +94,7 @@ public class Activator implements ManagedService,BundleContextAware {
     }
 
     public void stop() {
-        LOG.fine("RemoteServiceAdmin Implementation is shutting down now");
+        LOG.debug("RemoteServiceAdmin Implementation is shutting down now");
         
         // This also triggers the unimport and unexport of the remote services
         rsaFactoryReg.unregister();
@@ -103,7 +103,7 @@ public class Activator implements ManagedService,BundleContextAware {
         // shutdown the CXF Bus -> Causes also the shutdown of the embedded HTTP server
         Bus b = BusFactory.getDefaultBus();
         if (b != null) {
-            LOG.fine("Shutting down the CXF Bus");
+            LOG.debug("Shutting down the CXF Bus");
             b.shutdown(true);
         }
 

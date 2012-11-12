@@ -20,10 +20,8 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
@@ -35,9 +33,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
-    private static final Logger LOG = LogUtils.getL7dLogger(PojoConfigurationTypeHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PojoConfigurationTypeHandler.class);
 
     public PojoConfigurationTypeHandler(BundleContext dswBC, Map<String, Object> handlerProps) {
         super(dswBC, handlerProps);
@@ -49,7 +49,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         //
         String address = getPojoAddress(sd.getProperties(), iClass);
         if (address == null) {
-            LOG.warning("Remote address is unavailable");
+            LOG.warn("Remote address is unavailable");
             // TODO: fire Event
             return null;
         }
@@ -81,7 +81,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             Object proxy = getProxy(factory.create(), iClass);
             return proxy;
         } catch (Exception e) {
-            LOG.log(Level.WARNING, "proxy creation failed", e);
+            LOG.warn("proxy creation failed", e);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
@@ -134,7 +134,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     protected String getPojoAddress(Map sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
         if(address == null && sd.get(RemoteConstants.ENDPOINT_ID)!=null ){
-            LOG.severe("Could not use address property " + RemoteConstants.ENDPOINT_ID );
+            LOG.error("Could not use address property " + RemoteConstants.ENDPOINT_ID );
             return null;
         }
         
@@ -142,7 +142,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
         }
         if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY)!=null ){
-            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
+            LOG.error("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
             return null;
         }
         
@@ -150,7 +150,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);
         }
         if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY_OLD)!=null ){
-            LOG.severe("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
+            LOG.error("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
             return null;
         }
         
@@ -158,7 +158,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
         }
         if(address == null && sd.get(Constants.RS_ADDRESS_PROPERTY)!=null ){
-            LOG.severe("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
+            LOG.error("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
             return null;
         }
         

@@ -21,10 +21,7 @@ package org.apache.cxf.dosgi.dsw.handlers;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
@@ -33,10 +30,11 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigurationTypeHandler {
-    private static final Logger LOG = LogUtils.getL7dLogger(JaxRSHttpServiceConfigurationTypeHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRSHttpServiceConfigurationTypeHandler.class);
 
     protected JaxRSHttpServiceConfigurationTypeHandler(BundleContext dswBC,
                                                        Map<String, Object> handlerProps) {

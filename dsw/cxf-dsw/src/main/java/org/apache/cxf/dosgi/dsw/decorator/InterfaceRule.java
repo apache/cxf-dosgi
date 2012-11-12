@@ -21,18 +21,17 @@ package org.apache.cxf.dosgi.dsw.decorator;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InterfaceRule implements Rule {
-    private static final Logger LOG = LogUtils.getL7dLogger(InterfaceRule.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InterfaceRule.class);
     
     private final Bundle bundle;
     private final Pattern matchPattern;
@@ -57,7 +56,7 @@ public class InterfaceRule implements Rule {
                 Constructor<?> ctor = cls.getConstructor(new Class [] {String.class});
                 obj = ctor.newInstance(value);
             } catch (Throwable th) {
-                LOG.log(Level.WARNING, "Could not handle property '" + name +
+                LOG.warn("Could not handle property '" + name +
                     "' with value '" + value + "' of type: " + type, th);
                 return;
             }

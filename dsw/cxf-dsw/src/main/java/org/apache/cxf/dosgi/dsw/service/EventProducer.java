@@ -20,9 +20,7 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -31,10 +29,12 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EventProducer {
 
-    private final static Logger LOG = LogUtils.getL7dLogger(EventProducer.class);
+    private final static Logger LOG = LoggerFactory.getLogger(EventProducer.class);
     private BundleContext bctx;
     private EventAdminHelper eaHelper;
 
@@ -70,14 +70,15 @@ public class EventProducer {
             if (listenerRefs != null) {
                 for (ServiceReference sref : listenerRefs) {
                     RemoteServiceAdminListener rsal = (RemoteServiceAdminListener)bctx.getService(sref);
-                    LOG.fine("notify RemoteServiceAdminListener " + rsal
-                             + " of bundle " + sref.getBundle().getSymbolicName());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("notify RemoteServiceAdminListener {} of bundle {}" + rsal, sref.getBundle().getSymbolicName());
+                    }
                     rsal.remoteAdminEvent(rsae);
                 }
             }
 
         } catch (InvalidSyntaxException e) {
-            LOG.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
     }
 

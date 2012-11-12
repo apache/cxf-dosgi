@@ -28,18 +28,18 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractConfigurationHandler implements ConfigurationTypeHandler {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractConfigurationHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractConfigurationHandler.class);
 
     final Map<String, Object> handlerProps;
     protected BundleContext bundleContext;
@@ -157,7 +157,7 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
                 if (!skey.startsWith("."))
                     endpointProps.put(skey, entry.getValue());
             } catch (ClassCastException e) {
-                LOG.warning("ServiceProperties Map contained non String key. Skipped  " + entry + "   "
+                LOG.warn("ServiceProperties Map contained non String key. Skipped  " + entry + "   "
                             + e.getLocalizedMessage());
             }
         }
