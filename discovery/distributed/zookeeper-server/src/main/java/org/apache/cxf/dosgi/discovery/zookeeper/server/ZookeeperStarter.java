@@ -31,6 +31,7 @@ import org.apache.zookeeper.server.ServerConfig;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig.ConfigException;
+import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 
@@ -38,7 +39,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
     private static final Logger LOG = Logger.getLogger(ZookeeperStarter.class);
 
     private final BundleContext bundleContext;
-    protected MyZooKeeperServerMain main;
+    protected ZookeeperServer main;
     private Thread zkMainThread;
 
     public ZookeeperStarter(BundleContext ctx) {
@@ -125,29 +126,64 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
         return config;
     }
 
-    protected void startFromConfig(QuorumPeerConfig config) throws IOException, InterruptedException {
-        final ServerConfig serverConfig = new ServerConfig();
-        serverConfig.readFrom(config);
-        
-        main = new MyZooKeeperServerMain();
+    protected void startFromConfig(final QuorumPeerConfig config) throws IOException, InterruptedException {
+        int numServers = config.getServers().size();
+        if (numServers > 1) {
+            main = new MyQuorumPeerMain(config);
+        } else {
+            main = new MyZooKeeperServerMain(config);
+        }
         zkMainThread = new Thread(new Runnable() {
             public void run() {
                 try {
-                    main.runFromConfig(serverConfig);
+                    main.startup();
                 } catch (Throwable e) {
                     LOG.error("Problem running ZooKeeper server.", e);
-                }                    
-            }                
+                }
+            }
         });
         zkMainThread.start();
     }
+    
+    interface ZookeeperServer {
+            void startup() throws IOException;
+            void shutdown();
+    }
 
-    // Make the shutdown accessible from here
-    static class MyZooKeeperServerMain extends ZooKeeperServerMain {
-        @Override
-        protected void shutdown() {
+    static class MyQuorumPeerMain extends QuorumPeerMain implements ZookeeperServer {
+        private QuorumPeerConfig config;
+
+        public MyQuorumPeerMain(QuorumPeerConfig config) {
+            this.config = config;
+        }
+
+        public void startup() throws IOException {
+            runFromConfig(config);
+        }
+
+        public void shutdown() {
+            if (null != quorumPeer) {
+                quorumPeer.shutdown();
+            }
+        }
+    }
+
+    static class MyZooKeeperServerMain extends ZooKeeperServerMain implements ZookeeperServer {
+        private QuorumPeerConfig config;
+
+        public MyZooKeeperServerMain(QuorumPeerConfig config) {
+            this.config = config;
+        }
+        
+        public void startup() throws IOException {
+            ServerConfig serverConfig = new ServerConfig();
+            serverConfig.readFrom(config);
+            runFromConfig(serverConfig );
+        }
+
+        public void shutdown() {
             super.shutdown();
-        }        
+        }
     }
 
 }
