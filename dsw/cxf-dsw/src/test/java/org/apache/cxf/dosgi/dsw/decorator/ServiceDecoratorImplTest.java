@@ -66,9 +66,10 @@ public class ServiceDecoratorImplTest extends TestCase {
     }
     
     public void testGetDecoratorElements() {
+        URL sdURL = getClass().getResource("/test-resources/sd.xml");
         Bundle b = EasyMock.createMock(Bundle.class);
         EasyMock.expect(b.findEntries("OSGI-INF/remote-service", "*.xml", false)).andReturn(
-            Collections.enumeration(Arrays.asList(getClass().getResource("/test-resources/sd.xml")))).anyTimes();
+            Collections.enumeration(Arrays.asList(sdURL))).anyTimes();
         EasyMock.replay(b);
 
         List<Element> elements = ServiceDecoratorImpl.getDecorationElements(b);

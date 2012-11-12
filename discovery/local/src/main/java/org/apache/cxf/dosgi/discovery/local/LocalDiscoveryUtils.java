@@ -34,8 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -49,11 +47,12 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+import org.slf4j.LoggerFactory;
 
 
 public final class LocalDiscoveryUtils {
-    private static final Logger LOG =
-        Logger.getLogger(LocalDiscoveryUtils.class.getName());
+    private static final org.slf4j.Logger LOG =
+        LoggerFactory.getLogger(LocalDiscoveryUtils.class);
 
     private static final String REMOTE_SERVICES_HEADER_NAME = "Remote-Service";
     private static final String REMOTE_SERVICES_DIRECTORY =
@@ -214,7 +213,7 @@ public final class LocalDiscoveryUtils {
             map.put(name, array);
             return true;
         } catch (Exception e) {
-            LOG.log(Level.WARNING, "Could not create array for Endpoint Description", e);
+            LOG.warn("Could not create array for Endpoint Description", e);
             return false;
         }
     }
@@ -270,7 +269,7 @@ public final class LocalDiscoveryUtils {
 
         String type = getTypeName(prop);
         if (!"String".equals(type)) {
-            LOG.warning("Embedded XML must be of type String, found: " + type);
+            LOG.warn("Embedded XML must be of type String, found: " + type);
             return null;
         }
 
@@ -331,7 +330,7 @@ public final class LocalDiscoveryUtils {
                 return ctor.newInstance(value);
             }
         } catch (Exception e) {
-            LOG.warning("Could not create Endpoint Property of type " + type + " and value " + value);
+            LOG.warn("Could not create Endpoint Property of type " + type + " and value " + value);
             return null;
         }
     }
@@ -375,7 +374,7 @@ public final class LocalDiscoveryUtils {
             try {
                 elements.addAll(getElements(resourceURL.openStream()));
             } catch (Exception ex) {
-                LOG.log(Level.WARNING, "Problem parsing: " + resourceURL, ex);
+                LOG.warn("Problem parsing: " + resourceURL, ex);
             }
         }
         return elements;

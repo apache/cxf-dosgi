@@ -21,7 +21,6 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.Bundle;
@@ -31,13 +30,15 @@ import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates local Endpointlisteners that publish to Zookeeper 
  */
 public class PublishingEndpointListenerFactory implements ServiceFactory {
     public static final String DISCOVERY_ZOOKEEPER_ID = "org.apache.cxf.dosgi.discovery.zookeeper";
-    private static final Logger LOG = Logger.getLogger(PublishingEndpointListenerFactory.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListenerFactory.class);
 
     private BundleContext bctx;
     private ZooKeeper zookeeper;
@@ -50,7 +51,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
     }
 
     public Object getService(Bundle b, ServiceRegistration sr) {
-        LOG.fine("new EndpointListener from factory");
+        LOG.debug("new EndpointListener from factory");
         synchronized (listeners) {
             PublishingEndpointListener epl = new PublishingEndpointListener(zookeeper, bctx);
             listeners.add(epl);
@@ -59,7 +60,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
     }
 
     public void ungetService(Bundle b, ServiceRegistration sr, Object s) {
-        LOG.fine("remove EndpointListener");
+        LOG.debug("remove EndpointListener");
         synchronized (listeners) {
             if (listeners.contains(s)) {
                 PublishingEndpointListener epl = (PublishingEndpointListener)s;

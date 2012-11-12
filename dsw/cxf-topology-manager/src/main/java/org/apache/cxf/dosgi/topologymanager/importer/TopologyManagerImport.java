@@ -29,8 +29,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminLifeCycleListener;
 import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
@@ -43,6 +41,8 @@ import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Listens for remote endpoints using the EndpointListener interface and the EndpointListenerManager.
@@ -52,7 +52,7 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdminListener;
  */
 public class TopologyManagerImport implements EndpointListener, RemoteServiceAdminListener, ServiceInterestListener {
 
-    private final static Logger LOG = Logger.getLogger(TopologyManagerImport.class.getName());
+    private final static Logger LOG = LoggerFactory.getLogger(TopologyManagerImport.class);
     private ExecutorService execService;
 
     private final EndpointListenerManager endpointListenerManager;
@@ -126,7 +126,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
      */
     public void removeServiceInterest(String filter) {
         if (importInterests.removeReference(filter) <= 0) {
-            LOG.log(Level.FINE, "last reference to import interest is gone -> removing interest  filter: {0}", filter);
+            LOG.debug("last reference to import interest is gone -> removing interest  filter: {}", filter);
             endpointListenerManager.reduceScope(filter);
             List<ImportRegistration> irs = importedServices.remove(filter);
             if (irs != null) {
@@ -140,18 +140,17 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     }
 
     public void endpointAdded(EndpointDescription epd, String filter) {
-        if(filter==null){
-            LOG.severe("Endpoint is not handled because no matching filter was provided!");
+        if (filter==null) {
+            LOG.error("Endpoint is not handled because no matching filter was provided!");
             return;
         }
-        // Decide if it is worth it ? 
-        LOG.log(Level.FINE, "importable service added for filter {0} -> {1}", new Object[]{filter, epd});
+        LOG.debug("importable service added for filter {}, endpoint {}", filter, epd);
         addImportPossibility(epd, filter);
         triggerImport(filter);
     }
 
     public void endpointRemoved(EndpointDescription epd, String filter) {
-        LOG.fine("EndpointRemoved -> " + epd);
+        LOG.debug("EndpointRemoved {}", epd);
         removeImportPossibility(epd, filter);
         triggerImport(filter);
     }
@@ -180,7 +179,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     }
 
     public void triggerImportsForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
-        LOG.fine("New RSA detected trying to import services with it");
+        LOG.debug("New RSA detected trying to import services with it");
         synchronized (importPossibilities) {
             Set<Map.Entry<String, List<EndpointDescription>>> entries = importPossibilities.entrySet();
             for (Entry<String, List<EndpointDescription>> entry : entries) {
@@ -190,7 +189,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     }
 
     private void triggerImport(final String filter) {
-        LOG.log(Level.FINE, "import of a service for filter {0} was queued", filter);
+        LOG.debug("Import of a service for filter {} was queued", filter);
 
         execService.execute(new Runnable() {
             public void run() {
@@ -202,7 +201,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
                         }
                     }
                 } catch (Exception e) {
-                    LOG.log(Level.SEVERE, e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
                 // Notify EndpointListeners ? NO!
             }
@@ -280,7 +279,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
         for (RemoteServiceAdmin rsa : remoteServiceAdminTracker.getList()) {
             ImportRegistration ir = rsa.importService(ep);
             if (ir != null && ir.getException() == null) {
-                LOG.fine("service impoort was successful: " + ir);
+                LOG.debug("Service import was successful {}", ir);
                 return ir;
             }
         }

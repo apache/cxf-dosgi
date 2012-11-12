@@ -56,7 +56,6 @@ public class ExportRegistrationImpl implements ExportRegistration {
 
     // provide a clone of the provided exp.Reg that is linked to this instance
     public ExportRegistrationImpl(ExportRegistrationImpl exportRegistration) {
-
         parent = exportRegistration;
         exportReference = new ExportReferenceImpl(parent.getExportReference());
         exception = parent.getException();

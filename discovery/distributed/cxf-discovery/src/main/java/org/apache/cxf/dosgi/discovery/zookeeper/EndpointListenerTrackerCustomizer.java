@@ -18,21 +18,21 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tracks interest in EndpointListeners. Delegates to InterfaceMonitorManager to manage 
  * interest in the scopes of each EndpointListener
  */
 public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomizer {
-    private static final Logger LOG = Logger.getLogger(EndpointListenerTrackerCustomizer.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerTrackerCustomizer.class);
     private static final Pattern OBJECTCLASS_PATTERN = Pattern.compile(".*\\(objectClass=([^)]+)\\).*");
 
     private InterfaceMonitorManager imManager;
@@ -52,21 +52,21 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
 
     private void handleEndpointListener(ServiceReference sref) {
         if (isOurOwnEndpointListener(sref)) {
-            LOG.finest("Skipping our own endpointListener");
+            LOG.debug("Skipping our own endpointListener");
             return;
         }
 
-        if (LOG.isLoggable(Level.FINEST)) {
+        if (LOG.isDebugEnabled()) {
             for (String key : sref.getPropertyKeys()) {
-                LOG.finest("modifiedService: property: " + key + " => " + sref.getProperty(key));
+                LOG.debug("modifiedService: property: " + key + " => " + sref.getProperty(key));
             }
         }
         
         String[] scopes = Util.getScopes(sref);
         for (String scope : scopes) {
             String objClass = getObjectClass(scope);
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Adding interest in scope: " + scope + " objectClass: " + objClass);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Adding interest in scope: " + scope + " objectClass: " + objClass);
             }
             imManager.addInterest(sref, scope, objClass);
         }

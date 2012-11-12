@@ -18,13 +18,14 @@
   */
 package org.apache.cxf.dosgi.discovery.local.internal;
 
-import java.util.logging.Logger;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Activator implements BundleActivator {
 
-    private static final Logger LOG = Logger.getLogger(Activator.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
 
     LocalDiscovery localDiscovery;
     

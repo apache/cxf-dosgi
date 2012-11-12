@@ -26,10 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -39,9 +36,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServiceDecoratorImpl implements ServiceDecorator {
-    private static final Logger LOG = LogUtils.getL7dLogger(ServiceDecoratorImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceDecoratorImpl.class);
     
     private final BundleContext bundleContext;
     private final BundleListenerImpl bundleListener;
@@ -95,7 +94,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
                 Namespace ns = Namespace.getNamespace("http://cxf.apache.org/xmlns/service-decoration/1.0.0");
                 elements.addAll(d.getRootElement().getChildren("service-decoration", ns));
             } catch (Exception ex) {
-                LOG.log(Level.WARNING, "Problem parsing: " + resourceURL, ex);
+                LOG.warn("Problem parsing: " + resourceURL, ex);
             }
         }
         return elements;

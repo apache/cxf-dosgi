@@ -28,8 +28,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminLifeCycleListener;
 import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
@@ -43,6 +41,8 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <li>This class keeps a list of currently imported and exported endpoints <li>It requests the import/export
@@ -50,7 +50,7 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
  */
 public class TopologyManagerExport implements ExportRepository {
 
-    private final static Logger LOG = Logger.getLogger(TopologyManagerExport.class.getName());
+    private final static Logger LOG = LoggerFactory.getLogger(TopologyManagerExport.class);
 
     private final BundleContext bctx;
     private final EndpointListenerNotifier epListenerNotifier;
@@ -95,14 +95,14 @@ public class TopologyManagerExport implements ExportRepository {
         });
         serviceListerner = new ServiceListener() {
             public void serviceChanged(ServiceEvent event) {
-                LOG.fine("Received ServiceEvent: " + event);
                 ServiceReference sref = event.getServiceReference();
                 if (event.getType() == ServiceEvent.REGISTERED) {
-                    LOG.fine("Registered");
+                    LOG.debug("Received REGISTERED ServiceEvent: {}", event);
                     if (shouldExportService(sref)) {
                         exportService(sref);
                     }
                 } else if (event.getType() == ServiceEvent.UNREGISTERING) {
+                    LOG.debug("Received UNREGISTERING ServiceEvent: {}", event);
                     removeService(sref);
                 }
             }
@@ -139,7 +139,7 @@ public class TopologyManagerExport implements ExportRepository {
     }
 
     protected void triggerExportForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
-        LOG.finer("TopologyManager: triggerExportImportForRemoteSericeAdmin()");
+        LOG.debug("triggerExportImportForRemoteSericeAdmin()");
 
         synchronized (exportedServices) {
             for (ServiceReference serviceRef : exportedServices.keySet()) {
@@ -147,10 +147,10 @@ public class TopologyManagerExport implements ExportRepository {
                 String bundleName = serviceRef.getBundle().getSymbolicName();
                 if (rsaExports.containsKey(rsa)) {
                     // already handled....
-                    LOG.fine("TopologyManager: service from bundle " + bundleName + "is already handled by this RSA");
+                    LOG.debug("service from bundle {} is already handled by this RSA", bundleName);
                 } else {
                     // trigger export of this service....
-                    LOG.fine("TopologyManager: service from bundle " + bundleName + " is to be exported by this RSA");
+                    LOG.debug("service from bundle {} is to be exported by this RSA", bundleName);
                     exportService(serviceRef);
                 }
             }
@@ -165,7 +165,7 @@ public class TopologyManagerExport implements ExportRepository {
         try {
             exportExistingServices();
         } catch (InvalidSyntaxException e) {
-            LOG.log(Level.FINER, "Failed to check existing services.", e);
+            LOG.debug("Failed to export existing services.", e);
         }
     }
 
@@ -217,7 +217,7 @@ public class TopologyManagerExport implements ExportRepository {
     }
 
     private void doExportService(final ServiceReference sref) {
-        LOG.finer("TopologyManager: exporting service ...");
+        LOG.debug("Exporting service");
 
         Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports = null;
 
@@ -229,11 +229,10 @@ public class TopologyManagerExport implements ExportRepository {
             return;
         }
         if (remoteServiceAdminTracker == null || remoteServiceAdminTracker.size() == 0) {
-            LOG.log(Level.SEVERE,
-                    "No RemoteServiceAdmin available! Unable to export service from bundle {0}, interfaces: {1}",
-                    new Object[] {
-                            sref.getBundle().getSymbolicName(),
-                            sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS) });
+            LOG.error(
+                    "No RemoteServiceAdmin available! Unable to export service from bundle {}, interfaces: {}",
+                    sref.getBundle().getSymbolicName(),
+                    sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS));
         }
 
 
@@ -244,24 +243,22 @@ public class TopologyManagerExport implements ExportRepository {
 
             if (exports.containsKey(remoteServiceAdmin)) {
                 // already handled by this remoteServiceAdmin
-                LOG.fine("TopologyManager: already handled by this remoteServiceAdmin -> skipping");
+                LOG.debug("already handled by this remoteServiceAdmin -> skipping");
             } else {
                 // TODO: additional parameter Map ?
-                LOG.fine("TopologyManager: exporting ...");
+                LOG.debug("exporting ...");
                 Collection<ExportRegistration> endpoints = remoteServiceAdmin
                         .exportService(sref, null);
                 if (endpoints == null) {
                     // TODO export failed -> What should be done here?
-                    LOG.severe("TopologyManager: export failed");
+                    LOG.error("export failed");
                     exports.put(remoteServiceAdmin, null);
                 } else {
-                    LOG.info("TopologyManager: export sucessful Endpoints:"
-                            + endpoints);
+                    LOG.info("TopologyManager: export sucessful Endpoints: {}", endpoints);
                     // enqueue in local list of endpoints
                     exports.put(remoteServiceAdmin, endpoints);
 
-                    epListenerNotifier
-                            .nofifyEndpointListenersOfAdding(endpoints);
+                    epListenerNotifier.nofifyEndpointListenersOfAdding(endpoints);
                 }
             }
         }

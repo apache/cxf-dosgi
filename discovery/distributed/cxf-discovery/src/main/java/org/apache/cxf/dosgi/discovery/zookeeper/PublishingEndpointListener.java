@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
 import org.apache.zookeeper.CreateMode;
@@ -41,12 +39,14 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Listens for local Endpoints and publishes them to Zookeeper
  */
 public class PublishingEndpointListener implements EndpointListener {
-    private final Logger LOG = Logger.getLogger(PublishingEndpointListener.class.getName());
+    private final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListener.class);
 
     private final ZooKeeper zookeeper;
     private final List<DiscoveryPlugin> discoveryPlugins = new CopyOnWriteArrayList<DiscoveryPlugin>();
@@ -104,13 +104,13 @@ public class PublishingEndpointListener implements EndpointListener {
                     ensurePath(path, zookeeper);
 
                     String fullPath = path + '/' + endpointKey;
-                    LOG.fine("Creating ZooKeeper node: " + fullPath);
+                    LOG.debug("Creating ZooKeeper node: {}", fullPath);
                     zookeeper.create(fullPath, getData(props), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
                 }
 
                 endpoints.add(endpoint);
             } catch (Exception ex) {
-                LOG.log(Level.SEVERE, "Exception while processing the addition of a ServicePublication.", ex);
+                LOG.error("Exception while processing the addition of a ServicePublication.", ex);
             }
         }
 
@@ -132,7 +132,7 @@ public class PublishingEndpointListener implements EndpointListener {
 
                 endpoints.remove(endpoint);
             } catch (Exception ex) {
-                LOG.log(Level.SEVERE, "Exception while processing the removal of a ServicePublication.", ex);
+                LOG.error("Exception while processing the removal of a ServicePublication.", ex);
             }
         }
 
@@ -146,7 +146,7 @@ public class PublishingEndpointListener implements EndpointListener {
         for (String name : interfaces) {
             String path = Util.getZooKeeperPath(name);
             String fullPath = path + '/' + endpointKey;
-            LOG.fine("Removing ZooKeeper node: " + fullPath);
+            LOG.debug("Removing ZooKeeper node: {}", fullPath);
             zookeeper.delete(fullPath, -1);
         }
     }
@@ -186,14 +186,13 @@ public class PublishingEndpointListener implements EndpointListener {
     }
 
     public void close() {
-        LOG.fine("removing all service publications");
+        LOG.debug("removing all service publications");
         synchronized (endpoints) {
             for (EndpointDescription ed : endpoints) {
                 try {
                     removeEndpoint(ed);
                 } catch (Exception ex) {
-                    LOG.log(Level.SEVERE, "Exception while processing the removal of a ServicePublication.",
-                            ex);
+                    LOG.error("Exception while processing the removal of a ServicePublication.", ex);
                 }
             }
             endpoints.clear();

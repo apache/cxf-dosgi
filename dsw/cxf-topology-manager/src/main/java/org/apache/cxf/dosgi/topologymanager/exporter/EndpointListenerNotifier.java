@@ -23,8 +23,6 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -35,12 +33,14 @@ import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tracks EndpointListeners and allows to notify them of endpoints
  */
 public class EndpointListenerNotifier {
-    private final static Logger LOG = Logger.getLogger(EndpointListenerNotifier.class.getName());
+    private final static Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
     private BundleContext bctx;
     private ServiceTracker stEndpointListeners;
     private ExportRepository exportRepository;
@@ -51,14 +51,14 @@ public class EndpointListenerNotifier {
         this.stEndpointListeners = new ServiceTracker(bctx, EndpointListener.class.getName(), null) {
             @Override
             public Object addingService(ServiceReference reference) {
-                LOG.fine("TopologyManager: new EndpointListener that wants to be informed about whats going on ... ");
+                LOG.debug("new EndpointListener detected");
                 notifyListenerOfAllExistingExports(reference);
                 return super.addingService(reference);
             }
 
             @Override
             public void modifiedService(ServiceReference reference, Object service) {
-                LOG.fine("TopologyManager: EndpointListener changed ... ");
+                LOG.debug("EndpointListener modified");
                 notifyListenerOfAllExistingExports(reference);
                 super.modifiedService(reference, service);
             }
@@ -112,7 +112,7 @@ public class EndpointListenerNotifier {
         EndpointListener epl = (EndpointListener)bctx.getService(epListenerReference);
         List<Filter> filters = getFiltersFromEndpointListenerScope(epListenerReference, bctx);
 
-        LOG.finer("TopologyManager: notifyListenerOfAddingIfAppropriate() ");
+        LOG.debug("notifyListenerOfAdding");
         for (ExportRegistration exReg : exportRegistrations) {
             EndpointDescription endpoint = getExportedEndpoint(exReg);
             List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
@@ -127,7 +127,6 @@ public class EndpointListenerNotifier {
                                           Collection<ExportRegistration> exportRegistrations) {
         EndpointListener epl = (EndpointListener)bctx.getService(epListenerReference);
         List<Filter> filters = getFiltersFromEndpointListenerScope(epListenerReference, bctx);
-        LOG.finer("TopologyManager: notifyListenerOfREMOVALIfAppropriate() ");
         for (ExportRegistration exReg : exportRegistrations) {
             EndpointDescription endpoint = getExportedEndpoint(exReg);
             List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
@@ -155,12 +154,12 @@ public class EndpointListenerNotifier {
                     if (o instanceof String) {
                         filters.add(bctx.createFilter((String) o));
                     } else {
-                        LOG.warning("Component of a filter is not a string -> skipped !");
+                        LOG.warn("Component of a EndpointListener filter is not a string -> skipped !");
                     }
                 }
             }
         } catch (InvalidSyntaxException e) {
-            LOG.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         return filters;
     }
@@ -171,12 +170,18 @@ public class EndpointListenerNotifier {
         Dictionary<String, Object> d = getEndpointProperties(endpoint);
 
         for (Filter filter : filters) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Matching: " + filter + "  against " + d);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Matching: {} against {}", filter, d);
             }
             if (filter.match(d)) {
-                LOG.fine("Listener matched one of the Endpoints !!!! --> calling removed() ...");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Filter {} matches endpoint {}", filter, d);
+                }
                 matchingFilters.add(filter);
+            } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Filter {} does not match endpoint {}", filter, d);
+                }
             }
         }
         return matchingFilters;
@@ -194,7 +199,7 @@ public class EndpointListenerNotifier {
            String filter = "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*)";
            result = bctx.getServiceReferences(EndpointListener.class.getName(), filter);
        } catch (InvalidSyntaxException e) {
-           LOG.log(Level.SEVERE, e.getMessage(), e);
+           LOG.error(e.getMessage(), e);
        }
        return (result == null) ? new ServiceReference[]{} : result;
    }

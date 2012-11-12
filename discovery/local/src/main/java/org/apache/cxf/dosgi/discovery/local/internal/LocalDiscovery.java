@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
 import org.osgi.framework.Bundle;
@@ -40,9 +39,11 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocalDiscovery implements BundleListener {   
-    private static final Logger LOG = Logger.getLogger(LocalDiscovery.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(LocalDiscovery.class);
     
     // this is effectively a set which allows for multiple service descriptions with the
     // same interface name but different properties and takes care of itself with respect to concurrency 
@@ -251,7 +252,7 @@ public class LocalDiscovery implements BundleListener {
         try {
             return bundleContext.createFilter(filterValue); 
         } catch (Exception ex) {
-            LOG.severe("Problem creating a Filter from " + filterValue); 
+            LOG.error("Problem creating a Filter from " + filterValue, ex); 
         }
         return null;
     }    

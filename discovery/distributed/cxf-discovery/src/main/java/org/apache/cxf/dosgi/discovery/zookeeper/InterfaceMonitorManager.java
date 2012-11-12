@@ -7,8 +7,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
@@ -18,6 +16,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the EndpointListeners and the scopes they are interested in.
@@ -26,7 +26,7 @@ import org.osgi.service.remoteserviceadmin.EndpointListener;
  * These events are then forwarded to all interested EndpointListeners
  */
 public class InterfaceMonitorManager {
-    private static final Logger LOG = Logger.getLogger(InterfaceMonitorManager.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitorManager.class);
     
     private final ZooKeeper zooKeeper;
     private final Map<ServiceReference, List<String> /* scopes of the epl */> handledEndpointlisteners = new HashMap<ServiceReference, List<String>>();
@@ -135,9 +135,9 @@ public class InterfaceMonitorManager {
             EndpointListener epl = (EndpointListener) service;
             String[] scopes = Util.getScopes(sref);
             for (final String currentScope : scopes) {
-                LOG.fine("matching " + epd + " against " + currentScope);
+                LOG.debug("matching {} against {}", epd, currentScope);
                 if (matches(currentScope, epd)) {
-                    LOG.fine("Matched " + epd + "against " + currentScope);
+                    LOG.debug("Matched {} against {}", epd, currentScope);
                     if (isAdded) {
                         LOG.info("calling EndpointListener.endpointAdded: " + epl + "from bundle "
                                 + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
@@ -159,7 +159,7 @@ public class InterfaceMonitorManager {
             Dictionary<String, Object> dict = mapToDictionary(epd.getProperties());
             return f.match(dict);
         } catch (InvalidSyntaxException e) {
-            LOG.log(Level.SEVERE, "Currentscope [" + scope + "] resulted in" + " a bad filter!", e);
+            LOG.error("Currentscope [" + scope + "] resulted in" + " a bad filter!", e);
             return false;
         }
     }

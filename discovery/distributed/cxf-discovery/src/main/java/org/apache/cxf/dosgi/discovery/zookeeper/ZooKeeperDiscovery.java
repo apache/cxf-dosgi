@@ -20,8 +20,6 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.io.IOException;
 import java.util.Dictionary;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -32,10 +30,12 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZooKeeperDiscovery implements Watcher, ManagedService {
 
-    private static final Logger LOG = Logger.getLogger(ZooKeeperDiscovery.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ZooKeeperDiscovery.class);
 
     private final BundleContext bctx;
 
@@ -56,8 +56,8 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
 
     @SuppressWarnings("rawtypes")
     public synchronized void updated(Dictionary configuration) throws ConfigurationException {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Received configuration update for Zookeeper Discovery: " + configuration);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Received configuration update for Zookeeper Discovery: " + configuration);
         }
 
         synchronized (this) {
@@ -71,7 +71,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         try {
             zooKeeper = createZooKeeper(configuration);
         } catch (IOException e) {
-            LOG.log(Level.SEVERE, "Failed to start the Zookeeper Discovery component.", e);
+            LOG.error("Failed to start the Zookeeper Discovery component.", e);
         }
     }
 
@@ -98,7 +98,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
             try {
                 zooKeeper.close();
             } catch (InterruptedException e) {
-                LOG.log(Level.SEVERE, "Error closing zookeeper", e);
+                LOG.error("Error closing zookeeper", e);
             }
         }
     }
@@ -121,7 +121,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
             rv = val.toString();
         }
 
-        LOG.fine("Reading Config Admin property: " + key + " value returned: " + rv);
+        LOG.debug("Reading Config Admin property: {} value returned: {}", key, rv);
         return rv;
     }
 
@@ -138,7 +138,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
             try {
                 zooKeeper = createZooKeeper(curConfiguration);
             } catch (IOException e) {
-                LOG.log(Level.SEVERE, "Failed to start the Zookeeper Discovery component.", e);
+                LOG.error("Failed to start the Zookeeper Discovery component.", e);
             }
         }
     }

@@ -22,18 +22,19 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages an EndpointListener add adjusts its scope according to requested service filters
  */
 public class EndpointListenerManager {
 
-    private static final Logger LOG = Logger.getLogger(EndpointListenerManager.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerManager.class);
     
     private final BundleContext bctx;
     private ServiceRegistration serviceRegistration;
@@ -55,12 +56,10 @@ public class EndpointListenerManager {
     }
 
     protected void extendScope(String filter) {
-        if (filter == null)
+        if (filter == null) {
             return;
-        
-        
-        LOG.fine("EndpointListener: extending scope by " + filter);
-
+        }
+        LOG.debug("EndpointListenxtending scope by {}", filter);
         synchronized (filters) {
             filters.add(filter);
         }
@@ -68,11 +67,10 @@ public class EndpointListenerManager {
     }
 
     protected void reduceScope(String filter) {
-        if (filter == null)
+        if (filter == null) {
             return;
-        
-        
-        LOG.fine("EndpointListener: reducing scope by " + filter);
+        }
+        LOG.debug("EndpointListener: reducing scope by {}", filter);
         synchronized (filters) {
             filters.remove(filter);
         }
@@ -83,7 +81,9 @@ public class EndpointListenerManager {
         Dictionary<String, Object> p = new Hashtable<String, Object>();
 
         synchronized (filters) {
-            LOG.finer("EndpointListener: current filter: " + filters);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Current filter: " + filters);
+            }
             // TODO: make a copy of the filter list
             p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, filters);
         }
@@ -92,8 +92,6 @@ public class EndpointListenerManager {
     }
 
     private void updateRegistration() {
-        // This tends to be verbose.
-        LOG.finer("EndpointListenerImpl: filters: " + filters);
         serviceRegistration.setProperties(getRegistrationProperties());
     }
 

@@ -1,23 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one
-  or more contributor license agreements. See the NOTICE file
-  distributed with this work for additional information
-  regarding copyright ownership. The ASF licenses this file
-  to you under the Apache License, Version 2.0 (the
-  "License"); you may not use this file except in compliance
-  with the License. You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing,
-  software distributed under the License is distributed on an
-  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  KIND, either express or implied. See the License for the
-  specific language governing permissions and limitations
-  under the License.
--->
+    <!-- Licensed to the Apache Software Foundation (ASF) under one or more 
+        contributor license agreements. See the NOTICE file distributed with this 
+        work for additional information regarding copyright ownership. The ASF licenses 
+        this file to you under the Apache License, Version 2.0 (the "License"); you 
+        may not use this file except in compliance with the License. You may obtain 
+        a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless 
+        required by applicable law or agreed to in writing, software distributed 
+        under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+        OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+        the specific language governing permissions and limitations under the License. -->
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-dosgi-ri-discovery-local</artifactId>
@@ -36,7 +29,7 @@
     </properties>
 
     <dependencies>
-        <dependency> 
+        <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
             <version>${felix.version}</version>
@@ -46,7 +39,7 @@
                     <artifactId>org.osgi.foundation</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency> 
+        </dependency>
 
         <dependency>
             <groupId>org.osgi</groupId>
@@ -54,23 +47,27 @@
             <version>${osgi.version}</version>
         </dependency>
 
-        <dependency>  
-            <groupId>org.jdom</groupId>  
-            <artifactId>com.springsource.org.jdom</artifactId>  
-            <version>1.1.0</version> 
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>com.springsource.org.jdom</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>  
+        </dependency>
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
             <scope>test</scope>
         </dependency>
-    </dependencies> 
+    </dependencies>
 
     <build>
         <plugins>
@@ -80,7 +77,9 @@
                 <configuration>
                     <instructions>
                         <Bundle-Name>CXF Local Discovery Service Bundle</Bundle-Name>
-                        <Bundle-Description>This bundle contains the implementation required by the CXF Local Discovery Service Bundle</Bundle-Description>
+                        <Bundle-Description>This bundle contains the
+                            implementation required by the CXF Local
+                            Discovery Service Bundle</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.apache.cxf.dosgi.discovery.local.internal.Activator</Bundle-Activator>
                         <Import-Package>
@@ -90,10 +89,10 @@
                         <Private-Package>org.apache.cxf.dosgi.discovery.local.internal</Private-Package>
                         <Export-Package>
                             org.apache.cxf.dosgi.discovery.local
-                        </Export-Package> 
+                        </Export-Package>
                     </instructions>
                 </configuration>
-            </plugin> 
+            </plugin>
         </plugins>
-    </build>    
+    </build>
 </project>

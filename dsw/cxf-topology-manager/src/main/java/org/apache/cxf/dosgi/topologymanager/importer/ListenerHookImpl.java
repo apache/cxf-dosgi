@@ -22,8 +22,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,13 +29,15 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Listens for service listeners and informs ServiceInterestListener about added and removed interest
  * in services
  */
 public class ListenerHookImpl implements ListenerHook {
-    private static final Logger LOG = Logger.getLogger(ListenerHookImpl.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ListenerHookImpl.class);
     private BundleContext bctx;
     private ServiceInterestListener serviceInterestListener;
 
@@ -65,28 +65,27 @@ public class ListenerHookImpl implements ListenerHook {
 
     @SuppressWarnings("rawtypes")
     public void added(Collection/* <ListenerInfo> */ listeners) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("ListenerHookImpl: added() " + listeners);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("added listeners {}", listeners);
         }
         for (Object li : listeners) {
             ListenerInfo listenerInfo = (ListenerInfo)li;
-            LOG.fine("*** Filter: " + listenerInfo.getFilter());
+            LOG.debug("Filter {}", listenerInfo.getFilter());
 
             String className = getClassNameFromFilter(listenerInfo.getFilter());
 
             if (listenerInfo.getBundleContext().getBundle().equals(bctx.getBundle())) {
-                LOG.fine("ListenerHookImpl: skipping request from myself");
+                LOG.debug("ListenerHookImpl: skipping request from myself");
                 continue;
             }
 
             if (listenerInfo.getFilter() == null) {
-                LOG.fine("ListenerHookImpl: skipping empty filter");
+                LOG.debug("skipping empty filter");
                 continue;
             }
 
             if (isClassExcluded(className)) {
-                LOG.fine("ListenerHookImpl: skipping import request for excluded classs ["
-                                   + className + "]");
+                LOG.debug("Skipping import request for excluded classs [{}]", className);
                 continue;
             }
             String exFilter = extendFilter(listenerInfo.getFilter(), bctx);
@@ -98,13 +97,13 @@ public class ListenerHookImpl implements ListenerHook {
 
     @SuppressWarnings("rawtypes")
     public void removed(Collection/* <ListenerInfo> */ listeners) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("ListenerHookImpl: removed: " + listeners);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("removed: " + listeners);
         }
 
         for (Object li : listeners) {
             ListenerInfo listenerInfo = (ListenerInfo)li;
-            LOG.fine("*** Filter: " + listenerInfo.getFilter());
+            LOG.debug("Filter {}", listenerInfo.getFilter());
 
             // TODO: determine if service was handled ? 
             String exFilter = extendFilter(listenerInfo.getFilter(), bctx);

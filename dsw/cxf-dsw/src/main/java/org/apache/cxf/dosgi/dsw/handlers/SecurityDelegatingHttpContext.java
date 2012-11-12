@@ -20,7 +20,6 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -30,11 +29,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -49,7 +49,7 @@ import org.osgi.service.http.HttpContext;
  * </p>
  */
 public class SecurityDelegatingHttpContext implements HttpContext {
-  private static final Logger LOG = LogUtils.getL7dLogger(SecurityDelegatingHttpContext.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SecurityDelegatingHttpContext.class);
   public static final String FILTER_PROP = "org.apache.cxf.httpservice.filter";
   public static final String FILTER_REQUIRED_PROP = "org.apache.cxf.httpservice.requirefilter";
   private static final String FILTER_FILTER = "(" + FILTER_PROP + "=*)";
@@ -77,7 +77,7 @@ public class SecurityDelegatingHttpContext implements HttpContext {
     try {
       refs = bundleContext.getServiceReferences(Filter.class.getName(), FILTER_FILTER);
     } catch (InvalidSyntaxException e) {
-      LOG.warning(e.getMessage());
+      LOG.warn(e.getMessage(), e);
       return false;
     }
     if (refs == null || refs.length == 0) {
@@ -91,7 +91,7 @@ public class SecurityDelegatingHttpContext implements HttpContext {
       new Chain(filters).doFilter(request, response);
       return !response.isCommitted();
     } catch (ServletException e) {
-      LOG.warning(e.getMessage());
+      LOG.warn(e.getMessage(), e);
       return false;
     }
   }
@@ -101,7 +101,7 @@ public class SecurityDelegatingHttpContext implements HttpContext {
  * A {@link FilterChain} composed of {@link Filter}s with the
  */
 class Chain implements FilterChain {
-  private static final Logger LOG = Logger.getLogger(Chain.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(Chain.class);
 
   int current = 0;
   Filter[] filters;
@@ -113,7 +113,7 @@ class Chain implements FilterChain {
   public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
     if (current < filters.length && !response.isCommitted()) {
       Filter filter = filters[current++];
-      LOG.info("doFilter() on " + filter);
+      LOG.info("doFilter() on {}", filter);
       filter.doFilter(request, response, this);
     }
   }

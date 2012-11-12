@@ -18,16 +18,16 @@
   */
 package org.apache.cxf.dosgi.topologymanager;
 
-import java.util.logging.Logger;
-
 import org.apache.cxf.dosgi.topologymanager.exporter.TopologyManagerExport;
 import org.apache.cxf.dosgi.topologymanager.importer.TopologyManagerImport;
 import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Activator implements BundleActivator {
-    private static final Logger LOG = Logger.getLogger(Activator.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
 
     private TopologyManagerExport topManager;
     private TopologyManagerImport topManagerImport;
@@ -35,7 +35,7 @@ public class Activator implements BundleActivator {
     private RemoteServiceAdminTracker rsaTracker;
 
     public void start(BundleContext bc) throws Exception {
-        LOG.fine("TopologyManager: start()");
+        LOG.debug("TopologyManager: start()");
         rsaTracker = new RemoteServiceAdminTracker(bc);
         topManager = new TopologyManagerExport(bc, rsaTracker);
         topManagerImport = new TopologyManagerImport(bc, rsaTracker);
@@ -46,7 +46,7 @@ public class Activator implements BundleActivator {
     }
 
     public void stop(BundleContext bc) throws Exception {
-        LOG.fine("TopologyManager: stop()");
+        LOG.debug("TopologyManager: stop()");
         topManager.stop();
         topManagerImport.stop();
         rsaTracker.close();
