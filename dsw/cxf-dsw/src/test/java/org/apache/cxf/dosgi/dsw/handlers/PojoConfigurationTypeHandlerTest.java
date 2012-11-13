@@ -18,7 +18,6 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import junit.framework.TestCase;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
-import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;

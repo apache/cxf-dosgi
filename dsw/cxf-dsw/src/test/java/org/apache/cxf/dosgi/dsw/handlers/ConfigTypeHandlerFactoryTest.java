@@ -26,11 +26,8 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.easymock.EasyMock;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.remoteserviceadmin.EndpointDescription;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class ConfigTypeHandlerFactoryTest extends TestCase {
 

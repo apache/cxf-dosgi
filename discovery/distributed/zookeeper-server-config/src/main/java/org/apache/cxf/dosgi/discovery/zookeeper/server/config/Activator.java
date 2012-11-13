@@ -20,8 +20,6 @@ package org.apache.cxf.dosgi.discovery.zookeeper.server.config;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Hashtable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -30,9 +28,11 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Activator implements BundleActivator {
-    private static final Logger LOG = Logger.getLogger(Activator.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
     private static final String ZOOKEEPER_PORT = "org.apache.cxf.dosgi.discovery.zookeeper.port";
     private static final String PID = "org.apache.cxf.dosgi.discovery.zookeeper.server";
     private ServiceTracker st;
@@ -43,7 +43,7 @@ public class Activator implements BundleActivator {
             if (System.getProperty(ZOOKEEPER_PORT) == null) {
                 String port = getFreePort();
                 System.setProperty(ZOOKEEPER_PORT, port);
-                LOG.info("Global zookeeper port: " + port);
+                LOG.info("Global zookeeper port: {}", port);
             }
         }
         
@@ -59,9 +59,9 @@ public class Activator implements BundleActivator {
                         String zp = System.getProperty(ZOOKEEPER_PORT);
                         props.put("clientPort", zp);
                         cfg.update(props);
-                        LOG.fine("Set zookeeper client port to " + zp);
+                        LOG.debug("Set zookeeper client port to {}", zp);
                     } catch (IOException e) {
-                        LOG.log(Level.SEVERE, "Failed to configure zookeeper server!", e);
+                        LOG.error("Failed to configure zookeeper server!", e);
                     }
                 }
                 return svc;
@@ -81,7 +81,7 @@ public class Activator implements BundleActivator {
         props.put("zookeeper.host", "127.0.0.1");
         props.put("zookeeper.port", System.getProperty(ZOOKEEPER_PORT));
         ms.updated(props);
-        LOG.fine("Passed the zookeeper.host property to the Zookeeper Client managed service.");
+        LOG.debug("Passed the zookeeper.host property to the Zookeeper Client managed service.");
 	}
     
     private String getFreePort() {
@@ -91,7 +91,7 @@ public class Activator implements BundleActivator {
             ss.close();
             return port;
         } catch (IOException e) {
-            LOG.log(Level.SEVERE, "Failed to find a free port!", e);
+            LOG.error("Failed to find a free port!", e);
             return null;
         }
     }    

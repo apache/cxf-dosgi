@@ -26,7 +26,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.Bus;

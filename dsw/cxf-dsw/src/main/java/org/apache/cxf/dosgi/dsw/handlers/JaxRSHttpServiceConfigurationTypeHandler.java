@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.dsw.handlers;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;

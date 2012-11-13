@@ -31,7 +31,6 @@ import org.easymock.EasyMock;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class JaxRSUtilsTest extends TestCase {

@@ -20,7 +20,6 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.Dictionary;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;

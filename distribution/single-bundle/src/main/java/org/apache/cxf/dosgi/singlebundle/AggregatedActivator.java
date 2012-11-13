@@ -27,15 +27,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AggregatedActivator implements BundleActivator {
-    private static final Logger LOG = LogUtils.getL7dLogger(AggregatedActivator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AggregatedActivator.class);
     
     static final String HTTP_PORT_PROPERTY = "org.osgi.service.http.port";
     static final String HTTPS_PORT_PROPERTY = "org.osgi.service.http.port.secure";
@@ -68,7 +67,7 @@ public class AggregatedActivator implements BundleActivator {
         if (port == null || port.length() == 0) {
             port = tryPortFree(DEFAULT_HTTP_PORT);
             if (port == null) {
-                LOG.fine("Port " + DEFAULT_HTTP_PORT + " is not available. ");
+                LOG.debug("Port {} is not available. ", DEFAULT_HTTP_PORT);
                 port = tryPortFree("0");
             }
             LOG.info("Setting HttpService port to: " + port);
@@ -77,10 +76,9 @@ public class AggregatedActivator implements BundleActivator {
             System.setProperty(prop, port);
         } else {
             if (tryPortFree(port) == null) {
-                LOG.warning("The system is configured to use HttpService port " 
-                    + port + ". However this port is already in use.");
+                LOG.warn("The system is configured to use HttpService port {}. However this port is already in use.", port);
             } else {
-                LOG.info("HttpService using port: " + port);
+                LOG.info("HttpService using port: {}", port);
             }
         }
     }
@@ -120,7 +118,7 @@ public class AggregatedActivator implements BundleActivator {
                         ba.start(ctx);
                     }
                 } catch (Throwable th) {
-                    LOG.log(Level.SEVERE, "Failed to start Activator " + s, th);
+                    LOG.error("Failed to start Activator " + s, th);
                 }
             }
 
@@ -141,7 +139,7 @@ public class AggregatedActivator implements BundleActivator {
         	try {
                 ba.stop(ctx);
         	} catch (Throwable ex) {
-        		LOG.warning("BundleActivator " + ba.getClass().getName() + " can not be stopped");
+        		LOG.warn("BundleActivator {} can not be stopped", ba.getClass().getName());
         	}
         }
     }

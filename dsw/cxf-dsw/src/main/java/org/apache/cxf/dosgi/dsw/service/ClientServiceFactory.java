@@ -20,7 +20,6 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.logging.Level;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.IntentUnsatifiedException;

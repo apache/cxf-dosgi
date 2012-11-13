@@ -18,15 +18,7 @@
   */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import junit.framework.TestCase;
-
-import org.easymock.EasyMock;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 public class DistributionProviderImplTest extends TestCase {
     public void testDUMMY(){

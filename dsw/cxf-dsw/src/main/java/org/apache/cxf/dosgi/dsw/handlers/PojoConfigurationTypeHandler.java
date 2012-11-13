@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;

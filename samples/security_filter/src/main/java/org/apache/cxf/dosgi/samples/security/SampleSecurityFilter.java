@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.samples.security;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -30,11 +29,14 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A filter that requires a query string of "secure" to invoke the protected resource.
  */
 public class SampleSecurityFilter implements Filter {
-  private static final Logger LOG = Logger.getLogger(SampleSecurityFilter.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(SampleSecurityFilter.class);
 
   public void destroy() {
     LOG.info("destroy()");
@@ -46,7 +48,7 @@ public class SampleSecurityFilter implements Filter {
       LOG.info("Access granted");
       chain.doFilter(request, response);
     } else {
-      LOG.warning("Access denied");
+      LOG.warn("Access denied");
       ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
     }
   }

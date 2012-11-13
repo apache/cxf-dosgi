@@ -18,7 +18,6 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,13 +26,12 @@ import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
-import org.apache.cxf.dosgi.dsw.service.ExportRegistrationImpl;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.ws.addressing.AttributedURIType;

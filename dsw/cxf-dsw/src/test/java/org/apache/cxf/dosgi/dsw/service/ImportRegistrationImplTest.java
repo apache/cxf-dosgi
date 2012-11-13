@@ -18,15 +18,16 @@
   */
 package org.apache.cxf.dosgi.dsw.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
+import org.junit.Test;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
-
-import org.junit.Test;
 
 public class ImportRegistrationImplTest {
 

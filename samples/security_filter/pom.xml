@@ -54,6 +54,10 @@
         <artifactId>org.apache.servicemix.specs.jsr311-api-1.0</artifactId>
         <version>${servicemix.specs.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+      </dependency>
   </dependencies> 
 
   <build>

@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import junit.framework.TestCase;
 
 public class ClassUtilsTest extends TestCase {

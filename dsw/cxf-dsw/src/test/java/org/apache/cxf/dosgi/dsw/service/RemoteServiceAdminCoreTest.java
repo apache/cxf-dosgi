@@ -18,6 +18,11 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +33,7 @@ import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
+import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -35,13 +41,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class RemoteServiceAdminCoreTest {
 
