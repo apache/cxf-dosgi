@@ -12,6 +12,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 public class IntentUtils {
@@ -67,8 +68,13 @@ public class IntentUtils {
 	        Thread.currentThread().setContextClassLoader(PolicyNamespaceHandler.class.getClassLoader());
 	        
 	        LOG.debug("Loading Intent map from {}", springIntentLocations);
-	        OsgiBundleXmlApplicationContext ctx = new OsgiBundleXmlApplicationContext(springIntentLocations
-	            .toArray(new String[] {}));
+	        OsgiBundleXmlApplicationContext ctx = new OsgiBundleXmlApplicationContext  (springIntentLocations.toArray(new String[] {})) {
+                    @Override
+                    protected void initBeanDefinitionReader(XmlBeanDefinitionReader pBeanDefinitionReader) {
+                        super.initBeanDefinitionReader(pBeanDefinitionReader);
+                        pBeanDefinitionReader.setValidating(false);
+                    }
+                };
 	        ctx.setPublishContextAsService(false);
 	        ctx.setBundleContext(bundleContext);
 	        ctx.refresh();

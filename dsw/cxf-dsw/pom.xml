@@ -87,6 +87,11 @@
             <artifactId>spring-osgi-core</artifactId>
             <version>${spring.osgi.version}</version>
         </dependency> 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency> 
     </dependencies> 
 
     <build>
