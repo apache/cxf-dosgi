@@ -30,6 +30,7 @@ import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
@@ -73,7 +74,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
 
                 @Override
                 String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                        List<AbstractFeature> features, AbstractEndpointFactory factory, 
+                        List<Feature> features, AbstractEndpointFactory factory, 
                         Map sd) {
                     return new String [] {"a.b.c"};
                 }            
@@ -152,7 +153,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
 
                 @Override
                 String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                        List<AbstractFeature> features, AbstractEndpointFactory factory, 
+                        List<Feature> features, AbstractEndpointFactory factory, 
                         Map sd) {
                     return new String [] {};
                 }            
@@ -224,7 +225,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
 
                 @Override
                 String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                        List<AbstractFeature> features, AbstractEndpointFactory factory, 
+                        List<Feature> features, AbstractEndpointFactory factory, 
                         Map sd) {
                     return new String [] {};
                 }            
@@ -356,7 +357,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
 
             @Override
             String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                    List<AbstractFeature> features, AbstractEndpointFactory factory, Map sd) {
+                    List<Feature> features, AbstractEndpointFactory factory, Map sd) {
                 return new String[] { "a.b.c" };
             }
         };

@@ -151,26 +151,21 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
     	}
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+        String[] intents = new String[] { "HTTP" };
+
+        // The properties for the EndpointDescription
+        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] { Constants.RS_CONFIG_TYPE },
+                address, intents);
+
         try {
-            String[] intents = new String[] {
-                "HTTP"
-            };
-
-            // The properties for the EndpointDescription
-            Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {
-                Constants.RS_CONFIG_TYPE
-            }, address,intents);
-            EndpointDescription endpdDesc = null;
-
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-
-            // add the information on the new Endpoint to the export registration
             return new ExportResult(endpointProps, server);
+        } catch (Exception e) {
+            return new ExportResult(endpointProps, e);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
-
 
     }
 

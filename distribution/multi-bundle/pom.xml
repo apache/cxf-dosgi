@@ -51,7 +51,12 @@
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-javamail_1.4_spec</artifactId>
-      <version>1.2</version>
+      <version>1.7.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jpa_2.0_spec</artifactId>
+      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
@@ -73,11 +78,6 @@
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
     </dependency>
-    <dependency>
-	<groupId>org.osgi</groupId>
-	<artifactId>org.osgi.enterprise</artifactId>
-	<version>${osgi.version}</version>
-    </dependency> 
     <dependency>  
         <groupId>org.slf4j</groupId>  
         <artifactId>slf4j-api</artifactId>  
@@ -86,7 +86,6 @@
         <groupId>org.slf4j</groupId>  
         <artifactId>slf4j-jcl</artifactId>  
     </dependency>
-    
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>com.springsource.org.jdom</artifactId>
@@ -143,11 +142,6 @@
       <version>${spring.osgi.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.aggregate</groupId>
-      <artifactId>jetty-all-server</artifactId>
-      <version>${jetty.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-spi</artifactId>
       <version>${pax.web.version}</version>
@@ -156,6 +150,11 @@
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-runtime</artifactId>
       <version>${pax.web.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.aggregate</groupId>
+      <artifactId>jetty-all-server</artifactId>
+      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
@@ -174,17 +173,17 @@
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
-      <artifactId>org.apache.servicemix.specs.jaxb-api-2.1</artifactId>
+      <artifactId>org.apache.servicemix.specs.jaxb-api-2.2</artifactId>
       <version>${servicemix.specs.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
-      <artifactId>org.apache.servicemix.specs.jaxws-api-2.1</artifactId>
+      <artifactId>org.apache.servicemix.specs.jaxws-api-2.2</artifactId>
       <version>${servicemix.specs.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
-      <artifactId>org.apache.servicemix.specs.jsr311-api-1.1.1</artifactId>
+      <artifactId>org.apache.servicemix.specs.jsr339-api-m10</artifactId>
       <version>${servicemix.specs.version}</version>
     </dependency>
     <dependency>
@@ -223,6 +222,11 @@
        <artifactId>org.apache.servicemix.bundles.asm</artifactId> 
        <version>${asm.bundle.version}</version> 
     </dependency>
+    <dependency>
+       <groupId>org.apache.servicemix.bundles</groupId> 
+       <artifactId>org.apache.servicemix.bundles.commons-pool</artifactId> 
+       <version>${commons.pool.bundle.version}</version> 
+    </dependency>
 
     <dependency>
        <groupId>org.codehaus.woodstox</groupId> 
@@ -234,11 +238,7 @@
        <artifactId>woodstox-core-asl</artifactId> 
        <version>${woodstox.bundle.version}</version> 
     </dependency>
-    <dependency>
-       <groupId>org.apache.servicemix.bundles</groupId> 
-       <artifactId>org.apache.servicemix.bundles.commons-pool</artifactId> 
-       <version>${commons.pool.bundle.version}</version> 
-    </dependency>
+
     <dependency>
        <groupId>org.apache.servicemix.bundles</groupId> 
        <artifactId>org.apache.servicemix.bundles.joda-time</artifactId>
@@ -249,11 +249,94 @@
        <artifactId>org.apache.servicemix.bundles.opensaml</artifactId>
        <version>2.4.1_1</version>
     </dependency>
+
+    <dependency>
+        <groupId>org.apache.aries</groupId>
+        <artifactId>org.apache.aries.util</artifactId>
+        <version>0.3.1</version>
+    </dependency>   
+    <dependency>
+        <groupId>org.apache.aries.proxy</groupId>
+        <artifactId>org.apache.aries.proxy</artifactId>
+        <version>0.3.1</version>
+    </dependency>    
+    <dependency>
+        <groupId>org.apache.aries.blueprint</groupId>
+        <artifactId>org.apache.aries.blueprint</artifactId>
+        <version>0.3.2</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-api</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-core</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-simple</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxws</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-bindings-xml</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-bindings-soap</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-databinding-jaxb</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-databinding-aegis</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+        <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-ws-policy</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-transports-http</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-transports-http-jetty</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-rs-extension-providers</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-bundle-minimal</artifactId>
+      <artifactId>cxf-bundle-compatible</artifactId>
       <version>${cxf.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-discovery-local</artifactId>
@@ -310,6 +393,11 @@
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-discovery-distributed</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+	<groupId>org.osgi</groupId>
+	<artifactId>org.osgi.enterprise</artifactId>
+	<version>${osgi.version}</version>
     </dependency>
     <dependency>
         <groupId>org.apache.cxf.dosgi</groupId>

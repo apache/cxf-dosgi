@@ -25,8 +25,8 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.jaxrs.provider.aegis.AegisElementProvider;
 import org.easymock.EasyMock;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -80,8 +80,8 @@ public class JaxRSUtilsTest extends TestCase {
 
     public void testServiceProviderProperty() throws Exception {
 
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        Bundle bundle = EasyMock.createNiceMock(Bundle.class);
+        BundleContext bc = EasyMock.createMock(BundleContext.class);
+        Bundle bundle = EasyMock.createMock(Bundle.class);
         bc.getBundle();
         EasyMock.expectLastCall().andReturn(bundle).times(2);
         bundle.loadClass(AegisElementProvider.class.getName());
@@ -92,8 +92,8 @@ public class JaxRSUtilsTest extends TestCase {
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.RS_PROVIDER_PROP_KEY,
-                  "\r\n org.apache.cxf.jaxrs.provider.AegisElementProvider , \r\n"
-                      + "org.apache.cxf.jaxrs.provider.JAXBElementProvider\r\n");
+                "\r\n " + AegisElementProvider.class.getName() + " , \r\n"
+                        + JAXBElementProvider.class.getName() + "\r\n");
 
         props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");
         addRequiredProps(props);
@@ -106,8 +106,8 @@ public class JaxRSUtilsTest extends TestCase {
 
     public void testServiceProviderStrings() throws Exception {
 
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        Bundle bundle = EasyMock.createNiceMock(Bundle.class);
+        BundleContext bc = EasyMock.createMock(BundleContext.class);
+        Bundle bundle = EasyMock.createMock(Bundle.class);
         bc.getBundle();
         EasyMock.expectLastCall().andReturn(bundle).times(2);
         bundle.loadClass(AegisElementProvider.class.getName());
@@ -118,8 +118,8 @@ public class JaxRSUtilsTest extends TestCase {
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.RS_PROVIDER_PROP_KEY, new String[] {
-            "\r\n org.apache.cxf.jaxrs.provider.AegisElementProvider",
-            "org.apache.cxf.jaxrs.provider.JAXBElementProvider\r\n"
+            "\r\n " + AegisElementProvider.class.getName(),
+            JAXBElementProvider.class.getName() + "\r\n"
         });
 
         props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");

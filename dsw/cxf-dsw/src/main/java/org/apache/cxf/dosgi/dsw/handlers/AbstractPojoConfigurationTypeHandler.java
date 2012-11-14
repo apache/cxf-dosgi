@@ -40,6 +40,7 @@ import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -84,7 +85,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     String [] applyIntents(BundleContext dswContext,
                            BundleContext callingContext,
-                           List<AbstractFeature> features,
+                           List<Feature> features,
                            AbstractEndpointFactory factory,
                            Map sd) throws IntentUnsatifiedException {
         String[] requestedIntents = getRequestedIntents(sd);
@@ -242,7 +243,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     }
     
     private boolean processIntent(Set<String> appliedIntents,
-                                  List<AbstractFeature> features,
+                                  List<Feature> features,
                                   AbstractEndpointFactory factory, String intentName,
                                   IntentMap intentMap) throws IntentUnsatifiedException {
         boolean rc = processIntent(features, factory, intentName, intentMap);
@@ -250,7 +251,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return rc;
     }
     
-    private boolean processIntent(List<AbstractFeature> features,
+    private boolean processIntent(List<Feature> features,
                                   AbstractEndpointFactory factory, String intentName,
                                   IntentMap intentMap) throws IntentUnsatifiedException {
         Object intent = intentMap.get(intentName);
@@ -258,8 +259,8 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
             if (PROVIDED_INTENT_VALUE.equalsIgnoreCase((String) intent)) {
                 return false;
             }
-        } else if (intent instanceof AbstractFeature) {
-            AbstractFeature feature = (AbstractFeature)intent;
+        } else if (intent instanceof Feature) {
+            Feature feature = (Feature)intent;
             LOG.info("Applying intent: " + intentName
                      + " via feature: " + feature);
             features.add(feature);

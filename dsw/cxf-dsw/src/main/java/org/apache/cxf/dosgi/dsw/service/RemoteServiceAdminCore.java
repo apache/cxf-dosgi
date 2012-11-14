@@ -245,22 +245,15 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 Class<?> interfaceClass = ClassUtils.getInterfaceClass(serviceObject, interfaceName);
 
                 if (interfaceClass != null) {
-                    try {
-                        ExportResult  exportResult = handler.createServer(serviceReference, bctx, callingContext, serviceProperties,
-                                             interfaceClass, serviceObject);
-                        LOG.info("created server for interface " + iface);
-
-                        EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
-                        ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
+                    ExportResult exportResult = handler.createServer(serviceReference, bctx, callingContext,
+                            serviceProperties, interfaceClass, serviceObject);
+                    LOG.info("created server for interface " + iface);
+                    EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
+                    ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
+                    if (exportRegistration.getException() == null) {
                         exportRegistration.startServiceTracker(bctx);
-                        exportRegs.put(iface, exportRegistration);
-                    } catch (Exception e) {
-                        LOG.warn("server creation for interface {} failed!", iface);
-                        EndpointDescription epd = new EndpointDescription(new HashMap<String, Object>());
-                        ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
-                        exportRegistration.setException(e);
-                        exportRegs.put(iface, exportRegistration);
                     }
+                    exportRegs.put(iface, exportRegistration);
                 }
             }
 

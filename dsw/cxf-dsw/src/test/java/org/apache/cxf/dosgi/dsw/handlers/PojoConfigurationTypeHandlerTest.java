@@ -35,6 +35,7 @@ import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
@@ -137,7 +138,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
             
             @Override
             String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                List<AbstractFeature> features, AbstractEndpointFactory factory, Map sd) {
+                List<Feature> features, AbstractEndpointFactory factory, Map sd) {
                 return new String[0];
             }
         };
@@ -273,7 +274,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
             @Override
             String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                List<AbstractFeature> features, AbstractEndpointFactory factory, Map sd) {
+                List<Feature> features, AbstractEndpointFactory factory, Map sd) {
                 return new String []{};
             }
         };
@@ -359,7 +360,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext dswContext = control.createMock(BundleContext.class);
         BundleContext callingContext = control.createMock(BundleContext.class);        
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
@@ -395,7 +396,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext dswContext = control.createMock(BundleContext.class);
         BundleContext callingContext = control.createMock(BundleContext.class);        
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
@@ -431,7 +432,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext dswContext = control.createMock(BundleContext.class);
         BundleContext callingContext = control.createMock(BundleContext.class);        
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
@@ -469,7 +470,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext dswContext = control.createMock(BundleContext.class);
         BundleContext callingContext = control.createMock(BundleContext.class);
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
         
@@ -513,7 +514,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         BundleContext dswContext = control.createMock(BundleContext.class);
         BundleContext callingContext = control.createMock(BundleContext.class);
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
         
@@ -552,7 +553,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         BundleContext dswContext = control.createMock(BundleContext.class);
         BundleContext callingContext = control.createMock(BundleContext.class);
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
         
@@ -626,7 +627,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         IMocksControl control = EasyMock.createNiceControl();
         final BundleContext dswContext = control.createMock(BundleContext.class);
         final BundleContext callingContext = control.createMock(BundleContext.class);        
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
@@ -657,7 +658,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         p.applyIntents(dswContext, callingContext, features, factory, props);
 
         List<String> featureNames = new ArrayList<String>();
-        for (AbstractFeature f : features) {
+        for (Feature f : features) {
             featureNames.add(f.toString());
         }
         return featureNames;
@@ -675,7 +676,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         IMocksControl control = EasyMock.createNiceControl();
         final BundleContext dswContext = control.createMock(BundleContext.class);
         final BundleContext callingContext = control.createMock(BundleContext.class);        
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
         

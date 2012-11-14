@@ -28,6 +28,7 @@ import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 import org.apache.cxf.dosgi.samples.greeter.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
+import org.apache.cxf.dosgi.systests2.common.test1.GreeterDataImpl;
 import org.apache.cxf.dosgi.systests2.common.test1.MyActivator;
 import org.apache.cxf.dosgi.systests2.common.test1.MyServiceTracker;
 import org.apache.cxf.dosgi.systests2.common.test1.StartServiceTracker;
@@ -48,6 +49,7 @@ public abstract class AbstractTestImportService {
             .add(MyActivator.class)
             .add(MyServiceTracker.class)
             .add(StartServiceTracker.class)
+            .add(GreeterDataImpl.class)
             .add("OSGI-INF/remote-service/remote-services.xml", AbstractTestImportService.class.getResource("/rs-test1.xml"))
             .set(Constants.BUNDLE_SYMBOLICNAME, "testClientBundle")
             .set(Constants.EXPORT_PACKAGE, "org.apache.cxf.dosgi.systests2.common.test1")

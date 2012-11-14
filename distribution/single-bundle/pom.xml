@@ -37,8 +37,8 @@
   <properties>
     <topDirectoryLocation>../..</topDirectoryLocation>
   </properties>
-  
- <dependencies>
+
+  <dependencies>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-annotation_1.0_spec</artifactId>
@@ -208,7 +208,6 @@
        <artifactId>org.apache.servicemix.bundles.asm</artifactId> 
        <version>${asm.bundle.version}</version> 
     </dependency>
-            
     <dependency>
        <groupId>org.apache.servicemix.bundles</groupId> 
        <artifactId>org.apache.servicemix.bundles.commons-pool</artifactId> 
@@ -220,7 +219,6 @@
        <artifactId>stax2-api</artifactId> 
        <version>3.1.1</version> 
     </dependency>
-
     <dependency>
        <groupId>org.codehaus.woodstox</groupId> 
        <artifactId>woodstox-core-asl</artifactId> 
@@ -264,7 +262,11 @@
       <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
       <version>${project.version}</version>
     </dependency>
-   
+    <dependency>
+      <groupId>org.apache.cxf.dosgi</groupId>
+      <artifactId>cxf-dosgi-ri-topology-manager</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
@@ -289,17 +291,10 @@
       <artifactId>cxf-dosgi-ri-discovery-distributed</artifactId>
       <version>${project.version}</version>
     </dependency>
- 
     <dependency>
 	<groupId>org.osgi</groupId>
 	<artifactId>org.osgi.enterprise</artifactId>
 	<version>${osgi.version}</version>
-    </dependency>
-   
-    <dependency>
-      <groupId>org.apache.cxf.dosgi</groupId>
-      <artifactId>cxf-dosgi-ri-topology-manager</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>

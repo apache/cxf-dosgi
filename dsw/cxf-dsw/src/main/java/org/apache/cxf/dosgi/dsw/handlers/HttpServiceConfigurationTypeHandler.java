@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;
@@ -161,18 +160,19 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         		constructAddress(dswContext, contextRoot, relativeEndpointAddress);
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+        String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
+
+        // The properties for the EndpointDescription
+        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {
+            Constants.WS_CONFIG_TYPE
+        }, completeEndpointAddress, intents);
+
         try {
-            String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
-
-            // The properties for the EndpointDescription
-            Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {
-                Constants.WS_CONFIG_TYPE
-            }, completeEndpointAddress, intents);
-
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-
             return new ExportResult(endpointProps, server);
+        } catch (Exception ex) {
+            return new ExportResult(endpointProps, ex);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
@@ -216,11 +216,15 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         }
         
         String address = getAddress(https ? "https" : "http", hostName, port, contextRoot);
-        if (!StringUtils.isEmpty(relativeEndpointAddress) 
+        if (!isEmpty(relativeEndpointAddress) 
         	&& !relativeEndpointAddress.equals("/")) {
         	address += relativeEndpointAddress;
         }
         return address;
+    }
+
+    private boolean isEmpty(String relativeEndpointAddress) {
+        return relativeEndpointAddress == null || "".equals(relativeEndpointAddress);
     }
 
     protected HttpService getHttpService() {

@@ -48,13 +48,11 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>${osgi.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.enterprise</artifactId>
-            <version>${osgi.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -66,9 +64,13 @@
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle-minimal</artifactId>
+            <artifactId>cxf-api</artifactId>
             <version>${cxf.version}</version>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-core</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency> 
             <groupId>org.apache.log4j</groupId> 

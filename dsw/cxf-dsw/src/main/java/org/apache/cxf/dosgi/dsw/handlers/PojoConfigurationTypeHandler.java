@@ -115,16 +115,17 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         setWsdlProperties(factory, callingContext, sd, false);
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
+        String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
 
-            // The properties for the EndpointDescription
-            Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, address,intents);
-            
+        // The properties for the EndpointDescription
+        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, address,intents);
+
+        try {
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-
-            return new ExportResult(endpointProps, server);
+            return new ExportResult(endpointProps, server);                
+        } catch (Exception e) {
+            return new ExportResult(endpointProps, e);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }

@@ -27,7 +27,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.osgi.framework.Bundle;
@@ -40,27 +39,6 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class OsgiUtilsTest extends TestCase {
-
-    public void testNoIntentMap() {
-        Bundle b = EasyMock.createNiceMock(Bundle.class);
-        EasyMock.replay(b);
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
-        EasyMock.replay(bc);
-        
-        assertNull(IntentUtils.readIntentMap(bc));
-        assertNotNull(IntentUtils.getIntentMap(bc));
-    }    
-    
-    public void testIntentsParsingAndFormatting() {
-        String initial = "A SOAP_1.1 integrity";
-
-        String[] expected = {"A", "SOAP_1.1", "integrity"};
-        String[] actual = IntentUtils.parseIntents(initial);
-        assertTrue(Arrays.equals(expected, actual));
-        
-        assertEquals(initial, IntentUtils.formatIntents(actual));
-    }
 
     public void testMultiValuePropertyAsString() {
         assertEquals(Collections.singleton("hi"), 

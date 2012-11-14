@@ -28,7 +28,7 @@ import java.util.Map;
 import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.jaxrs.model.UserResource;
-import org.apache.cxf.jaxrs.provider.AegisElementProvider;
+import org.apache.cxf.jaxrs.provider.aegis.AegisElementProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;

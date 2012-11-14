@@ -23,8 +23,8 @@
 
         <osgi.version>4.2.0</osgi.version>
 
-        <cxf.version>2.5.4</cxf.version>
-        <cxf.build-utils.version>2.4.0</cxf.build-utils.version>
+        <cxf.version>2.7.0</cxf.version>
+        <cxf.build-utils.version>2.4.1</cxf.build-utils.version>
         <felix.version>3.0.8</felix.version>
         <spring.version>3.0.6.RELEASE</spring.version>
         <spring.osgi.version>1.2.1</spring.osgi.version>
@@ -32,7 +32,7 @@
 
         <remote.service.admin.interfaces.version>1.0.0</remote.service.admin.interfaces.version>
 
-        <servicemix.specs.version>1.9.0</servicemix.specs.version>
+        <servicemix.specs.version>2.1.0</servicemix.specs.version>
         <pax.web.version>1.0.3</pax.web.version>
         <servlet.version>3.0</servlet.version>
         <log4j.version>1.2.15</log4j.version>
@@ -53,6 +53,16 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${osgi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.enterprise</artifactId>
+                <version>${osgi.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -81,7 +91,7 @@
                 <version>2.5.2</version>
                 <scope>test</scope>
             </dependency>
-       </dependencies>
+        </dependencies>
     </dependencyManagement>
 
     <build>

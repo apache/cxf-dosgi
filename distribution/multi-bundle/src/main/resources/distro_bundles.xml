@@ -2,7 +2,8 @@
 <bundles>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-annotation_1.0_spec-1.1.1.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-activation_1.1_spec-1.1.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-javamail_1.4_spec-1.2.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-jpa_2.0_spec-1.1.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-javamail_1.4_spec-1.7.1.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-servlet_3.0_spec-1.0.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-ws-metadata_2.0_spec-1.1.3.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/com.springsource.org.apache.commons.logging-1.1.1.jar</bundle>
@@ -36,12 +37,31 @@
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.bundles.commons-pool-${commons.pool.bundle.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.saaj-api-1.3-${servicemix.specs.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.stax-api-1.0-${servicemix.specs.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jaxb-api-2.1-${servicemix.specs.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jaxws-api-2.1-${servicemix.specs.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jsr311-api-1.1.1-${servicemix.specs.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jaxb-api-2.2-${servicemix.specs.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jaxws-api-2.2-${servicemix.specs.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.specs.jsr339-api-m10-${servicemix.specs.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.bundles.joda-time-1.5.2_4.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.bundles.opensaml-2.4.1_1.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-bundle-minimal-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.aries.util-0.3.1.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.aries.proxy-0.3.1.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.aries.blueprint-0.3.2.jar</bundle>
+
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-api-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-core-${cxf.version}.jar</bundle>
+
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-frontend-simple-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-frontend-jaxws-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-frontend-jaxrs-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-databinding-jaxb-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-databinding-aegis-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-bindings-xml-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-bindings-soap-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-transports-http-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-transports-http-jetty-${cxf.version}.jar</bundle>  
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-ws-policy-${cxf.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-rs-extension-providers-${cxf.version}.jar</bundle>
+  
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-bundle-compatible-${cxf.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-discovery-local-${project.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.osgi.enterprise-${osgi.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-dsw-cxf-${project.version}.jar</bundle>

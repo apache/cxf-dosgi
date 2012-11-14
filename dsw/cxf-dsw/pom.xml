@@ -43,40 +43,63 @@
             org.apache.cxf.dosgi.*;version="${project.version}"
         </bundle.export.package>
     </properties>
-    
+
     <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.enterprise</artifactId>
-            <version>${osgi.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle-minimal</artifactId>
+            <artifactId>cxf-rt-core</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-        <dependency> 
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>${felix.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.osgi.foundation</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency> 
         <dependency>
-            <groupId>org.jdom</groupId>  
-            <artifactId>com.springsource.org.jdom</artifactId>  
-            <version>1.1.0</version> 
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-aegis</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-providers</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_${servlet.version}_spec</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>com.springsource.org.jdom</artifactId>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>  
+        </dependency>
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
@@ -86,13 +109,29 @@
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-core</artifactId>
             <version>${spring.osgi.version}</version>
-        </dependency> 
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
             <version>${spring.version}</version>
-        </dependency> 
-    </dependencies> 
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+    </dependencies>
 
     <build>
         <plugins>
@@ -102,8 +141,11 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Name>CXF dOSGi Remote Service Admin Implementation</Bundle-Name>
-                        <Bundle-Description>This bundle contains the implementation required by the CXF Distributed Software Bundle</Bundle-Description>
+                        <Bundle-Name>CXF dOSGi Remote Service Admin
+                            Implementation</Bundle-Name>
+                        <Bundle-Description>This bundle contains the
+                            implementation required by the CXF
+                            Distributed Software Bundle</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
                         <Import-Package>${bundle.import.package}</Import-Package>
@@ -112,7 +154,7 @@
                         <Spring-Context>META-INF/spring/*.xml;create-asynchrously:=false</Spring-Context>
                     </instructions>
                 </configuration>
-            </plugin> 
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -124,5 +166,5 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>    
+    </build>
 </project>
