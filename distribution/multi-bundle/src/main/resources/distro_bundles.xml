@@ -11,23 +11,15 @@
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/commons-lang-2.6.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-core-${spring.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-beans-${spring.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-context-${spring.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/com.springsource.org.aopalliance-1.0.0.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/slf4j-api-${slf4j.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/slf4j-jcl-${slf4j.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-aop-${spring.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-asm-${spring.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-expression-${spring.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-osgi-io-${spring.osgi.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-osgi-core-${spring.osgi.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-osgi-extender-${spring.osgi.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/jetty-all-server-${jetty.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/pax-web-spi-${pax.web.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/pax-web-runtime-${pax.web.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/pax-web-jetty-${pax.web.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/pax-logging-api-${pax.logging.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/pax-logging-service-${pax.logging.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.bundles.jaxb-impl-${jaxbimpl.bundle.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.bundles.wsdl4j-${wsdl4j.bundle.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.bundles.xmlsec-${xmlsec.bundle.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/xmlsec-${xmlsec.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/xmlschema-core-${xmlschema.bundle.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.bundles.asm-${asm.bundle.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.bundles.xmlresolver-${xmlresolver.bundle.version}.jar</bundle>
@@ -45,10 +37,12 @@
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.aries.util-0.3.1.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.aries.proxy-0.3.1.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.aries.blueprint-0.3.2.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.osgi.enterprise-${osgi.version}.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.felix.configadmin-1.2.8.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.felix.fileinstall-3.1.10.jar</bundle>
 
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-api-${cxf.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-core-${cxf.version}.jar</bundle>
-
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-frontend-simple-${cxf.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-frontend-jaxws-${cxf.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-frontend-jaxrs-${cxf.version}.jar</bundle>
@@ -60,11 +54,9 @@
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-transports-http-jetty-${cxf.version}.jar</bundle>  
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-ws-policy-${cxf.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-rt-rs-extension-providers-${cxf.version}.jar</bundle>
-  
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-bundle-compatible-${cxf.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-discovery-local-${project.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.osgi.enterprise-${osgi.version}.jar</bundle>
+  
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-dsw-cxf-${project.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-topology-manager-${project.version}.jar</bundle>
-  
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-discovery-local-${project.version}.jar</bundle>  
 </bundles>

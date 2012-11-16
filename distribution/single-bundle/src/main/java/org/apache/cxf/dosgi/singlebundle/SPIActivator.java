@@ -38,8 +38,6 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.SynchronousBundleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.osgi.io.OsgiBundleResourcePatternResolver;
 
 public class SPIActivator implements BundleActivator, SynchronousBundleListener {
     private static final Logger LOG = LoggerFactory.getLogger(SPIActivator.class);
@@ -67,14 +65,14 @@ public class SPIActivator implements BundleActivator, SynchronousBundleListener 
         Map<String, Callable<Class>> map = factories.get(bundle.getBundleId());
 
         Vector<URL> v = new Vector<URL>();
-        try {
-            Resource[] resources = new OsgiBundleResourcePatternResolver(bundle).getResources("classpath*:META-INF/services/*");
-            for (Resource r : resources) {
-                v.add(r.getURL());
-            }
-        } catch (IOException e1) {
-            LOG.error("Failed to resolve service resources", e1);
-        }
+//        try {
+//            Resource[] resources = bundle.getResources("classpath*:META-INF/services/*");
+//            for (Resource r : resources) {
+//                v.add(r.getURL());
+//            }
+//        } catch (IOException e1) {
+//            LOG.error("Failed to resolve service resources", e1);
+//        }
 
         Enumeration<URL> e = v.elements();
         if (e != null) {

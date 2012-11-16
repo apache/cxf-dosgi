@@ -5,22 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
-import org.apache.cxf.ws.policy.spring.PolicyNamespaceHandler;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 public class IntentUtils {
     private static final Logger LOG = LoggerFactory.getLogger(IntentUtils.class);
-
-    private static final String[] INTENT_MAP = {
-        "/OSGI-INF/cxf/intents/intent-map.xml"
-    };
 
     public static String formatIntents(String[] intents) {
         StringBuilder sb = new StringBuilder();
@@ -56,39 +48,10 @@ public class IntentUtils {
         return im;
     }
 
+    
+    
     public static IntentMap readIntentMap(BundleContext bundleContext) {
-        List<String> springIntentLocations = new ArrayList<String>();
-        for (String mapFile : INTENT_MAP) {
-            if (bundleContext.getBundle().getResource(mapFile) == null) {
-                OsgiUtils.LOG.info("Could not find intent map file " + mapFile);
-                return null;
-            }
-            springIntentLocations.add("classpath:" + mapFile);
-        }
-
-        // switch to cxf bundle classloader for spring
-        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(PolicyNamespaceHandler.class.getClassLoader());
-
-        LOG.debug("Loading Intent map from {}", springIntentLocations);
-        OsgiBundleXmlApplicationContext ctx = new OsgiBundleXmlApplicationContext(springIntentLocations.toArray(new String[] {})) {
-            @Override
-            protected void initBeanDefinitionReader(XmlBeanDefinitionReader pBeanDefinitionReader) {
-                super.initBeanDefinitionReader(pBeanDefinitionReader);
-                pBeanDefinitionReader.setValidating(false);
-            }
-        };
-        ctx.setPublishContextAsService(false);
-        ctx.setBundleContext(bundleContext);
-        ctx.refresh();
-        LOG.debug("application context: {}", ctx);
-        IntentMap im = (IntentMap) ctx.getBean("intentMap");
-        LOG.debug("retrieved intent map: {}", im);
-
-        Thread.currentThread().setContextClassLoader(oldClassLoader);
-
-        return im;
-
+        return new DefaultIntentMapFactory().create();
     }
 
     @SuppressWarnings("rawtypes")

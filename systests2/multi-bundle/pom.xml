@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,30 +17,55 @@
     <packaging>jar</packaging>
 
     <name>Distributed OSGi System Tests Multi-Bundle</name>
-    
+
     <properties>
         <!-- this is temporary! -->
-        <!--
-        <maven.test.skip>true</maven.test.skip>
-        -->
+        <!-- <maven.test.skip>true</maven.test.skip> -->
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam</artifactId>
-            <version>1.2.4</version>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-atinject_1.0_spec</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam-junit</artifactId>
-            <version>1.2.4</version>
+            <artifactId>pax-exam-junit4</artifactId>
+            <version>${exam.version}</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam-container-default</artifactId>
-            <version>1.2.4</version>
+            <artifactId>pax-exam-inject</artifactId>
+            <version>${exam.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-native</artifactId>
+            <version>${exam.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-link-mvn</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>1.5.0</version>
+            <scope>test</scope>
+        </dependency>
+ 
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>3.2.2</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.ops4j.pax.swissbox</groupId>
             <artifactId>pax-swissbox-tinybundles</artifactId>
@@ -72,9 +98,19 @@
             <artifactId>cxf-rt-core</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-        <dependency> 
-            <groupId>org.apache.log4j</groupId> 
-            <artifactId>com.springsource.org.apache.log4j</artifactId> 
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-bindings-soap</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.log4j</groupId>
+            <artifactId>com.springsource.org.apache.log4j</artifactId>
             <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
@@ -84,16 +120,16 @@
             <version>${zookeeper.version}</version>
             <exclusions>
                 <exclusion>
-                   <groupId>com.sun.jdmk</groupId>
-                   <artifactId>jmxtools</artifactId> 
+                    <groupId>com.sun.jdmk</groupId>
+                    <artifactId>jmxtools</artifactId>
                 </exclusion>
                 <exclusion>
-                   <groupId>com.sun.jmx</groupId>
-                   <artifactId>jmxri</artifactId> 
+                    <groupId>com.sun.jmx</groupId>
+                    <artifactId>jmxri</artifactId>
                 </exclusion>
                 <exclusion>
-                   <groupId>log4j</groupId>
-                   <artifactId>log4j</artifactId> 
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -101,7 +137,7 @@
             <groupId>org.apache.cxf.dosgi</groupId>
             <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-server</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>           
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
@@ -117,34 +153,25 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jcl</artifactId>
-            <scope>test</scope>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.1</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency> 
     </dependencies>
 
     <build>
         <plugins>
             <!-- use pax exam maven plugin -->
 
-            <!--
-            Note: settings and dependencies for the final osgi runtime (TESTS) are just used in TestCases
-            that annotated with this:
-            @RunWith( MavenConfiguredJUnit4TestRunner.class )
-
-            All other testcases will use their own settings/provisioning inside @Configure Methods.
-            -->
+            <!-- Note: settings and dependencies for the final osgi runtime 
+                (TESTS) are just used in TestCases that annotated with this: @RunWith( MavenConfiguredJUnit4TestRunner.class 
+                ) All other testcases will use their own settings/provisioning inside @Configure 
+                Methods. -->
             <plugin>
                 <groupId>org.ops4j.pax.exam</groupId>
                 <artifactId>maven-paxexam-plugin</artifactId>
@@ -169,10 +196,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <!--
-                        <org.apache.cxf.dosgi.test.debug.port>5005</org.apache.cxf.dosgi.test.debug.port>
-                        <org.apache.cxf.dosgi.test.serviceWaitTimeout>180</org.apache.cxf.dosgi.test.serviceWaitTimeout>
-                        -->
+                        <!-- <org.apache.cxf.dosgi.test.debug.port>5005</org.apache.cxf.dosgi.test.debug.port> 
+                            <org.apache.cxf.dosgi.test.serviceWaitTimeout>180</org.apache.cxf.dosgi.test.serviceWaitTimeout> -->
                         <java.util.logging.config.file>${project.build.directory}/test-classes/logging.properties</java.util.logging.config.file>
                     </systemPropertyVariables>
                 </configuration>

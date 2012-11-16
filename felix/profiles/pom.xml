@@ -122,9 +122,9 @@
           <version>${wsdl4j.bundle.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.apache.servicemix.bundles</groupId> 
-          <artifactId>org.apache.servicemix.bundles.xmlsec</artifactId> 
-          <version>${xmlsec.bundle.version}</version>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>${xmlsec.version}</version>
         </dependency>
 
         <dependency>

@@ -50,8 +50,7 @@ public class ActivatorTest extends TestCase{
         
         control.replay();
         Activator a = new Activator();
-        a.setBundleContext(bc);
-        a.start();
+        a.start(bc);
         control.verify();
     }
     

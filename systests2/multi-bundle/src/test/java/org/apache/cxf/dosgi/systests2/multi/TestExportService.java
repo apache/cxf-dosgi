@@ -23,11 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.inject.Inject;
+
 import org.apache.cxf.dosgi.systests2.common.AbstractTestExportService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.CoreOptions;
-import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
@@ -45,15 +46,16 @@ public class TestExportService extends AbstractTestExportService {
         
         List<Option> opts = new ArrayList<Option>();
 
-        // Run this test under Felix. 
-        opts.add(CoreOptions.frameworks(CoreOptions.felix()));
-        
         for(Map.Entry<Integer, String> entry : bundles.entrySet()) {
-            opts.add(CoreOptions.bundle(entry.getValue()).startLevel(entry.getKey()));
+            String bundleUri = entry.getValue();
+            if (!bundleUri.contains("pax-logging")) {
+                opts.add(CoreOptions.bundle(bundleUri));
+            }
         }
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject().startLevel(++startLevel));
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject().startLevel(++startLevel));
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject().startLevel(++startLevel));
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles" ).artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"));
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject());
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject());
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject());
         opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));
         
         // For debugging...

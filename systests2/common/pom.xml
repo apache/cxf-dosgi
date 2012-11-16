@@ -38,7 +38,6 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.enterprise</artifactId>
-            <version>${osgi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.swissbox</groupId>
@@ -48,21 +47,28 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle-minimal</artifactId>
+            <artifactId>cxf-rt-core</artifactId>
             <version>${cxf.version}</version>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-aegis</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
             <artifactId>cxf-dosgi-ri-samples-greeter-impl</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
             <artifactId>cxf-dosgi-ri-samples-greeter-interface</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

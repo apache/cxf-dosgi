@@ -105,32 +105,6 @@
             <artifactId>easymockclassextension</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>spring-osgi-core</artifactId>
-            <version>${spring.osgi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -150,8 +124,8 @@
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
                         <Import-Package>${bundle.import.package}</Import-Package>
                         <Export-Package>${bundle.export.package}</Export-Package>
+                        <Bundle-Activator>org.apache.cxf.dosgi.dsw.Activator</Bundle-Activator>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Spring-Context>META-INF/spring/*.xml;create-asynchrously:=false</Spring-Context>
                     </instructions>
                 </configuration>
             </plugin>

@@ -43,7 +43,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
     private BundleContext bctx;
     private ZooKeeper zookeeper;
     private List<PublishingEndpointListener> listeners = new ArrayList<PublishingEndpointListener>();
-    private ServiceRegistration serviceRegistartion;
+    private ServiceRegistration serviceRegistration;
 
     public PublishingEndpointListenerFactory(ZooKeeper zooKeeper, BundleContext bctx) {
         this.bctx = bctx;
@@ -74,12 +74,12 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
         Properties props = new Properties();
         props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(&(" + Constants.OBJECTCLASS + "=*)("+RemoteConstants.ENDPOINT_FRAMEWORK_UUID+"="+Util.getUUID(bctx)+"))");
         props.put(DISCOVERY_ZOOKEEPER_ID, "true");
-        serviceRegistartion = bctx.registerService(EndpointListener.class.getName(), this, props);
+        serviceRegistration = bctx.registerService(EndpointListener.class.getName(), this, props);
     }
 
     public synchronized void stop() {
-        if (serviceRegistartion != null) {
-            serviceRegistartion.unregister();
+        if (serviceRegistration != null) {
+            serviceRegistration.unregister();
         }
         
         for (PublishingEndpointListener epl : listeners) {

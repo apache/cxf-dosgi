@@ -147,7 +147,11 @@ public class PublishingEndpointListener implements EndpointListener {
             String path = Util.getZooKeeperPath(name);
             String fullPath = path + '/' + endpointKey;
             LOG.debug("Removing ZooKeeper node: {}", fullPath);
-            zookeeper.delete(fullPath, -1);
+            try {
+                zookeeper.delete(fullPath, -1);
+            } catch (Exception e) {
+                LOG.debug("Error while removing endpoint");
+            }
         }
     }
 

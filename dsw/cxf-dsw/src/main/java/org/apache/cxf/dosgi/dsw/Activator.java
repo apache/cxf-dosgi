@@ -28,6 +28,7 @@ import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
@@ -36,36 +37,33 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.osgi.context.BundleContextAware;
-
 
 // registered as spring bean -> start / stop called accordingly 
-public class Activator implements ManagedService,BundleContextAware {
+public class Activator implements ManagedService, BundleActivator {
 
     private final static Logger LOG = LoggerFactory.getLogger(Activator.class);
 
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
-    private BundleContext bc;
 
     private ServiceRegistration rsaFactoryReg;
 
     private ServiceRegistration decoratorReg;
 
-    public synchronized void start() {
+    public void start(BundleContext bc) throws Exception {
         // Disable the fast infoset as it's not compatible (yet) with OSGi
         System.setProperty("org.apache.cxf.nofastinfoset", "true");
 
         // should we have a seperate PID for a find and publish hook ?
         // context.registerService(ManagedService.class.getName(), this, getDefaults());
 
-        registerRemoteServiceAdminService();
+        registerRemoteServiceAdminService(bc);
 
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc),
                                           null);
 
     }
 
-    private RemoteServiceadminFactory registerRemoteServiceAdminService() {
+    private RemoteServiceadminFactory registerRemoteServiceAdminService(BundleContext bc) {
     	IntentMap intentMap = IntentUtils.getIntentMap(bc);
         RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(bc, intentMap);
         Hashtable<String, Object> props = new Hashtable<String, Object>();
@@ -93,7 +91,7 @@ public class Activator implements ManagedService,BundleContextAware {
         return rsaf;
     }
 
-    public void stop() {
+    public void stop(BundleContext context) throws Exception {
         LOG.debug("RemoteServiceAdmin Implementation is shutting down now");
         
         // This also triggers the unimport and unexport of the remote services
@@ -115,10 +113,6 @@ public class Activator implements ManagedService,BundleContextAware {
         if (props != null && CONFIG_SERVICE_PID.equals(props.get(Constants.SERVICE_PID))) {
             // topManager.updated(props);
         }
-    }
-
-    public void setBundleContext(BundleContext bundleContext) {
-        bc = bundleContext;
     }
 
 }

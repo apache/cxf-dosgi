@@ -83,56 +83,6 @@
       <version>1.1.0</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-beans</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.aopalliance</groupId>
-      <artifactId>com.springsource.org.aopalliance</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-aop</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-asm</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-expression</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-osgi-io</artifactId>
-      <version>${spring.osgi.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-osgi-core</artifactId>
-      <version>${spring.osgi.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>spring-osgi-extender</artifactId>
-      <version>${spring.osgi.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-runtime</artifactId>
       <version>${pax.web.version}</version>
@@ -192,11 +142,11 @@
       <artifactId>org.apache.servicemix.bundles.wsdl4j</artifactId> 
       <version>${wsdl4j.bundle.version}</version>
     </dependency>
-    <dependency>
-       <groupId>org.apache.servicemix.bundles</groupId> 
-       <artifactId>org.apache.servicemix.bundles.xmlsec</artifactId> 
-       <version>${xmlsec.bundle.version}</version>
-    </dependency>  
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>${xmlsec.version}</version>
+        </dependency> 
     <dependency>
        <groupId>org.apache.servicemix.bundles</groupId> 
        <artifactId>org.apache.servicemix.bundles.jaxb-impl</artifactId> 
@@ -246,10 +196,82 @@
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
     </dependency>
+    
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-api</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-core</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-simple</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxws</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-bindings-xml</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-bindings-soap</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-databinding-jaxb</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-databinding-aegis</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+        <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-ws-policy</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-transports-http</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-transports-http-jetty</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-rs-extension-providers</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-bundle-minimal</artifactId>
+      <artifactId>cxf-bundle-compatible</artifactId>
       <version>${cxf.version}</version>
+      <exclusions>
+        <exclusion>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-jms</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

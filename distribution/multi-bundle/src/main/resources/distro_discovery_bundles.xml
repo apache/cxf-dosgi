@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bundles>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.felix.configadmin-1.2.8.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.felix.fileinstall-3.1.10.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/com.springsource.org.apache.log4j-${log4j.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/zookeeper-${zookeeper.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-discovery-distributed-${project.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-discovery-distributed-zookeeper-server-${project.version}.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/cxf-dosgi-ri-discovery-distributed-zookeeper-server-config-${project.version}.jar</bundle>
 </bundles>

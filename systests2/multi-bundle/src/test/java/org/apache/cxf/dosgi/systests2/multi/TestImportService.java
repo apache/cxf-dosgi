@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.inject.Inject;
+
 import org.apache.cxf.dosgi.systests2.common.AbstractTestImportService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.CoreOptions;
-import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.container.def.PaxRunnerOptions;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
@@ -42,36 +42,19 @@ public class TestImportService extends AbstractTestImportService {
     @Configuration
     public static Option[] configure() throws Exception {
         Map<Integer, String> bundles = new TreeMap<Integer, String>();
-        int startLevel = MultiBundleTools.getDistroBundles(bundles, false);
+        MultiBundleTools.getDistroBundles(bundles, false);
         
         List<Option> opts = new ArrayList<Option>();
-        
-        // Run this test under Felix. 
-        opts.add(CoreOptions.frameworks(CoreOptions.felix()));
-
         for(Map.Entry<Integer, String> entry : bundles.entrySet()) {
-            opts.add(CoreOptions.bundle(entry.getValue()).startLevel(entry.getKey()));
+            String bundleUri = entry.getValue();
+            if (!bundleUri.contains("pax-logging")) {
+                opts.add(CoreOptions.bundle(bundleUri));
+            }
         }
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject().startLevel(++startLevel));
-
-        // This bundle contains the common system testing code
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject().startLevel(++startLevel));
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject());
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles" ).artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"));
+        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject());
         opts.add(CoreOptions.provision(getTestClientBundle()));
-        opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));
-
-        String loggingConfigFile = System.getProperty("java.util.logging.config.file");
-        if (loggingConfigFile != null) {
-            // When running from eclipse junit the loggingConfigFile will not be set
-            opts.add(CoreOptions.systemProperty("java.util.logging.config.file").value(loggingConfigFile));
-        }
-
-        // For debugging...
-        final String debugPort = System.getProperty("org.apache.cxf.dosgi.test.debug.port");
-        if(debugPort != null) {
-            opts.add(PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=" + debugPort ));
-            opts.add(CoreOptions.waitForFrameworkStartup());
-        }
-        // end debugging section.
 
         // service wait timeout (this should also be increased for debugging)...
         opts.add(CoreOptions.systemProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout").value(System.getProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout", "20")));
@@ -85,6 +68,9 @@ public class TestImportService extends AbstractTestImportService {
 
     @Test
     public void testClientConsumer() throws Exception {
+//        for( Bundle b : bundleContext.getBundles() ) {
+//            System.out.println( "*** Bundle " + b.getBundleId() + " : " + b.getSymbolicName() + "/" + b.getState());
+//        }
         baseTestClientConsumer();
     }    
 }
