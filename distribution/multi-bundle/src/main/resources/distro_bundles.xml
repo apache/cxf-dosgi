@@ -6,8 +6,7 @@
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-javamail_1.4_spec-1.7.1.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-servlet_3.0_spec-1.0.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/geronimo-ws-metadata_2.0_spec-1.1.3.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/com.springsource.org.apache.commons.logging-1.1.1.jar</bundle>
-  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/com.springsource.org.jdom-1.1.0.jar</bundle>
+  <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/org.apache.servicemix.bundles.jdom-${jdom.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/commons-lang-2.6.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-core-${spring.version}.jar</bundle>
   <bundle>cxf-dosgi-ri-multibundle-distribution-${project.version}-dir/apache-cxf-dosgi-ri-${project.version}/dosgi_bundles/spring-beans-${spring.version}.jar</bundle>

@@ -30,21 +30,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>${felix.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.osgi.foundation</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.enterprise</artifactId>
-            <version>${osgi.version}</version>
         </dependency>
 
         <dependency>
@@ -66,6 +57,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        
+        <!--  We need the newer log4j as the one from zookeeper has some ugly dependencies -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>
@@ -74,14 +72,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- This is a zookeeper dependency that we apparently have to list 
-            here -->
-        <dependency>
-            <groupId>org.apache.log4j</groupId>
-            <artifactId>com.springsource.org.apache.log4j</artifactId>
-            <version>${log4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

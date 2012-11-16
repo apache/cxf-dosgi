@@ -36,24 +36,14 @@
     </properties>
     
     <dependencies>
-
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.enterprise</artifactId>
-            <version>${osgi.version}</version>
         </dependency>
-
-        <dependency> 
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>${felix.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.osgi.foundation</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency> 
 
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
@@ -68,19 +58,14 @@
                    <groupId>com.sun.jmx</groupId>
                    <artifactId>jmxri</artifactId> 
                 </exclusion>
-                <exclusion>
-                   <groupId>log4j</groupId>
-                   <artifactId>log4j</artifactId> 
-                </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- This is a zookeeper dependency that we apparently have to list here -->
-        <dependency> 
-            <groupId>org.apache.log4j</groupId> 
-            <artifactId>com.springsource.org.apache.log4j</artifactId> 
+        
+        <!--  We need the newer log4j as the one from zookeeper has some ugly dependencies -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

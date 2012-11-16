@@ -128,17 +128,6 @@
       <artifactId>slf4j-log4j</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-      <version>${slf4j.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.log4j</groupId>  
-      <artifactId>com.springsource.org.apache.log4j</artifactId>  
-      <version>1.2.15</version> 
-    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -146,4 +135,27 @@
       <scope>test</scope>
     </dependency>
   </dependencies> 
+
+  <profiles>
+        <profile>
+            <id>ci-build-profile</id>
+            <activation>
+                <property>
+                    <name>maven.repo.local</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <!-- when the local repo location has been specified, we need to pass on this information to PAX mvn url -->
+                            <argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${maven.repo.local}</argLine>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

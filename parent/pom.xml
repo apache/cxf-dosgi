@@ -34,9 +34,9 @@
 
         <servicemix.specs.version>2.1.0</servicemix.specs.version>
         <pax.web.version>1.0.11</pax.web.version>
-        <pax.logging.version>1.1.1</pax.logging.version>
+        <pax.logging.version>1.7.0</pax.logging.version>
         <servlet.version>3.0</servlet.version>
-        <log4j.version>1.2.15</log4j.version>
+        <log4j.version>1.2.17</log4j.version>
         <jetty.version>7.4.2.v20110526</jetty.version>
         <xmlschema.bundle.version>2.0.3</xmlschema.bundle.version>
         <xmlresolver.bundle.version>1.2_5</xmlresolver.bundle.version>          
@@ -50,6 +50,7 @@
         <slf4j.version>1.6.4</slf4j.version>
         <felix.plugin.version>2.3.4</felix.plugin.version>
         <exam.version>2.6.0</exam.version>
+        <jdom.version>1.1.2_1</jdom.version>
     </properties>
 
     <dependencyManagement>
@@ -230,113 +231,7 @@
             </snapshots>
         </repository>
 
-        <!-- I21 repository -->
-        <repository>
-            <id>i21-s3-maven-repo</id>
-            <name>i21 S3 milestone repo</name>
-            <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>  
-            <id>com.springsource.repository.bundles.release</id>  
-            <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>           
-            <url>http://repository.springsource.com/maven/bundles/release</url> 
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository> 
-
-        <repository>  
-            <id>com.springsource.repository.bundles.external</id>  
-            <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>                         
-            <url>http://repository.springsource.com/maven/bundles/external</url> 
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>central</id>
-            <name>Default maven repo</name>
-            <url>http://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <!-- ServiceMix repo -->
-        <repository>
-            <id>servicemix</id>
-            <name>ServiceMix Repository</name>
-            <url>http://svn.apache.org/repos/asf/servicemix/m2-repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <!-- OPS4j repository -->
-        <repository>
-            <id>ops4j</id>
-            <name>OPS4j repo</name>
-            <url>http://repository.ops4j.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>spring-osgified-artifacts</id>
-            <name>Springframework Maven OSGified Artifacts Repository</name>
-            <url>http://s3.amazonaws.com/maven.springframework.org/osgi</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository> 
-
-        <repository>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <id>springframework.org</id>
-            <name>Springframework Maven SNAPSHOT Repository</name>
-            <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
-        </repository>
-        
-        <repository>
-            <id>apache-incubating</id>
-            <name>Apache Incubating Repository</name>
-            <url>http://people.apache.org/repo/m2-incubating-repository/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+ 
     </repositories>
 
     <pluginRepositories>

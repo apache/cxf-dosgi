@@ -61,9 +61,7 @@ public class TestDiscoveryExport extends AbstractTestDiscoveryRoundtrip {
 
         for (Map.Entry<Integer, String> entry : bundles.entrySet()) {
             String bundleUri = entry.getValue();
-            if (!bundleUri.contains("pax-logging")) {
-                opts.add(CoreOptions.bundle(bundleUri));
-            }
+            opts.add(CoreOptions.bundle(bundleUri));
         }
         opts.add(CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles")
                 .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"));

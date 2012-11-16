@@ -20,10 +20,9 @@
 -->
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.cxf.dosgi</groupId>
-  <artifactId>cxf-dosgi-ri-singlebundle-distribution</artifactId>
-  <version>1.4-SNAPSHOT</version>
-  <packaging>bundle</packaging>
+    <artifactId>cxf-dosgi-ri-singlebundle-distribution</artifactId>
+    <version>1.4-SNAPSHOT</version>
+    <packaging>bundle</packaging>
   <name>Distributed OSGI Single-Bundle Distribution</name>
   <url>http://cxf.apache.org</url>
 
@@ -64,11 +63,6 @@
       <artifactId>geronimo-servlet_${servlet.version}_spec</artifactId>
       <version>1.0</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-      <version>1.1.1</version>
-    </dependency>
     <dependency>  
         <groupId>org.slf4j</groupId>  
         <artifactId>slf4j-api</artifactId>  
@@ -76,11 +70,6 @@
     <dependency>  
         <groupId>org.slf4j</groupId>  
         <artifactId>slf4j-jcl</artifactId>  
-    </dependency>
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>com.springsource.org.jdom</artifactId>
-      <version>1.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
@@ -185,12 +174,6 @@
       <artifactId>org.apache.felix.fileinstall</artifactId>
       <version>3.1.10</version>
     </dependency>      
-
-    <dependency> 
-      <groupId>org.apache.log4j</groupId> 
-      <artifactId>com.springsource.org.apache.log4j</artifactId> 
-      <version>${log4j.version}</version>
-    </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
@@ -314,9 +297,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-	<groupId>org.osgi</groupId>
-	<artifactId>org.osgi.enterprise</artifactId>
-	<version>${osgi.version}</version>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.enterprise</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.jdom</artifactId>
+        <version>${jdom.version}</version>
     </dependency>
 
     <dependency>
