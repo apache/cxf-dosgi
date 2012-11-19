@@ -108,7 +108,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
-      <artifactId>org.apache.servicemix.specs.jsr311-api-1.1.1</artifactId>
+      <artifactId>org.apache.servicemix.specs.jsr339-api-m10</artifactId>
       <version>${servicemix.specs.version}</version>
     </dependency>
     <dependency>
@@ -350,7 +350,7 @@
             <Embed-Directory>lib</Embed-Directory>
             <_exportcontents>
               javax.xml.ws.*;version="2.1.0",
-              javax.ws.rs.*;version="1.0.0", 
+              javax.ws.rs.*;version="2.0.0", 
               javax.jws.*;version="2.0.0", 
               javax.xml.bind.annotation.*;version="2.1",
               javax.servlet.*;version="2.5.0",
