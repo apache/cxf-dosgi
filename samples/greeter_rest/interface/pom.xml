@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
           <groupId>org.apache.servicemix.specs</groupId>
-          <artifactId>org.apache.servicemix.specs.jsr311-api-1.0</artifactId>
+          <artifactId>org.apache.servicemix.specs.jsr339-api-m10</artifactId>
           <version>${servicemix.specs.version}</version>
         </dependency>
         <dependency>
