@@ -260,16 +260,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     }
     
     protected String getHttpServiceAddress(Map sd, Class<?> iClass) {
-        String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
-        if(address == null && sd.get(RemoteConstants.ENDPOINT_ID)!=null ){
-            LOG.error("Could not use address property " + RemoteConstants.ENDPOINT_ID );
-            return null;
-        }
-        
-        
-        if (address == null) {
-            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
-        }
+        String address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
         if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY)!=null ){
             LOG.error("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
             return null;

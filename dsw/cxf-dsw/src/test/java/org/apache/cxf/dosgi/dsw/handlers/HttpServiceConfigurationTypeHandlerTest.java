@@ -335,12 +335,13 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         ServiceReference sr = c.createMock(ServiceReference.class);
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(RemoteConstants.ENDPOINT_ID, "http://google.de/");
+        props.put(RemoteConstants.ENDPOINT_ID, "000001");
+        props.put(Constants.WS_ADDRESS_PROPERTY, "http://google.de/");
         props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[] { "my.class" });
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, new String[] { "my.config" });
         EndpointDescription endpoint = new EndpointDescription(props);
 
-        cpfb.setAddress((String) EasyMock.eq(props.get(RemoteConstants.ENDPOINT_ID)));
+        cpfb.setAddress((String) EasyMock.eq(props.get(Constants.WS_ADDRESS_PROPERTY)));
         EasyMock.expectLastCall().atLeastOnce();
 
         cpfb.setServiceClass(EasyMock.eq(CharSequence.class));
