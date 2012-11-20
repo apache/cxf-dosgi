@@ -18,14 +18,12 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.inject.Inject;
 
@@ -36,7 +34,6 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
@@ -54,38 +51,38 @@ public class TestDiscoveryExport extends AbstractTestDiscoveryRoundtrip {
 
     @Configuration
     public static Option[] configure() throws Exception {
-        Map<Integer, String> bundles = new TreeMap<Integer, String>();
-        MultiBundleTools.getDistroBundles(bundles, true);
-
-        List<Option> opts = new ArrayList<Option>();
-
-        for (Map.Entry<Integer, String> entry : bundles.entrySet()) {
-            String bundleUri = entry.getValue();
-            opts.add(CoreOptions.bundle(bundleUri));
-        }
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles")
-                .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"));
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-                .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject());
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-                .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject());
-        opts.add(mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common")
-                .versionAsInProject());
-
-        return CoreOptions.options(opts.toArray(new Option[opts.size()]));
+        return new Option[] {
+                MultiBundleTools.getDistroWithDiscovery(),
+                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
+                mavenBundle().groupId("org.apache.servicemix.bundles").artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
+                mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
+                frameworkStartLevel(100)
+        };
     }
 
     @Test
     public void testDiscoveryExport() throws Exception {
         final int zkPort = getFreePort();
         configureZookeeper(configAdmin, zkPort);
-        Thread.sleep(3000);
         ZooKeeper zk = new ZooKeeper("localhost:" + zkPort, 1000, null);
-        Stat stat = zk.exists(
-                "/osgi/service_registry/org/apache/cxf/dosgi/samples/greeter/GreeterService/localhost#9090##greeter",
-                null);
-        Assert.assertNotNull("Node for GreeterService endpoint not found in zookeeper", stat);
+        assertExists(zk, "/osgi/service_registry/org/apache/cxf/dosgi/samples/greeter/GreeterService/localhost#9090##greeter", 4000);
         zk.close();
+    }
+
+    private void assertExists(ZooKeeper zk, String zNode, int timeout) {
+        long endTime = System.currentTimeMillis() + timeout;
+        Stat stat = null;
+        while (stat == null  && System.currentTimeMillis() < endTime) {
+            try {
+                stat = zk.exists(zNode, null);
+                Thread.sleep(200);
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+        Assert.assertNotNull("Zookeeper node " + zNode + " was not found", stat);
     }
 
     private int getFreePort() throws IOException {

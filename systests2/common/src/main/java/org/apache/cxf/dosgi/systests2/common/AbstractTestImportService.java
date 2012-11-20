@@ -88,9 +88,6 @@ public abstract class AbstractTestImportService {
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             server = factory.create();
             
-            System.out.println("Give the system a few seconds to breathe...");
-            Thread.sleep(3000);
-        
             Hashtable<String, Object> props = new Hashtable<String, Object>();
             props.put("testName", "test1");
             getBundleContext().registerService(Object.class.getName(), new Object(), props);

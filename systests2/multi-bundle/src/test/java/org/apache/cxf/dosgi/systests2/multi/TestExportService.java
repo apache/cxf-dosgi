@@ -18,17 +18,15 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 import javax.inject.Inject;
 
 import org.apache.cxf.dosgi.systests2.common.AbstractTestExportService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
@@ -41,29 +39,15 @@ public class TestExportService extends AbstractTestExportService {
 
     @Configuration
     public static Option[] configure() throws Exception {
-        Map<Integer, String> bundles = new TreeMap<Integer, String>();
-        int startLevel = MultiBundleTools.getDistroBundles(bundles, false);
-        
-        List<Option> opts = new ArrayList<Option>();
-
-        for(Map.Entry<Integer, String> entry : bundles.entrySet()) {
-            String bundleUri = entry.getValue();
-            if (!bundleUri.contains("pax-logging")) {
-                opts.add(CoreOptions.bundle(bundleUri));
-            }
-        }
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles" ).artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"));
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject());
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject());
-        opts.add(CoreOptions.mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject());
-        opts.add(CoreOptions.systemProperty("org.osgi.framework.startlevel.beginning").value("" + startLevel));
-        
-        // For debugging...
-        // opts.add(PaxRunnerOptions.vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=6006" ));
-        // opts.add(CoreOptions.waitForFrameworkStartup());
-        // end debugging section.
-
-        return CoreOptions.options(opts.toArray(new Option[opts.size()]));
+        return new Option[] {
+                MultiBundleTools.getDistroWithDiscovery(),
+                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
+                mavenBundle().groupId("org.apache.servicemix.bundles" ).artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
+                mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
+                frameworkStartLevel(100)
+        };
     }
 
     

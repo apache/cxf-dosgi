@@ -21,12 +21,17 @@ package org.apache.cxf.dosgi.systests2.multi;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.ops4j.pax.exam.CoreOptions;
+import org.ops4j.pax.exam.Option;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -35,7 +40,7 @@ import org.w3c.dom.NodeList;
 public class MultiBundleTools {
     private MultiBundleTools() {}
     
-    static int getDistroBundles(Map<Integer, String> bundles, boolean discovery) throws Exception {
+    private static int getDistroBundles(Map<Integer, String> bundles, boolean discovery) throws Exception {
         File root = getRootDirectory();        
         File mdRoot = new File(root, "distribution/multi-bundle");
         String pomVersion = getPomVersion(mdRoot);
@@ -101,5 +106,24 @@ public class MultiBundleTools {
             throw new RuntimeException("Failed to retrieved version from pom file " + mdPom);
         }
         return pomVersion;
+    }
+
+    private static Option[] getDistroBundleOptions(boolean b) throws Exception {
+        Map<Integer, String> bundles = new TreeMap<Integer, String>();
+        MultiBundleTools.getDistroBundles(bundles, true);
+        List<Option> opts = new ArrayList<Option>();
+        for (Map.Entry<Integer, String> entry : bundles.entrySet()) {
+            String bundleUri = entry.getValue();
+            opts.add(CoreOptions.bundle(bundleUri));
+        }
+        return opts.toArray(new Option[opts.size()]);
+    }
+
+    public static Option getDistroWithDiscovery() throws Exception {
+        return CoreOptions.composite(getDistroBundleOptions(true));
+    }
+    
+    public static Option getDistro() throws Exception {
+        return CoreOptions.composite(getDistroBundleOptions(true));
     }
 }
