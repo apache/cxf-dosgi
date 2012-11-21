@@ -31,6 +31,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
@@ -47,7 +48,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,10 +58,8 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
     Map<Long, String> exportedAliases = Collections.synchronizedMap(new HashMap<Long, String>());
     
-    protected HttpServiceConfigurationTypeHandler(BundleContext dswBC,
-
-    Map<String, Object> handlerProps) {
-        super(dswBC, handlerProps);
+    protected HttpServiceConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, Map<String, Object> handlerProps) {
+        super(dswBC, intentManager, handlerProps);
 
         ServiceTracker st = new ServiceTracker(dswBC, HttpService.class.getName(), null) {
             @Override
@@ -108,8 +106,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
             factory.setAddress(address);
             factory.getServiceFactory().setDataBinding(databinding);
 
-            applyIntents(dswContext, callingContext, factory.getFeatures(), factory.getClientFactoryBean(),
-                         sd.getProperties());
+            intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd.getProperties());
 
             Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
             Object proxy = getProxy(factory.create(), iClass);
@@ -160,7 +157,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         		constructAddress(dswContext, contextRoot, relativeEndpointAddress);
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
+        String[] intents = intentManager.applyIntents(factory.getFeatures(),factory, sd);
 
         // The properties for the EndpointDescription
         Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {
@@ -210,7 +207,7 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
 
         String hostName = null;
         try {
-            hostName = AbstractConfigurationHandler.getLocalHost().getHostAddress();
+            hostName = LocalHostUtil.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
             hostName = "localhost";
         }

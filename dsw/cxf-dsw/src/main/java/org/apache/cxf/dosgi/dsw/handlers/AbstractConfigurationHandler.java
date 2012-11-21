@@ -19,17 +19,12 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.lang.reflect.Proxy;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.osgi.framework.BundleContext;
@@ -38,14 +33,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractConfigurationHandler implements ConfigurationTypeHandler {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractConfigurationHandler.class);
 
-    final Map<String, Object> handlerProps;
+    private final Map<String, Object> handlerProps;
+    protected IntentManager intentManager;
     protected BundleContext bundleContext;
 
-    protected AbstractConfigurationHandler(BundleContext dswBC, Map<String, Object> handlerProps) {
+    protected AbstractConfigurationHandler(BundleContext dswBC, IntentManager intentManager, Map<String, Object> handlerProps) {
         this.bundleContext = dswBC;
+        this.intentManager = intentManager;
         this.handlerProps = handlerProps;
     }
 
@@ -57,7 +53,7 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
         Object h = handlerProps.get(Constants.DEFAULT_HOST_CONFIG);
         if (h == null || h.toString().equals("localhost")) {
             try {
-                h = getLocalHost().getHostAddress();
+                h = LocalHostUtil.getLocalHost().getHostAddress();
             } catch (Exception e) {
                 h = "localhost";
             }
@@ -85,24 +81,10 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
         return buf.toString();
     }
 
-    protected boolean useMasterMap() {
-
-        Object value = handlerProps.get(Constants.USE_MASTER_MAP);
-        if (value == null) {
-            return true;
-        }
-
-        return OsgiUtils.toBoolean(value);
-    }
-
     protected Object getProxy(Object serviceProxy, Class<?> iType) {
         return Proxy.newProxyInstance(iType.getClassLoader(), new Class[] {
             iType
         }, new ServiceInvocationHandler(serviceProxy, iType));
-    }
-
-    protected BundleContext getBundleContext() {
-        return bundleContext;
     }
 
     protected Map<String, Object> createEndpointProps(Map sd, Class<?> iClass, String[] importedConfigs,
@@ -117,10 +99,10 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
         props.remove(org.osgi.framework.Constants.SERVICE_ID);
         props.put(org.osgi.framework.Constants.OBJECTCLASS, sa);
         props.put(RemoteConstants.ENDPOINT_SERVICE_ID, sd.get(org.osgi.framework.Constants.SERVICE_ID));        
-        props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(getBundleContext()));
+        props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(bundleContext));
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
         props.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + pkg, 
-                OsgiUtils.getVersion(iClass, getBundleContext()));
+                OsgiUtils.getVersion(iClass, bundleContext));
 
         for (String configurationType : importedConfigs) {
             if(Constants.WS_CONFIG_TYPE.equals(configurationType))
@@ -169,72 +151,5 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
         }
     }
     
-    // Utility methods to get the local address even on a linux host
 
-    /**
-     * Returns an InetAddress representing the address of the localhost. Every attempt is made to find an address for
-     * this host that is not the loopback address. If no other address can be found, the loopback will be returned.
-     * 
-     * @return InetAddress - the address of localhost
-     * @throws UnknownHostException
-     *             - if there is a problem determing the address
-     */
-    public static InetAddress getLocalHost() throws UnknownHostException {
-        InetAddress localHost = InetAddress.getLocalHost();
-        if (!localHost.isLoopbackAddress())
-            return localHost;
-        InetAddress[] addrs = getAllLocalUsingNetworkInterface();
-        for (int i = 0; i < addrs.length; i++) {
-            if (!addrs[i].isLoopbackAddress() && !addrs[i].getHostAddress().contains(":"))
-                return addrs[i];
-        }
-        return localHost;
-    }
-
-    /**
-     * This method attempts to find all InetAddresses for this machine in a conventional way (via InetAddress). If only
-     * one address is found and it is the loopback, an attempt is made to determine the addresses for this machine using
-     * NetworkInterface.
-     * 
-     * @return InetAddress[] - all addresses assigned to the local machine
-     * @throws UnknownHostException
-     *             - if there is a problem determining addresses
-     */
-    public static InetAddress[] getAllLocal() throws UnknownHostException {
-        InetAddress[] iAddresses = InetAddress.getAllByName("127.0.0.1");
-        if (iAddresses.length != 1)
-            return iAddresses;
-        if (!iAddresses[0].isLoopbackAddress())
-            return iAddresses;
-        return getAllLocalUsingNetworkInterface();
-
-    }
-
-    /**
-     * Utility method that delegates to the methods of NetworkInterface to determine addresses for this machine.
-     * 
-     * @return InetAddress[] - all addresses found from the NetworkInterfaces
-     * @throws UnknownHostException
-     *             - if there is a problem determining addresses
-     */
-    private static InetAddress[] getAllLocalUsingNetworkInterface() throws UnknownHostException {
-        ArrayList addresses = new ArrayList();
-        Enumeration e = null;
-        try {
-            e = NetworkInterface.getNetworkInterfaces();
-        } catch (SocketException ex) {
-            throw new UnknownHostException("127.0.0.1");
-        }
-        while (e.hasMoreElements()) {
-            NetworkInterface ni = (NetworkInterface) e.nextElement();
-            for (Enumeration e2 = ni.getInetAddresses(); e2.hasMoreElements();) {
-                addresses.add(e2.nextElement());
-            }
-        }
-        InetAddress[] iAddresses = new InetAddress[addresses.size()];
-        for (int i = 0; i < iAddresses.length; i++) {
-            iAddresses[i] = (InetAddress) addresses.get(i);
-        }
-        return iAddresses;
-    }
 }

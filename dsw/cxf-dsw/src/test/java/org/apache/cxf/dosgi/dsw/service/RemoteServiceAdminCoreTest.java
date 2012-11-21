@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.qos.IntentMap;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
 import org.junit.Test;
@@ -59,8 +59,8 @@ public class RemoteServiceAdminCoreTest {
         ServiceReference sref = c.createMock(ServiceReference.class);
         EasyMock.expect(sref.getBundle()).andReturn(b).anyTimes();
 
-        IntentMap IntentMap = new IntentMap();
-		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, IntentMap );
+        IntentManager intentManager = c.createMock(IntentManager.class);
+		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentManager);
 
         c.replay();
 
@@ -91,8 +91,8 @@ public class RemoteServiceAdminCoreTest {
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(b.getSymbolicName()).andReturn("BundleName").anyTimes();
 
-        IntentMap intentMap = new IntentMap();
-		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentMap ) {
+        IntentManager intentManager = c.createMock(IntentManager.class);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentManager) {
             @Override
             protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
                                                     ConfigurationTypeHandler handler,
@@ -155,10 +155,9 @@ public class RemoteServiceAdminCoreTest {
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
 
+        IntentManager intentManager = c.createMock(IntentManager.class);
         c.replay();
-
-        IntentMap IntentMap = new IntentMap();
-		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, IntentMap );
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentManager);
 
         Properties serviceProperties = new Properties();
 
@@ -179,10 +178,10 @@ public class RemoteServiceAdminCoreTest {
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
 
-        c.replay();
 
-        IntentMap intentMap = new IntentMap();
-		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentMap );
+        IntentManager intentManager = c.createMock(IntentManager.class);
+        c.replay();
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentManager);
 
         Properties serviceProperties = new Properties();
 

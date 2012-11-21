@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -44,10 +45,8 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
 
-    protected JaxRSPojoConfigurationTypeHandler(BundleContext dswBC,
-
-    Map<String, Object> handlerProps) {
-        super(dswBC, handlerProps);
+    protected JaxRSPojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, Map<String, Object> handlerProps) {
+        super(dswBC, intentManager, handlerProps);
     }
 
     @Override

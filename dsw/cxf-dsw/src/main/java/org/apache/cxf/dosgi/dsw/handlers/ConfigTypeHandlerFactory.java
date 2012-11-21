@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.osgi.framework.BundleContext;
@@ -30,15 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class ConfigTypeHandlerFactory {
-
     private static final Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
-    private static final ConfigTypeHandlerFactory FACTORY = new ConfigTypeHandlerFactory();
+    private IntentManager intentManager;
 
-    private ConfigTypeHandlerFactory() {
-    }
-
-    public static ConfigTypeHandlerFactory getInstance() {
-        return FACTORY;
+    public ConfigTypeHandlerFactory(IntentManager intentManager) {
+        this.intentManager = intentManager;
+        
     }
 
     public ConfigurationTypeHandler getHandler(BundleContext dswBC, List<String> configurationTypes,
@@ -53,16 +51,16 @@ public final class ConfigTypeHandlerFactory {
                 || OsgiUtils.getProperty(serviceProperties, Constants.RS_HTTP_SERVICE_CONTEXT) != null
                 || OsgiUtils.getProperty(serviceProperties, Constants.WS_HTTP_SERVICE_CONTEXT_OLD) != null) {
                 return jaxrs
-                    ? new JaxRSHttpServiceConfigurationTypeHandler(dswBC, props)
-                    : new HttpServiceConfigurationTypeHandler(dswBC, props);
+                    ? new JaxRSHttpServiceConfigurationTypeHandler(dswBC, intentManager, props)
+                    : new HttpServiceConfigurationTypeHandler(dswBC, intentManager, props);
 
             } else {
                 return jaxrs
-                    ? new JaxRSPojoConfigurationTypeHandler(dswBC, props)
-                    : new PojoConfigurationTypeHandler(dswBC, props);
+                    ? new JaxRSPojoConfigurationTypeHandler(dswBC, intentManager, props)
+                    : new PojoConfigurationTypeHandler(dswBC, intentManager, props);
             }
         } else if (configurationTypes.contains(Constants.WSDL_CONFIG_TYPE)) {
-            return new WsdlConfigurationTypeHandler(dswBC, props);
+            return new WsdlConfigurationTypeHandler(dswBC, intentManager, props);
         }
 
         LOG.warn("None of the configuration types in " + configurationTypes + " is supported.");

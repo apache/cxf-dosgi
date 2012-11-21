@@ -1,12 +1,34 @@
+/** 
+  * Licensed to the Apache Software Foundation (ASF) under one 
+  * or more contributor license agreements. See the NOTICE file 
+  * distributed with this work for additional information 
+  * regarding copyright ownership. The ASF licenses this file 
+  * to you under the Apache License, Version 2.0 (the 
+  * "License"); you may not use this file except in compliance 
+  * with the License. You may obtain a copy of the License at 
+  * 
+  * http://www.apache.org/licenses/LICENSE-2.0 
+  * 
+  * Unless required by applicable law or agreed to in writing, 
+  * software distributed under the License is distributed on an 
+  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
+  * KIND, either express or implied. See the License for the 
+  * specific language governing permissions and limitations 
+  * under the License. 
+  */
 package org.apache.cxf.dosgi.dsw.qos;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,47 +52,6 @@ public class IntentUtils {
 
     public static String[] parseIntents(String intentsSequence) {
         return intentsSequence == null ? new String[] {} : intentsSequence.split(" ");
-    }
-
-    public static IntentMap getIntentMap(BundleContext bundleContext) {
-        IntentMap im = null;
-        try {
-            im = IntentUtils.readIntentMap(bundleContext);
-        } catch (Throwable t) {
-            LOG.warn("Intent map load failed: ", t);
-        }
-        if (im == null) {
-            // Couldn't read an intent map
-            LOG.debug("Using default intent map");
-            im = new IntentMap();
-            im.setIntents(new HashMap<String, Object>());
-        }
-        return im;
-    }
-
-    
-    
-    public static IntentMap readIntentMap(BundleContext bundleContext) {
-        return new DefaultIntentMapFactory().create();
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static String[] getAllRequiredIntents(Map serviceProperties) {
-        // Get the intents that need to be supported by the RSA
-        String[] requiredIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
-        if (requiredIntents == null) {
-            requiredIntents = new String[0];
-        }
-
-        { // merge with extra intents;
-            String[] requiredExtraIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
-            if (requiredExtraIntents != null && requiredExtraIntents.length > 0) {
-
-                requiredIntents = IntentUtils.mergeArrays(requiredIntents, requiredExtraIntents);
-            }
-        }
-
-        return requiredIntents;
     }
 
     @SuppressWarnings("rawtypes")
@@ -97,6 +78,19 @@ public class IntentUtils {
         }
 
         return list.toArray(new String[list.size()]);
+    }
+    
+    public static Set<String> getRequestedIntents(Map<?, ?> sd) {
+        Collection<String> intents = Arrays.asList(
+            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));        
+        Collection<String> oldIntents = Arrays.asList(
+            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_OLD))); 
+        
+        Set<String> allIntents = new HashSet<String>(intents.size() + oldIntents.size());
+        allIntents.addAll(intents);
+        allIntents.addAll(oldIntents);
+        LOG.debug("Intents asserted: " + allIntents);
+        return allIntents;
     }
 
 }

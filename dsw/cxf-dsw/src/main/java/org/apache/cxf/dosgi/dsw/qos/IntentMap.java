@@ -18,31 +18,36 @@
   */
 package org.apache.cxf.dosgi.dsw.qos;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public final class IntentMap {
-
-    private static final Logger LOG = LoggerFactory.getLogger(IntentMap.class);
-
-    private Map<String, Object> intents; 
-
-    public void setIntents(Map<String, Object> intents) {
-        LOG.info("Injected intents: " + intents);
-        this.intents = intents;
+/**
+ * Maps intent names to intent objects
+ * An intent object can be a Feature, a BindingConfiguration or a String
+ * 
+ * Also supports a default intent map. Custom intents can override the defaults 
+ */
+public class IntentMap extends HashMap<String, Object> {
+    private static final long serialVersionUID = 2606460607920520767L;
+    private Map<String, Object> defaultMap;
+    
+    public IntentMap() {
+        super(new HashMap<String, Object>());
     }
-
-    public Map<String, Object> getIntents() {
-        return intents;
+    
+    public IntentMap(Map<String, Object> defaultMap) {
+        super();
+        this.defaultMap = defaultMap;
+        putAll(defaultMap);
     }
-
-    public Object get(String key) {
-        return intents.get(key);
+    
+    @Override
+    public Object remove(Object key) {
+        Object old = super.remove(key);
+        if (defaultMap.containsKey(key)) {
+            put((String)key, defaultMap.get(key));
+        }
+        return old;
     }
-
-    public String toString() {
-        return "IntentMap: " + intents;
-    }
+    
 }

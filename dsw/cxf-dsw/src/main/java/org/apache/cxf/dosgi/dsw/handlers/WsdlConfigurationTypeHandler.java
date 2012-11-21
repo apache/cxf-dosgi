@@ -26,9 +26,13 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -45,9 +49,9 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
     private static final Logger LOG = LoggerFactory.getLogger(WsdlConfigurationTypeHandler.class);
     
     public WsdlConfigurationTypeHandler(BundleContext dswBC,
-                               
+                                        IntentManager intentManager,
                                         Map<String, Object> handlerProps) {
-        super(dswBC, handlerProps);
+        super(dswBC, intentManager, handlerProps);
     }
     
     public String getType() {
@@ -151,7 +155,7 @@ public class WsdlConfigurationTypeHandler extends HttpServiceConfigurationTypeHa
         	factory.setBus(bus);
         }
         
-        String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
+        String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
 
         // The properties for the EndpointDescription
         Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, address,intents);

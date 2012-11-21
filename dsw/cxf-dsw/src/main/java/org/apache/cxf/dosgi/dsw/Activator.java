@@ -25,6 +25,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
+import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
@@ -64,8 +67,9 @@ public class Activator implements ManagedService, BundleActivator {
     }
 
     private RemoteServiceadminFactory registerRemoteServiceAdminService(BundleContext bc) {
-    	IntentMap intentMap = IntentUtils.getIntentMap(bc);
-        RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(bc, intentMap);
+        IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
+        IntentManager intentManager = new IntentManagerImpl(bc, intentMap);
+        RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(bc, intentManager);
         Hashtable<String, Object> props = new Hashtable<String, Object>();
 
         // TODO .... RemoteAdminService.XXX
@@ -73,7 +77,7 @@ public class Activator implements ManagedService, BundleActivator {
         // props.put(DistributionProvider.PRODUCT_VERSION, getHeader("Bundle-Version"));
         // props.put(DistributionProvider.VENDOR_NAME, getHeader("Bundle-Vendor"));
 
-        String[] supportedIntents = intentMap.getIntents().keySet().toArray(new String[] {});
+        String[] supportedIntents = intentMap.keySet().toArray(new String[] {});
         String siString = IntentUtils.formatIntents(supportedIntents);
         props.put("remote.intents.supported", siString);
 

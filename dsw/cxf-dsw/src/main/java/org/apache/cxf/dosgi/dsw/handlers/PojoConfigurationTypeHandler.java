@@ -21,8 +21,12 @@ package org.apache.cxf.dosgi.dsw.handlers;
 import java.util.Map;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
@@ -38,8 +42,8 @@ import org.slf4j.LoggerFactory;
 public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PojoConfigurationTypeHandler.class);
 
-    public PojoConfigurationTypeHandler(BundleContext dswBC, Map<String, Object> handlerProps) {
-        super(dswBC, handlerProps);
+    public PojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, Map<String, Object> handlerProps) {
+        super(dswBC, intentManager, handlerProps);
     }
 
     public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
@@ -73,8 +77,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd.getProperties());
             setClientWsdlProperties(factory.getClientFactoryBean(), dswContext, sd.getProperties(), false);
             
-            applyIntents(dswContext, callingContext, factory.getFeatures(), factory.getClientFactoryBean(),
-                         sd.getProperties());
+            intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd.getProperties());
 
             Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
             Object proxy = getProxy(factory.create(), iClass);
@@ -115,7 +118,8 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         setWsdlProperties(factory, callingContext, sd, false);
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        String[] intents = applyIntents(dswContext, callingContext, factory.getFeatures(), factory, sd);
+        
+        String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
 
         // The properties for the EndpointDescription
         Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, address,intents);

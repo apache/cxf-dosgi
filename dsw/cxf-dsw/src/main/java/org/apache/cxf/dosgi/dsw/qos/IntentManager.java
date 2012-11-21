@@ -18,5 +18,14 @@
   */
 package org.apache.cxf.dosgi.dsw.qos;
 
-public final class IntentMapBeanInfo {
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.cxf.endpoint.AbstractEndpointFactory;
+import org.apache.cxf.feature.Feature;
+
+public interface IntentManager {
+    List<String> getUnsupportedIntents(Properties serviceProperties);
+    String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory, Map<String, Object> props);
 }

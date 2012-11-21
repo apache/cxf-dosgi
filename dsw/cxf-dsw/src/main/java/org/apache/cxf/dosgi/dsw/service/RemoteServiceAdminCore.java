@@ -35,8 +35,7 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.ExportResult;
-import org.apache.cxf.dosgi.dsw.qos.IntentMap;
-import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
@@ -63,11 +62,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     private BundleContext bctx;
     private EventProducer eventProducer;
-    private IntentMap intentMap;
 
     private volatile boolean useMasterMap = true;
     private volatile String defaultPort;
     private volatile String defaultHost;
+
+    private ConfigTypeHandlerFactory configTypeHandlerFactory;
+    private IntentManager intentManager;
 
     // protected because of tests
     protected static final List<String> supportedConfigurationTypes = new ArrayList<String>();
@@ -81,10 +82,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     protected final static String DEFAULT_CONFIGURATION = Constants.WS_CONFIG_TYPE;
 
-    public RemoteServiceAdminCore(BundleContext bc, IntentMap intentMap) {
+    public RemoteServiceAdminCore(BundleContext bc, IntentManager intentManager) {
         bctx = bc;
+        this.intentManager = intentManager;
         eventProducer = new EventProducer(bctx);
-        this.intentMap = intentMap;
+        this.configTypeHandlerFactory = new ConfigTypeHandlerFactory(intentManager);
     }
 
     @SuppressWarnings("rawtypes")
@@ -144,25 +146,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 OsgiUtils.overlayProperties(serviceProperties,additionalProperties);
             }
 
-            // Get the intents that need to be supported by the RSA
-            String[] requiredIntents = IntentUtils.getAllRequiredIntents(serviceProperties);
-
-            {
-                List<String> unsupportedIntents = new ArrayList<String>();
-
-                for (String ri : requiredIntents) {
-                    if (!intentMap.getIntents().containsKey(ri)) {
-                        unsupportedIntents.add(ri);
-                    }
-                }
-
-                if (unsupportedIntents.size() > 0) {
-                    LOG.error("service cannot be exported because the following intents are not supported by this RSA: "
-                                + unsupportedIntents);
-                    // TODO: publish error event
-                    return Collections.emptyList();
-                }
-
+            List<String> unsupportedIntents = intentManager.getUnsupportedIntents(serviceProperties);
+            
+            if (unsupportedIntents.size() > 0) {
+                LOG.error("service cannot be exported because the following intents are not supported by this RSA: "
+                            + unsupportedIntents);
+                // TODO: publish error event
+                return Collections.emptyList();
             }
 
             List<String> interfaces = new ArrayList<String>(1);
@@ -322,7 +312,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     private ConfigurationTypeHandler getHandler(List<String> configurationTypes, Map<?, ?> serviceProperties,
                                                 Map<String, Object> props) {
-        return ConfigTypeHandlerFactory.getInstance().getHandler(bctx, configurationTypes, serviceProperties,
+        return configTypeHandlerFactory.getHandler(bctx, configurationTypes, serviceProperties,
                                                                  props);
     }
 

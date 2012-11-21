@@ -26,6 +26,9 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
+import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.easymock.EasyMock;
 import org.osgi.framework.BundleContext;
 
@@ -38,7 +41,9 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         List<String> configs = new ArrayList<String>();
         Map<String, Object> serviceProps = new HashMap<String, Object>();
 
-        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        IntentMap intentMap = new IntentMap();
+        IntentManager intentManager = new IntentManagerImpl(intentMap );
+        ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager );
 
         configs.add(Constants.RS_CONFIG_TYPE);
 
@@ -53,7 +58,9 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         List<String> configs = new ArrayList<String>();
         Map<String, Object> serviceProps = new HashMap<String, Object>();
 
-        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        IntentMap intentMap = new IntentMap();
+        IntentManager intentManager = new IntentManagerImpl(intentMap);
+        ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager);
         configs.add(Constants.RS_CONFIG_TYPE);
         serviceProps.put(Constants.EXPORTED_INTENTS, "HTTP");
 
@@ -68,7 +75,9 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         List<String> configs = new ArrayList<String>();
         Map<String, Object> serviceProps = new HashMap<String, Object>();
 
-        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        IntentMap intentMap = new IntentMap();
+        IntentManager intentManager = new IntentManagerImpl(intentMap);
+        ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager);
         configs.add(Constants.RS_CONFIG_TYPE);
         serviceProps.put(Constants.EXPORTED_INTENTS, "SOAP HTTP");
 
@@ -84,7 +93,9 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         List<String> configs = new ArrayList<String>();
         Map<String, Object> serviceProps = new HashMap<String, Object>();
 
-        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        IntentMap intentMap = new IntentMap();
+        IntentManager intentManager = new IntentManagerImpl(intentMap);
+        ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager);
         configs.add(Constants.WS_CONFIG_TYPE);
 
         ConfigurationTypeHandler handler = f.getHandler(bc, configs, serviceProps, null);
@@ -95,7 +106,9 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bc);
 
-        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        IntentMap intentMap = new IntentMap();
+        IntentManager intentManager = new IntentManagerImpl(intentMap);
+        ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager);
 
         List<String> configs = new ArrayList<String>();
         Map<String, Object> serviceProps = new HashMap<String, Object>();
@@ -111,7 +124,9 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bc);
 
-        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        IntentMap intentMap = new IntentMap();
+        IntentManager intentManager = new IntentManagerImpl(intentMap);
+        ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager);
 
         List<String> configs = new ArrayList<String>();
         Map<String, Object> serviceProps = new HashMap<String, Object>();
@@ -126,7 +141,9 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bc);
 
-        ConfigTypeHandlerFactory f = ConfigTypeHandlerFactory.getInstance();
+        IntentMap intentMap = new IntentMap();
+        IntentManager intentManager = new IntentManagerImpl(intentMap);
+        ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager);
 
         List<String> configs = new ArrayList<String>();
         Map<String, Object> serviceProps = new HashMap<String, Object>();

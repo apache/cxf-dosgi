@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -38,8 +39,9 @@ public class JaxRSHttpServiceConfigurationTypeHandler extends HttpServiceConfigu
     private static final Logger LOG = LoggerFactory.getLogger(JaxRSHttpServiceConfigurationTypeHandler.class);
 
     protected JaxRSHttpServiceConfigurationTypeHandler(BundleContext dswBC,
+                                                       IntentManager intentManager,
                                                        Map<String, Object> handlerProps) {
-        super(dswBC, handlerProps);
+        super(dswBC, intentManager, handlerProps);
     }
 
     @Override

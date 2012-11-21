@@ -32,7 +32,7 @@ public class Activator implements BundleActivator {
     private ServiceRegistration registration;
 
     public void start(BundleContext bc) throws Exception {
-        Dictionary props = new Hashtable();
+        Dictionary<String, String> props = new Hashtable<String, String>();
 
         props.put("service.exported.interfaces", "*");
         props.put("service.exported.configs", "org.apache.cxf.ws");

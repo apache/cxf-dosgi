@@ -18,13 +18,18 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
@@ -49,35 +54,29 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
     
     public void testServer() throws Exception {
-        BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
+        IMocksControl c = EasyMock.createNiceControl();
+        BundleContext dswContext = c.createMock(BundleContext.class);
         EasyMock.expect(dswContext.getProperty("org.osgi.service.http.port")).
             andReturn("1327").anyTimes();
-        HttpService httpService = EasyMock.createNiceMock(HttpService.class);
+        HttpService httpService = c.createMock(HttpService.class);
         // expect that the cxf servlet is registered
-        EasyMock.replay(httpService);
         
-        ServiceReference httpSvcSR = EasyMock.createNiceMock(ServiceReference.class);
-        EasyMock.replay(httpSvcSR);
+        ServiceReference httpSvcSR = c.createMock(ServiceReference.class);
         EasyMock.expect(dswContext.getService(httpSvcSR)).andReturn(httpService).anyTimes();
-        EasyMock.replay(dswContext);
         
         final ServerFactoryBean sfb = createMockServerFactoryBean();
         
         //        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext);
         Map<String, Object> handlerProps = new HashMap<String, Object>();
+        IntentManager intentManager = new DummyIntentManager(new String [] {"a.b.c"});
+        c.replay();
+        
         HttpServiceConfigurationTypeHandler h = 
-            new HttpServiceConfigurationTypeHandler(dswContext,  handlerProps) {
+            new HttpServiceConfigurationTypeHandler(dswContext, intentManager , handlerProps) {
                 @Override
                 ServerFactoryBean createServerFactoryBean(String frontend) {
                     return sfb;
                 }
-
-                @Override
-                String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                        List<Feature> features, AbstractEndpointFactory factory, 
-                        Map sd) {
-                    return new String [] {"a.b.c"};
-                }            
         };
         h.httpServiceReferences.add(httpSvcSR);
         
@@ -105,7 +104,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         String hostName;
         try {
-            hostName = AbstractConfigurationHandler.getLocalHost().getHostAddress();
+            hostName = LocalHostUtil.getLocalHost().getHostAddress();
         } catch (Exception e) {
             hostName = "localhost";
         }
@@ -141,22 +140,18 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         final ServerFactoryBean sfb = createMockServerFactoryBean();
         
-        IntentMap intentMap = new IntentMap();
-		RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap );
+        IntentManager intentManager = new DummyIntentManager(new String[]{});
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentManager);
         Map<String, Object> handlerProps = new HashMap<String, Object>();
+        
         HttpServiceConfigurationTypeHandler h = 
-            new HttpServiceConfigurationTypeHandler(dswContext,  handlerProps) {
+            new HttpServiceConfigurationTypeHandler(dswContext, intentManager, handlerProps) {
                 @Override
                 ServerFactoryBean createServerFactoryBean(String frontend) {
                     return sfb;
                 }
 
-                @Override
-                String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                        List<Feature> features, AbstractEndpointFactory factory, 
-                        Map sd) {
-                    return new String [] {};
-                }            
+                            
         };
         h.httpServiceReferences.add(httpSvcSR);
         
@@ -181,7 +176,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         String hostname;
         try {
-            hostname = AbstractConfigurationHandler.getLocalHost().getHostAddress();
+            hostname = LocalHostUtil.getLocalHost().getHostAddress();
         } catch (Exception e) {
             hostname = "localhost";
         }
@@ -213,22 +208,15 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         final ServerFactoryBean sfb = createMockServerFactoryBean();
         
-        IntentMap intentMap = new IntentMap();
-		RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentMap);
+		IntentManager intentManager = new DummyIntentManager(new String [] {});
+        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(dswContext, intentManager);
         Map<String, Object> handlerProps = new HashMap<String, Object>();
         HttpServiceConfigurationTypeHandler h = 
-            new HttpServiceConfigurationTypeHandler(dswContext,  handlerProps) {
+            new HttpServiceConfigurationTypeHandler(dswContext, intentManager, handlerProps) {
                 @Override
                 ServerFactoryBean createServerFactoryBean(String frontend) {
                     return sfb;
                 }
-
-                @Override
-                String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                        List<Feature> features, AbstractEndpointFactory factory, 
-                        Map sd) {
-                    return new String [] {};
-                }            
         };
         h.httpServiceReferences.add(httpSvcSR);
         
@@ -255,7 +243,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         
         String hostName;
         try {
-            hostName = AbstractConfigurationHandler.getLocalHost().getHostAddress();
+            hostName = LocalHostUtil.getLocalHost().getHostAddress();
         } catch (Exception e) {
             hostName = "localhost";
         }
@@ -350,17 +338,13 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         c.replay();
 
         Map<String, Object> handlerProps = new HashMap<String, Object>();
-        HttpServiceConfigurationTypeHandler h = new HttpServiceConfigurationTypeHandler(bc1, handlerProps) {
+        IntentManager intentManager = new DummyIntentManager(new String[] { "a.b.c" });
+        HttpServiceConfigurationTypeHandler h = new HttpServiceConfigurationTypeHandler(bc1, intentManager , handlerProps) {
             @Override
             ClientProxyFactoryBean createClientProxyFactoryBean(String frontend) {
                 return cpfb;
             }
 
-            @Override
-            String[] applyIntents(BundleContext dswContext, BundleContext callingContext,
-                    List<Feature> features, AbstractEndpointFactory factory, Map sd) {
-                return new String[] { "a.b.c" };
-            }
         };
 
         h.httpServiceReferences.add(httpSvcSR);
@@ -390,4 +374,30 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
     public void testServletUnregistration() {        
     }
     */
+    
+    class DummyIntentManager implements IntentManager {
+        private String[] applyResult;
+
+        public DummyIntentManager(String[] applyResult) {
+            this.applyResult = applyResult;
+        }
+        
+        public List<String> getUnsupportedIntents(Properties serviceProperties) {
+            return new ArrayList<String>();
+        }
+
+        public BindingConfiguration getBindingConfiguration(String[] requestedIntents,
+                BindingConfiguration defaultConfig) {
+            return defaultConfig;
+        }
+
+        public String[] applyIntents(List<Feature> features, String[] requestedIntents)
+                throws IntentUnsatifiedException {
+            return applyResult;
+        }
+
+        public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory, Map<String, Object> props) {
+            return applyResult;
+        }
+    };
 }

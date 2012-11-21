@@ -19,28 +19,18 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.qos.IntentMap;
-import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
+import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.feature.Feature;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -55,14 +45,12 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPojoConfigurationTypeHandler.class);
-    private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
     private static final String CONFIGURATION_TYPE = "org.apache.cxf.ws";
     
-    private IntentMap masterMap;
-    
-    public AbstractPojoConfigurationTypeHandler(BundleContext dswBC,                                                
+    public AbstractPojoConfigurationTypeHandler(BundleContext dswBC,
+                                                IntentManager intentManager,
                                                 Map<String, Object> handlerProps) {
-        super(dswBC,  handlerProps);
+        super(dswBC, intentManager, handlerProps);
     }
 
     // Isolated so that it can be substituted for testing
@@ -81,35 +69,6 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
       } else {
         return new ServerFactoryBean();
       }
-    }
-
-    String [] applyIntents(BundleContext dswContext,
-                           BundleContext callingContext,
-                           List<Feature> features,
-                           AbstractEndpointFactory factory,
-                           Map sd) throws IntentUnsatifiedException {
-        String[] requestedIntents = getRequestedIntents(sd);
-        Set<String> appliedIntents = new HashSet<String>(Arrays.asList(requestedIntents));
-        
-        IntentMap intentMap = getIntentMap(callingContext);        
-        if (useMasterMap()) {
-            intentMap = mergeWithMaster(dswContext, intentMap);
-        }
-        appliedIntents.addAll(reverseLookup(intentMap, PROVIDED_INTENT_VALUE));
-        
-        boolean bindingConfigAdded = false;
-        for (String requestedName : requestedIntents) {
-            bindingConfigAdded 
-                |= processIntent(appliedIntents, features, factory, requestedName, intentMap);
-        }
-        
-        if (!bindingConfigAdded && getDefaultBindingIntent() != null) {
-            // If no binding config was specified, add SOAP
-            processIntent(appliedIntents, features, factory, getDefaultBindingIntent(), intentMap);
-        }
-
-        appliedIntents.addAll(addSynonymIntents(appliedIntents, intentMap));        
-        return appliedIntents.toArray(new String[0]);
     }
 
     protected void setWsdlProperties(ServerFactoryBean factory,
@@ -241,117 +200,10 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         	factory.getProperties(true).putAll(props);
         }
     }
-    
-    private boolean processIntent(Set<String> appliedIntents,
-                                  List<Feature> features,
-                                  AbstractEndpointFactory factory, String intentName,
-                                  IntentMap intentMap) throws IntentUnsatifiedException {
-        boolean rc = processIntent(features, factory, intentName, intentMap);
-        appliedIntents.add(intentName);
-        return rc;
-    }
-    
-    private boolean processIntent(List<Feature> features,
-                                  AbstractEndpointFactory factory, String intentName,
-                                  IntentMap intentMap) throws IntentUnsatifiedException {
-        Object intent = intentMap.get(intentName);
-        if (intent instanceof String) {
-            if (PROVIDED_INTENT_VALUE.equalsIgnoreCase((String) intent)) {
-                return false;
-            }
-        } else if (intent instanceof Feature) {
-            Feature feature = (Feature)intent;
-            LOG.info("Applying intent: " + intentName
-                     + " via feature: " + feature);
-            features.add(feature);
-            return false;
-        } else if (intent instanceof BindingConfiguration) {
-            BindingConfiguration bindingCfg = (BindingConfiguration)intent;
-            LOG.info("Applying intent: " + intentName
-                     + " via binding config: " + bindingCfg);
-            factory.setBindingConfig(bindingCfg);
-            return true;
-        } else {
-            LOG.info("No mapping for intent: " + intentName);
-            throw new IntentUnsatifiedException(intentName);
-        }
-        return false;
-    }
-    
-
-    private Collection<String> addSynonymIntents(Collection<String> appliedIntents, IntentMap intentMap) {
-        // E.g. SOAP and SOAP.1_1 are synonyms
-        List<Object> values = new ArrayList<Object>();
-        for (String key : appliedIntents) {
-            values.add(intentMap.get(key));
-        }
-        return reverseLookup(intentMap, values);
-    }
-
-    private Collection<String> reverseLookup(IntentMap intentMap, Object obj) {
-        return reverseLookup(intentMap, Collections.singleton(obj));
-    }
-    
-    private Collection<String> reverseLookup(IntentMap intentMap, Collection<? extends Object> objs) {
-        Set<String> intentsFound = new HashSet<String>();
-        for (Map.Entry<String, Object> entry : intentMap.getIntents().entrySet()) {
-            if (objs.contains(entry.getValue())) {
-                intentsFound.add(entry.getKey());
-            }
-        }
-        return intentsFound;
-    }
-    
-    String getDefaultBindingIntent() {
-        return "SOAP";
-    }
-
-    IntentMap getIntentMap(BundleContext callingContext) {
-        return IntentUtils.getIntentMap(callingContext);
-    }
 
     public String getType() {
         return CONFIGURATION_TYPE;
     }
-
-    private static String[] getRequestedIntents(Map sd) {
-        Collection<String> intents = Arrays.asList(
-            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));        
-        Collection<String> extraIntents = Arrays.asList(
-            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));
-        Collection<String> oldIntents = Arrays.asList(
-            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_OLD))); 
-        
-        Set<String> allIntents = new HashSet<String>(intents.size() + extraIntents.size() + oldIntents.size());
-        allIntents.addAll(intents);
-        allIntents.addAll(extraIntents);
-        allIntents.addAll(oldIntents);
-        
-        LOG.debug("Intents asserted: " + allIntents);
-        return allIntents.toArray(new String[allIntents.size()]);
-    }
-    
-    private IntentMap mergeWithMaster(BundleContext dswContext, IntentMap intentMap) {
-        synchronized (this) {
-            if (masterMap == null) {
-                LOG.debug("Loading master intent map");
-                masterMap = getIntentMap(dswContext);
-            }
-        }
-        if (masterMap != null) {
-            Iterator<String> masterKeys = masterMap.getIntents().keySet().iterator();
-            while (masterKeys.hasNext()) {
-                String masterKey = masterKeys.next();
-                if (intentMap.get(masterKey) == null) {
-                    LOG.debug("Merging in master intent map entry: " + masterKey);
-                    intentMap.getIntents().put(masterKey, masterMap.get(masterKey));
-                } else {
-                    LOG.debug("Overridden master intent map entry: " + masterKey);
-                }
-            }
-        }
-        return intentMap;
-    }    
 
     protected String getPojoAddress(Map sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
