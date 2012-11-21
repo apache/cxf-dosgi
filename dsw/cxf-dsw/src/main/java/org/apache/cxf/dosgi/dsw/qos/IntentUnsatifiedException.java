@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations 
  * under the License. 
  */
-package org.apache.cxf.dosgi.dsw.handlers;
+package org.apache.cxf.dosgi.dsw.qos;
 
 public class IntentUnsatifiedException extends RuntimeException {
     private static final long serialVersionUID = 1L;

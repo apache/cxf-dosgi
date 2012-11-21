@@ -28,7 +28,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.cxf.binding.BindingConfiguration;
-import org.apache.cxf.dosgi.dsw.handlers.IntentUnsatifiedException;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.Feature;
 import org.osgi.framework.BundleContext;

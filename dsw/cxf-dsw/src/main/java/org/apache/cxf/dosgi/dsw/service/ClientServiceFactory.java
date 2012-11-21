@@ -22,7 +22,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.handlers.IntentUnsatifiedException;
+import org.apache.cxf.dosgi.dsw.qos.IntentUnsatifiedException;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
