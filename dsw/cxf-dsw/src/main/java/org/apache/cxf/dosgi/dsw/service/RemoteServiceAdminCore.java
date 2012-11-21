@@ -99,29 +99,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         synchronized (exportedServices) {
             // check if it is already exported ....
             if (exportedServices.containsKey(serviceReference)) {
-                LOG.debug("already exported ...  {} ", ifaceName);
-                Collection<ExportRegistration> regs = exportedServices.get(serviceReference);
-
-                List<EndpointDescription> copiedEndpoints = new ArrayList<EndpointDescription>();
-
-                // / create a new list with copies of the exportRegistrations
-                List<ExportRegistration> copy = new ArrayList<ExportRegistration>(regs.size());
-                for (ExportRegistration exportRegistration : regs) {
-                	if (exportRegistration instanceof ExportRegistrationImpl) {
-                		ExportRegistrationImpl exportRegistrationImpl = (ExportRegistrationImpl) exportRegistration;
-                		EndpointDescription epd = exportRegistration.getExportReference().getExportedEndpoint();
-                		// create one copy for each distinct endpoint description
-                		if (!copiedEndpoints.contains(epd)) {
-                			copiedEndpoints.add(epd);
-                			copy.add(new ExportRegistrationImpl(exportRegistrationImpl));
-                		}
-                	}
-                }
-
-                regs.addAll(copy);
-
-                eventProducer.publishNotifcation(copy);
-                return copy;
+                return copyExportRegistration(serviceReference, ifaceName);
             }
 
             if (isCreatedByThisRSA(serviceReference)) {
@@ -130,24 +108,12 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return Collections.emptyList();
             }
 
-
-
-            Properties serviceProperties = new Properties();
-
-            {// gather properties from sRef
-                String[] keys = serviceReference.getPropertyKeys();
-                for (String k : keys) {
-                    serviceProperties.put(k, serviceReference.getProperty(k));
-                }
-            }
-
-
-            if (additionalProperties != null) {// overlay properties with the additionalProperies
-                OsgiUtils.overlayProperties(serviceProperties,additionalProperties);
+            Properties serviceProperties = getProperties(serviceReference);
+            if (additionalProperties != null) {
+                OsgiUtils.overlayProperties(serviceProperties, additionalProperties);
             }
 
             List<String> unsupportedIntents = intentManager.getUnsupportedIntents(serviceProperties);
-            
             if (unsupportedIntents.size() > 0) {
                 LOG.error("service cannot be exported because the following intents are not supported by this RSA: "
                             + unsupportedIntents);
@@ -155,85 +121,36 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return Collections.emptyList();
             }
 
-            List<String> interfaces = new ArrayList<String>(1);
-
-            {// determine which interfaces should be exported ? based on props and sRef
-                String[] providedInterfaces = (String[])serviceProperties
-                    .get(org.osgi.framework.Constants.OBJECTCLASS);
-                String[] allowedInterfaces = Utils.normalizeStringPlus(serviceProperties
-                    .get(RemoteConstants.SERVICE_EXPORTED_INTERFACES));
-                if (providedInterfaces == null || allowedInterfaces == null) {
-                    LOG.error("export failed: no provided service interfaces found or service_exported_interfaces is null !!");
-                    // TODO: publish error event ? not sure
-                    return Collections.emptyList();
-                }
-
-                if (allowedInterfaces.length == 1 && "*".equals(allowedInterfaces[0])) {
-                    for (String i : providedInterfaces) {
-                        interfaces.add(i);
-                    }
-                } else {
-                    for (String x : allowedInterfaces) {
-                        for (String i : providedInterfaces) {
-                            if (x.equals(i)) {
-                                interfaces.add(i);
-                            }
-                        }
-                    }
-                }
-            }
-
-            LOG.info("interfaces selected for export: " + interfaces);
-
-            // if no interface is to be exported return null
+            List<String> interfaces = getInterfaces(serviceProperties);
             if (interfaces.size() == 0) {
-                LOG.warn("no interfaces to be exported");
+                LOG.error("export failed: no provided service interfaces found or service_exported_interfaces is null !!");
                 // TODO: publish error event ? not sure
                 return Collections.emptyList();
             }
+            LOG.info("interfaces selected for export: " + interfaces);
 
             List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
-
             LOG.info("configuration types selected for export: " + configurationTypes);
-
-            // if no configuration type is supported ? return null
             if (configurationTypes.size() == 0) {
                 LOG.info("the requested configuration types are not supported");
                 // TODO: publish error event ? not sure
                 return Collections.emptyList();
             }
 
-            LinkedHashMap<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>(
-                                                                                                                         1);
-
-            for (String iface : interfaces) {
-                LOG.info("creating initial ExportDescription for interface " + iface
-                         + "  with configuration types " + configurationTypes);
-
-                // create initial ExportRegistartion
-
+            LinkedHashMap<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>(1);
+            Object serviceObject = bctx.getService(serviceReference);
+            BundleContext callingContext = serviceReference.getBundle().getBundleContext();
+            ConfigurationTypeHandler handler = getHandler(configurationTypes, serviceProperties, getHandlerProperties());
+            if (handler == null) {
+                // TODO: publish error event ? not sure
+                return Collections.emptyList();
             }
 
             // FIXME: move out of synchronized ... -> blocks until publication is finished
             for (String iface : interfaces) {
-                LOG.info("creating server for interface " + iface);
-
-                ConfigurationTypeHandler handler = getHandler(configurationTypes, serviceProperties,
-                                                              getHandlerProperties());
-                Object serviceObject = bctx.getService(serviceReference);
-                BundleContext callingContext = serviceReference.getBundle().getBundleContext();
-
-                if (handler == null) {
-                    // TODO: publish error event ? not sure
-                    return Collections.emptyList();
-                }
-
-                LOG.info("found handler for " + iface + "  -> " + handler);
-
-                String interfaceName = iface;
+                LOG.info("creating server for interface " + iface + " with configurationTypes " + configurationTypes);
                 // this is an extra sanity check, but do we really need it now ?
-                Class<?> interfaceClass = ClassUtils.getInterfaceClass(serviceObject, interfaceName);
-
+                Class<?> interfaceClass = ClassUtils.getInterfaceClass(serviceObject, iface);
                 if (interfaceClass != null) {
                     ExportResult exportResult = handler.createServer(serviceReference, bctx, callingContext,
                             serviceProperties, interfaceClass, serviceObject);
@@ -255,6 +172,71 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
             return lExpReg;
         }
+    }
+
+    /**
+     * Determine which interfaces should be exported
+     * 
+     * @param serviceProperties 
+     * @return interfaces to be exported
+     */
+    private List<String> getInterfaces(Properties serviceProperties) {
+        List<String> interfaces = new ArrayList<String>(1);
+        
+        String[] providedInterfaces = (String[]) serviceProperties.get(org.osgi.framework.Constants.OBJECTCLASS);
+        String[] allowedInterfaces = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTERFACES));
+        if (providedInterfaces == null || allowedInterfaces == null) {
+            return Collections.emptyList();
+        }
+
+        if (allowedInterfaces.length == 1 && "*".equals(allowedInterfaces[0])) {
+            for (String i : providedInterfaces) {
+                interfaces.add(i);
+            }
+        } else {
+            for (String x : allowedInterfaces) {
+                for (String i : providedInterfaces) {
+                    if (x.equals(i)) {
+                        interfaces.add(i);
+                    }
+                }
+            }
+        }
+        return interfaces;
+    }
+
+    private Properties getProperties(ServiceReference serviceReference) {
+        Properties serviceProperties = new Properties();
+        for (String key : serviceReference.getPropertyKeys()) {
+            serviceProperties.put(key, serviceReference.getProperty(key));
+        }
+        return serviceProperties;
+    }
+
+    private List<ExportRegistration> copyExportRegistration(ServiceReference serviceReference, String ifaceName) {
+        LOG.debug("already exported ...  {} ", ifaceName);
+        Collection<ExportRegistration> regs = exportedServices.get(serviceReference);
+
+        List<EndpointDescription> copiedEndpoints = new ArrayList<EndpointDescription>();
+
+        // / create a new list with copies of the exportRegistrations
+        List<ExportRegistration> copy = new ArrayList<ExportRegistration>(regs.size());
+        for (ExportRegistration exportRegistration : regs) {
+        	if (exportRegistration instanceof ExportRegistrationImpl) {
+        		ExportRegistrationImpl exportRegistrationImpl = (ExportRegistrationImpl) exportRegistration;
+        		EndpointDescription epd = exportRegistration.getExportReference().getExportedEndpoint();
+        		// create one copy for each distinct endpoint description
+        		if (!copiedEndpoints.contains(epd)) {
+        			copiedEndpoints.add(epd);
+        			copy.add(new ExportRegistrationImpl(exportRegistrationImpl));
+        		}
+        	}
+        }
+
+        regs.addAll(copy);
+
+        eventProducer.publishNotifcation(copy);
+        return copy;
     }
 
 
