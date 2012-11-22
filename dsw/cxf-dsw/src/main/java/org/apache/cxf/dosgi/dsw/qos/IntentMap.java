@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.qos;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Maps intent names to intent objects
@@ -27,12 +28,12 @@ import java.util.Map;
  * 
  * Also supports a default intent map. Custom intents can override the defaults 
  */
-public class IntentMap extends HashMap<String, Object> {
+public class IntentMap extends ConcurrentHashMap<String, Object> {
     private static final long serialVersionUID = 2606460607920520767L;
     private Map<String, Object> defaultMap;
     
     public IntentMap() {
-        super(new HashMap<String, Object>());
+        this(new HashMap<String, Object>());
     }
     
     public IntentMap(Map<String, Object> defaultMap) {

@@ -27,6 +27,7 @@ import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
@@ -45,8 +46,11 @@ public class ActivatorTest extends TestCase{
     public void testCreateAndShutdownRemoteServiceAdminService() throws Exception {
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext bc = getMockBundleContext(control);
+        Filter filter = control.createMock(Filter.class);
+        EasyMock.expect(bc.createFilter(EasyMock.<String>anyObject())).andReturn(filter );
+        EasyMock.expectLastCall().atLeastOnce();
         ServiceRegistration sr = control.createMock(ServiceRegistration.class);
-        EasyMock.expect(bc.registerService(EasyMock.eq(RemoteServiceAdmin.class.getName()),EasyMock.anyObject(), (Dictionary)EasyMock.anyObject())).andReturn(sr).atLeastOnce();
+        EasyMock.expect(bc.registerService(EasyMock.eq(RemoteServiceAdmin.class.getName()),EasyMock.anyObject(), (Dictionary<?,?>)EasyMock.anyObject())).andReturn(sr).atLeastOnce();
         
         control.replay();
         Activator a = new Activator();
