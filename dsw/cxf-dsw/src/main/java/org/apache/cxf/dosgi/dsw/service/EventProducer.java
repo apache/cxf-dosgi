@@ -104,7 +104,7 @@ public class EventProducer {
     }
      
     
-    public void notifyRemoval(ImportRegistrationImpl eri) {
+    public void notifyRemoval(ImportRegistration eri) {
         RemoteServiceAdminEvent rsae = null;
         rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION, bctx.getBundle(), eri.getImportReference(), eri.getException());
         
