@@ -27,6 +27,7 @@ import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +76,7 @@ public final class ConfigTypeHandlerFactory {
         }
 
         if (types.contains(Constants.RS_CONFIG_TYPE)) {
-            String intentsProperty = OsgiUtils.getProperty(serviceProperties, Constants.EXPORTED_INTENTS);
+            String intentsProperty = OsgiUtils.getProperty(serviceProperties, RemoteConstants.SERVICE_EXPORTED_INTENTS);
             boolean hasHttpIntent = false, hasSoapIntent = false;
             if (intentsProperty != null) {
                 String[] intents = IntentUtils.parseIntents(intentsProperty);

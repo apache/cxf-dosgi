@@ -18,22 +18,34 @@
   */
 package org.apache.cxf.dosgi.dsw;
 
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
+
 public class Constants {
     // Constants from RFC 119, they should ultimately be picked up from an OSGi class.
-    public static final String EXPORTED_INTERFACES = "service.exported.interfaces";
+    @Deprecated
+    public static final String EXPORTED_INTERFACES = RemoteConstants.SERVICE_EXPORTED_INTERFACES;
+    @Deprecated
     public static final String EXPORTED_INTERFACES_OLD = "osgi.remote.interfaces"; // for BW compatibility
 
-    public static final String EXPORTED_CONFIGS = "service.exported.configs";
+    @Deprecated
+    public static final String EXPORTED_CONFIGS = RemoteConstants.SERVICE_EXPORTED_CONFIGS;
+    @Deprecated
     public static final String EXPORTED_CONFIGS_OLD = "osgi.remote.configuration.type"; // for BW comp.
     
-    public static final String EXPORTED_INTENTS = "service.exported.intents";
-    public static final String EXPORTED_INTENTS_EXTRA = "service.exported.intents.extra";
+    @Deprecated
+    public static final String EXPORTED_INTENTS = RemoteConstants.SERVICE_EXPORTED_INTENTS;
+    @Deprecated
+    public static final String EXPORTED_INTENTS_EXTRA = RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA;
+    @Deprecated
     public static final String EXPORTED_INTENTS_OLD = "osgi.remote.requires.intents";
     
-    public static final String IMPORTED = "service.imported";
-    public static final String IMPORTD_CONFIGS = "service.imported.configs";
+    @Deprecated
+    public static final String IMPORTED = RemoteConstants.SERVICE_IMPORTED;
+    @Deprecated
+    public static final String IMPORTD_CONFIGS = RemoteConstants.SERVICE_IMPORTED_CONFIGS;
     
-    public static final String INTENTS = "service.intents";
+    @Deprecated
+    public static final String INTENTS = RemoteConstants.SERVICE_INTENTS;
         
     // WSDL
     public static final String WSDL_CONFIG_TYPE = "wsdl";

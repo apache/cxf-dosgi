@@ -31,6 +31,7 @@ import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.easymock.EasyMock;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class ConfigTypeHandlerFactoryTest extends TestCase {
 
@@ -62,7 +63,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         IntentManager intentManager = new IntentManagerImpl(intentMap);
         ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager);
         configs.add(Constants.RS_CONFIG_TYPE);
-        serviceProps.put(Constants.EXPORTED_INTENTS, "HTTP");
+        serviceProps.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, "HTTP");
 
         ConfigurationTypeHandler handler = f.getHandler(bc, configs, serviceProps, null);
         assertTrue(handler instanceof JaxRSPojoConfigurationTypeHandler);
@@ -79,7 +80,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         IntentManager intentManager = new IntentManagerImpl(intentMap);
         ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager);
         configs.add(Constants.RS_CONFIG_TYPE);
-        serviceProps.put(Constants.EXPORTED_INTENTS, "SOAP HTTP");
+        serviceProps.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, "SOAP HTTP");
 
         ConfigurationTypeHandler handler = f.getHandler(bc, configs, serviceProps, null);
         assertTrue(handler instanceof PojoConfigurationTypeHandler);
