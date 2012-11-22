@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.Feature;
 import org.osgi.framework.BundleContext;
@@ -41,7 +42,6 @@ import org.slf4j.LoggerFactory;
 public class IntentManagerImpl implements IntentManager {
     private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
     private static final Logger LOG = LoggerFactory.getLogger(IntentManagerImpl.class);
-    private static final String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
 
     private final IntentMap intentMap;
     private final ServiceTracker intentTracker;
@@ -55,7 +55,7 @@ public class IntentManagerImpl implements IntentManager {
         this.intentMap = intentMap;
         Filter filter;
         try {
-            filter = bc.createFilter("(" + INTENT_NAME_PROP + "=*)");
+            filter = bc.createFilter("(" + Constants.INTENT_NAME_PROP + "=*)");
         } catch (InvalidSyntaxException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -63,16 +63,16 @@ public class IntentManagerImpl implements IntentManager {
 
             @Override
             public Object addingService(ServiceReference reference) {
-                String intentName = (String) reference.getProperty(INTENT_NAME_PROP);
+                String intentName = (String) reference.getProperty(Constants.INTENT_NAME_PROP);
                 Object intent = bc.getService(reference);
-                LOG.info("Adding custom intent " + intentName + " defined in bundle " + reference.getBundle().getSymbolicName());
+                LOG.info("Adding custom intent " + intentName);
                 intentMap.put(intentName, intent);
                 return super.addingService(reference);
             }
 
             @Override
             public void removedService(ServiceReference reference, Object service) {
-                String intentName = (String) reference.getProperty(INTENT_NAME_PROP);
+                String intentName = (String) reference.getProperty(Constants.INTENT_NAME_PROP);
                 intentMap.remove(intentName);
                 super.removedService(reference, service);
             }

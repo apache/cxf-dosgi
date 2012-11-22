@@ -107,5 +107,7 @@ public class Constants {
     
     //DSW Identification - TODO do we really need this one?
     public static final String DSW_CLIENT_ID = PROVIDER_PREFIX + ".remote.dsw.client";
+
+    public static final String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
     
 }

@@ -16,25 +16,27 @@
   * specific language governing permissions and limitations 
   * under the License. 
   */
-package org.apache.cxf.dosgi.dsw;
+package org.apache.cxf.dosgi.dsw.qos;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+import java.util.HashMap;
+import java.util.Map;
 
-public class OsgiService<T> {
-    private ServiceReference sr;
-    private T serviceObject;
-    
-    public OsgiService(ServiceReference sref, T service) {
-        sr = sref;
-        serviceObject = service;
-    }
-    
-    public T getService() {
-        return serviceObject;
-    }
-    
-    public void ungetService(BundleContext bc) {
-        bc.ungetService(sr);
+import org.junit.Test;
+
+import junit.framework.Assert;
+
+public class IntentMapTest {
+
+    @Test
+    public void inheritanceTest() {
+        Map<String, Object> defaultMap = new HashMap<String, Object>();
+        defaultMap.put("key1", "defaultValue");
+        IntentMap intentMap = new IntentMap(defaultMap);
+        Assert.assertEquals("defaultValue", intentMap.get("key1"));
+        intentMap.put("key1", "overridden");
+        Assert.assertEquals("overridden", intentMap.get("key1"));
+        Object curValue = intentMap.remove("key1");
+        Assert.assertEquals("overridden", curValue);
+        Assert.assertEquals("defaultValue", intentMap.get("key1"));
     }
 }
