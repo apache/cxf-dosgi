@@ -92,6 +92,30 @@ public final class OsgiUtils {
         }
         return null;
     }
+    
+    public static String getFirstNonEmptyStringProperty(@SuppressWarnings("rawtypes") Map dict, String ... keys) {
+        for (String key : keys) {
+            String value = getStringProperty(dict, key);
+            if (value != null) {
+                return value;
+            }
+        }
+        return null;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    private static String getStringProperty(Map dict, String name) {
+        Object o = dict.get(name);
+
+        if (o != null) {
+            if (o instanceof String) {
+                return (String)o;
+            } else {
+                throw new RuntimeException("Could not use property " + name + " as the value is not a String");
+            }
+        }
+        return null;
+    }
 
     /**
      * Tries to retrieve the version of iClass via the PackageAdmin

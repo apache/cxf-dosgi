@@ -71,7 +71,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         HttpServiceConfigurationTypeHandler h = 
             new HttpServiceConfigurationTypeHandler(dswContext, intentManager , handlerProps) {
                 @Override
-                ServerFactoryBean createServerFactoryBean(String frontend) {
+                ServerFactoryBean createServerFactoryBean(ServiceReference sRef, Class<?> iClass) {
                     return sfb;
                 }
         };
@@ -144,7 +144,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         HttpServiceConfigurationTypeHandler h = 
             new HttpServiceConfigurationTypeHandler(dswContext, intentManager, handlerProps) {
                 @Override
-                ServerFactoryBean createServerFactoryBean(String frontend) {
+                ServerFactoryBean createServerFactoryBean(ServiceReference sRef, Class<?> iClass) {
                     return sfb;
                 }
 
@@ -211,7 +211,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         HttpServiceConfigurationTypeHandler h = 
             new HttpServiceConfigurationTypeHandler(dswContext, intentManager, handlerProps) {
                 @Override
-                ServerFactoryBean createServerFactoryBean(String frontend) {
+                ServerFactoryBean createServerFactoryBean(ServiceReference sRef, Class<?> iClass) {
                     return sfb;
                 }
         };
@@ -338,7 +338,7 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
         IntentManager intentManager = new DummyIntentManager(new String[] { "a.b.c" });
         HttpServiceConfigurationTypeHandler h = new HttpServiceConfigurationTypeHandler(bc1, intentManager , handlerProps) {
             @Override
-            ClientProxyFactoryBean createClientProxyFactoryBean(String frontend) {
+            ClientProxyFactoryBean createClientProxyFactoryBean(ServiceReference sRef, Class<?> iClass) {
                 return cpfb;
             }
 

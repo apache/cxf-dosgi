@@ -138,7 +138,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         };
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(bc1, intentManager, handlerProps) {
             @Override
-            ClientProxyFactoryBean createClientProxyFactoryBean(String frontend) {
+            ClientProxyFactoryBean createClientProxyFactoryBean(ServiceReference sRef, Class<?> iClass) {
                 return cpfb;
             }
         };
@@ -275,7 +275,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         };
         PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, intentManager, handlerProps) {
             @Override
-            ServerFactoryBean createServerFactoryBean(String frontend) {
+            ServerFactoryBean createServerFactoryBean(ServiceReference sRef, Class<?> iClass) {
                 return sfb;
             }
         };

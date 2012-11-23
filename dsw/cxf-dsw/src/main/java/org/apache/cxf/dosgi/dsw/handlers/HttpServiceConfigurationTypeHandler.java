@@ -90,21 +90,11 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            DataBinding databinding;
-            String dataBindingImpl = (String)serviceReference.getProperty(Constants.WS_DATABINDING_PROP_KEY);
-            if ("jaxb".equals(dataBindingImpl)) {
-                databinding = new JAXBDataBinding();
-            } else {
-                databinding = new AegisDatabinding();
-            }
-            String frontEndImpl = (String)serviceReference.getProperty(Constants.WS_FRONTEND_PROP_KEY);
-            ClientProxyFactoryBean factory = createClientProxyFactoryBean(frontEndImpl);
+            ClientProxyFactoryBean factory = createClientProxyFactoryBean(serviceReference, iClass);
             addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd.getProperties());
             setClientWsdlProperties(factory.getClientFactoryBean(), dswContext, sd.getProperties(), false);
-            
             factory.setServiceClass(iClass);
             factory.setAddress(address);
-            factory.getServiceFactory().setDataBinding(databinding);
 
             intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd.getProperties());
 
@@ -127,34 +117,19 @@ public class HttpServiceConfigurationTypeHandler extends AbstractPojoConfigurati
         }
 
         Bus bus = registerServletAndGetBus(contextRoot, dswContext, sref);
-        DataBinding databinding;
-        String dataBindingImpl = (String)sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
-        String dataBindingImpl2 = (String) sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
-        if ("jaxb".equals(dataBindingImpl) || "jaxb".equals(dataBindingImpl2)) {
-            databinding = new JAXBDataBinding();
-        } else {
-            databinding = new AegisDatabinding();
-        }
-        String frontEndImpl = (String)sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
-        String frontEndImpl2 = (String) sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
-        
-        ServerFactoryBean factory = 
-        	createServerFactoryBean(frontEndImpl != null ? frontEndImpl : frontEndImpl2);
-        
+
+        ServerFactoryBean factory = createServerFactoryBean(sref, iClass);
         factory.setBus(bus);
         factory.setServiceClass(iClass);
-        
         String relativeEndpointAddress = getRelativeEndpointAddress(sd);
         factory.setAddress(relativeEndpointAddress);
-        factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
         
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         
         setWsdlProperties(factory, callingContext, sd, false);
         
-        String completeEndpointAddress = 
-        		constructAddress(dswContext, contextRoot, relativeEndpointAddress);
+        String completeEndpointAddress = constructAddress(dswContext, contextRoot, relativeEndpointAddress);
         
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         String[] intents = intentManager.applyIntents(factory.getFeatures(),factory, sd);

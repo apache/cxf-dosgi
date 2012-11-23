@@ -119,14 +119,8 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
             String[] allIntents = IntentUtils.mergeArrays(intents, IntentUtils.getInetntsImplementedByTheService(sd));
             props.put(RemoteConstants.SERVICE_INTENTS, allIntents);
         }
-
-        //        for (String cfg : importedConfigs) {
-        //            props.put(cfg + ".stuff", "unused");
-        //        }
-
-        // make sure that the Endpoint contains the address that was actualy used
-        addAddressProperty(props, address);
-
+        
+        props.put(RemoteConstants.ENDPOINT_ID, address);
         return props;
 
     }
@@ -144,12 +138,5 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
             }
         }
     }
-
-    protected void addAddressProperty(Map props, String address) {
-        if (props != null) {
-            props.put(RemoteConstants.ENDPOINT_ID, address);
-        }
-    }
-    
 
 }

@@ -24,7 +24,9 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.util.ClassUtils;
@@ -36,9 +38,11 @@ import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,21 +58,23 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     }
 
     // Isolated so that it can be substituted for testing
-    ClientProxyFactoryBean createClientProxyFactoryBean(String frontEndImpl) {
-      if("jaxws".equals(frontEndImpl)) {
-        return new JaxWsProxyFactoryBean();
-      } else {
-        return new ClientProxyFactoryBean();
-      }
+    ClientProxyFactoryBean createClientProxyFactoryBean(ServiceReference sref, Class<?> iClass) {
+        String frontEnd = (String)sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
+        ClientProxyFactoryBean factory = "jaxws".equals(frontEnd) ? new JaxWsProxyFactoryBean() : new ClientProxyFactoryBean();
+        String dataBindingName = (String)sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
+        DataBinding databinding = "jaxb".equals(dataBindingName) ? new JAXBDataBinding() : new AegisDatabinding();
+        factory.getServiceFactory().setDataBinding(databinding);
+        return factory;
     }
 
     // Isolated so that it can be substituted for testing
-    ServerFactoryBean createServerFactoryBean(String frontEndImpl) {
-      if("jaxws".equals(frontEndImpl)) {
-        return new JaxWsServerFactoryBean();
-      } else {
-        return new ServerFactoryBean();
-      }
+    ServerFactoryBean createServerFactoryBean(ServiceReference sref, Class<?> iClass) {
+        String frontEnd = (String)sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
+        ServerFactoryBean factory = "jaxws".equals(frontEnd) ? new JaxWsServerFactoryBean() : new ServerFactoryBean();
+        String dataBindingName = (String)sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
+        DataBinding databinding = "jaxb".equals(dataBindingName) ? new JAXBDataBinding() : new AegisDatabinding();
+        factory.getServiceFactory().setDataBinding(databinding);
+        return factory;
     }
 
     protected void setWsdlProperties(ServerFactoryBean factory,
@@ -137,7 +143,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     	}
     }
     
-    protected QName getServiceQName(Class<?> iClass, Map sd, String nsPropName, String namePropName) {
+    protected static QName getServiceQName(Class<?> iClass, Map sd, String nsPropName, String namePropName) {
     	String serviceNs = OsgiUtils.getProperty(sd, nsPropName);
     	String serviceName = OsgiUtils.getProperty(sd, namePropName);
     	if (iClass == null && (serviceNs == null || serviceName == null)) {
@@ -153,7 +159,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return new QName(serviceNs, serviceName);
     }
     
-    protected QName getPortQName(String ns, Map sd, String propName) {
+    protected static QName getPortQName(String ns, Map sd, String propName) {
     	String portName = OsgiUtils.getProperty(sd, propName);
         if (portName == null) {
         	return null;	
@@ -161,7 +167,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return new QName(ns, portName);
     }
     
-    protected void addInterceptors(AbstractEndpointFactory factory, BundleContext callingContext, 
+    protected static void addInterceptors(AbstractEndpointFactory factory, BundleContext callingContext, 
     		Map sd, String propName) {
 
         List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName); 
@@ -184,7 +190,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     }
     
        
-    protected void addFeatures(AbstractEndpointFactory factory, BundleContext callingContext, 
+    protected static void addFeatures(AbstractEndpointFactory factory, BundleContext callingContext, 
     		Map sd, String propName) {
 
         List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName); 
@@ -193,7 +199,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         }
     }
     
-    protected void addContextProperties(AbstractEndpointFactory factory, BundleContext callingContext, 
+    protected static void addContextProperties(AbstractEndpointFactory factory, BundleContext callingContext, 
     		Map sd, String propName) {
     	Map<String, Object> props = (Map<String, Object>)sd.get(propName);
         if (props != null) {
@@ -206,38 +212,18 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     }
 
     protected String getPojoAddress(Map sd, Class<?> iClass) {
-        String address = OsgiUtils.getProperty(sd, RemoteConstants.ENDPOINT_ID);
-        if(address == null && sd.get(RemoteConstants.ENDPOINT_ID)!=null ){
-            LOG.error("Could not use address property " + RemoteConstants.ENDPOINT_ID );
+        String address = null;
+        try {
+            address = OsgiUtils.getFirstNonEmptyStringProperty(sd, 
+                    RemoteConstants.ENDPOINT_ID,
+                    Constants.WS_ADDRESS_PROPERTY,
+                    Constants.WS_ADDRESS_PROPERTY,
+                    Constants.WS_ADDRESS_PROPERTY_OLD,
+                    Constants.RS_ADDRESS_PROPERTY);
+        } catch (RuntimeException e) {
+            LOG.error(e.getMessage(), e);
             return null;
         }
-        
-        
-        if (address == null) {
-            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY);
-        }
-        if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY)!=null ){
-            LOG.error("Could not use address property " + Constants.WS_ADDRESS_PROPERTY );
-            return null;
-        }
-        
-        if (address == null) {
-            address = OsgiUtils.getProperty(sd, Constants.WS_ADDRESS_PROPERTY_OLD);
-        }
-        if(address == null && sd.get(Constants.WS_ADDRESS_PROPERTY_OLD)!=null ){
-            LOG.error("Could not use address property " + Constants.WS_ADDRESS_PROPERTY_OLD);
-            return null;
-        }
-        
-        if (address == null) {
-            address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
-        }
-        if(address == null && sd.get(Constants.RS_ADDRESS_PROPERTY)!=null ){
-            LOG.error("Could not use address property " + Constants.RS_ADDRESS_PROPERTY);
-            return null;
-        }
-        
-        
         if (address == null) {
             String port = null;
             Object p = sd.get(Constants.WS_PORT_PROPERTY);
