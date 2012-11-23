@@ -20,7 +20,6 @@ package org.apache.cxf.dosgi.dsw.qos;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.easymock.EasyMock.expect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,20 +36,12 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
-import org.easymock.Capture;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
 
 public class IntentManagerImplTest {
-    private static final String MY_INTENT_NAME = "myIntent";
     private Map<String, Object> handlerProps;
     
     @Before
@@ -72,7 +63,7 @@ public class IntentManagerImplTest {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
-        IntentManager intentManager = new IntentManagerImpl(intentMap);
+        IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "A");
@@ -285,43 +276,6 @@ public class IntentManagerImplTest {
             intentManager.applyIntents(features, factory, props)));
         Set<String> expectedIntents = new HashSet<String>(Arrays.asList(new String [] {"A", "B", "SOAP"}));
         assertEquals(expectedIntents, effectiveIntents);
-    }
-    
-    @Test
-    public void testIntentAsService() throws InvalidSyntaxException {
-        IMocksControl c = EasyMock.createControl();
-        BundleContext bc = c.createMock(BundleContext.class);
-        Filter filter = c.createMock(Filter.class);
-        expect(bc.createFilter(EasyMock.<String>anyObject())).andReturn(filter);
-        expect(bc.getProperty(org.osgi.framework.Constants.FRAMEWORK_VERSION)).andReturn("1.6.0");
-        final Capture<ServiceListener> capturedListener = new Capture<ServiceListener>();
-        bc.addServiceListener(EasyMock.capture(capturedListener), EasyMock.<String>anyObject());
-        EasyMock.expectLastCall().atLeastOnce();
-        expect(bc.getServiceReferences(EasyMock.<String>anyObject(), EasyMock.<String>anyObject())).andReturn(new ServiceReference[]{});
-        IntentMap intentMap = new IntentMap();
-
-        // Create a custom intent
-        ServiceReference reference = c.createMock(ServiceReference.class);
-        expect(reference.getProperty(Constants.INTENT_NAME_PROP)).andReturn(MY_INTENT_NAME);
-        TestFeature testIntent = new TestFeature(MY_INTENT_NAME);
-        expect(bc.getService(reference)).andReturn(testIntent).atLeastOnce();
-
-        c.replay();
-        
-        new IntentManagerImpl(bc, intentMap);
-        Assert.assertFalse("IntentMap should not contain " + MY_INTENT_NAME, intentMap.containsKey(MY_INTENT_NAME));
-        ServiceListener listener = capturedListener.getValue();
-        
-        // Simulate adding custom intent service
-        ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, reference);
-        listener.serviceChanged(event);
-        
-        // our custom intent should now be available
-        Assert.assertTrue("IntentMap should contain " + MY_INTENT_NAME, intentMap.containsKey(MY_INTENT_NAME));
-        Assert.assertEquals(testIntent, intentMap.get(MY_INTENT_NAME));
-        
-        c.verify();
-        
     }
     
     private static class TestFeature extends AbstractFeature {

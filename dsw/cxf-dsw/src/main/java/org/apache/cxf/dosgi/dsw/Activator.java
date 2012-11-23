@@ -29,6 +29,7 @@ import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
+import org.apache.cxf.dosgi.dsw.qos.IntentTracker;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
 import org.osgi.framework.BundleActivator;
@@ -44,6 +45,8 @@ import org.slf4j.LoggerFactory;
 // registered as spring bean -> start / stop called accordingly 
 public class Activator implements ManagedService, BundleActivator {
 
+    private static final int DEFAULT_INTENT_TIMEOUT = 30000;
+
     private final static Logger LOG = LoggerFactory.getLogger(Activator.class);
 
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
@@ -52,23 +55,19 @@ public class Activator implements ManagedService, BundleActivator {
 
     private ServiceRegistration decoratorReg;
 
+    private IntentTracker intentTracker;
+
     public void start(BundleContext bc) throws Exception {
         // Disable the fast infoset as it's not compatible (yet) with OSGi
         System.setProperty("org.apache.cxf.nofastinfoset", "true");
 
         // should we have a seperate PID for a find and publish hook ?
         // context.registerService(ManagedService.class.getName(), this, getDefaults());
-
-        registerRemoteServiceAdminService(bc);
-
-        decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc),
-                                          null);
-
-    }
-
-    private RemoteServiceadminFactory registerRemoteServiceAdminService(BundleContext bc) {
+        
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
-        IntentManager intentManager = new IntentManagerImpl(bc, intentMap);
+        intentTracker = new IntentTracker(bc, intentMap);
+        intentTracker.open();
+        IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
         RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(bc, intentManager);
         Hashtable<String, Object> props = new Hashtable<String, Object>();
 
@@ -88,16 +87,14 @@ public class Activator implements ManagedService, BundleActivator {
                                      org.apache.cxf.dosgi.dsw.Constants.RS_CONFIG_TYPE
         };
         props.put("remote.configs.supported", supportedConfigs);
-        
         LOG.info("Registering RemoteServiceAdminFactory...");
-
         rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
-        return rsaf;
+        decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc), null);
     }
 
     public void stop(BundleContext context) throws Exception {
         LOG.debug("RemoteServiceAdmin Implementation is shutting down now");
-        
+        intentTracker.close();
         // This also triggers the unimport and unexport of the remote services
         rsaFactoryReg.unregister();
         decoratorReg.unregister();

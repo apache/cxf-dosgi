@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.systests2.multi.customintent;
 import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.provision;
+import static org.ops4j.pax.exam.CoreOptions.streamBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 import java.io.IOException;
@@ -47,6 +48,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.swissbox.tinybundles.core.TinyBundles;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
@@ -78,17 +80,19 @@ public class TestCustomIntent extends AbstractTestExportService {
         return new Option[] {
                 MultiBundleTools.getDistro(),
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("DEBUG"),
-                mavenBundle().groupId("org.apache.servicemix.bundles")
-                        .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
-                mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-                        .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common")
-                        .versionAsInProject(), provision(getCustomIntentBundle()), provision(getServiceBundle()),
+                mavenBundle().groupId("org.apache.servicemix.bundles").artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
+                mavenBundle().groupId("org.apache.cxf.dosgi.samples").artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf.dosgi.systests").artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(), 
+                streamBundle(getCustomIntentBundle()).noStart(), 
+                provision(getServiceBundle()),
                 frameworkStartLevel(100) };
     }
 
     @Test
-    public void testAccessEndpoint() throws Exception {
+    public void testCustomIntent() throws Exception {
+        // There should be warnings of unsatisfied intent myIntent in the log at debug level
+        Thread.sleep(2000);
+        getBundleByName(bundleContext, "CustomIntent").start();
         waitPort(9090);
         ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
         factory.setServiceClass(GreeterService.class);
@@ -109,6 +113,15 @@ public class TestCustomIntent extends AbstractTestExportService {
         }
     }
     
+    private Bundle getBundleByName(BundleContext bc, String sn) {
+        for (Bundle bundle : bc.getBundles()) {
+            if (bundle.getSymbolicName().equals(sn)) {
+                return bundle;
+            }
+        }
+        return null;
+    }
+
     private void waitPort(int port) throws Exception {
         for (int i = 0; i < 20; i++) {
             Socket s = null;

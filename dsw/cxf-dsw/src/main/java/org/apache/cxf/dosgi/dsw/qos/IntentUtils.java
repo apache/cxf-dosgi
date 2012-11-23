@@ -89,7 +89,6 @@ public class IntentUtils {
         Set<String> allIntents = new HashSet<String>(intents.size() + oldIntents.size());
         allIntents.addAll(intents);
         allIntents.addAll(oldIntents);
-        LOG.debug("Intents asserted: " + allIntents);
         return allIntents;
     }
 

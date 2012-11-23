@@ -26,6 +26,6 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.Feature;
 
 public interface IntentManager {
-    List<String> getUnsupportedIntents(Properties serviceProperties);
     String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory, Map<String, Object> props);
+    void assertAllIntentsSupported(Properties serviceProperties);
 }

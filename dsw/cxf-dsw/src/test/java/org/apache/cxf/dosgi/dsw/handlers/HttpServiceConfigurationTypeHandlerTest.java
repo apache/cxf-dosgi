@@ -18,7 +18,6 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +28,10 @@ import junit.framework.TestCase;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
-import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.qos.IntentUnsatifiedException;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -383,10 +379,6 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
             this.applyResult = applyResult;
         }
         
-        public List<String> getUnsupportedIntents(Properties serviceProperties) {
-            return new ArrayList<String>();
-        }
-
         public BindingConfiguration getBindingConfiguration(String[] requestedIntents,
                 BindingConfiguration defaultConfig) {
             return defaultConfig;
@@ -399,6 +391,9 @@ public class HttpServiceConfigurationTypeHandlerTest extends TestCase {
 
         public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory, Map<String, Object> props) {
             return applyResult;
+        }
+
+        public void assertAllIntentsSupported(Properties serviceProperties) {
         }
     };
 }

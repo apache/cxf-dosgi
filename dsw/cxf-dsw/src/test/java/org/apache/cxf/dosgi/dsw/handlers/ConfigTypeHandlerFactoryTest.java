@@ -43,7 +43,7 @@ public class ConfigTypeHandlerFactoryTest extends TestCase {
         Map<String, Object> serviceProps = new HashMap<String, Object>();
 
         IntentMap intentMap = new IntentMap();
-        IntentManager intentManager = new IntentManagerImpl(intentMap );
+        IntentManager intentManager = new IntentManagerImpl(intentMap);
         ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(intentManager );
 
         configs.add(Constants.RS_CONFIG_TYPE);

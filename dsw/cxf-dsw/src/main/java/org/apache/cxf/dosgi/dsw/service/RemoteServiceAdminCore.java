@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -113,11 +114,10 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 OsgiUtils.overlayProperties(serviceProperties, additionalProperties);
             }
 
-            List<String> unsupportedIntents = intentManager.getUnsupportedIntents(serviceProperties);
-            if (unsupportedIntents.size() > 0) {
-                LOG.error("service cannot be exported because the following intents are not supported by this RSA: "
-                            + unsupportedIntents);
-                // TODO: publish error event
+            try {
+                intentManager.assertAllIntentsSupported(serviceProperties);
+            } catch (RuntimeException e) {
+                LOG.error(e.getMessage(), e);
                 return Collections.emptyList();
             }
 
@@ -392,46 +392,49 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         try {
             // MARC: relies on dynamic imports ?
             Class<?> iClass = bctx.getBundle().loadClass(interfaceName);
-            if (iClass != null) {
-                BundleContext actualContext = bctx;
-                Class<?> actualClass = requestingContext.getBundle().loadClass(interfaceName);
-                if (actualClass != iClass) {
-                    LOG.info("Class " + interfaceName + " loaded by DSW's bundle context is not "
+            if (iClass == null) {
+                throw new ClassNotFoundException("Cannot load interface class");
+            }
+            
+            BundleContext actualContext = bctx;
+            Class<?> actualClass = requestingContext.getBundle().loadClass(interfaceName);
+            if (actualClass != iClass) {
+                LOG.info("Class " + interfaceName + " loaded by DSW's bundle context is not "
                              + "equal to the one loaded by the requesting bundle context, "
                              + "DSW will use the requesting bundle context to register " + "a proxy service");
-                    iClass = actualClass;
-                    actualContext = requestingContext;
-                }
-
-                /* TODO: add additional local params ... */
-                Dictionary<String, Object> serviceProps = new Hashtable<String, Object>(imReg.getImportedEndpointDescription()
-                    .getProperties());
-                serviceProps.put(RemoteConstants.SERVICE_IMPORTED, true);
-                serviceProps.remove(RemoteConstants.SERVICE_EXPORTED_INTERFACES);
-
-                // synchronized (discoveredServices) {
-                ClientServiceFactory csf = new ClientServiceFactory(actualContext, iClass, imReg
-                    .getImportedEndpointDescription(), handler, imReg);
-
-                imReg.setClientServiceFactory(csf);
-                ServiceRegistration proxyRegistration = actualContext.registerService(interfaceName, csf,
-                                                                                      serviceProps);
-                imReg.setImportedServiceRegistration(proxyRegistration);
-                // cacheEndpointId(sd, proxyRegistration);
-                // }
-            } else {
-                LOG.info("not proxifying service, cannot load interface class: " + interfaceName);
-                imReg.setException(new ClassNotFoundException(
-                                                              "not proxifying service, cannot load interface class: "
-                                                                  + interfaceName));
+                iClass = actualClass;
+                actualContext = requestingContext;
             }
-        } catch (ClassNotFoundException ex) {
+
+            EndpointDescription ed = imReg.getImportedEndpointDescription();
+            /* TODO: add additional local params ... */
+            Dictionary<String, Object> serviceProps = new Hashtable<String, Object>(ed.getProperties());
+            serviceProps.put(RemoteConstants.SERVICE_IMPORTED, true);
+            serviceProps.remove(RemoteConstants.SERVICE_EXPORTED_INTERFACES);
+            intentManager.assertAllIntentsSupported(getProperties(serviceProps));
+                
+            // synchronized (discoveredServices) {
+            ClientServiceFactory csf = new ClientServiceFactory(actualContext, iClass, ed, handler, imReg);
+            imReg.setClientServiceFactory(csf);
+            ServiceRegistration proxyReg = actualContext.registerService(interfaceName, csf, serviceProps);
+            imReg.setImportedServiceRegistration(proxyReg);
+        } catch (Exception ex) {
             if (LOG.isDebugEnabled()) {
                 // Only logging at debug level as this might be written to the log at the TopologyManager
-                LOG.debug("No class can be found for " + interfaceName, ex);
+                LOG.debug("Can not proxy service with interface " + interfaceName + ": " + ex.getMessage(), ex);
             }
             imReg.setException(ex);
         }
+    }
+
+    private Properties getProperties(Dictionary<String, Object> serviceProps) {
+        Properties props = new Properties();
+        Enumeration<String> keys = serviceProps.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            props.put(key, serviceProps.get(key));
+        }
+        return props;
     }
 
     /**

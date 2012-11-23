@@ -43,6 +43,15 @@ public class IntentMap extends ConcurrentHashMap<String, Object> {
     }
     
     @Override
+    public Object put(String key, Object value) {
+        Object result = super.put(key, value);
+        synchronized (this) {
+            notifyAll();
+            return result;
+        }
+    }
+
+    @Override
     public Object remove(Object key) {
         Object old = super.remove(key);
         if (defaultMap.containsKey(key)) {

@@ -28,69 +28,27 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.cxf.binding.BindingConfiguration;
-import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.Feature;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IntentManagerImpl implements IntentManager {
     private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
-    private static final Logger LOG = LoggerFactory.getLogger(IntentManagerImpl.class);
+    static final Logger LOG = LoggerFactory.getLogger(IntentManagerImpl.class);
 
     private final IntentMap intentMap;
-    private final ServiceTracker intentTracker;
+    private long maxIntentWaitTime;
     
     public IntentManagerImpl(IntentMap intentMap) {
-        this.intentMap = intentMap;
-        this.intentTracker = null;
+        this(intentMap, 0);
     }
     
-    public IntentManagerImpl(final BundleContext bc, final IntentMap intentMap) {
+    public IntentManagerImpl(IntentMap intentMap, int maxIntentWaitTime) {
         this.intentMap = intentMap;
-        Filter filter;
-        try {
-            filter = bc.createFilter("(" + Constants.INTENT_NAME_PROP + "=*)");
-        } catch (InvalidSyntaxException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        this.intentTracker = new ServiceTracker(bc, filter, null) {
-
-            @Override
-            public Object addingService(ServiceReference reference) {
-                String intentName = (String) reference.getProperty(Constants.INTENT_NAME_PROP);
-                Object intent = bc.getService(reference);
-                LOG.info("Adding custom intent " + intentName);
-                intentMap.put(intentName, intent);
-                return super.addingService(reference);
-            }
-
-            @Override
-            public void removedService(ServiceReference reference, Object service) {
-                String intentName = (String) reference.getProperty(Constants.INTENT_NAME_PROP);
-                intentMap.remove(intentName);
-                super.removedService(reference, service);
-            }
-            
-        };
-        this.intentTracker.open();
+        this.maxIntentWaitTime = maxIntentWaitTime;
     }
     
-    public BindingConfiguration getBindingConfiguration(String[] requestedIntents, BindingConfiguration defaultConfig) {
-        for (String intentName : requestedIntents) {
-            Object intent = intentMap.get(intentName);
-            if (intent instanceof BindingConfiguration) {
-                return (BindingConfiguration) intent;
-            }
-        }
-        return defaultConfig;
-    }
-
     public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory, Map<String, Object> props) throws IntentUnsatifiedException {
         Set<String> requestedIntents = IntentUtils.getRequestedIntents(props);
         Set<String> appliedIntents = new HashSet<String>();
@@ -160,15 +118,34 @@ public class IntentManagerImpl implements IntentManager {
         return intentsFound;
     }
     
-    public List<String> getUnsupportedIntents(Properties serviceProperties) {
+    public void assertAllIntentsSupported(Properties serviceProperties) {
+        long endTime = System.currentTimeMillis() + maxIntentWaitTime;
         Set<String> requiredIntents = IntentUtils.getRequestedIntents(serviceProperties);
         List<String> unsupportedIntents = new ArrayList<String>();
-        for (String ri : requiredIntents) {
-            if (!intentMap.containsKey(ri)) {
-                unsupportedIntents.add(ri);
+        do {
+            unsupportedIntents.clear();
+            for (String ri : requiredIntents) {
+                if (!intentMap.containsKey(ri)) {
+                    unsupportedIntents.add(ri);
+                }
             }
+            long remainingSeconds = (endTime - System.currentTimeMillis()) / 1000;
+            if (unsupportedIntents.size() > 0 && remainingSeconds > 0) {
+                LOG.debug("Waiting for custom intents " + unsupportedIntents + " timeout in " + remainingSeconds);
+                try {
+                    synchronized (intentMap) {
+                        intentMap.wait(1000);
+                    }
+                } catch (InterruptedException e) {
+                    LOG.warn(e.getMessage(), e);
+                }
+            }
+        } while (unsupportedIntents.size() > 0 && System.currentTimeMillis() < endTime);
+        
+        if (unsupportedIntents.size() > 0) {
+            throw new RuntimeException("service cannot be exported because the following intents are not supported by this RSA: "
+                    + unsupportedIntents);
         }
-        return unsupportedIntents;
     }
 
 }

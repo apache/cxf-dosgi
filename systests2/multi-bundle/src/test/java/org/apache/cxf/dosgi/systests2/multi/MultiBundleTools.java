@@ -114,7 +114,9 @@ public class MultiBundleTools {
         List<Option> opts = new ArrayList<Option>();
         for (Map.Entry<Integer, String> entry : bundles.entrySet()) {
             String bundleUri = entry.getValue();
-            opts.add(CoreOptions.bundle(bundleUri));
+            if (!bundleUri.contains("pax-logging")) {
+                opts.add(CoreOptions.bundle(bundleUri));
+            }
         }
         return opts.toArray(new Option[opts.size()]);
     }
@@ -124,6 +126,6 @@ public class MultiBundleTools {
     }
     
     public static Option getDistro() throws Exception {
-        return CoreOptions.composite(getDistroBundleOptions(true));
+        return CoreOptions.composite(getDistroBundleOptions(false));
     }
 }
