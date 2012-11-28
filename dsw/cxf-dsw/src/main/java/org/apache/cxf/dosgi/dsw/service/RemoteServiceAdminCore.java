@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.ExportResult;
@@ -61,10 +60,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     private BundleContext bctx;
     private EventProducer eventProducer;
-
-    private volatile boolean useMasterMap = true;
-    private volatile String defaultPort;
-    private volatile String defaultHost;
 
     private ConfigTypeHandlerFactory configTypeHandlerFactory;
 
@@ -113,7 +108,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             BundleContext callingContext = serviceReference.getBundle().getBundleContext();
             ConfigurationTypeHandler handler = null;
             try {
-                handler = configTypeHandlerFactory.getHandler(bctx, (Map)serviceProperties, getHandlerProperties());
+                handler = configTypeHandlerFactory.getHandler(bctx, (Map)serviceProperties);
             } catch (RuntimeException e) {
                 LOG.error(e.getMessage(), e);
                 return Collections.emptyList();
@@ -239,16 +234,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
             return Collections.unmodifiableCollection(irs);
         }
-    }
-
-    protected Map<String, Object> getHandlerProperties() {
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.DEFAULT_PORT_CONFIG, defaultPort == null
-            ? Constants.DEFAULT_PORT_VALUE : defaultPort);
-        props.put(Constants.DEFAULT_HOST_CONFIG, defaultHost == null
-            ? Constants.DEFAULT_HOST_VALUE : defaultHost);
-        props.put(Constants.USE_MASTER_MAP, useMasterMap);
-        return props;
     }
 
     /**

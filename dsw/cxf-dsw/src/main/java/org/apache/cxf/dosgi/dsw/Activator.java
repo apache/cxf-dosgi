@@ -19,7 +19,10 @@
 package org.apache.cxf.dosgi.dsw;
 
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -47,79 +50,95 @@ import org.slf4j.LoggerFactory;
 
 // registered as spring bean -> start / stop called accordingly 
 public class Activator implements ManagedService, BundleActivator {
-
     private static final int DEFAULT_INTENT_TIMEOUT = 30000;
-
     private final static Logger LOG = LoggerFactory.getLogger(Activator.class);
-
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
-
     private ServiceRegistration rsaFactoryReg;
-
     private ServiceRegistration decoratorReg;
-
     private IntentTracker intentTracker;
+    private BundleContext bc;
 
     public void start(BundleContext bc) throws Exception {
+        this.bc = bc;
+        start(bc, new Hashtable<String, Object>());
+    }
+
+    private void start(BundleContext bc, Map<String, Object> config) {
+        this.bc = bc;
         // Disable the fast infoset as it's not compatible (yet) with OSGi
         System.setProperty("org.apache.cxf.nofastinfoset", "true");
 
-        // should we have a seperate PID for a find and publish hook ?
-        // context.registerService(ManagedService.class.getName(), this, getDefaults());
-        
+        registerManagedService(bc);
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         intentTracker = new IntentTracker(bc, intentMap);
         intentTracker.open();
         IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
         HttpServiceManager httpServiceManager = new HttpServiceManager(bc);
-        ConfigTypeHandlerFactory configTypeHandlerFactory = new ConfigTypeHandlerFactory(intentManager, httpServiceManager );
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory );
+        ConfigTypeHandlerFactory configTypeHandlerFactory = new ConfigTypeHandlerFactory(intentManager, httpServiceManager, config);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
         RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(rsaCore);
         Hashtable<String, Object> props = new Hashtable<String, Object>();
-
-        // TODO .... RemoteAdminService.XXX
-        // props.put(DistributionProvider.PRODUCT_NAME, getHeader("Bundle-Name"));
-        // props.put(DistributionProvider.PRODUCT_VERSION, getHeader("Bundle-Version"));
-        // props.put(DistributionProvider.VENDOR_NAME, getHeader("Bundle-Vendor"));
-
         String[] supportedIntents = intentMap.keySet().toArray(new String[] {});
         String siString = IntentUtils.formatIntents(supportedIntents);
         props.put("remote.intents.supported", siString);
-
-        // // TODO make this a little smarter
-        String[] supportedConfigs = {
-                                     org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE,
-                                     org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE_OLD,
-                                     org.apache.cxf.dosgi.dsw.Constants.RS_CONFIG_TYPE
-        };
-        props.put("remote.configs.supported", supportedConfigs);
+        props.put("remote.configs.supported", configTypeHandlerFactory.getSupportedConfigurationTypes());
         LOG.info("Registering RemoteServiceAdminFactory...");
         rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc), null);
     }
 
+    private void registerManagedService(BundleContext bc) {
+        Dictionary<String, String> props = new Hashtable<String, String>();
+        props.put(Constants.SERVICE_PID, CONFIG_SERVICE_PID);
+        bc.registerService(ManagedService.class.getName(), this, props);
+    }
+
     public void stop(BundleContext context) throws Exception {
         LOG.debug("RemoteServiceAdmin Implementation is shutting down now");
-        intentTracker.close();
-        // This also triggers the unimport and unexport of the remote services
-        rsaFactoryReg.unregister();
-        decoratorReg.unregister();
-
-        // shutdown the CXF Bus -> Causes also the shutdown of the embedded HTTP server
-        Bus b = BusFactory.getDefaultBus();
-        if (b != null) {
-            LOG.debug("Shutting down the CXF Bus");
-            b.shutdown(true);
-        }
-
-        // unregister other registered services (ManagedService + Hooks)
-    }
-
-    @SuppressWarnings("rawtypes")
-	public synchronized void updated(Dictionary props) throws ConfigurationException {
-        if (props != null && CONFIG_SERVICE_PID.equals(props.get(Constants.SERVICE_PID))) {
-            // topManager.updated(props);
+        if (intentTracker != null) {
+            intentTracker.close();
+            // This also triggers the unimport and unexport of the remote services
+            rsaFactoryReg.unregister();
+            decoratorReg.unregister();
+            // shutdown the CXF Bus -> Causes also the shutdown of the embedded HTTP server
+            Bus b = BusFactory.getDefaultBus();
+            if (b != null) {
+                LOG.debug("Shutting down the CXF Bus");
+                b.shutdown(true);
+            }
+            intentTracker = null;
+            rsaFactoryReg = null;
+            decoratorReg = null;
         }
     }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public synchronized void updated(Dictionary config) throws ConfigurationException {
+        if (rsaFactoryReg != null) {
+            try {
+                stop(bc);
+            } catch (Exception e) {
+                LOG.error(e.getMessage(), e);
+            }
+        }
+        if (config != null) {
+            HashMap<String, Object> configMap = getMapFromDictionary(config);
+            start(bc, configMap);
+        }
+    }
+
+    private HashMap<String, Object> getMapFromDictionary(Dictionary<String, Object> config) {
+        HashMap<String, Object> configMap = new HashMap<String, Object>();
+        if (config == null) {
+            return configMap;
+        }
+        Enumeration<String> keys = config.keys();
+        while (keys.hasMoreElements()) {
+            String key = (String) keys.nextElement();
+            configMap.put(key, config.get(key));
+        }
+        return configMap;
+    }
+
 
 }

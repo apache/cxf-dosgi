@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.lang.reflect.Proxy;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -36,69 +35,31 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractConfigurationHandler implements ConfigurationTypeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractConfigurationHandler.class);
 
-    private final Map<String, Object> handlerProps;
     protected IntentManager intentManager;
     protected BundleContext bundleContext;
+    private String servletBase = null;
 
     protected AbstractConfigurationHandler(BundleContext dswBC, IntentManager intentManager, Map<String, Object> handlerProps) {
         this.bundleContext = dswBC;
         this.intentManager = intentManager;
-        this.handlerProps = handlerProps;
+        if (handlerProps != null) {
+            this.servletBase = (String) handlerProps.get(Constants.SERVLET_BASE);
+        }
+        if (this.servletBase == null) {
+            // This default only works for Apache Karaf and cxf with default settings
+            this.servletBase = "http://" + LocalHostUtil.getLocalIp() + ":8181/cxf";
+        }
     }
 
     protected String getDefaultAddress(Class<?> type) {
-        return getDefaultAddress(type, null);
-    }
-    
-    protected String getDefaultAddress(Class<?> type, String port) {
-        Object h = handlerProps.get(Constants.DEFAULT_HOST_CONFIG);
-        if (h == null || h.toString().equals("localhost")) {
-            h = LocalHostUtil.getLocalHostAddress();
-        }
-        String host = h.toString();
-
-        if (port == null) {
-            Object p = handlerProps.get(Constants.DEFAULT_PORT_CONFIG);
-            if (p == null) {
-                p = "9000";
-            }
-            port = p.toString();
-        } 
-        return getAddress("http", host, port, "/" + type.getName().replace('.', '/'));
+        return "/" + type.getName().replace('.', '/');
     }
 
-    protected String getAddress(String scheme, String host, String port, String context) {
-        StringBuilder buf = new StringBuilder();
-        buf.append(scheme).append("://").append(host).append(':').append(port).append(context);
-        return buf.toString();
-    }
-    
     protected String constructAddress(BundleContext ctx, String contextRoot, String relativeEndpointAddress) {
         if (relativeEndpointAddress.startsWith("http")) {
             return relativeEndpointAddress;
         }
-        boolean https = "true".equalsIgnoreCase(ctx.getProperty("org.osgi.service.http.secure.enabled"));
-        String port = ctx.getProperty(https ? "org.osgi.service.http.port.secure" : "org.osgi.service.http.port"); 
-        if (port == null) {
-            port = "8080";
-        }
-
-        String hostName = null;
-        try {
-            hostName = LocalHostUtil.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            hostName = "localhost";
-        }
-
-        String address = getAddress(https ? "https" : "http", hostName, port, contextRoot);
-        if (!isEmpty(relativeEndpointAddress) && !relativeEndpointAddress.equals("/")) {
-            address += relativeEndpointAddress;
-        }
-        return address;
-    }
-
-    private boolean isEmpty(String relativeEndpointAddress) {
-        return relativeEndpointAddress == null || "".equals(relativeEndpointAddress);
+        return this.servletBase + relativeEndpointAddress;
     }
 
     protected Object getProxy(Object serviceProxy, Class<?> iType) {
@@ -122,7 +83,7 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
         props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(bundleContext));
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
         props.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + pkg, 
-                OsgiUtils.getVersion(iClass, bundleContext));
+                OsgiUtils.getVersion(iClass, bundleContext)); 
 
         for (String configurationType : importedConfigs) {
             if(Constants.WS_CONFIG_TYPE.equals(configurationType))

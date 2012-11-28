@@ -105,7 +105,7 @@ public class RemoteServiceAdminCoreTest {
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
         HttpServiceManager httpServiceManager = c.createMock(HttpServiceManager.class);
-        ConfigTypeHandlerFactory configTypeHandlerFactory = new ConfigTypeHandlerFactory(intentManager, httpServiceManager);
+        ConfigTypeHandlerFactory configTypeHandlerFactory = new ConfigTypeHandlerFactory(intentManager, httpServiceManager, null);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory ) {
             @Override
             protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,

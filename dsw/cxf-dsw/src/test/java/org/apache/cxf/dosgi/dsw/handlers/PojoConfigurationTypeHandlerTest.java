@@ -84,47 +84,14 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         assertEquals(url, handler.getServerAddress(sd, String.class));
     }
     
-    public void testGetPojoAddressDefaultWithAlternatePort() {
-        Map<String, Object> hp = new HashMap<String, Object>();
-        IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , dummyHttpServiceManager(), hp);
-        Map<String, Object> sd = new HashMap<String, Object>();
-        String localIP = getLocalIp();
-        String url = "http://"+localIP+":1234/java/lang/String";
-        sd.put("org.apache.cxf.ws.port", "1234");
-        assertEquals(url, handler.getServerAddress(sd, String.class));        
-    }
-
     public void testGetDefaultPojoAddress() {
         Map<String, Object> hp = new HashMap<String, Object>();
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
         PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , dummyHttpServiceManager(), hp);
         Map<String, Object> sd = new HashMap<String, Object>(); 
-        String localIP = getLocalIp();
-        assertEquals("http://"+localIP+":9000/java/lang/String", handler.getServerAddress(sd, String.class));
+        assertEquals("/java/lang/String", handler.getServerAddress(sd, String.class));
     }
 
-    private String getLocalIp() {
-        String localIP;
-        try {
-            localIP = LocalHostUtil.getLocalHost().getHostAddress();
-        } catch (Exception e) {
-            localIP = "localhost";
-        }
-        return localIP;
-    }
-
-    private Map<String, Object> handlerProps;
-    
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        
-        handlerProps = new HashMap<String, Object>();
-        handlerProps.put(Constants.DEFAULT_HOST_CONFIG, "somehost");
-        handlerProps.put(Constants.DEFAULT_PORT_CONFIG, "54321");
-    }
-    
     //  todo: add test for data bindings
     public void testCreateProxy(){
         IMocksControl c = EasyMock.createNiceControl();
@@ -142,14 +109,14 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                 return new String[0];
             }
         };
-        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(bc1, intentManager, dummyHttpServiceManager(), handlerProps) {
+        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(bc1, intentManager, dummyHttpServiceManager(), null) {
             @Override
             ClientProxyFactoryBean createClientProxyFactoryBean(ServiceReference sRef, Class<?> iClass) {
                 return cpfb;
             }
         };
         
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         
         props.put(RemoteConstants.ENDPOINT_ID, "http://google.de/");
         props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{"my.class"});
@@ -164,26 +131,10 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.expectLastCall().atLeastOnce();
         
         c.replay();
-        
-        
-        
-        
-        
         Object proxy = p.createProxy(sref, bc1, bc2, CharSequence.class, endpoint);
-        
         assertNotNull(proxy);
-        
-        if (proxy instanceof CharSequence) {
-            CharSequence cs = (CharSequence)proxy;
-            
-        }else{
-            assertTrue("Proxy is not of the requested type! ", false);
-        }
-        
-        
-        
+        assertTrue("Proxy is not of the requested type! ", proxy instanceof CharSequence);
         c.verify();
-        
     }
 
 //    public void testCreateProxyPopulatesDistributionProvider() {
@@ -279,7 +230,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                 return new String []{};
             }
         };
-        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, intentManager, dummyHttpServiceManager(), handlerProps) {
+        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, intentManager, dummyHttpServiceManager(), null) {
             @Override
             ServerFactoryBean createServerFactoryBean(ServiceReference sRef, Class<?> iClass) {
                 return sfb;
@@ -297,7 +248,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         ExportResult exportResult = p.createServer(sr, dswContext, callingContext, props, String.class, myService);
         
         
-        Map edProps = exportResult.getEndpointProps();
+        Map<String, Object> edProps = exportResult.getEndpointProps();
 
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
         assertEquals(1, ((String[])edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS)).length);

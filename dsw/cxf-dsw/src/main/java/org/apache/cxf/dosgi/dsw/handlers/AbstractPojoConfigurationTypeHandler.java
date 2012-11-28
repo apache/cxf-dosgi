@@ -165,19 +165,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
             LOG.error(e.getMessage(), e);
             return null;
         }
-        if (address == null) {
-            String port = null;
-            Object p = sd.get(Constants.WS_PORT_PROPERTY);
-            if (p instanceof String) {
-                port = (String) p;
-            }
-            
-            address = getDefaultAddress(iClass, port);
-            if (address != null) {
-                LOG.info("Using a default address : " + address);
-            }
-        }
-        return address;
+        return (address == null) ? getDefaultAddress(iClass) : address;
     }
     
     protected final ExportResult createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {

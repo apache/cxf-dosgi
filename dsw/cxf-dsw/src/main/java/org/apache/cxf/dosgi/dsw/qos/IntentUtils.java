@@ -30,11 +30,8 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class IntentUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(IntentUtils.class);
 
     public static String formatIntents(String[] intents) {
         StringBuilder sb = new StringBuilder();
@@ -83,6 +80,7 @@ public class IntentUtils {
     public static Set<String> getRequestedIntents(Map<?, ?> sd) {
         Collection<String> intents = Arrays.asList(
             IntentUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));        
+        @SuppressWarnings("deprecation")
         Collection<String> oldIntents = Arrays.asList(
             IntentUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_OLD))); 
         

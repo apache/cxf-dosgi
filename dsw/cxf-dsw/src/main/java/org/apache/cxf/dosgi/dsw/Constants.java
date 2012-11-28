@@ -98,16 +98,22 @@ public class Constants {
 
     // Common Configuration Properties
     public static final String CHECK_BUNDLE = "check.bundle";
-    public static final String DEFAULT_PORT_CONFIG = "default.port";
-    public static final String DEFAULT_HOST_CONFIG = "default.host";
-    public static final String DEFAULT_PORT_VALUE = "9000";
-    public static final String DEFAULT_HOST_VALUE = "localhost";
-    public final static String USE_MASTER_MAP = "use.master.map";
     
+    // The following constants are not evaluated anymore
+    @Deprecated
+    public static final String DEFAULT_PORT_CONFIG = "default.port";
+    @Deprecated
+    public static final String DEFAULT_HOST_CONFIG = "default.host";
+    @Deprecated
+    public static final String DEFAULT_PORT_VALUE = "9000";
+    @Deprecated
+    public static final String DEFAULT_HOST_VALUE = "localhost";
+    @Deprecated
+    public final static String USE_MASTER_MAP = "use.master.map";
     
     //DSW Identification - TODO do we really need this one?
     public static final String DSW_CLIENT_ID = PROVIDER_PREFIX + ".remote.dsw.client";
 
     public static final String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
-    
+    public static final Object SERVLET_BASE = "servletBase";
 }

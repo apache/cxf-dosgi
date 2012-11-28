@@ -38,40 +38,38 @@ import org.slf4j.LoggerFactory;
 public class ConfigTypeHandlerFactory {
     private static Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
     // protected because of tests
-    protected static final List<String> supportedConfigurationTypes = new ArrayList<String>();
-
-    static {
-        supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
-        supportedConfigurationTypes.add(Constants.RS_CONFIG_TYPE);
-        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE);
-        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
-    }
+    protected final List<String> supportedConfigurationTypes;
 
     protected final static String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
     private IntentManager intentManager;
     private HttpServiceManager httpServiceManager;
+    private Map<String, Object> props;
 
-    public ConfigTypeHandlerFactory(IntentManager intentManager, HttpServiceManager httpServiceManager) {
+    public ConfigTypeHandlerFactory(IntentManager intentManager, HttpServiceManager httpServiceManager, Map<String, Object> props) {
+        supportedConfigurationTypes = new ArrayList<String>();
+        supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
+        supportedConfigurationTypes.add(Constants.RS_CONFIG_TYPE);
+        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE);
+        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
         this.intentManager = intentManager;
         this.httpServiceManager = httpServiceManager;
+        this.props = props;
     }
     
     public ConfigurationTypeHandler getHandler(BundleContext dswBC,
-            Map<String, Object> serviceProperties, 
-            Map<String, Object> props) {
+            Map<String, Object> serviceProperties) {
         List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
-        return getHandler(dswBC, configurationTypes, serviceProperties, props);
+        return getHandler(dswBC, configurationTypes, serviceProperties);
     }
     
     public ConfigurationTypeHandler getHandler(BundleContext dswBC, EndpointDescription endpoint) {
         List<String> configurationTypes = determineConfigTypesForImport(endpoint);
-        return getHandler(dswBC, configurationTypes, endpoint.getProperties(), Collections.<String, Object>emptyMap());
+        return getHandler(dswBC, configurationTypes, endpoint.getProperties());
     }
 
     private ConfigurationTypeHandler getHandler(BundleContext dswBC,
                                                List<String> configurationTypes,
-                                               Map<String, Object> serviceProperties, 
-                                               Map<String, Object> props) {
+                                               Map<String, Object> serviceProperties) {
         intentManager.assertAllIntentsSupported(serviceProperties);
         if (configurationTypes.contains(Constants.WS_CONFIG_TYPE)
             || configurationTypes.contains(Constants.WS_CONFIG_TYPE_OLD) || configurationTypes.contains(Constants.RS_CONFIG_TYPE)) {
@@ -159,6 +157,10 @@ public class ConfigTypeHandlerFactory {
                         + remoteConfigurationTypes);
         }
         return usableConfigurationTypes;
+    }
+
+    public List<String> getSupportedConfigurationTypes() {
+        return supportedConfigurationTypes;
     }
 
 }

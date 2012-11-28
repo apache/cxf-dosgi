@@ -32,24 +32,14 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.apache.cxf.binding.BindingConfiguration;
-import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 public class IntentManagerImplTest {
-    private Map<String, Object> handlerProps;
-    
-    @Before
-    public void setUp() throws Exception {
-        handlerProps = new HashMap<String, Object>();
-        handlerProps.put(Constants.DEFAULT_HOST_CONFIG, "somehost");
-        handlerProps.put(Constants.DEFAULT_PORT_CONFIG, "54321");
-    }
     
     @Test
     public void testIntents() throws Exception {
@@ -219,7 +209,6 @@ public class IntentManagerImplTest {
     }
     
     public void testInheritMasterIntentMap() {
-        handlerProps.put(Constants.USE_MASTER_MAP, "true");
         List<String> features = runTestInheritMasterIntentMap("A B");
         
         assertEquals(2, features.size());

@@ -88,4 +88,15 @@ public class LocalHostUtil {
             return "localhost";
         }
     }
+    
+    public static String getLocalIp() {
+        String localIP;
+        try {
+            localIP = LocalHostUtil.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            localIP = "localhost";
+        }
+        return localIP;
+    }
+
 }
