@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -58,12 +59,12 @@ public class UtilsTest {
         sl.add(s3);
         sl.add(new Object()); // must be skipped
 
-        assertEquals(null, Utils.normalizeStringPlus(new Object()));
-        assertEquals(new String[] {
+        assertArrayEquals(null, Utils.normalizeStringPlus(new Object()));
+        assertArrayEquals(new String[] {
             s1
         }, Utils.normalizeStringPlus(s1));
-        assertEquals(sa, Utils.normalizeStringPlus(sa));
-        assertEquals(sa, Utils.normalizeStringPlus(sl));
+        assertArrayEquals(sa, Utils.normalizeStringPlus(sa));
+        assertArrayEquals(sa, Utils.normalizeStringPlus(sl));
 
     }
 

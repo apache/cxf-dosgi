@@ -65,6 +65,7 @@ public class JaxRSUtilsTest extends TestCase {
         assertEquals(AegisElementProvider.class.getName(), providers.get(0).getClass().getName());
     }
 
+    @SuppressWarnings("rawtypes")
     public void testServiceProviders() {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.RS_PROVIDER_PROP_KEY, new Object[] {
@@ -131,6 +132,7 @@ public class JaxRSUtilsTest extends TestCase {
         assertEquals(JAXBElementProvider.class.getName(), providers.get(1).getClass().getName());
     }
 
+    @SuppressWarnings("rawtypes")
     public void testCustomGlobalProvider() throws Exception {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
@@ -152,6 +154,7 @@ public class JaxRSUtilsTest extends TestCase {
         assertSame(p, providers.get(0));
     }
 
+    @SuppressWarnings("rawtypes")
     public void testNoCustomGlobalProvider() throws Exception {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
@@ -173,6 +176,7 @@ public class JaxRSUtilsTest extends TestCase {
         assertEquals(0, providers.size());
     }
 
+    @SuppressWarnings("rawtypes")
     public void testCustomGlobalProviderExpected() throws Exception {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);

@@ -27,25 +27,31 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 public class ClassUtilsTest extends TestCase {
-    @SuppressWarnings("unchecked")
+
     public void testGetInterfaceClass() {
         assertEquals(String.class, ClassUtils.getInterfaceClass("Hello", "java.lang.String"));
         assertNull(ClassUtils.getInterfaceClass("Hello", "java.lang.Integer"));
-        assertEquals(List.class, ClassUtils.getInterfaceClass(new ArrayList(), "java.util.List"));
-        assertEquals(Collection.class, ClassUtils.getInterfaceClass(new ArrayList(), "java.util.Collection"));
+        assertEquals(List.class, ClassUtils.getInterfaceClass(new ArrayList<String>(), "java.util.List"));
+        assertEquals(Collection.class, ClassUtils.getInterfaceClass(new ArrayList<String>(), "java.util.Collection"));
     }
     
     public void testGetInterfaceClassFromSubclass() {
 	    assertEquals(Map.class, ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.Map"));
 	    assertNull(ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.UnknownType"));
     }
-    static class MyMapSubclass extends HashMap{}
 
+    @SuppressWarnings({ "serial", "rawtypes" })
+    private static class MyMapSubclass extends HashMap{}
+
+    @SuppressWarnings("serial")
     static class MySubclassOne extends MyMapSubclass{}
 
+    @SuppressWarnings("serial")
     static class MySubclassTwo extends MySubclassOne{}
 
+    @SuppressWarnings("serial")
     static class MySubclassThree extends MySubclassTwo{}
 
+    @SuppressWarnings("serial")
     static class MySubclassFour extends MySubclassThree{}
 }
