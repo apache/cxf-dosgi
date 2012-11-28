@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.lang.reflect.Proxy;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -52,15 +53,7 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
     protected String getDefaultAddress(Class<?> type, String port) {
         Object h = handlerProps.get(Constants.DEFAULT_HOST_CONFIG);
         if (h == null || h.toString().equals("localhost")) {
-            try {
-                h = LocalHostUtil.getLocalHost().getHostAddress();
-            } catch (Exception e) {
-                h = "localhost";
-            }
-            if (h == null) {
-                h = "localhost";
-            }
-
+            h = LocalHostUtil.getLocalHostAddress();
         }
         String host = h.toString();
 
@@ -71,7 +64,6 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
             }
             port = p.toString();
         } 
-
         return getAddress("http", host, port, "/" + type.getName().replace('.', '/'));
     }
 
@@ -80,6 +72,34 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
         buf.append(scheme).append("://").append(host).append(':').append(port).append(context);
         return buf.toString();
     }
+    
+    protected String constructAddress(BundleContext ctx, String contextRoot, String relativeEndpointAddress) {
+        if (relativeEndpointAddress.startsWith("http")) {
+            return relativeEndpointAddress;
+        }
+        boolean https = "true".equalsIgnoreCase(ctx.getProperty("org.osgi.service.http.secure.enabled"));
+        String port = ctx.getProperty(https ? "org.osgi.service.http.port.secure" : "org.osgi.service.http.port"); 
+        if (port == null) {
+            port = "8080";
+        }
+
+        String hostName = null;
+        try {
+            hostName = LocalHostUtil.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            hostName = "localhost";
+        }
+
+        String address = getAddress(https ? "https" : "http", hostName, port, contextRoot);
+        if (!isEmpty(relativeEndpointAddress) && !relativeEndpointAddress.equals("/")) {
+            address += relativeEndpointAddress;
+        }
+        return address;
+    }
+
+    private boolean isEmpty(String relativeEndpointAddress) {
+        return relativeEndpointAddress == null || "".equals(relativeEndpointAddress);
+    }
 
     protected Object getProxy(Object serviceProxy, Class<?> iType) {
         return Proxy.newProxyInstance(iType.getClassLoader(), new Class[] {
@@ -87,7 +107,7 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
         }, new ServiceInvocationHandler(serviceProxy, iType));
     }
 
-    protected Map<String, Object> createEndpointProps(Map sd, Class<?> iClass, String[] importedConfigs,
+    protected Map<String, Object> createEndpointProps(Map<String, Object> sd, Class<?> iClass, String[] importedConfigs,
                                                       String address, String[] intents) {
         Map<String, Object> props = new HashMap<String, Object>();
 
@@ -125,9 +145,9 @@ public abstract class AbstractConfigurationHandler implements ConfigurationTypeH
 
     }
 
-    private void copyEndpointProperties(Map sd, Map<String, Object> endpointProps) {
-        Set<Map.Entry> keys = sd.entrySet();
-        for (Map.Entry entry : keys) {
+    private void copyEndpointProperties(Map<String, Object> sd, Map<String, Object> endpointProps) {
+        Set<Map.Entry<String, Object>> keys = sd.entrySet();
+        for (Map.Entry<String, Object> entry : keys) {
             try {
                 String skey = (String)entry.getKey();
                 if (!skey.startsWith("."))

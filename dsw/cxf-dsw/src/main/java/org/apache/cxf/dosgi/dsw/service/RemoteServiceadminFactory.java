@@ -21,9 +21,7 @@ package org.apache.cxf.dosgi.dsw.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
@@ -36,8 +34,8 @@ public class RemoteServiceadminFactory implements ServiceFactory {
 
     private RemoteServiceAdminCore rsaCore;
 
-    public RemoteServiceadminFactory(BundleContext bc, IntentManager intentManager) {
-    	this.rsaCore = new RemoteServiceAdminCore(bc, intentManager);
+    public RemoteServiceadminFactory(RemoteServiceAdminCore rsaCore) {
+    	this.rsaCore = rsaCore;
     }
 
     public Object getService(Bundle b, ServiceRegistration sr) {
@@ -54,14 +52,6 @@ public class RemoteServiceadminFactory implements ServiceFactory {
             rsai.close();
             rsaServiceInstances.remove(rsai);
         }
-    }
-
-    public void setRsaCore(RemoteServiceAdminCore rsaCore) {
-        this.rsaCore = rsaCore;
-    }
-
-    public RemoteServiceAdminCore getRsaCore() {
-        return rsaCore;
     }
 
 }

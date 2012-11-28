@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -36,7 +35,6 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.ExportResult;
-import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
@@ -69,28 +67,14 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private volatile String defaultHost;
 
     private ConfigTypeHandlerFactory configTypeHandlerFactory;
-    private IntentManager intentManager;
 
-    // protected because of tests
-    protected static final List<String> supportedConfigurationTypes = new ArrayList<String>();
-
-    static {
-        supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
-        supportedConfigurationTypes.add(Constants.RS_CONFIG_TYPE);
-        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE);
-        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
-    }
-
-    protected final static String DEFAULT_CONFIGURATION = Constants.WS_CONFIG_TYPE;
-
-    public RemoteServiceAdminCore(BundleContext bc, IntentManager intentManager) {
+    public RemoteServiceAdminCore(BundleContext bc, ConfigTypeHandlerFactory configTypeHandlerFactory) {
         bctx = bc;
-        this.intentManager = intentManager;
         eventProducer = new EventProducer(bctx);
-        this.configTypeHandlerFactory = new ConfigTypeHandlerFactory(intentManager);
+        this.configTypeHandlerFactory = configTypeHandlerFactory;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<ExportRegistration> exportService(ServiceReference serviceReference, Map additionalProperties)
         throws IllegalArgumentException, UnsupportedOperationException {
 
@@ -114,13 +98,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 OsgiUtils.overlayProperties(serviceProperties, additionalProperties);
             }
 
-            try {
-                intentManager.assertAllIntentsSupported(serviceProperties);
-            } catch (RuntimeException e) {
-                LOG.error(e.getMessage(), e);
-                return Collections.emptyList();
-            }
-
             List<String> interfaces = getInterfaces(serviceProperties);
             if (interfaces.size() == 0) {
                 LOG.error("export failed: no provided service interfaces found or service_exported_interfaces is null !!");
@@ -129,31 +106,27 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
             LOG.info("interfaces selected for export: " + interfaces);
 
-            List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
-            LOG.info("configuration types selected for export: " + configurationTypes);
-            if (configurationTypes.size() == 0) {
-                LOG.info("the requested configuration types are not supported");
-                // TODO: publish error event ? not sure
-                return Collections.emptyList();
-            }
+            
 
             LinkedHashMap<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>(1);
             Object serviceObject = bctx.getService(serviceReference);
             BundleContext callingContext = serviceReference.getBundle().getBundleContext();
-            ConfigurationTypeHandler handler = getHandler(configurationTypes, serviceProperties, getHandlerProperties());
-            if (handler == null) {
-                // TODO: publish error event ? not sure
+            ConfigurationTypeHandler handler = null;
+            try {
+                handler = configTypeHandlerFactory.getHandler(bctx, (Map)serviceProperties, getHandlerProperties());
+            } catch (RuntimeException e) {
+                LOG.error(e.getMessage(), e);
                 return Collections.emptyList();
             }
 
             // FIXME: move out of synchronized ... -> blocks until publication is finished
             for (String iface : interfaces) {
-                LOG.info("creating server for interface " + iface + " with configurationTypes " + configurationTypes);
+                LOG.info("creating server for interface " + iface);
                 // this is an extra sanity check, but do we really need it now ?
                 Class<?> interfaceClass = ClassUtils.getInterfaceClass(serviceObject, iface);
                 if (interfaceClass != null) {
                     ExportResult exportResult = handler.createServer(serviceReference, bctx, callingContext,
-                            serviceProperties, interfaceClass, serviceObject);
+                            (Map)serviceProperties, interfaceClass, serviceObject);
                     LOG.info("created server for interface " + iface);
                     EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
                     ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
@@ -240,30 +213,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
 
-    protected List<String> determineConfigurationTypes(Properties serviceProperties) {
-
-        List<String> configurationTypes = new ArrayList<String>();
-
-        {// determine which configuration types should be used / if the requested are supported
-            String[] requestedConfigurationTypes = Utils.normalizeStringPlus(serviceProperties
-                .get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
-            if (requestedConfigurationTypes == null || requestedConfigurationTypes.length == 0) {
-                // add default configuration
-                configurationTypes.add(DEFAULT_CONFIGURATION);
-            } else {
-                for (String rct : requestedConfigurationTypes) {
-                    if (supportedConfigurationTypes.contains(rct)) {
-                        // this RSA supports this requested type ...
-                        configurationTypes.add(rct);
-                    }
-                }
-            }
-
-        }
-
-        return configurationTypes;
-    }
-
     private boolean isCreatedByThisRSA(ServiceReference sref) {
         return (sref.getBundle() != null ) && sref.getBundle().equals(bctx.getBundle());
     }
@@ -290,12 +239,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
             return Collections.unmodifiableCollection(irs);
         }
-    }
-
-    private ConfigurationTypeHandler getHandler(List<String> configurationTypes, Map<?, ?> serviceProperties,
-                                                Map<String, Object> props) {
-        return configTypeHandlerFactory.getHandler(bctx, configurationTypes, serviceProperties,
-                                                                 props);
     }
 
     protected Map<String, Object> getHandlerProperties() {
@@ -326,34 +269,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return ir;
             }
 
-            List<String> remoteConfigurationTypes = endpoint.getConfigurationTypes();
-
-            if (remoteConfigurationTypes == null) {
-                LOG.error("the supplied endpoint has no configuration type");
-                return null;
-            }
-
-            List<String> usableConfigurationTypes = new ArrayList<String>();
-            for (String ct : supportedConfigurationTypes) {
-                if (remoteConfigurationTypes.contains(ct)) {
-                    usableConfigurationTypes.add(ct);
-                }
-            }
-
-            if (usableConfigurationTypes.size() == 0) {
-                LOG.error("the supplied endpoint has no compatible configuration type. Supported types are: "
-                            + supportedConfigurationTypes
-                            + "    Types needed by the endpoint: "
-                            + remoteConfigurationTypes);
-                return null;
-            }
-
-            Map<String, Object> emptyProps = Collections.emptyMap();
-            ConfigurationTypeHandler handler = getHandler(usableConfigurationTypes, endpoint.getProperties(),
-                                                          emptyProps);
-
-            if (handler == null) {
-                LOG.error("no handler found");
+            ConfigurationTypeHandler handler = null;
+            try {
+                handler = configTypeHandlerFactory.getHandler(bctx, endpoint);
+            } catch (RuntimeException e) {
+                LOG.error("no handler found: " + e.getMessage(), e);
                 return null;
             }
 
@@ -411,7 +331,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             Dictionary<String, Object> serviceProps = new Hashtable<String, Object>(ed.getProperties());
             serviceProps.put(RemoteConstants.SERVICE_IMPORTED, true);
             serviceProps.remove(RemoteConstants.SERVICE_EXPORTED_INTERFACES);
-            intentManager.assertAllIntentsSupported(getProperties(serviceProps));
                 
             // synchronized (discoveredServices) {
             ClientServiceFactory csf = new ClientServiceFactory(actualContext, iClass, ed, handler, imReg);
@@ -425,16 +344,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
             imReg.setException(ex);
         }
-    }
-
-    private Properties getProperties(Dictionary<String, Object> serviceProps) {
-        Properties props = new Properties();
-        Enumeration<String> keys = serviceProps.keys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            props.put(key, serviceProps.get(key));
-        }
-        return props;
     }
 
     /**

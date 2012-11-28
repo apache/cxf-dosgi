@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.Map;
 
+import org.apache.cxf.dosgi.dsw.qos.IntentUnsatifiedException;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -30,12 +31,12 @@ public interface ConfigurationTypeHandler {
     ExportResult createServer(ServiceReference serviceReference,
                         BundleContext dswContext,
                         BundleContext callingContext, 
-                        Map sd, 
+                        Map<String, Object> sd, 
                         Class<?> iClass, 
                         Object serviceBean);
 
     Object createProxy(ServiceReference serviceReference,
                        BundleContext dswContext,
                        BundleContext callingContext,
-                       Class<?> iClass, EndpointDescription sd);
+                       Class<?> iClass, EndpointDescription sd) throws IntentUnsatifiedException;
 }

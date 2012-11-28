@@ -20,12 +20,11 @@ package org.apache.cxf.dosgi.dsw.qos;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.Feature;
 
 public interface IntentManager {
     String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory, Map<String, Object> props);
-    void assertAllIntentsSupported(Properties serviceProperties);
+    void assertAllIntentsSupported(Map<String, Object> serviceProperties);
 }

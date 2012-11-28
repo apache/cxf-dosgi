@@ -21,7 +21,6 @@ package org.apache.cxf.dosgi.dsw.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -29,8 +28,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.handlers.HttpServiceManager;
+import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
+import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
 import org.junit.Test;
@@ -39,6 +43,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
@@ -53,19 +58,19 @@ public class RemoteServiceAdminCoreTest {
 
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
 
-        Dictionary d = new Properties();
+        Dictionary<?,?> d = new Properties();
         EasyMock.expect(b.getHeaders()).andReturn(d).anyTimes();
 
         ServiceReference sref = c.createMock(ServiceReference.class);
         EasyMock.expect(sref.getBundle()).andReturn(b).anyTimes();
 
-        IntentManager intentManager = c.createMock(IntentManager.class);
-		RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentManager);
+		ConfigTypeHandlerFactory configTypeHandlerFactory = c.createMock(ConfigTypeHandlerFactory.class);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory );
 
         c.replay();
 
         // must return an empty List as sref if from the same bundle
-        List exRefs = rsaCore.exportService(sref, null);
+        List<ExportRegistration> exRefs = rsaCore.exportService(sref, null);
 
         assertNotNull(exRefs);
         assertEquals(0, exRefs.size());
@@ -77,7 +82,6 @@ public class RemoteServiceAdminCoreTest {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testImport() {
 
@@ -85,14 +89,24 @@ public class RemoteServiceAdminCoreTest {
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
 
-        Dictionary d = new Properties();
+        Dictionary<?,?> d = new Properties();
         EasyMock.expect(b.getHeaders()).andReturn(d).anyTimes();
 
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(b.getSymbolicName()).andReturn("BundleName").anyTimes();
-
-        IntentManager intentManager = c.createMock(IntentManager.class);
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentManager) {
+        
+        Map<String, Object> p = new HashMap<String, Object>();
+        p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
+        p.put(Constants.OBJECTCLASS, new String[] {
+            "es.schaaf.my.class"
+        });
+        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "unsupportetConfiguration");
+        EndpointDescription endpoint = new EndpointDescription(p);
+        IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
+        IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
+        HttpServiceManager httpServiceManager = c.createMock(HttpServiceManager.class);
+        ConfigTypeHandlerFactory configTypeHandlerFactory = new ConfigTypeHandlerFactory(intentManager, httpServiceManager);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory ) {
             @Override
             protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
                                                     ConfigurationTypeHandler handler,
@@ -100,15 +114,6 @@ public class RemoteServiceAdminCoreTest {
 
             }
         };
-
-        Map p = new HashMap();
-        p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
-        p.put(Constants.OBJECTCLASS, new String[] {
-            "es.schaaf.my.class"
-        });
-        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "unsupportetConfiguration");
-        EndpointDescription endpoint = new EndpointDescription(p);
-
         c.replay();
 
         // must be null as the endpoint doesn't contain any usable configurations
@@ -116,7 +121,7 @@ public class RemoteServiceAdminCoreTest {
         // must be empty ...
         assertEquals(0, rsaCore.getImportedEndpoints().size());
 
-        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "org.apache.cxf.ws");
+        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE);
         endpoint = new EndpointDescription(p);
 
         ImportRegistration ireg = rsaCore.importService(endpoint);
@@ -146,56 +151,6 @@ public class RemoteServiceAdminCoreTest {
 
         c.verify();
 
-    }
-
-    @Test
-    public void testDefaultConfigurationType() {
-
-        IMocksControl c = EasyMock.createNiceControl();
-        Bundle b = c.createMock(Bundle.class);
-        BundleContext bc = c.createMock(BundleContext.class);
-
-        IntentManager intentManager = c.createMock(IntentManager.class);
-        c.replay();
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentManager);
-
-        Properties serviceProperties = new Properties();
-
-        List<String> types = rsaCore.determineConfigurationTypes(serviceProperties);
-
-        c.verify();
-
-        assertNotNull(types);
-        assertEquals(1, types.size());
-
-        assertTrue(types.contains(org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE));
-    }
-
-    @Test
-    public void testSpecificConfigurationType() {
-
-        IMocksControl c = EasyMock.createNiceControl();
-        Bundle b = c.createMock(Bundle.class);
-        BundleContext bc = c.createMock(BundleContext.class);
-
-
-        IntentManager intentManager = c.createMock(IntentManager.class);
-        c.replay();
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, intentManager);
-
-        Properties serviceProperties = new Properties();
-
-        serviceProperties.setProperty(RemoteConstants.SERVICE_EXPORTED_CONFIGS,
-                                      org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE);
-
-        List<String> types = rsaCore.determineConfigurationTypes(serviceProperties);
-
-        c.verify();
-
-        assertNotNull(types);
-        assertEquals(1, types.size());
-
-        assertTrue(types.contains(org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE));
     }
 
 }

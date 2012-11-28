@@ -51,51 +51,57 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     public void testGetPojoAddressEndpointURI() {
         Map<String, Object> hp = new HashMap<String, Object>();
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , hp);
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager, dummyHttpServiceManager(), hp);
         Map<String, Object> sd = new HashMap<String, Object>();
         String url = "http://somewhere:1234/blah";
         sd.put(RemoteConstants.ENDPOINT_ID, url);
-        assertEquals(url, handler.getPojoAddress(sd, String.class));
+        assertEquals(url, handler.getServerAddress(sd, String.class));
     }
     
+    private HttpServiceManager dummyHttpServiceManager() {
+        HttpServiceManager httpServiceManager = EasyMock.createNiceMock(HttpServiceManager.class);
+        EasyMock.replay(httpServiceManager);
+        return httpServiceManager;
+    }
+
     public void testGetPojoAddressEndpointCxf() {
         Map<String, Object> hp = new HashMap<String, Object>();
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , hp);
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager, dummyHttpServiceManager(), hp);
         Map<String, Object> sd = new HashMap<String, Object>();
         String url = "http://somewhere:29/boo";
         sd.put("org.apache.cxf.ws.address", url);
-        assertEquals(url, handler.getPojoAddress(sd, String.class));
+        assertEquals(url, handler.getServerAddress(sd, String.class));
     }
 
     public void testGetPojoAddressEndpointPojo() {
         Map<String, Object> hp = new HashMap<String, Object>();
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , hp);
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager, dummyHttpServiceManager(), hp);
         Map<String, Object> sd = new HashMap<String, Object>();
         String url = "http://somewhere:32768/foo";
         sd.put("osgi.remote.configuration.pojo.address", url);
-        assertEquals(url, handler.getPojoAddress(sd, String.class));
+        assertEquals(url, handler.getServerAddress(sd, String.class));
     }
     
     public void testGetPojoAddressDefaultWithAlternatePort() {
         Map<String, Object> hp = new HashMap<String, Object>();
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , hp);
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , dummyHttpServiceManager(), hp);
         Map<String, Object> sd = new HashMap<String, Object>();
         String localIP = getLocalIp();
         String url = "http://"+localIP+":1234/java/lang/String";
         sd.put("org.apache.cxf.ws.port", "1234");
-        assertEquals(url, handler.getPojoAddress(sd, String.class));        
+        assertEquals(url, handler.getServerAddress(sd, String.class));        
     }
 
     public void testGetDefaultPojoAddress() {
         Map<String, Object> hp = new HashMap<String, Object>();
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , hp);
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , dummyHttpServiceManager(), hp);
         Map<String, Object> sd = new HashMap<String, Object>(); 
         String localIP = getLocalIp();
-        assertEquals("http://"+localIP+":9000/java/lang/String", handler.getPojoAddress(sd, String.class));
+        assertEquals("http://"+localIP+":9000/java/lang/String", handler.getServerAddress(sd, String.class));
     }
 
     private String getLocalIp() {
@@ -136,7 +142,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                 return new String[0];
             }
         };
-        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(bc1, intentManager, handlerProps) {
+        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(bc1, intentManager, dummyHttpServiceManager(), handlerProps) {
             @Override
             ClientProxyFactoryBean createClientProxyFactoryBean(ServiceReference sRef, Class<?> iClass) {
                 return cpfb;
@@ -273,7 +279,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                 return new String []{};
             }
         };
-        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, intentManager, handlerProps) {
+        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, intentManager, dummyHttpServiceManager(), handlerProps) {
             @Override
             ServerFactoryBean createServerFactoryBean(ServiceReference sRef, Class<?> iClass) {
                 return sfb;
@@ -359,7 +365,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.replay(bc);
         
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler pch = new PojoConfigurationTypeHandler(bc, intentManager , null);
+        PojoConfigurationTypeHandler pch = new PojoConfigurationTypeHandler(bc, intentManager, dummyHttpServiceManager(), null);
         
         Map<String, Object> sd = new HashMap<String, Object>();
         sd.put(org.osgi.framework.Constants.SERVICE_ID, 42);

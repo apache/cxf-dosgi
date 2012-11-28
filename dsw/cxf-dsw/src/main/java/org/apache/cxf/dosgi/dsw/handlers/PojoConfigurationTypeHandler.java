@@ -20,15 +20,12 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.Map;
 
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.Bus;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUnsatifiedException;
-import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -38,15 +35,13 @@ import org.slf4j.LoggerFactory;
 public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PojoConfigurationTypeHandler.class);
 
-    public PojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, Map<String, Object> handlerProps) {
-        super(dswBC, intentManager, handlerProps);
+    public PojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, HttpServiceManager httpServiceManager, Map<String, Object> handlerProps) {
+        super(dswBC, intentManager, httpServiceManager, handlerProps);
     }
 
     public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
-                              BundleContext callingContext, Class<?> iClass, EndpointDescription sd)
-        throws IntentUnsatifiedException {
-        //
-        String address = getPojoAddress(sd.getProperties(), iClass);
+            BundleContext callingContext, Class<?> iClass, EndpointDescription sd) throws IntentUnsatifiedException {
+        String address = getClientAddress(sd.getProperties(), iClass);
         if (address == null) {
             LOG.warn("Remote address is unavailable");
             // TODO: fire Event
@@ -60,9 +55,9 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             ClientProxyFactoryBean factory = createClientProxyFactoryBean(serviceReference, iClass);
             factory.setServiceClass(iClass);
             factory.setAddress(address);
-            addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd.getProperties());
+            InterceptorUtils.addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd.getProperties());
             setClientWsdlProperties(factory.getClientFactoryBean(), dswContext, sd.getProperties(), false);
-            
+
             intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd.getProperties());
 
             Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
@@ -75,43 +70,30 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         }
         return null;
     }
-
+    
     public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
-                             BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean)
-        throws IntentUnsatifiedException {
-        String address = getPojoAddress(sd, iClass);
-        if (address == null) {
-            throw new RuntimeException("Remote address is unavailable");
-        }
-
-        LOG.info("Creating a " + iClass.getName() + " endpoint from CXF PublishHook, address is " + address);
-
+                             BundleContext callingContext, Map<String, Object> sd, Class<?> iClass, Object serviceBean) throws IntentUnsatifiedException {
+        String address = getServerAddress(sd, iClass);
+        String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
+        
         ServerFactoryBean factory = createServerFactoryBean(sref, iClass);
+        if (contextRoot != null) {
+            Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, dswContext, sref);
+            factory.setBus(bus);
+        }
         factory.setServiceClass(iClass);
         factory.setAddress(address);
         factory.setServiceBean(serviceBean);
-
-        addWsInterceptorsFeaturesProps(factory, callingContext, sd);
+        InterceptorUtils.addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         setWsdlProperties(factory, callingContext, sd, false);
-        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
+        
+        String completeEndpointAddress = constructAddress(dswContext, contextRoot, address);
 
         // The properties for the EndpointDescription
-        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, address,intents);
+        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, completeEndpointAddress,intents);
 
-        try {
-            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
-            Server server = factory.create();
-            return new ExportResult(endpointProps, server);                
-        } catch (Exception e) {
-            return new ExportResult(endpointProps, e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldClassLoader);
-        }
+        return createServerFromFactory(factory, endpointProps);
     }
-
-    
-
 
 }

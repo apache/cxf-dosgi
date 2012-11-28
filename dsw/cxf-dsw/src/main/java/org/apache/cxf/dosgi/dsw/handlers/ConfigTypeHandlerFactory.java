@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,50 +28,65 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
+import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class ConfigTypeHandlerFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
-    private IntentManager intentManager;
+public class ConfigTypeHandlerFactory {
+    private static Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
+    // protected because of tests
+    protected static final List<String> supportedConfigurationTypes = new ArrayList<String>();
 
-    public ConfigTypeHandlerFactory(IntentManager intentManager) {
-        this.intentManager = intentManager;
-        
+    static {
+        supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
+        supportedConfigurationTypes.add(Constants.RS_CONFIG_TYPE);
+        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE);
+        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
     }
 
-    public ConfigurationTypeHandler getHandler(BundleContext dswBC, List<String> configurationTypes,
-                                               Map serviceProperties, Map<String, Object> props) {
+    protected final static String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
+    private IntentManager intentManager;
+    private HttpServiceManager httpServiceManager;
 
+    public ConfigTypeHandlerFactory(IntentManager intentManager, HttpServiceManager httpServiceManager) {
+        this.intentManager = intentManager;
+        this.httpServiceManager = httpServiceManager;
+    }
+    
+    public ConfigurationTypeHandler getHandler(BundleContext dswBC,
+            Map<String, Object> serviceProperties, 
+            Map<String, Object> props) {
+        List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
+        return getHandler(dswBC, configurationTypes, serviceProperties, props);
+    }
+    
+    public ConfigurationTypeHandler getHandler(BundleContext dswBC, EndpointDescription endpoint) {
+        List<String> configurationTypes = determineConfigTypesForImport(endpoint);
+        return getHandler(dswBC, configurationTypes, endpoint.getProperties(), Collections.<String, Object>emptyMap());
+    }
+
+    private ConfigurationTypeHandler getHandler(BundleContext dswBC,
+                                               List<String> configurationTypes,
+                                               Map<String, Object> serviceProperties, 
+                                               Map<String, Object> props) {
+        intentManager.assertAllIntentsSupported(serviceProperties);
         if (configurationTypes.contains(Constants.WS_CONFIG_TYPE)
             || configurationTypes.contains(Constants.WS_CONFIG_TYPE_OLD) || configurationTypes.contains(Constants.RS_CONFIG_TYPE)) {
 
             boolean jaxrs = isJaxrsRequested(configurationTypes, serviceProperties);
 
-            if (OsgiUtils.getProperty(serviceProperties, Constants.WS_HTTP_SERVICE_CONTEXT) != null
-                || OsgiUtils.getProperty(serviceProperties, Constants.RS_HTTP_SERVICE_CONTEXT) != null
-                || OsgiUtils.getProperty(serviceProperties, Constants.WS_HTTP_SERVICE_CONTEXT_OLD) != null) {
-                return jaxrs
-                    ? new JaxRSHttpServiceConfigurationTypeHandler(dswBC, intentManager, props)
-                    : new HttpServiceConfigurationTypeHandler(dswBC, intentManager, props);
-
-            } else {
-                return jaxrs
-                    ? new JaxRSPojoConfigurationTypeHandler(dswBC, intentManager, props)
-                    : new PojoConfigurationTypeHandler(dswBC, intentManager, props);
-            }
+            return jaxrs ? new JaxRSPojoConfigurationTypeHandler(dswBC, intentManager, httpServiceManager, props)
+                    : new PojoConfigurationTypeHandler(dswBC, intentManager, httpServiceManager, props);
         } else if (configurationTypes.contains(Constants.WSDL_CONFIG_TYPE)) {
-            return new WsdlConfigurationTypeHandler(dswBC, intentManager, props);
+            return new WsdlConfigurationTypeHandler(dswBC, intentManager, httpServiceManager, props);
         }
-
-        LOG.warn("None of the configuration types in " + configurationTypes + " is supported.");
-
-        return null;
+        throw new RuntimeException("None of the configuration types in " + configurationTypes + " is supported.");
     }
 
-    private boolean isJaxrsRequested(Collection<String> types,  Map serviceProperties) {
+    private boolean isJaxrsRequested(Collection<String> types,  Map<String, Object> serviceProperties) {
 
         if (types == null) {
             return false;
@@ -95,6 +112,53 @@ public final class ConfigTypeHandlerFactory {
             }
         }
         return false;
+    }
+    
+    /**
+     * determine which configuration types should be used / if the requested are
+     * supported
+     */
+    private List<String> determineConfigurationTypes(Map<String, Object> serviceProperties) {
+        String[] requestedConfigurationTypes = Utils.normalizeStringPlus(serviceProperties
+                .get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
+        if (requestedConfigurationTypes == null || requestedConfigurationTypes.length == 0) {
+            return Collections.singletonList(DEFAULT_CONFIGURATION_TYPE);
+        }
+
+        List<String> configurationTypes = new ArrayList<String>();
+        for (String rct : requestedConfigurationTypes) {
+            if (supportedConfigurationTypes.contains(rct)) {
+                configurationTypes.add(rct);
+            }
+        }
+        LOG.info("configuration types selected for export: " + configurationTypes);
+        if (configurationTypes.size() == 0) {
+            throw new RuntimeException("the requested configuration types are not supported");
+        }
+        return configurationTypes;
+    }
+    
+    private List<String> determineConfigTypesForImport(EndpointDescription endpoint) {
+        List<String> remoteConfigurationTypes = endpoint.getConfigurationTypes();
+
+        if (remoteConfigurationTypes == null) {
+            throw new RuntimeException("The supplied endpoint has no configuration type");
+        }
+
+        List<String> usableConfigurationTypes = new ArrayList<String>();
+        for (String ct : supportedConfigurationTypes) {
+            if (remoteConfigurationTypes.contains(ct)) {
+                usableConfigurationTypes.add(ct);
+            }
+        }
+
+        if (usableConfigurationTypes.size() == 0) {
+            throw new RuntimeException("The supplied endpoint has no compatible configuration type. Supported types are: "
+                        + supportedConfigurationTypes
+                        + "    Types needed by the endpoint: "
+                        + remoteConfigurationTypes);
+        }
+        return usableConfigurationTypes;
     }
 
 }

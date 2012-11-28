@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUnsatifiedException;
@@ -41,19 +42,17 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHandler {
+public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(JaxRSPojoConfigurationTypeHandler.class);
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
 
-    protected JaxRSPojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, Map<String, Object> handlerProps) {
-        super(dswBC, intentManager, handlerProps);
+    protected JaxRSPojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, HttpServiceManager httpServiceManager, Map<String, Object> handlerProps) {
+        super(dswBC, intentManager, httpServiceManager, handlerProps);
     }
 
-    @Override
     public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
-                              BundleContext callingContext, Class<?> iClass, EndpointDescription sd)
-        throws IntentUnsatifiedException {
+                              BundleContext callingContext, Class<?> iClass, EndpointDescription sd) throws IntentUnsatifiedException {
 
         String address = getPojoAddress(sd, iClass);
         if (address == null) {
@@ -93,7 +92,7 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
         	bean.setClassLoader(loader);
         }
         
-        addRsInterceptorsFeaturesProps(bean, callingContext, sd.getProperties());
+        InterceptorUtils.addRsInterceptorsFeaturesProps(bean, callingContext, sd.getProperties());
         
         List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
         if (resources != null) {
@@ -110,53 +109,29 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
         return proxy;
     }
     
-    @Override
     public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
-                             BundleContext callingContext, Map sd, Class<?> iClass, Object serviceBean)
-        throws IntentUnsatifiedException {
+                             BundleContext callingContext, Map<String, Object> sd, Class<?> iClass, Object serviceBean) throws IntentUnsatifiedException {
 
-        String address = getPojoAddress(sd, iClass);
-        if (address == null) {
-            throw new RuntimeException("Remote address is unavailable");
-        }
+        String address = getServerAddress(sd, iClass);
+        String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
+
+        Bus bus = contextRoot != null ? httpServiceManager.registerServletAndGetBus(contextRoot, dswContext, sref) : null;
 
         LOG.info("Creating a " + iClass.getName()
                  + " endpoint via JaxRSPojoConfigurationTypeHandler, address is " + address);
 
-        JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-
-        List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
-        if (resources != null) {
-            factory.setModelBeansWithServiceClass(resources, iClass);
-            factory.setServiceBeanObjects(serviceBean);
-        } else {
-            factory.setServiceClass(iClass);
-            factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
-        }
-
-        factory.setAddress(address);
-        List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd);
-        if (providers != null && providers.size() > 0) {
-            factory.setProviders(providers);
-        }
-
-        addRsInterceptorsFeaturesProps(factory, callingContext, sd);
-
-        String location = OsgiUtils.getProperty(sd, Constants.RS_WADL_LOCATION);
-    	if (location != null) {
-    		URL wadlURL = callingContext.getBundle().getResource(location);
-                if (wadlURL != null) {
-	            factory.setDocLocation(wadlURL.toString());
-                }
-    	}
-        
-        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        String[] intents = new String[] { "HTTP" };
+        JAXRSServerFactoryBean factory = createServerFactory(dswContext, callingContext, sd, iClass, serviceBean, address, bus);
+        String completeEndpointAddress = constructAddress(dswContext, contextRoot, address);
 
         // The properties for the EndpointDescription
         Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] { Constants.RS_CONFIG_TYPE },
-                address, intents);
+                completeEndpointAddress, new String[] { "HTTP" });
 
+        return createServerFromFactory(factory, endpointProps);
+    }
+    
+    private final ExportResult createServerFromFactory(JAXRSServerFactoryBean factory, Map<String, Object> endpointProps) {
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
@@ -166,7 +141,36 @@ public class JaxRSPojoConfigurationTypeHandler extends PojoConfigurationTypeHand
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
-
+    }
+    
+    private JAXRSServerFactoryBean createServerFactory(BundleContext dswContext, BundleContext callingContext, Map<String, Object> sd,
+            Class<?> iClass, Object serviceBean, String address, Bus bus) {
+        JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
+        if (bus !=null) {
+            factory.setBus(bus);
+        }
+        List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
+        if (resources != null) {
+            factory.setModelBeansWithServiceClass(resources, iClass);
+            factory.setServiceBeanObjects(serviceBean);
+        } else {
+            factory.setServiceClass(iClass);
+            factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
+        }
+        factory.setAddress(address);
+        List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd);
+        if (providers != null && providers.size() > 0) {
+            factory.setProviders(providers);
+        }
+        InterceptorUtils.addRsInterceptorsFeaturesProps(factory, callingContext, sd);
+        String location = OsgiUtils.getProperty(sd, Constants.RS_WADL_LOCATION);
+        if (location != null) {
+            URL wadlURL = callingContext.getBundle().getResource(location);
+            if (wadlURL != null) {
+                factory.setDocLocation(wadlURL.toString());
+            }
+        }
+        return factory;
     }
 
     protected String getPojoAddress(EndpointDescription sd, Class<?> iClass) {

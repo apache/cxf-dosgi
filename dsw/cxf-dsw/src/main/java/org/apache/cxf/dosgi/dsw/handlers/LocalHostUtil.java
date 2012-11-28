@@ -79,4 +79,13 @@ public class LocalHostUtil {
             throw new UnknownHostException("127.0.0.1");
         }
     }
+
+    public static Object getLocalHostAddress() {
+        try {
+            String host = LocalHostUtil.getLocalHost().getHostAddress();
+            return (host == null) ? "localhost" : host;
+        } catch (Exception e) {
+            return "localhost";
+        }
+    }
 }

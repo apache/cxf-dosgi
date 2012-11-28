@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -29,15 +28,11 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
-import org.apache.cxf.endpoint.AbstractEndpointFactory;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -50,11 +45,14 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPojoConfigurationTypeHandler.class);
     private static final String CONFIGURATION_TYPE = "org.apache.cxf.ws";
+    protected HttpServiceManager httpServiceManager;
     
     public AbstractPojoConfigurationTypeHandler(BundleContext dswBC,
                                                 IntentManager intentManager,
+                                                HttpServiceManager httpServiceManager,
                                                 Map<String, Object> handlerProps) {
         super(dswBC, intentManager, handlerProps);
+        this.httpServiceManager = httpServiceManager;
     }
 
     // Isolated so that it can be substituted for testing
@@ -79,7 +77,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
 
     protected void setWsdlProperties(ServerFactoryBean factory,
                                      BundleContext callingContext,  
-                                     Map sd, boolean wsdlType) {
+                                     Map<String, Object> sd, boolean wsdlType) {
     	String location = OsgiUtils.getProperty(sd, wsdlType ? Constants.WSDL_LOCATION : Constants.WS_WSDL_LOCATION);
     	if (location != null) {
     		URL wsdlURL = callingContext.getBundle().getResource(location);
@@ -100,29 +98,8 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     	}
     }
     
-    protected void addWsInterceptorsFeaturesProps(
-    		AbstractEndpointFactory factory, BundleContext callingContext, Map sd) {
-    	addInterceptors(factory, callingContext, sd, Constants.WS_IN_INTERCEPTORS_PROP_KEY);
-        addInterceptors(factory, callingContext, sd, Constants.WS_OUT_INTERCEPTORS_PROP_KEY);
-        addInterceptors(factory, callingContext, sd, Constants.WS_OUT_FAULT_INTERCEPTORS_PROP_KEY);
-        addInterceptors(factory, callingContext, sd, Constants.WS_IN_FAULT_INTERCEPTORS_PROP_KEY);
-        addFeatures(factory, callingContext, sd, Constants.WS_FEATURES_PROP_KEY);
-        addContextProperties(factory, callingContext, sd, Constants.WS_CONTEXT_PROPS_PROP_KEY);
-    }
-    
-    protected void addRsInterceptorsFeaturesProps(
-    		AbstractEndpointFactory factory, BundleContext callingContext, Map sd) {
-    	addInterceptors(factory, callingContext, sd, Constants.RS_IN_INTERCEPTORS_PROP_KEY);
-        addInterceptors(factory, callingContext, sd, Constants.RS_OUT_INTERCEPTORS_PROP_KEY);
-        addInterceptors(factory, callingContext, sd, Constants.RS_OUT_FAULT_INTERCEPTORS_PROP_KEY);
-        addInterceptors(factory, callingContext, sd, Constants.RS_IN_FAULT_INTERCEPTORS_PROP_KEY);
-        addFeatures(factory, callingContext, sd, Constants.RS_FEATURES_PROP_KEY);
-        addContextProperties(factory, callingContext, sd, Constants.RS_CONTEXT_PROPS_PROP_KEY);
-    }
-        
-    
     protected void setClientWsdlProperties(ClientFactoryBean factory, BundleContext dswContext, 
-    		Map sd, boolean wsdlType) {
+    		Map<String, Object> sd, boolean wsdlType) {
     	String location = OsgiUtils.getProperty(sd, wsdlType ? Constants.WSDL_LOCATION : Constants.WS_WSDL_LOCATION);
     	if (location != null) {
     		URL wsdlURL = dswContext.getBundle().getResource(location);
@@ -143,7 +120,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
     	}
     }
     
-    protected static QName getServiceQName(Class<?> iClass, Map sd, String nsPropName, String namePropName) {
+    protected static QName getServiceQName(Class<?> iClass, Map<String, Object> sd, String nsPropName, String namePropName) {
     	String serviceNs = OsgiUtils.getProperty(sd, nsPropName);
     	String serviceName = OsgiUtils.getProperty(sd, namePropName);
     	if (iClass == null && (serviceNs == null || serviceName == null)) {
@@ -159,7 +136,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return new QName(serviceNs, serviceName);
     }
     
-    protected static QName getPortQName(String ns, Map sd, String propName) {
+    protected static QName getPortQName(String ns, Map<String, Object> sd, String propName) {
     	String portName = OsgiUtils.getProperty(sd, propName);
         if (portName == null) {
         	return null;	
@@ -167,59 +144,23 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return new QName(ns, portName);
     }
     
-    protected static void addInterceptors(AbstractEndpointFactory factory, BundleContext callingContext, 
-    		Map sd, String propName) {
-
-        List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName); 
-        boolean in = propName.contains("in.interceptors");
-        boolean out = propName.contains("out.interceptors");
-        boolean in_fault = propName.contains("in.fault.interceptors");
-        boolean out_fault = propName.contains("out.fault.interceptors");
-        for (int i = 0; i < providers.size(); i++) {
-        	Interceptor<?> interceptor = (Interceptor<?>)providers.get(i);  
-	        if (in) {
-	        	factory.getInInterceptors().add(interceptor);
-	        } else if (out) {
-	        	factory.getOutInterceptors().add(interceptor);
-	        } else if (in_fault) {
-	        	factory.getInFaultInterceptors().add(interceptor);
-	        } else if (out_fault) {
-	        	factory.getOutFaultInterceptors().add(interceptor);
-	        }
-        }
-    }
-    
-       
-    protected static void addFeatures(AbstractEndpointFactory factory, BundleContext callingContext, 
-    		Map sd, String propName) {
-
-        List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName); 
-        if (providers.size() > 0) {
-        	factory.getFeatures().addAll(CastUtils.cast(providers, AbstractFeature.class));
-        }
-    }
-    
-    protected static void addContextProperties(AbstractEndpointFactory factory, BundleContext callingContext, 
-    		Map sd, String propName) {
-    	Map<String, Object> props = (Map<String, Object>)sd.get(propName);
-        if (props != null) {
-        	factory.getProperties(true).putAll(props);
-        }
-    }
-
     public String getType() {
         return CONFIGURATION_TYPE;
     }
+    
+    protected String getClientAddress(Map<String, Object> sd, Class<?> iClass) {
+        return OsgiUtils.getFirstNonEmptyStringProperty(sd, 
+                RemoteConstants.ENDPOINT_ID,
+                Constants.WS_ADDRESS_PROPERTY,
+                Constants.WS_ADDRESS_PROPERTY,
+                Constants.WS_ADDRESS_PROPERTY_OLD,
+                Constants.RS_ADDRESS_PROPERTY);
+    }
 
-    protected String getPojoAddress(Map sd, Class<?> iClass) {
+    protected String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
         String address = null;
         try {
-            address = OsgiUtils.getFirstNonEmptyStringProperty(sd, 
-                    RemoteConstants.ENDPOINT_ID,
-                    Constants.WS_ADDRESS_PROPERTY,
-                    Constants.WS_ADDRESS_PROPERTY,
-                    Constants.WS_ADDRESS_PROPERTY_OLD,
-                    Constants.RS_ADDRESS_PROPERTY);
+            address = getClientAddress(sd, iClass);
         } catch (RuntimeException e) {
             LOG.error(e.getMessage(), e);
             return null;
@@ -238,4 +179,18 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         }
         return address;
     }
+    
+    protected final ExportResult createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
+            Server server = factory.create();
+            return new ExportResult(endpointProps, server);
+        } catch (Exception e) {
+            return new ExportResult(endpointProps, e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldClassLoader);
+        }
+    }
+
 }

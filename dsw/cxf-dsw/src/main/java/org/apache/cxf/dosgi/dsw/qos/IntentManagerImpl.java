@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.cxf.binding.BindingConfiguration;
@@ -118,7 +117,7 @@ public class IntentManagerImpl implements IntentManager {
         return intentsFound;
     }
     
-    public void assertAllIntentsSupported(Properties serviceProperties) {
+    public void assertAllIntentsSupported(Map<String, Object> serviceProperties) {
         long endTime = System.currentTimeMillis() + maxIntentWaitTime;
         Set<String> requiredIntents = IntentUtils.getRequestedIntents(serviceProperties);
         List<String> unsupportedIntents = new ArrayList<String>();

@@ -31,7 +31,6 @@ import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.aegis.AegisElementProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,22 +41,18 @@ public class JaxRSUtils {
 
     public final static String MODEL_FOLDER = "/OSGI-INF/cxf/jaxrs/";
     public final static String DEFAULT_MODEL = "/OSGI-INF/cxf/jaxrs/model.xml";
-    public final static String PROVIDERS_FILTER = "(|" + "(" + Constants.OBJECTCLASS
-                                                  + "=javax.ws.rs.ext.MessageBodyReader" + ")" + "("
-                                                  + Constants.OBJECTCLASS
-                                                  + "=javax.ws.rs.ext.MessageBodyWriter" + ")" + "("
-                                                  + Constants.OBJECTCLASS
-                                                  + "=javax.ws.rs.ext.ExceptionMapper" + ")" + "("
-                                                  + Constants.OBJECTCLASS
-                                                  + "=org.apache.cxf.jaxrs.ext.RequestHandler" + ")" + "("
-                                                  + Constants.OBJECTCLASS
-                                                  + "=org.apache.cxf.jaxrs.ext.ResponseHandler" + ")" + "("
-                                                  + Constants.OBJECTCLASS
-                                                  + "=org.apache.cxf.jaxrs.ext.ParameterHandler" + ")" + "("
-                                                  + Constants.OBJECTCLASS
-                                                  + "=org.apache.cxf.jaxrs.ext.ResponseExceptionMapper" + ")" + ")";
+    public final static String PROVIDERS_FILTER = "(|" 
+            + "(objectClass=javax.ws.rs.ext.MessageBodyReader)"
+            + "(objectClass=javax.ws.rs.ext.MessageBodyWriter)" 
+            + "(objectClass=javax.ws.rs.ext.ExceptionMapper)" 
+            + "(objectClass=org.apache.cxf.jaxrs.ext.RequestHandler)" 
+            + "(objectClass=org.apache.cxf.jaxrs.ext.ResponseHandler)" 
+            + "(objectClass=org.apache.cxf.jaxrs.ext.ParameterHandler)" 
+            + "(objectClass=org.apache.cxf.jaxrs.ext.ResponseExceptionMapper)" 
+            + ")";
 
-    public static List<Object> getProviders(BundleContext callingContext, BundleContext dswBC, Map sd) {
+    @SuppressWarnings("rawtypes")
+    static List<Object> getProviders(BundleContext callingContext, BundleContext dswBC, Map sd) {
 
         List<Object> providers = new ArrayList<Object>();
         if ("aegis".equals(sd.get(org.apache.cxf.dosgi.dsw.Constants.RS_DATABINDING_PROP_KEY))) {
@@ -96,15 +91,13 @@ public class JaxRSUtils {
         return providers;
     }
 
-    
-
-    public static List<UserResource> getModel(BundleContext callingContext, Class<?> iClass) {
+    static List<UserResource> getModel(BundleContext callingContext, Class<?> iClass) {
         String classModel = MODEL_FOLDER + iClass.getSimpleName() + "-model.xml";
         List<UserResource> list = getModel(callingContext, iClass, classModel);
         return list != null ? list : getModel(callingContext, iClass, DEFAULT_MODEL);
     }
 
-    public static List<UserResource> getModel(BundleContext callingContext, Class<?> iClass, String name) {
+    private static List<UserResource> getModel(BundleContext callingContext, Class<?> iClass, String name) {
         InputStream r = iClass.getClassLoader().getResourceAsStream(name);
         if (r == null) {
             URL u = callingContext.getBundle().getResource(name);

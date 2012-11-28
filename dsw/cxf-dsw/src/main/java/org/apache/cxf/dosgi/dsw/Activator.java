@@ -25,12 +25,15 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
+import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
+import org.apache.cxf.dosgi.dsw.handlers.HttpServiceManager;
 import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.qos.IntentTracker;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
+import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -68,7 +71,10 @@ public class Activator implements ManagedService, BundleActivator {
         intentTracker = new IntentTracker(bc, intentMap);
         intentTracker.open();
         IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
-        RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(bc, intentManager);
+        HttpServiceManager httpServiceManager = new HttpServiceManager(bc);
+        ConfigTypeHandlerFactory configTypeHandlerFactory = new ConfigTypeHandlerFactory(intentManager, httpServiceManager );
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory );
+        RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(rsaCore);
         Hashtable<String, Object> props = new Hashtable<String, Object>();
 
         // TODO .... RemoteAdminService.XXX

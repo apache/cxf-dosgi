@@ -21,9 +21,9 @@ package org.apache.cxf.dosgi.dsw.qos;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-
 import junit.framework.Assert;
+
+import org.junit.Test;
 
 public class IntentMapTest {
 
