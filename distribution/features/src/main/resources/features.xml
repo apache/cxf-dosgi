@@ -3,7 +3,11 @@
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/2.7.0/xml/features</repository>
 
     <feature name="cxf-dosgi-core" version="${project.version}">
-        <feature>cxf</feature>
+        <feature>cxf-specs</feature>
+        <feature>cxf-jaxws</feature>
+        <feature>cxf-jaxrs</feature>
+        <feature>cxf-databinding-aegis</feature>
+        <feature>cxf-http-jetty</feature>
         <bundle>mvn:org.osgi/org.osgi.enterprise/4.2.0</bundle>        
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/1.1_3</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-topology-manager/${project.version}</bundle>

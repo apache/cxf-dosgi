@@ -26,13 +26,10 @@ import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.feature.LoggingFeature;
-import org.apache.cxf.ws.policy.WSPolicyFeature;
-import org.apache.neethi.Policy;
 
 public class DefaultIntentMapFactory {
     public Map<String, Object> create() {
         Map<String,Object> intentMap = new HashMap<String, Object>();
-        intentMap.put("addressing", getNonDecoupledAddressing());
         intentMap.put("logging", getLoggingFeature());
         Object soap11 = getSoapBinding(Soap11.getInstance());
         intentMap.put("SOAP", soap11);
@@ -42,12 +39,6 @@ public class DefaultIntentMapFactory {
         return intentMap;
     }
 
-    private Object getNonDecoupledAddressing() {
-        Policy wsAddressing = new Policy();
-        WSPolicyFeature wsPolicy = new WSPolicyFeature(wsAddressing );
-        return wsPolicy;
-    }
-    
     private Object getLoggingFeature() {
         return new LoggingFeature();
     }
