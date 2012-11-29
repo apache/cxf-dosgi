@@ -58,7 +58,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     }
     
     private HttpServiceManager dummyHttpServiceManager() {
-        return new HttpServiceManager(null, null, null);
+        return new HttpServiceManager(null, null, null, null);
     }
 
     public void testGetPojoAddressEndpointCxf() {

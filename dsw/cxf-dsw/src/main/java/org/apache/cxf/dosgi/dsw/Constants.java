@@ -115,5 +115,6 @@ public class Constants {
     public static final String DSW_CLIENT_ID = PROVIDER_PREFIX + ".remote.dsw.client";
 
     public static final String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
-    public static final Object SERVLET_BASE = "servletBase";
+    public static final String HTTP_BASE = "httpBase";
+    public static final String CXF_SERVLET_ALIAS = "cxfServletAlias";
 }

@@ -45,29 +45,24 @@ public class HttpServiceManager {
     private ServiceTracker tracker;
     private BundleContext bundleContext;
     private Map<Long, String> exportedAliases = Collections.synchronizedMap(new HashMap<Long, String>());
-    private String servletBase;
+    private String httpBase;
+    private String cxfServletAlias;
 
-    public HttpServiceManager(BundleContext bundleContext, String servletBase) {
-        this.bundleContext = bundleContext;
-        this.tracker = new ServiceTracker(bundleContext, HttpService.class.getName(), null);
+    public HttpServiceManager(BundleContext bundleContext, String httpBase, String cxfServletAlias) {
+        this(bundleContext, httpBase, cxfServletAlias, new ServiceTracker(bundleContext, HttpService.class.getName(), null));
         this.tracker.open();
-        setServletBase(servletBase);
-        
     }
-    
+
     // Only for tests
-    public HttpServiceManager(BundleContext bundleContext, String servletBase, ServiceTracker tracker) {
+    public HttpServiceManager(BundleContext bundleContext, String httpBase, String cxfServletAlias, ServiceTracker tracker) {
         this.bundleContext = bundleContext;
         this.tracker = tracker;
-        setServletBase(servletBase);
+        this.httpBase = getWithDefault(httpBase, "http://" + LocalHostUtil.getLocalIp() + ":8181");
+        this.cxfServletAlias = getWithDefault(cxfServletAlias, "cxf");
     }
     
-    private void setServletBase(String newServletBase) {
-        this.servletBase = newServletBase;
-        if( this.servletBase == null) {
-            // This default only works for Apache Karaf and cxf with default settings
-            this.servletBase = "http://" + LocalHostUtil.getLocalIp() + ":8181/cxf";
-        }
+    private String getWithDefault(String value, String defaultValue) {
+        return value == null ? defaultValue : value;
     }
     
     public Bus registerServletAndGetBus(String contextRoot, BundleContext dswContext,
@@ -144,7 +139,8 @@ public class HttpServiceManager {
         if (relativeEndpointAddress.startsWith("http")) {
             return relativeEndpointAddress;
         }
-        return this.servletBase + relativeEndpointAddress;
+        String effContextRoot = contextRoot == null ? cxfServletAlias : contextRoot; 
+        return this.httpBase + effContextRoot + relativeEndpointAddress;
     }
     
     public void close() {

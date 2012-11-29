@@ -73,9 +73,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 	public List<ExportRegistration> exportService(ServiceReference serviceReference, Map additionalProperties)
         throws IllegalArgumentException, UnsupportedOperationException {
 
+        // TODO This might be wrong as it gets the classname of servicereference
         String ifaceName = serviceReference.getClass().getName();
-        LOG.debug("RemoteServiceAdmin: exportService: {}", ifaceName);
-
         synchronized (exportedServices) {
             // check if it is already exported ....
             if (exportedServices.containsKey(serviceReference)) {

@@ -65,7 +65,8 @@ public class Activator implements ManagedService, BundleActivator {
 
     private void start(BundleContext bc, Map<String, Object> config) {
         this.bc = bc;
-        String servletBase = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.SERVLET_BASE);
+        String httpBase = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.HTTP_BASE);
+        String cxfServletAlisas = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.CXF_SERVLET_ALIAS);
         // Disable the fast infoset as it's not compatible (yet) with OSGi
         System.setProperty("org.apache.cxf.nofastinfoset", "true");
 
@@ -74,7 +75,7 @@ public class Activator implements ManagedService, BundleActivator {
         intentTracker = new IntentTracker(bc, intentMap);
         intentTracker.open();
         IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
-        HttpServiceManager httpServiceManager = new HttpServiceManager(bc, servletBase);
+        HttpServiceManager httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlisas);
         ConfigTypeHandlerFactory configTypeHandlerFactory = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
         RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(rsaCore);

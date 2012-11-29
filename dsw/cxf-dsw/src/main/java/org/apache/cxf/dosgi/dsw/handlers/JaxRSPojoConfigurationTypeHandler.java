@@ -117,7 +117,10 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
     public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
                              BundleContext callingContext, Map<String, Object> sd, Class<?> iClass, Object serviceBean) throws IntentUnsatifiedException {
 
-        String address = getServerAddress(sd, iClass);
+        String address = getClientAddress(sd, iClass);
+        if (address == null) {
+            address = "";
+        }
         String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
 
         Bus bus = contextRoot != null ? httpServiceManager.registerServletAndGetBus(contextRoot, dswContext, sref) : null;

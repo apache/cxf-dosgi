@@ -140,6 +140,18 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.dosgi.samples</groupId>
+            <artifactId>cxf-dosgi-ri-samples-greeter-rest-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.dosgi.samples</groupId>
+            <artifactId>cxf-dosgi-ri-samples-greeter-rest-interface</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>

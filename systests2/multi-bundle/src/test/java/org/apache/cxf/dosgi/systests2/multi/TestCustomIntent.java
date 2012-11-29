@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations 
  * under the License. 
  */
-package org.apache.cxf.dosgi.systests2.multi.customintent;
+package org.apache.cxf.dosgi.systests2.multi;
 
 import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
@@ -38,7 +38,9 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
 import org.apache.cxf.dosgi.systests2.common.AbstractTestExportService;
-import org.apache.cxf.dosgi.systests2.multi.MultiBundleTools;
+import org.apache.cxf.dosgi.systests2.multi.customintent.AddGreetingPhraseInterceptor;
+import org.apache.cxf.dosgi.systests2.multi.customintent.CustomFeature;
+import org.apache.cxf.dosgi.systests2.multi.customintent.CustomIntentActivator;
 import org.apache.cxf.dosgi.systests2.multi.customintent.service.EmptyGreeterService;
 import org.apache.cxf.dosgi.systests2.multi.customintent.service.GreeterServiceWithCustomIntentActivator;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;

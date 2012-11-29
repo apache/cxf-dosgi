@@ -64,7 +64,7 @@ public class HttpServiceManagerTest extends TestCase {
         expect(sr.getProperty(EasyMock.eq("service.id"))).andReturn(12345l).atLeastOnce();
         c.replay();
         
-        HttpServiceManager h = new HttpServiceManager(dswContext, null, null) {
+        HttpServiceManager h = new HttpServiceManager(dswContext, null, null, null) {
 
             @Override
             protected HttpService getHttpService() {

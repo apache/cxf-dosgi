@@ -65,35 +65,12 @@ public abstract class AbstractTestExportService {
             factory.setAddress("http://localhost:9090/greeter");
             factory.getServiceFactory().setDataBinding(new AegisDatabinding());
             GreeterService client = (GreeterService)factory.create();
+
             Map<GreetingPhrase, String> greetings = client.greetMe("Fred");
             Assert.assertEquals("Fred", greetings.get(new GreetingPhrase("Hello")));
             System.out.println("Invocation result: " + greetings);
-            
+
             try {
-                class GreeterDataImpl implements GreeterData {
-                    private String name;
-                    private int age;
-                    private boolean exception;
-
-                    GreeterDataImpl(String n, int a, boolean ex) {
-                        name = n;
-                        age = a;
-                        exception = ex;
-                    }
-                    
-                    public String getName() {
-                        return name;
-                    }
-
-                    public int getAge() {
-                        return age;
-                    }
-
-                    public boolean isException() {
-                        return exception;
-                    }                
-                }
-                
                 GreeterData gd = new GreeterDataImpl("Stranger", 11, true);
                 client.greetMe(gd);
                 Assert.fail("GreeterException has to be thrown");
@@ -101,7 +78,8 @@ public abstract class AbstractTestExportService {
                 Assert.assertEquals("Wrong exception message", 
                              "GreeterService can not greet Stranger", 
                              ex.toString());
-            } 
+            }
+
         } finally {
             Thread.currentThread().setContextClassLoader(cl);            
         } 
@@ -127,5 +105,29 @@ public abstract class AbstractTestExportService {
             Thread.sleep(1000);            
         }
         throw new TimeoutException();
+    }
+    
+    class GreeterDataImpl implements GreeterData {
+        private String name;
+        private int age;
+        private boolean exception;
+
+        GreeterDataImpl(String n, int a, boolean ex) {
+            name = n;
+            age = a;
+            exception = ex;
+        }
+        
+        public String getName() {
+            return name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public boolean isException() {
+            return exception;
+        }                
     }
 }

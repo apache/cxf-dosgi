@@ -85,7 +85,7 @@ public class ConfigTypeHandlerFactoryTest {
         serviceProps.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, intents);
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap);
-        HttpServiceManager httpServiceManager = new HttpServiceManager(bc, null);
+        HttpServiceManager httpServiceManager = new HttpServiceManager(bc, null, null);
         ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
         return f.getHandler(bc, serviceProps);
     }
