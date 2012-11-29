@@ -35,8 +35,13 @@ import org.slf4j.LoggerFactory;
 public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PojoConfigurationTypeHandler.class);
 
-    public PojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, HttpServiceManager httpServiceManager, Map<String, Object> handlerProps) {
-        super(dswBC, intentManager, httpServiceManager, handlerProps);
+    public PojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, HttpServiceManager httpServiceManager) {
+        super(dswBC, intentManager, httpServiceManager);
+    }
+    
+    @Override
+    public String[] getSupportedTypes() {
+        return new String[] {Constants.WS_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
     }
 
     public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
@@ -88,7 +93,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         setWsdlProperties(factory, callingContext, sd, false);
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
         
-        String completeEndpointAddress = constructAddress(dswContext, contextRoot, address);
+        String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(dswContext, contextRoot, address);
 
         // The properties for the EndpointDescription
         Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, completeEndpointAddress,intents);

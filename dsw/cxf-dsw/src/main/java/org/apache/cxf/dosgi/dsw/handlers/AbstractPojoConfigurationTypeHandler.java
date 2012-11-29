@@ -18,8 +18,11 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -28,6 +31,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientFactoryBean;
@@ -42,17 +46,76 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfigurationHandler {
+public abstract class AbstractPojoConfigurationTypeHandler implements ConfigurationTypeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPojoConfigurationTypeHandler.class);
-    private static final String CONFIGURATION_TYPE = "org.apache.cxf.ws";
+    protected BundleContext bundleContext;
+    protected IntentManager intentManager;
     protected HttpServiceManager httpServiceManager;
     
     public AbstractPojoConfigurationTypeHandler(BundleContext dswBC,
                                                 IntentManager intentManager,
-                                                HttpServiceManager httpServiceManager,
-                                                Map<String, Object> handlerProps) {
-        super(dswBC, intentManager, handlerProps);
+                                                HttpServiceManager httpServiceManager) {
+        this.bundleContext = dswBC;
+        this.intentManager = intentManager;
         this.httpServiceManager = httpServiceManager;
+    }
+    
+    protected Object getProxy(Object serviceProxy, Class<?> iType) {
+        return Proxy.newProxyInstance(iType.getClassLoader(), new Class[] {
+            iType
+        }, new ServiceInvocationHandler(serviceProxy, iType));
+    }
+
+    protected Map<String, Object> createEndpointProps(Map<String, Object> sd, Class<?> iClass, String[] importedConfigs,
+                                                      String address, String[] intents) {
+        Map<String, Object> props = new HashMap<String, Object>();
+
+        copyEndpointProperties(sd, props);
+
+        String[] sa = new String[] {iClass.getName()};
+        String pkg = iClass.getPackage().getName();
+        
+        props.remove(org.osgi.framework.Constants.SERVICE_ID);
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, sa);
+        props.put(RemoteConstants.ENDPOINT_SERVICE_ID, sd.get(org.osgi.framework.Constants.SERVICE_ID));        
+        props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(bundleContext));
+        props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
+        props.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + pkg, 
+                OsgiUtils.getVersion(iClass, bundleContext)); 
+
+        for (String configurationType : importedConfigs) {
+            if(Constants.WS_CONFIG_TYPE.equals(configurationType))
+                props.put(Constants.WS_ADDRESS_PROPERTY, address);
+            else if(Constants.RS_CONFIG_TYPE.equals(configurationType))
+                props.put(Constants.RS_ADDRESS_PROPERTY, address);
+            else if(Constants.WS_CONFIG_TYPE_OLD.equals(configurationType)){
+                props.put(Constants.WS_ADDRESS_PROPERTY_OLD, address);
+                props.put(Constants.WS_ADDRESS_PROPERTY, address);
+            }
+        }
+        
+        {
+            String[] allIntents = IntentUtils.mergeArrays(intents, IntentUtils.getInetntsImplementedByTheService(sd));
+            props.put(RemoteConstants.SERVICE_INTENTS, allIntents);
+        }
+        
+        props.put(RemoteConstants.ENDPOINT_ID, address);
+        return props;
+
+    }
+
+    private void copyEndpointProperties(Map<String, Object> sd, Map<String, Object> endpointProps) {
+        Set<Map.Entry<String, Object>> keys = sd.entrySet();
+        for (Map.Entry<String, Object> entry : keys) {
+            try {
+                String skey = (String)entry.getKey();
+                if (!skey.startsWith("."))
+                    endpointProps.put(skey, entry.getValue());
+            } catch (ClassCastException e) {
+                LOG.warn("ServiceProperties Map contained non String key. Skipped  " + entry + "   "
+                            + e.getLocalizedMessage());
+            }
+        }
     }
 
     // Isolated so that it can be substituted for testing
@@ -144,10 +207,6 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
         return new QName(ns, portName);
     }
     
-    public String getType() {
-        return CONFIGURATION_TYPE;
-    }
-    
     protected String getClientAddress(Map<String, Object> sd, Class<?> iClass) {
         return OsgiUtils.getFirstNonEmptyStringProperty(sd, 
                 RemoteConstants.ENDPOINT_ID,
@@ -165,7 +224,7 @@ public abstract class AbstractPojoConfigurationTypeHandler extends AbstractConfi
             LOG.error(e.getMessage(), e);
             return null;
         }
-        return (address == null) ? getDefaultAddress(iClass) : address;
+        return (address == null) ? httpServiceManager.getDefaultAddress(iClass) : address;
     }
     
     protected final ExportResult createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {

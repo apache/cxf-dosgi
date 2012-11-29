@@ -45,16 +45,29 @@ public class HttpServiceManager {
     private ServiceTracker tracker;
     private BundleContext bundleContext;
     private Map<Long, String> exportedAliases = Collections.synchronizedMap(new HashMap<Long, String>());
+    private String servletBase;
 
-    public HttpServiceManager(BundleContext bundleContext) {
+    public HttpServiceManager(BundleContext bundleContext, String servletBase) {
         this.bundleContext = bundleContext;
         this.tracker = new ServiceTracker(bundleContext, HttpService.class.getName(), null);
         this.tracker.open();
+        setServletBase(servletBase);
+        
     }
     
-    public HttpServiceManager(BundleContext bundleContext, ServiceTracker tracker) {
+    // Only for tests
+    public HttpServiceManager(BundleContext bundleContext, String servletBase, ServiceTracker tracker) {
         this.bundleContext = bundleContext;
         this.tracker = tracker;
+        setServletBase(servletBase);
+    }
+    
+    private void setServletBase(String newServletBase) {
+        this.servletBase = newServletBase;
+        if( this.servletBase == null) {
+            // This default only works for Apache Karaf and cxf with default settings
+            this.servletBase = "http://" + LocalHostUtil.getLocalIp() + ":8181/cxf";
+        }
     }
     
     public Bus registerServletAndGetBus(String contextRoot, BundleContext dswContext,
@@ -121,6 +134,17 @@ public class HttpServiceManager {
         } catch (InvalidSyntaxException e) {
             LOG.warn("Service listener could not be started. The service will not be automatically unexported.", e);
         }
+    }
+    
+    protected String getDefaultAddress(Class<?> type) {
+        return "/" + type.getName().replace('.', '/');
+    }
+
+    protected String getAbsoluteAddress(BundleContext ctx, String contextRoot, String relativeEndpointAddress) {
+        if (relativeEndpointAddress.startsWith("http")) {
+            return relativeEndpointAddress;
+        }
+        return this.servletBase + relativeEndpointAddress;
     }
     
     public void close() {

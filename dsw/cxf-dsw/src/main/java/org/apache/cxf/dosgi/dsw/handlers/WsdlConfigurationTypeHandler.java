@@ -39,22 +39,20 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("restriction")
 public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
-    private static final String CONFIGURATION_TYPE = "wsdl";
     private static final Logger LOG = LoggerFactory.getLogger(WsdlConfigurationTypeHandler.class);
     
     public WsdlConfigurationTypeHandler(BundleContext dswBC,
                                         IntentManager intentManager,
-                                        HttpServiceManager httpServiceManager,
-                                        Map<String, Object> handlerProps) {
-        super(dswBC, intentManager, httpServiceManager, handlerProps);
+                                        HttpServiceManager httpServiceManager) {
+        super(dswBC, intentManager, httpServiceManager);
     }
     
-    public String getType() {
-        return CONFIGURATION_TYPE;
+    @Override
+    public String[] getSupportedTypes() {
+        return new String[] {Constants.WSDL_CONFIG_TYPE};
     }
-
+    
     public Object createProxy(ServiceReference serviceReference,
                               BundleContext dswContext,
                               BundleContext callingContext,
@@ -154,7 +152,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     private String getWsdlAddress(EndpointDescription sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, Constants.WSDL_CONFIG_PREFIX);
         if (address == null) {
-            address = getDefaultAddress(iClass);
+            address = httpServiceManager.getDefaultAddress(iClass);
             if (address != null) {
                 address += "?wsdl";    
             }

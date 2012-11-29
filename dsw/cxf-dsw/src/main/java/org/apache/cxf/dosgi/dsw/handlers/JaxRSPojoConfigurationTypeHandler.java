@@ -47,10 +47,15 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
 
-    protected JaxRSPojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, HttpServiceManager httpServiceManager, Map<String, Object> handlerProps) {
-        super(dswBC, intentManager, httpServiceManager, handlerProps);
+    public JaxRSPojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, HttpServiceManager httpServiceManager) {
+        super(dswBC, intentManager, httpServiceManager);
     }
 
+    @Override
+    public String[] getSupportedTypes() {
+        return new String[] {Constants.WSDL_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
+    }
+    
     public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
                               BundleContext callingContext, Class<?> iClass, EndpointDescription sd) throws IntentUnsatifiedException {
 
@@ -121,7 +126,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
                  + " endpoint via JaxRSPojoConfigurationTypeHandler, address is " + address);
 
         JAXRSServerFactoryBean factory = createServerFactory(dswContext, callingContext, sd, iClass, serviceBean, address, bus);
-        String completeEndpointAddress = constructAddress(dswContext, contextRoot, address);
+        String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(dswContext, contextRoot, address);
 
         // The properties for the EndpointDescription
         Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] { Constants.RS_CONFIG_TYPE },
@@ -177,7 +182,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         String address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
 
         if (address == null) {
-            address = getDefaultAddress(iClass);
+            address = httpServiceManager.getDefaultAddress(iClass);
             if (address != null) {
                 LOG.info("Using a default address : " + address);
             }

@@ -26,7 +26,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public interface ConfigurationTypeHandler {
-    String getType();
+    String[] getSupportedTypes();
     
     ExportResult createServer(ServiceReference serviceReference,
                         BundleContext dswContext,

@@ -42,18 +42,20 @@ public class ConfigTypeHandlerFactory {
 
     protected final static String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
     private IntentManager intentManager;
-    private HttpServiceManager httpServiceManager;
-    private Map<String, Object> props;
+    private PojoConfigurationTypeHandler pojoConfigurationTypeHandler;
+    private JaxRSPojoConfigurationTypeHandler jaxRsPojoConfigurationTypeHandler;
+    private WsdlConfigurationTypeHandler wsdlConfigurationTypeHandler;
 
-    public ConfigTypeHandlerFactory(IntentManager intentManager, HttpServiceManager httpServiceManager, Map<String, Object> props) {
+    public ConfigTypeHandlerFactory(BundleContext bc, IntentManager intentManager, HttpServiceManager httpServiceManager) {
+        this.intentManager = intentManager;
+        this.pojoConfigurationTypeHandler = new PojoConfigurationTypeHandler(bc, intentManager, httpServiceManager);
+        this.jaxRsPojoConfigurationTypeHandler = new JaxRSPojoConfigurationTypeHandler(bc, intentManager, httpServiceManager);
+        this.wsdlConfigurationTypeHandler = new WsdlConfigurationTypeHandler(bc, intentManager, httpServiceManager);
         supportedConfigurationTypes = new ArrayList<String>();
         supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
         supportedConfigurationTypes.add(Constants.RS_CONFIG_TYPE);
         supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE);
         supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
-        this.intentManager = intentManager;
-        this.httpServiceManager = httpServiceManager;
-        this.props = props;
     }
     
     public ConfigurationTypeHandler getHandler(BundleContext dswBC,
@@ -76,10 +78,9 @@ public class ConfigTypeHandlerFactory {
 
             boolean jaxrs = isJaxrsRequested(configurationTypes, serviceProperties);
 
-            return jaxrs ? new JaxRSPojoConfigurationTypeHandler(dswBC, intentManager, httpServiceManager, props)
-                    : new PojoConfigurationTypeHandler(dswBC, intentManager, httpServiceManager, props);
+            return jaxrs ? jaxRsPojoConfigurationTypeHandler : pojoConfigurationTypeHandler;
         } else if (configurationTypes.contains(Constants.WSDL_CONFIG_TYPE)) {
-            return new WsdlConfigurationTypeHandler(dswBC, intentManager, httpServiceManager, props);
+            return wsdlConfigurationTypeHandler;
         }
         throw new RuntimeException("None of the configuration types in " + configurationTypes + " is supported.");
     }
