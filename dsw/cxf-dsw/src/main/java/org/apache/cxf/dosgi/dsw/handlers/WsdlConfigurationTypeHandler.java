@@ -48,7 +48,6 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         super(dswBC, intentManager, httpServiceManager);
     }
     
-    @Override
     public String[] getSupportedTypes() {
         return new String[] {Constants.WSDL_CONFIG_TYPE};
     }

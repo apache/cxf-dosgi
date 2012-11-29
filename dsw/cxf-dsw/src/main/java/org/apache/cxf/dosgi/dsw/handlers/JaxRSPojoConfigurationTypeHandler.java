@@ -51,7 +51,6 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         super(dswBC, intentManager, httpServiceManager);
     }
 
-    @Override
     public String[] getSupportedTypes() {
         return new String[] {Constants.WSDL_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
     }
@@ -117,11 +116,16 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
     public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
                              BundleContext callingContext, Map<String, Object> sd, Class<?> iClass, Object serviceBean) throws IntentUnsatifiedException {
 
-        String address = getClientAddress(sd, iClass);
-        if (address == null) {
-            address = "";
-        }
         String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
+        String address;
+        if (contextRoot == null) {
+            address = getServerAddress(sd, iClass);
+        } else {
+            address = getClientAddress(sd, iClass);
+            if (address == null) {
+                address = "/";
+            }
+        }
 
         Bus bus = contextRoot != null ? httpServiceManager.registerServletAndGetBus(contextRoot, dswContext, sref) : null;
 

@@ -39,7 +39,6 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         super(dswBC, intentManager, httpServiceManager);
     }
     
-    @Override
     public String[] getSupportedTypes() {
         return new String[] {Constants.WS_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
     }
