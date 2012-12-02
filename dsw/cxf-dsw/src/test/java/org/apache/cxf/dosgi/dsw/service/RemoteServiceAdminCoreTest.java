@@ -52,7 +52,7 @@ public class RemoteServiceAdminCoreTest {
     @Test
     public void dontExportOwnServiceProxies() {
 
-        IMocksControl c = EasyMock.createNiceControl();
+        IMocksControl c = EasyMock.createControl();
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
 
@@ -63,6 +63,7 @@ public class RemoteServiceAdminCoreTest {
 
         ServiceReference sref = c.createMock(ServiceReference.class);
         EasyMock.expect(sref.getBundle()).andReturn(b).anyTimes();
+        EasyMock.expect(sref.getPropertyKeys()).andReturn(new String[]{}).anyTimes();
 
 		ConfigTypeHandlerFactory configTypeHandlerFactory = c.createMock(ConfigTypeHandlerFactory.class);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory );

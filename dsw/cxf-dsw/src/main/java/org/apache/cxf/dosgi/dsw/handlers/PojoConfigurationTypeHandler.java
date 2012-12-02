@@ -82,7 +82,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         
         ServerFactoryBean factory = createServerFactoryBean(sref, iClass);
         if (contextRoot != null) {
-            Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, dswContext, sref);
+            Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref);
             factory.setBus(bus);
         }
         factory.setServiceClass(iClass);

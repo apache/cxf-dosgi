@@ -128,7 +128,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         DataBinding databinding = new JAXBDataBinding();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         if (contextRoot != null) {
-            Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, dswContext, sref);
+            Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref);
             factory.setBus(bus);
         }
         factory.setServiceClass(iClass);

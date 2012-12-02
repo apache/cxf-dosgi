@@ -127,7 +127,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
             }
         }
 
-        Bus bus = contextRoot != null ? httpServiceManager.registerServletAndGetBus(contextRoot, dswContext, sref) : null;
+        Bus bus = contextRoot != null ? httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref) : null;
 
         LOG.info("Creating a " + iClass.getName()
                  + " endpoint via JaxRSPojoConfigurationTypeHandler, address is " + address);

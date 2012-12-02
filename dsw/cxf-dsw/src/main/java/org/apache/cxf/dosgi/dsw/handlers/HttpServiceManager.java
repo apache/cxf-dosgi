@@ -65,13 +65,13 @@ public class HttpServiceManager {
         return value == null ? defaultValue : value;
     }
     
-    public Bus registerServletAndGetBus(String contextRoot, BundleContext dswContext,
+    public Bus registerServletAndGetBus(String contextRoot, BundleContext callingContext,
             ServiceReference sref) {
         CXFNonSpringServlet cxf = new CXFNonSpringServlet();
         try {
             HttpService httpService = getHttpService();
             httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), 
-                                       getHttpContext(dswContext, httpService));
+                                       getHttpContext(callingContext, httpService));
             registerUnexportHook(sref, contextRoot);
             
             LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);

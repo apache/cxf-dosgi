@@ -73,35 +73,31 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 	public List<ExportRegistration> exportService(ServiceReference serviceReference, Map additionalProperties)
         throws IllegalArgumentException, UnsupportedOperationException {
 
-        // TODO This might be wrong as it gets the classname of servicereference
-        String ifaceName = serviceReference.getClass().getName();
+        Properties serviceProperties = getProperties(serviceReference);
+        if (additionalProperties != null) {
+            OsgiUtils.overlayProperties(serviceProperties, additionalProperties);
+        }
+
+        List<String> interfaces = getInterfaces(serviceProperties);
+        if (interfaces.size() == 0) {
+            LOG.error("export failed: no provided service interfaces found or service_exported_interfaces is null !!");
+            // TODO: publish error event ? not sure
+            return Collections.emptyList();
+        }
+        
+        if (isCreatedByThisRSA(serviceReference)) {
+            LOG.debug("Skipping export of this service as we created it ourself as a proxy {}", interfaces);
+            // TODO: publish error event ? Not sure
+            return Collections.emptyList();
+        }
+
         synchronized (exportedServices) {
             // check if it is already exported ....
             if (exportedServices.containsKey(serviceReference)) {
-                return copyExportRegistration(serviceReference, ifaceName);
-            }
-
-            if (isCreatedByThisRSA(serviceReference)) {
-                LOG.debug("proxy provided by this bundle ...  {} ", ifaceName);
-                // TODO: publish error event ? Not sure
-                return Collections.emptyList();
-            }
-
-            Properties serviceProperties = getProperties(serviceReference);
-            if (additionalProperties != null) {
-                OsgiUtils.overlayProperties(serviceProperties, additionalProperties);
-            }
-
-            List<String> interfaces = getInterfaces(serviceProperties);
-            if (interfaces.size() == 0) {
-                LOG.error("export failed: no provided service interfaces found or service_exported_interfaces is null !!");
-                // TODO: publish error event ? not sure
-                return Collections.emptyList();
+                LOG.debug("already exported this service. Returning existing exportRegs {} ", interfaces);
+                return copyExportRegistration(serviceReference);
             }
             LOG.info("interfaces selected for export: " + interfaces);
-
-            
-
             LinkedHashMap<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>(1);
             Object serviceObject = bctx.getService(serviceReference);
             BundleContext callingContext = serviceReference.getBundle().getBundleContext();
@@ -180,8 +176,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         return serviceProperties;
     }
 
-    private List<ExportRegistration> copyExportRegistration(ServiceReference serviceReference, String ifaceName) {
-        LOG.debug("already exported ...  {} ", ifaceName);
+    private List<ExportRegistration> copyExportRegistration(ServiceReference serviceReference) {
         Collection<ExportRegistration> regs = exportedServices.get(serviceReference);
 
         List<EndpointDescription> copiedEndpoints = new ArrayList<EndpointDescription>();
