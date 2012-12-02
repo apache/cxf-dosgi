@@ -58,7 +58,7 @@ public class HttpServiceManager {
         this.bundleContext = bundleContext;
         this.tracker = tracker;
         this.httpBase = getWithDefault(httpBase, "http://" + LocalHostUtil.getLocalIp() + ":8181");
-        this.cxfServletAlias = getWithDefault(cxfServletAlias, "cxf");
+        this.cxfServletAlias = getWithDefault(cxfServletAlias, "/cxf");
     }
     
     private String getWithDefault(String value, String defaultValue) {

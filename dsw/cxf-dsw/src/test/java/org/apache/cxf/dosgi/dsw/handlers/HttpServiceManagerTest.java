@@ -46,6 +46,22 @@ import org.osgi.service.http.NamespaceException;
 
 public class HttpServiceManagerTest extends TestCase {
     
+    public void testGetAbsoluteAddress() {
+        IMocksControl c = EasyMock.createControl();
+        BundleContext bundleContext = c.createMock(BundleContext.class);
+        c.replay();
+        HttpServiceManager manager = new HttpServiceManager(bundleContext, null, null, null);
+        String localIp = LocalHostUtil.getLocalIp();
+
+        String address1 = manager.getAbsoluteAddress(bundleContext, null, "/myservice");
+        assertEquals("http://" + localIp  + ":8181/cxf/myservice", address1);
+        
+        String address2 = manager.getAbsoluteAddress(bundleContext, "/mycontext", "/myservice");
+        assertEquals("http://" + localIp  + ":8181/mycontext/myservice", address2);
+
+        c.verify();
+    }
+    
     public void testRegisterAndUnregisterServlet() throws Exception {
         IMocksControl c = EasyMock.createControl();
         BundleContext dswContext = c.createMock(BundleContext.class);
