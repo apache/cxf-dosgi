@@ -59,7 +59,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             ClientProxyFactoryBean factory = createClientProxyFactoryBean(serviceReference, iClass);
             factory.setServiceClass(iClass);
             factory.setAddress(address);
-            InterceptorUtils.addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd.getProperties());
+            addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd.getProperties());
             setClientWsdlProperties(factory.getClientFactoryBean(), dswContext, sd.getProperties(), false);
 
             intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd.getProperties());
@@ -88,7 +88,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         factory.setServiceClass(iClass);
         factory.setAddress(address);
         factory.setServiceBean(serviceBean);
-        InterceptorUtils.addWsInterceptorsFeaturesProps(factory, callingContext, sd);
+        addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         setWsdlProperties(factory, callingContext, sd, false);
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
         

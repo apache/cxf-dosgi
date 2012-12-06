@@ -96,7 +96,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         	bean.setClassLoader(loader);
         }
         
-        InterceptorUtils.addRsInterceptorsFeaturesProps(bean, callingContext, sd.getProperties());
+        addRsInterceptorsFeaturesProps(bean, callingContext, sd.getProperties());
         
         List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
         if (resources != null) {
@@ -174,7 +174,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         if (providers != null && providers.size() > 0) {
             factory.setProviders(providers);
         }
-        InterceptorUtils.addRsInterceptorsFeaturesProps(factory, callingContext, sd);
+        addRsInterceptorsFeaturesProps(factory, callingContext, sd);
         String location = OsgiUtils.getProperty(sd, Constants.RS_WADL_LOCATION);
         if (location != null) {
             URL wadlURL = callingContext.getBundle().getResource(location);

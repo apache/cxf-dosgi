@@ -136,7 +136,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         factory.getServiceFactory().setDataBinding(databinding);
         factory.setServiceBean(serviceBean);
 
-        InterceptorUtils.addWsInterceptorsFeaturesProps(factory, callingContext, sd);
+        addWsInterceptorsFeaturesProps(factory, callingContext, sd);
         
         setWsdlProperties(factory, callingContext, sd, true);
         
