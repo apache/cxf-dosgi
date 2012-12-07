@@ -256,15 +256,7 @@ Unnamed - org.slf4j:slf4j-api:jar:1.5.6 (http://www.slf4j.org/slf4j-api) org.slf
 Unnamed - org.slf4j:slf4j-jdk14:jar:1.5.6 (http://www.slf4j.org/slf4j-jdk14) org.slf4j:slf4j-jdk14:jar:1.5.6:runtime
     License: MIT License  (http://www.slf4j.org/license.html)
 
-Spring OSGi Core (http://www.springframework.org/osgi) org.springframework.osgi:spring-osgi-core:bundle:1.2.0
-    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
-
-Spring OSGi Extender (http://www.springframework.org/osgi) org.springframework.osgi:spring-osgi-extender:bundle:1.2.0
-    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
-
-Spring OSGi IO (http://www.springframework.org/osgi) org.springframework.osgi:spring-osgi-io:bundle:1.2.0
-    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
-
 WSDL4J (http://sf.net/projects/wsdl4j) wsdl4j:wsdl4j:jar:1.6.2
     License: CPL  (http://www.opensource.org/licenses/cpl1.0.txt)
+
 
