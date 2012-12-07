@@ -27,9 +27,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
@@ -39,15 +37,10 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ClientFactoryBean;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.jaxb.JAXBDataBinding;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,26 +115,6 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
                             + e.getLocalizedMessage());
             }
         }
-    }
-
-    // Isolated so that it can be substituted for testing
-    ClientProxyFactoryBean createClientProxyFactoryBean(ServiceReference sref, Class<?> iClass) {
-        String frontEnd = (String)sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
-        ClientProxyFactoryBean factory = "jaxws".equals(frontEnd) ? new JaxWsProxyFactoryBean() : new ClientProxyFactoryBean();
-        String dataBindingName = (String)sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
-        DataBinding databinding = "jaxb".equals(dataBindingName) ? new JAXBDataBinding() : new AegisDatabinding();
-        factory.getServiceFactory().setDataBinding(databinding);
-        return factory;
-    }
-
-    // Isolated so that it can be substituted for testing
-    ServerFactoryBean createServerFactoryBean(ServiceReference sref, Class<?> iClass) {
-        String frontEnd = (String)sref.getProperty(Constants.WS_FRONTEND_PROP_KEY);
-        ServerFactoryBean factory = "jaxws".equals(frontEnd) ? new JaxWsServerFactoryBean() : new ServerFactoryBean();
-        String dataBindingName = (String)sref.getProperty(Constants.WS_DATABINDING_PROP_KEY);
-        DataBinding databinding = "jaxb".equals(dataBindingName) ? new JAXBDataBinding() : new AegisDatabinding();
-        factory.getServiceFactory().setDataBinding(databinding);
-        return factory;
     }
 
     protected void setWsdlProperties(ServerFactoryBean factory,

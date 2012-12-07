@@ -20,12 +20,19 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.Map;
 
+import javax.jws.WebService;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUnsatifiedException;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -43,9 +50,10 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return new String[] {Constants.WS_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
     }
 
-    public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
-            BundleContext callingContext, Class<?> iClass, EndpointDescription sd) throws IntentUnsatifiedException {
-        String address = getClientAddress(sd.getProperties(), iClass);
+    public Object createProxy(ServiceReference sref, BundleContext dswContext,
+            BundleContext callingContext, Class<?> iClass, EndpointDescription epd) throws IntentUnsatifiedException {
+        Map<String, Object> sd = epd.getProperties();
+        String address = getClientAddress(sd, iClass);
         if (address == null) {
             LOG.warn("Remote address is unavailable");
             // TODO: fire Event
@@ -56,13 +64,14 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            ClientProxyFactoryBean factory = createClientProxyFactoryBean(serviceReference, iClass);
+            ClientProxyFactoryBean factory = createClientProxyFactoryBean(sd, iClass);
+            factory.getServiceFactory().setDataBinding(getDataBinding(sd, iClass));
             factory.setServiceClass(iClass);
             factory.setAddress(address);
-            addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd.getProperties());
-            setClientWsdlProperties(factory.getClientFactoryBean(), dswContext, sd.getProperties(), false);
+            addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd);
+            setClientWsdlProperties(factory.getClientFactoryBean(), dswContext, sd, false);
 
-            intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd.getProperties());
+            intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd);
 
             Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
             Object proxy = getProxy(factory.create(), iClass);
@@ -80,7 +89,8 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         String address = getServerAddress(sd, iClass);
         String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
         
-        ServerFactoryBean factory = createServerFactoryBean(sref, iClass);
+        ServerFactoryBean factory = createServerFactoryBean(sd, iClass);
+        factory.setDataBinding(getDataBinding(sd, iClass));
         if (contextRoot != null) {
             Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref);
             factory.setBus(bus);
@@ -95,9 +105,33 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(dswContext, contextRoot, address);
 
         // The properties for the EndpointDescription
-        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, completeEndpointAddress,intents);
+        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, completeEndpointAddress, intents);
 
         return createServerFromFactory(factory, endpointProps);
+    }
+
+    private DataBinding getDataBinding(Map<String, Object> sd, Class<?> iClass) {
+        return isJAXB(sd, iClass) ? new JAXBDataBinding() : new AegisDatabinding();
+    }
+
+    private boolean isJAXB(Map<String, Object> sd, Class<?> iClass) {
+        String dataBindingName = (String)sd.get(Constants.WS_DATABINDING_PROP_KEY);
+        return (iClass.getAnnotation(WebService.class) != null || Constants.WS_DATA_BINDING_JAXB.equals(dataBindingName)) && !Constants.WS_DATA_BINDING_AEGIS.equals(dataBindingName);
+    }
+
+    // Isolated so that it can be substituted for testing
+    protected ClientProxyFactoryBean createClientProxyFactoryBean(Map<String, Object> sd, Class<?> iClass) {
+        return isJAXWS(sd, iClass) ? new JaxWsProxyFactoryBean() : new ClientProxyFactoryBean();
+    }
+
+    // Isolated so that it can be substituted for testing
+    protected ServerFactoryBean createServerFactoryBean(Map<String, Object> sd, Class<?> iClass) {
+        return isJAXWS(sd, iClass) ? new JaxWsServerFactoryBean() : new ServerFactoryBean();
+    }
+    
+    private boolean isJAXWS(Map<String, Object> sd, Class<?> iClass) {
+        String frontEnd = (String)sd.get(Constants.WS_FRONTEND_PROP_KEY);
+        return (iClass.getAnnotation(WebService.class) != null || Constants.WS_FRONTEND_JAXWS.equals(frontEnd)) && !Constants.WS_FRONTEND_SIMPLE.equals(frontEnd);
     }
 
 }
