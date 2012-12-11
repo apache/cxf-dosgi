@@ -63,21 +63,21 @@ public class OsgiUtilsTest extends TestCase {
     }
     
     
-    public void testGetUUID(){
+    public void testGetUUID() {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn(null).atLeastOnce();
         EasyMock.replay(bc);
         String uuid = OsgiUtils.getUUID(bc);
         assertNotNull(uuid);
         
-        assertEquals(System.getProperty("org.osgi.framework.uuid"),uuid );
+        assertEquals(System.getProperty("org.osgi.framework.uuid"), uuid);
         
         EasyMock.verify(bc);
     }
     
     
     
-    public void testGetVersion(){
+    public void testGetVersion() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext bc = c.createMock(BundleContext.class);
         ServiceReference sref = c.createMock(ServiceReference.class);
@@ -102,7 +102,8 @@ public class OsgiUtilsTest extends TestCase {
         EasyMock.expect(bc.getService(EasyMock.eq(sref))).andReturn(pa);
         EasyMock.expect(pa.getBundle(EasyMock.eq(iClass))).andReturn(b);
         
-        ExportedPackage[] exP = new ExportedPackage[] { new MyExportedPackage(iClass.getPackage(),"1.2.3"), new MyExportedPackage(String.class.getPackage(),"4.5.6") }; 
+        ExportedPackage[] exP = new ExportedPackage[] {new MyExportedPackage(iClass.getPackage(), "1.2.3"),
+                                                       new MyExportedPackage(String.class.getPackage(), "4.5.6") }; 
         
         EasyMock.expect(pa.getExportedPackages(EasyMock.eq(b))).andReturn(exP).atLeastOnce();
         
@@ -112,7 +113,7 @@ public class OsgiUtilsTest extends TestCase {
     }
     
     
-    private static class MyExportedPackage implements ExportedPackage{
+    private static class MyExportedPackage implements ExportedPackage {
 
         Package package1;
         String version;
@@ -149,18 +150,18 @@ public class OsgiUtilsTest extends TestCase {
     }
     
     
-    public void testGetProperty(){
+    public void testGetProperty() {
         
         Map<String, Object> p = new HashMap<String, Object>();
         p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
-        p.put("notAString",new Object());
+        p.put("notAString", new Object());
         p.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{"my.class"});
         p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, new String[]{"my.config"});
         
         EndpointDescription ep = new EndpointDescription(p);
         
         assertNull(OsgiUtils.getProperty(ep, "unkownProp"));
-        assertEquals(p.get(RemoteConstants.ENDPOINT_ID),OsgiUtils.getProperty(ep, RemoteConstants.ENDPOINT_ID));
+        assertEquals(p.get(RemoteConstants.ENDPOINT_ID), OsgiUtils.getProperty(ep, RemoteConstants.ENDPOINT_ID));
         assertEquals(null, OsgiUtils.getProperty(ep, "notAString"));
     }
 }

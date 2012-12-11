@@ -42,7 +42,7 @@ public class ClientServiceFactoryTest extends TestCase {
         
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext dswContext = control.createMock(BundleContext.class);
-        Map<String, Object> map = new HashMap<String,Object>();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
         map.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myGreatConfiguration");
         map.put(Constants.OBJECTCLASS, new String[]{"my.class"});
@@ -64,7 +64,7 @@ public class ClientServiceFactoryTest extends TestCase {
         EasyMock.expectLastCall().andReturn(myTestProxyObject);        
         control.replay();       
         
-        ClientServiceFactory csf = new ClientServiceFactory(dswContext, String.class, ed, handler,iri);
+        ClientServiceFactory csf = new ClientServiceFactory(dswContext, String.class, ed, handler, iri);
         assertSame(myTestProxyObject, csf.getService(requestingBundle, sreg));
     }
 }

@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 public class WsdlConfigurationTypeHandlerTest extends TestCase {
     
-    public void testDUMMY(){
+    public void testDUMMY() {
         assertTrue(true);
     }
     

@@ -42,8 +42,8 @@ public class ClientServiceFactory implements ServiceFactory {
 
     private ImportRegistrationImpl importRegistartion;
 
-    private boolean closeable = false;
-    private int serviceCounter = 0;
+    private boolean closeable;
+    private int serviceCounter;
 
     public ClientServiceFactory(BundleContext dswContext, Class<?> iClass, EndpointDescription sd,
                                 ConfigurationTypeHandler handler, ImportRegistrationImpl ir) {
@@ -63,7 +63,7 @@ public class ClientServiceFactory implements ServiceFactory {
         try {
             Object proxy = AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
-                     return handler.createProxy(sreg.getReference(), dswContext, requestingBundle
+                    return handler.createProxy(sreg.getReference(), dswContext, requestingBundle
                                                        .getBundleContext(), iClass, sd);
                 }
             });
@@ -100,20 +100,22 @@ public class ClientServiceFactory implements ServiceFactory {
             --serviceCounter;
             LOG.debug("Services still provided by this ServiceFactory: {}", serviceCounter);
 
-            if (serviceCounter <= 0 && closeable)
+            if (serviceCounter <= 0 && closeable) {
                 remove();
+            }
         }
     }
 
     private void remove() {
-          importRegistartion.closeAll();
+        importRegistartion.closeAll();
     }
 
     public void setCloseable(boolean closeable) {
         synchronized (this) {
             this.closeable = closeable;
-            if (serviceCounter <= 0 && closeable)
+            if (serviceCounter <= 0 && closeable) {
                 remove();
+            }
         }
     }
 

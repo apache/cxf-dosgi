@@ -21,7 +21,7 @@ package org.apache.cxf.dosgi.dsw.service;
 import junit.framework.TestCase;
 
 public class DistributionProviderImplTest extends TestCase {
-    public void testDUMMY(){
+    public void testDUMMY() {
         assertTrue(true);
     }
     

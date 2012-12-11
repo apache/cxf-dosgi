@@ -59,10 +59,9 @@ public class JaxRSUtils {
             providers.add(new AegisElementProvider());
         }
         
-        providers.addAll(
-        		ClassUtils.loadProviderClasses(callingContext, 
-                                               sd, 
-                                               org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY));
+        providers.addAll(ClassUtils.loadProviderClasses(callingContext, 
+                                                        sd, 
+                                                        org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY));
 
         Object globalQueryProp = sd.get(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_GLOBAL_PROP_KEY);
         boolean globalQueryRequired = globalQueryProp == null || OsgiUtils.toBoolean(globalQueryProp);

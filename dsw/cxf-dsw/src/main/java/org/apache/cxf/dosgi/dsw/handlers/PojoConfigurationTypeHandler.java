@@ -105,7 +105,9 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(dswContext, contextRoot, address);
 
         // The properties for the EndpointDescription
-        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, completeEndpointAddress, intents);
+        Map<String, Object> endpointProps = createEndpointProps(sd, iClass,
+                                                                new String[]{Constants.WS_CONFIG_TYPE},
+                                                                completeEndpointAddress, intents);
 
         return createServerFromFactory(factory, endpointProps);
     }
@@ -116,7 +118,9 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
     private boolean isJAXB(Map<String, Object> sd, Class<?> iClass) {
         String dataBindingName = (String)sd.get(Constants.WS_DATABINDING_PROP_KEY);
-        return (iClass.getAnnotation(WebService.class) != null || Constants.WS_DATA_BINDING_JAXB.equals(dataBindingName)) && !Constants.WS_DATA_BINDING_AEGIS.equals(dataBindingName);
+        return (iClass.getAnnotation(WebService.class) != null 
+            || Constants.WS_DATA_BINDING_JAXB.equals(dataBindingName)) 
+            && !Constants.WS_DATA_BINDING_AEGIS.equals(dataBindingName);
     }
 
     // Isolated so that it can be substituted for testing
@@ -131,7 +135,9 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     
     private boolean isJAXWS(Map<String, Object> sd, Class<?> iClass) {
         String frontEnd = (String)sd.get(Constants.WS_FRONTEND_PROP_KEY);
-        return (iClass.getAnnotation(WebService.class) != null || Constants.WS_FRONTEND_JAXWS.equals(frontEnd)) && !Constants.WS_FRONTEND_SIMPLE.equals(frontEnd);
+        return (iClass.getAnnotation(WebService.class) != null
+            || Constants.WS_FRONTEND_JAXWS.equals(frontEnd)) 
+            && !Constants.WS_FRONTEND_SIMPLE.equals(frontEnd);
     }
 
 }

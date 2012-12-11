@@ -18,10 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +43,11 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+
 public class RemoteServiceAdminCoreTest {
 
     @Test
@@ -58,15 +59,15 @@ public class RemoteServiceAdminCoreTest {
 
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
 
-        Dictionary<?,?> d = new Properties();
+        Dictionary<?, ?> d = new Properties();
         EasyMock.expect(b.getHeaders()).andReturn(d).anyTimes();
 
         ServiceReference sref = c.createMock(ServiceReference.class);
         EasyMock.expect(sref.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(sref.getPropertyKeys()).andReturn(new String[]{}).anyTimes();
 
-		ConfigTypeHandlerFactory configTypeHandlerFactory = c.createMock(ConfigTypeHandlerFactory.class);
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory );
+        ConfigTypeHandlerFactory configTypeHandlerFactory = c.createMock(ConfigTypeHandlerFactory.class);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
 
         c.replay();
 
@@ -90,7 +91,7 @@ public class RemoteServiceAdminCoreTest {
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
 
-        Dictionary<?,?> d = new Properties();
+        Dictionary<?, ?> d = new Properties();
         EasyMock.expect(b.getHeaders()).andReturn(d).anyTimes();
 
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
@@ -106,8 +107,9 @@ public class RemoteServiceAdminCoreTest {
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
         HttpServiceManager httpServiceManager = c.createMock(HttpServiceManager.class);
-        ConfigTypeHandlerFactory configTypeHandlerFactory = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory ) {
+        ConfigTypeHandlerFactory configTypeHandlerFactory 
+            = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory) {
             @Override
             protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
                                                     ConfigurationTypeHandler handler,
@@ -133,7 +135,7 @@ public class RemoteServiceAdminCoreTest {
         // lets import the same endpoint once more -> should get a copy of the ImportRegistration
         ImportRegistration ireg2 = rsaCore.importService(endpoint);
         assertNotNull(ireg2);
-        assertEquals(2,rsaCore.getImportedEndpoints().size());
+        assertEquals(2, rsaCore.getImportedEndpoints().size());
 
         assertEquals(ireg.getImportReference(), (rsaCore.getImportedEndpoints().toArray())[0]);
 

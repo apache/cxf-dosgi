@@ -18,9 +18,6 @@
   */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-
 import java.util.Dictionary;
 
 import javax.servlet.Servlet;
@@ -43,6 +40,10 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+
 
 public class HttpServiceManagerTest extends TestCase {
     
@@ -74,10 +75,10 @@ public class HttpServiceManagerTest extends TestCase {
         ServletConfig config = c.createMock(ServletConfig.class);
         expect(config.getInitParameter(EasyMock.<String>anyObject())).andReturn(null).atLeastOnce();
         ServletContext servletContext = c.createMock(ServletContext.class);
-        expect(config.getServletContext()).andReturn(servletContext );
+        expect(config.getServletContext()).andReturn(servletContext);
         final HttpService httpService = new DummyHttpService(config);
         ServiceReference sr = c.createMock(ServiceReference.class);
-        expect(sr.getProperty(EasyMock.eq("service.id"))).andReturn(12345l).atLeastOnce();
+        expect(sr.getProperty(EasyMock.eq("service.id"))).andReturn(12345L).atLeastOnce();
         c.replay();
         
         HttpServiceManager h = new HttpServiceManager(dswContext, null, null, null) {

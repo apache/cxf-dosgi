@@ -38,15 +38,15 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
     private BundleContext bctx;
     private RemoteServiceAdminCore rsaCore;
 
-    private boolean closed = false;
+    private boolean closed;
 
     public RemoteServiceAdminInstance(BundleContext bc, RemoteServiceAdminCore core) {
         bctx = bc;
         rsaCore = core;
     }
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List /* ExportRegistration */exportService(ServiceReference ref, Map properties)
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List /* ExportRegistration */exportService(ServiceReference ref, Map properties)
         throws IllegalArgumentException, UnsupportedOperationException {
 
         SecurityManager sm = System.getSecurityManager();
@@ -64,16 +64,17 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
         return AccessController.doPrivileged(new PrivilegedAction<List>() {
             public List<ExportRegistration> run() {
 
-                if (closed)
+                if (closed) {
                     return Collections.emptyList();
+                }
 
-                 return rsaCore.exportService(refFinal, propertiesFinal);
+                return rsaCore.exportService(refFinal, propertiesFinal);
             }
         });
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	public Collection getExportedServices() {
+    public Collection getExportedServices() {
 
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
@@ -81,13 +82,14 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
             sm.checkPermission(epp);
         }
 
-        if (closed)
+        if (closed) {
             return null;
+        }
         return rsaCore.getExportedServices();
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	public Collection getImportedEndpoints() {
+    public Collection getImportedEndpoints() {
 
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
@@ -95,8 +97,9 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
             sm.checkPermission(epp);
         }
 
-        if (closed)
+        if (closed) {
             return null;
+        }
         return rsaCore.getImportedEndpoints();
     }
 
@@ -114,8 +117,9 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
         return AccessController.doPrivileged(new PrivilegedAction<ImportRegistration>() {
             public ImportRegistration run() {
 
-                if (closed)
+                if (closed) {
                     return null;
+                }
 
                 return rsaCore.importService(epd);
             }

@@ -144,7 +144,7 @@ public class ImportRegistrationImpl implements ImportRegistration {
     public EndpointDescription getImportedEndpointDescription() {
         if (isFailure())
             return null;
-        if(closed)
+        if (closed)
             return null;
         
         return importedEndpoint;
@@ -207,7 +207,7 @@ public class ImportRegistrationImpl implements ImportRegistration {
     }
 
     public ImportReference getImportReference() {
-        if(importReference==null){
+        if (importReference == null) {
             importReference = new ImportReferenceImpl(this);
         }
         return importReference;

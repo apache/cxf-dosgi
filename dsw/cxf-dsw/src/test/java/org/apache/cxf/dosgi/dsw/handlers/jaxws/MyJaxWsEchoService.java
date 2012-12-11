@@ -22,5 +22,5 @@ import javax.jws.WebService;
 
 @WebService
 public interface MyJaxWsEchoService {
-    public String echo(String message);
+    String echo(String message);
 }

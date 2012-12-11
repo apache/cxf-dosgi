@@ -18,9 +18,6 @@
   */
 package org.apache.cxf.dosgi.dsw.qos;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,6 +35,10 @@ import org.apache.cxf.feature.Feature;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Test;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 
 public class IntentManagerImplTest {
     
@@ -147,7 +148,8 @@ public class IntentManagerImplTest {
 
         Map<String, Object> intents = new HashMap<String, Object>();
         BindingConfiguration feat1 = control.createMock(BindingConfiguration.class);
-        intents.put("A", new AbstractFeature() {});
+        intents.put("A", new AbstractFeature() {
+        });
         intents.put("SOAP", feat1);
         intents.put("SOAP.1_1", feat1);
         intents.put("SOAP.1_2", control.createMock(BindingConfiguration.class));
@@ -176,7 +178,8 @@ public class IntentManagerImplTest {
 
         Map<String, Object> intents = new HashMap<String, Object>();
         BindingConfiguration feat1 = control.createMock(BindingConfiguration.class);
-        intents.put("A", new AbstractFeature() {});
+        intents.put("A", new AbstractFeature() {
+        });
         intents.put("SOAP", feat1);
         intents.put("SOAP.1_1", feat1);
         intents.put("SOAP.1_2", control.createMock(BindingConfiguration.class));
@@ -261,13 +264,14 @@ public class IntentManagerImplTest {
         
         IntentManager intentManager = new IntentManagerImpl(intentMap);
         
-        Set<String> effectiveIntents = new HashSet<String>(Arrays.asList( 
-            intentManager.applyIntents(features, factory, props)));
+        Set<String> effectiveIntents = new HashSet<String>(Arrays.asList(intentManager.applyIntents(features,
+                                                                                                    factory, 
+                                                                                                    props)));
         Set<String> expectedIntents = new HashSet<String>(Arrays.asList(new String [] {"A", "B", "SOAP"}));
         assertEquals(expectedIntents, effectiveIntents);
     }
     
-    private static class TestFeature extends AbstractFeature {
+    private static final class TestFeature extends AbstractFeature {
         private final String name;
         
         private TestFeature(String n) {

@@ -31,7 +31,7 @@ import org.osgi.framework.ServiceReference;
 
 public class InterfaceRuleTest extends TestCase {
     
-    public void testDUMMY(){
+    public void testDUMMY() {
         assertTrue(true);
     }
     

@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 public class ServiceHookUtilsTest extends TestCase {
     
-    public void testDUMMY(){
+    public void testDUMMY() {
         assertTrue(true);
     }
     
@@ -42,7 +42,7 @@ public class ServiceHookUtilsTest extends TestCase {
 //        control.replay();
 //        
 //        assertSame(srvr, 
-//            ServiceHookUtils.createServer(handler, serviceReference, dswContext, callingContext, sd, service));        
+//            ServiceHookUtils.createServer(handler, serviceReference, dswContext, callingContext, sd, service));
 //    }
 //
 //    public void testNoServerWhenNoInterfaceSpecified() {
@@ -101,8 +101,8 @@ public class ServiceHookUtilsTest extends TestCase {
 //                                                              String... interfaceNames) {
 //        List<String> iList = new ArrayList<String>();
 //        for (String iName : interfaceNames) {
-//    	    iList.add(iName);
-//    	}
+//            iList.add(iName);
+//        }
 //        ServiceEndpointDescription sd = control.createMock(ServiceEndpointDescription.class);
 //        sd.getProvidedInterfaces();
 //        EasyMock.expectLastCall().andReturn(iList);

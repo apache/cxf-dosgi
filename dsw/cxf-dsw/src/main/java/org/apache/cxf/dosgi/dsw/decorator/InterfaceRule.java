@@ -56,8 +56,8 @@ public class InterfaceRule implements Rule {
                 Constructor<?> ctor = cls.getConstructor(new Class [] {String.class});
                 obj = ctor.newInstance(value);
             } catch (Throwable th) {
-                LOG.warn("Could not handle property '" + name +
-                    "' with value '" + value + "' of type: " + type, th);
+                LOG.warn("Could not handle property '" + name 
+                         + "' with value '" + value + "' of type: " + type, th);
                 return;
             }
         }

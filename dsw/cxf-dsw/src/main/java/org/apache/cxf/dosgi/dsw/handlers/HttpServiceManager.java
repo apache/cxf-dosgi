@@ -114,14 +114,14 @@ public class HttpServiceManager {
         LOG.debug("Registering service listener for service with ID {}", sid);
      
         String previous = exportedAliases.put(sid, alias);
-        if(previous != null) {
+        if (previous != null) {
             LOG.warn("Overwriting service export for service with ID {}", sid);
         }
         
         try {
             Filter f = bundleContext.createFilter("(" + org.osgi.framework.Constants.SERVICE_ID + "=" + sid + ")");
             
-            if(f != null) {
+            if (f != null) {
                 bundleContext.addServiceListener(new UnregisterListener(), f.toString());
             } else {
                 LOG.warn("Service listener could not be started. The service will not be automatically unexported.");
@@ -159,7 +159,7 @@ public class HttpServiceManager {
             if (alias == null) {
                 LOG.error(
                         "Unable to unexport HTTP servlet for service class ''{0}'', service-id {1}: no servlet alias found",
-                        new Object[] { sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid });
+                        new Object[] {sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid});
                 return;
             }
             LOG.debug("Unexporting HTTP servlet for alias '{}'", alias);

@@ -56,7 +56,8 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
     }
     
     public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
-                              BundleContext callingContext, Class<?> iClass, EndpointDescription sd) throws IntentUnsatifiedException {
+                              BundleContext callingContext, Class<?> iClass,
+                              EndpointDescription sd) throws IntentUnsatifiedException {
 
         String address = getPojoAddress(sd, iClass);
         if (address == null) {
@@ -72,9 +73,9 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         }
         
         try {
-        	ProxyClassLoader cl = new ProxyClassLoader();
-        	cl.addLoader(iClass.getClassLoader());
-        	cl.addLoader(Client.class.getClassLoader());
+            ProxyClassLoader cl = new ProxyClassLoader();
+            cl.addLoader(iClass.getClassLoader());
+            cl.addLoader(Client.class.getClassLoader());
             return createJaxrsProxy(address, callingContext, dswContext, iClass, cl, sd);
         } catch (Throwable e) {
             LOG.warn("proxy creation failed", e);
@@ -85,15 +86,15 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
     }
 
     protected Object createJaxrsProxy(String address, 
-    		                          BundleContext dswContext,
+                                      BundleContext dswContext,
                                       BundleContext callingContext,
                                       Class<?> iClass,
                                       ClassLoader loader,
                                       EndpointDescription sd) {
-    	JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         if (loader != null) {
-        	bean.setClassLoader(loader);
+            bean.setClassLoader(loader);
         }
         
         addRsInterceptorsFeaturesProps(bean, callingContext, sd.getProperties());
@@ -113,8 +114,11 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         return proxy;
     }
     
-    public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
-                             BundleContext callingContext, Map<String, Object> sd, Class<?> iClass, Object serviceBean) throws IntentUnsatifiedException {
+    public ExportResult createServer(ServiceReference sref,
+                                     BundleContext dswContext,
+                                     BundleContext callingContext, 
+                                     Map<String, Object> sd, Class<?> iClass,
+                                     Object serviceBean) throws IntentUnsatifiedException {
 
         String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
         String address;
@@ -127,22 +131,25 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
             }
         }
 
-        Bus bus = contextRoot != null ? httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref) : null;
+        Bus bus = contextRoot != null 
+                ? httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref) : null;
 
         LOG.info("Creating a " + iClass.getName()
                  + " endpoint via JaxRSPojoConfigurationTypeHandler, address is " + address);
 
-        JAXRSServerFactoryBean factory = createServerFactory(dswContext, callingContext, sd, iClass, serviceBean, address, bus);
+        JAXRSServerFactoryBean factory = createServerFactory(dswContext, callingContext, sd,
+                                                             iClass, serviceBean, address, bus);
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(dswContext, contextRoot, address);
 
         // The properties for the EndpointDescription
-        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] { Constants.RS_CONFIG_TYPE },
-                completeEndpointAddress, new String[] { "HTTP" });
+        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {Constants.RS_CONFIG_TYPE},
+                completeEndpointAddress, new String[] {"HTTP"});
 
         return createServerFromFactory(factory, endpointProps);
     }
     
-    private final ExportResult createServerFromFactory(JAXRSServerFactoryBean factory, Map<String, Object> endpointProps) {
+    private ExportResult createServerFromFactory(JAXRSServerFactoryBean factory,
+                                                       Map<String, Object> endpointProps) {
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
@@ -155,10 +162,15 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         }
     }
     
-    private JAXRSServerFactoryBean createServerFactory(BundleContext dswContext, BundleContext callingContext, Map<String, Object> sd,
-            Class<?> iClass, Object serviceBean, String address, Bus bus) {
+    private JAXRSServerFactoryBean createServerFactory(BundleContext dswContext, 
+                                                       BundleContext callingContext,
+                                                       Map<String, Object> sd,
+                                                       Class<?> iClass, 
+                                                       Object serviceBean, 
+                                                       String address, 
+                                                       Bus bus) {
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-        if (bus !=null) {
+        if (bus != null) {
             factory.setBus(bus);
         }
         List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);

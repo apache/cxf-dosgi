@@ -35,12 +35,12 @@ public class RemoteServiceadminFactory implements ServiceFactory {
     private RemoteServiceAdminCore rsaCore;
 
     public RemoteServiceadminFactory(RemoteServiceAdminCore rsaCore) {
-    	this.rsaCore = rsaCore;
+        this.rsaCore = rsaCore;
     }
 
     public Object getService(Bundle b, ServiceRegistration sr) {
         LOG.debug("new RemoteServiceAdmin ServiceInstance created for Bundle {}", b.getSymbolicName());
-        RemoteServiceAdminInstance rsai = new RemoteServiceAdminInstance(b.getBundleContext(),rsaCore);
+        RemoteServiceAdminInstance rsai = new RemoteServiceAdminInstance(b.getBundleContext(), rsaCore);
         rsaServiceInstances.add(rsai);
         return rsai;
     }

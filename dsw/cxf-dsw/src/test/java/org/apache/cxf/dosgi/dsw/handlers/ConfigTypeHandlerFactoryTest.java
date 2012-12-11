@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +30,9 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+
+import static org.junit.Assert.assertTrue;
+
 
 public class ConfigTypeHandlerFactoryTest {
 

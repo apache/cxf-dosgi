@@ -47,7 +47,7 @@ public final class OsgiUtils {
     // TODO : move these property helpers into PropertyUtils ?
 
     @SuppressWarnings("rawtypes")
-	public static boolean getBooleanProperty(Map sd, String name) {
+    public static boolean getBooleanProperty(Map sd, String name) {
         Object value = sd.get(name);
         return toBoolean(value);
     }
@@ -75,7 +75,7 @@ public final class OsgiUtils {
     public static String getProperty(EndpointDescription sd, String name) {
         Object o = sd.getProperties().get(name);
 
-        if (o != null && o instanceof String) {
+        if (o instanceof String) {
             return (String)o;
         }
 
@@ -84,10 +84,10 @@ public final class OsgiUtils {
     }
 
     @SuppressWarnings("rawtypes")
-	public static String getProperty(Map dict, String name) {
+    public static String getProperty(Map dict, String name) {
         Object o = dict.get(name);
 
-        if (o != null && o instanceof String) {
+        if (o instanceof String) {
             return (String)o;
         }
         return null;
@@ -145,16 +145,15 @@ public final class OsgiUtils {
             String pack = iClass.getPackage().getName();
             LOG.debug("Looking for Package: {}", pack);
             if (ep != null) {
-	            for (ExportedPackage p : ep) {
-	            	if (p != null) {
-		                if (pack.equals(p.getName())) {
-		                    if (LOG.isDebugEnabled()) {
-		                        LOG.debug("found package -> Version: {}", p.getVersion());
-		                    }
-		                    return p.getVersion().toString();
-		                }
-	            	}
-	            }
+                for (ExportedPackage p : ep) {
+                    if (p != null
+                        && pack.equals(p.getName())) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("found package -> Version: {}", p.getVersion());
+                        }
+                        return p.getVersion().toString();
+                    }
+                }
             }
         } else {
             LOG.error("Was unable to obtain the package admin service -> can't resolve interface versions");
@@ -180,8 +179,8 @@ public final class OsgiUtils {
     public static void overlayProperties(Properties serviceProperties, Map additionalProperties) {
         Enumeration<Object> keys = serviceProperties.keys();
         // Maps lower case key to original key
-        HashMap<String,String> keysLowerCase = new HashMap<String, String>();
-        while(keys.hasMoreElements()){
+        Map<String, String> keysLowerCase = new HashMap<String, String>();
+        while (keys.hasMoreElements()) {
             Object o = keys.nextElement(); 
             if (o instanceof String) {
                 String ks = (String)o;
@@ -193,14 +192,14 @@ public final class OsgiUtils {
         for (Map.Entry e : adProps) {
             // objectClass and service.id must not be overwritten
             Object keyObj = e.getKey();
-            if (keyObj instanceof String && keyObj != null) {
+            if (keyObj instanceof String) {
                 String key = ((String)keyObj).toLowerCase();
                 if (org.osgi.framework.Constants.SERVICE_ID.toLowerCase().equals(key)
                     || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(key)) {
                     LOG.info("exportService called with additional properties map that contained illegal key: "
                               + key + "   The key is ignored");
                     continue;
-                } else if(keysLowerCase.containsKey(key)) {
+                } else if (keysLowerCase.containsKey(key)) {
                     String origKey = keysLowerCase.get(key);
                     serviceProperties.put(origKey, e.getValue());
                     LOG.debug("Overwriting property [{}]  with value [{}]", origKey, e.getValue());

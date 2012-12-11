@@ -82,15 +82,15 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         }
         String serviceName = OsgiUtils.getProperty(sd, Constants.WSDL_SERVICE_NAME);
         if (serviceName == null) {
-        	serviceName = iClass.getSimpleName();	
+            serviceName = iClass.getSimpleName();
         }
         QName serviceQname = getServiceQName(iClass, sd.getProperties(),
-        		Constants.WSDL_SERVICE_NAMESPACE, Constants.WSDL_SERVICE_NAME);
+                                             Constants.WSDL_SERVICE_NAMESPACE,
+                                             Constants.WSDL_SERVICE_NAME);
         QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd.getProperties(), Constants.WSDL_PORT_NAME);
         Service service = createWebService(wsdlAddress, serviceQname);
-        Object proxy = getProxy(
-            portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass), 
-        	iClass);
+        Object proxy = getProxy(portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass), 
+                                iClass);
         //MARC: FIXME !!!! getDistributionProvider().addRemoteService(serviceReference);
         return proxy;
         

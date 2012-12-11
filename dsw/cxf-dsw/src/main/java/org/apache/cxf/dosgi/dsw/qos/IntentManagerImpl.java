@@ -33,8 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IntentManagerImpl implements IntentManager {
-    private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
     static final Logger LOG = LoggerFactory.getLogger(IntentManagerImpl.class);
+    private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
 
     private final IntentMap intentMap;
     private long maxIntentWaitTime;
@@ -48,7 +48,8 @@ public class IntentManagerImpl implements IntentManager {
         this.maxIntentWaitTime = maxIntentWaitTime;
     }
     
-    public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory, Map<String, Object> props) throws IntentUnsatifiedException {
+    public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory,
+                                 Map<String, Object> props) throws IntentUnsatifiedException {
         Set<String> requestedIntents = IntentUtils.getRequestedIntents(props);
         Set<String> appliedIntents = new HashSet<String>();
         appliedIntents.addAll(reverseLookup(intentMap, PROVIDED_INTENT_VALUE));
@@ -66,7 +67,8 @@ public class IntentManagerImpl implements IntentManager {
         return appliedIntents.toArray(new String[0]);
     }
     
-    private boolean processIntent(List<Feature> features, AbstractEndpointFactory factory, String intentName, Object intent) throws IntentUnsatifiedException {
+    private boolean processIntent(List<Feature> features, AbstractEndpointFactory factory,
+                                  String intentName, Object intent) throws IntentUnsatifiedException {
         if (intent instanceof String) {
             if (PROVIDED_INTENT_VALUE.equalsIgnoreCase((String) intent)) {
                 return false;
@@ -88,7 +90,8 @@ public class IntentManagerImpl implements IntentManager {
         return false;
     }
 
-    private Collection<String> addSynonymIntents(Collection<String> appliedIntents, IntentMap intentMap) {
+    private Collection<String> addSynonymIntents(Collection<String> appliedIntents, 
+                                                 IntentMap intentMap) {
         // E.g. SOAP and SOAP.1_1 are synonyms
         List<Object> values = new ArrayList<Object>();
         for (String key : appliedIntents) {
@@ -142,8 +145,9 @@ public class IntentManagerImpl implements IntentManager {
         } while (unsupportedIntents.size() > 0 && System.currentTimeMillis() < endTime);
         
         if (unsupportedIntents.size() > 0) {
-            throw new RuntimeException("service cannot be exported because the following intents are not supported by this RSA: "
-                    + unsupportedIntents);
+            throw new RuntimeException("service cannot be exported because the following "
+                                       + "intents are not supported by this RSA: "
+                                       + unsupportedIntents);
         }
     }
 

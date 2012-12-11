@@ -30,19 +30,19 @@ public class Utils {
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
     
     @SuppressWarnings("rawtypes")
-	public static String[] normalizeStringPlus(Object object) {
+    public static String[] normalizeStringPlus(Object object) {
 
         if (object instanceof String) {
             String s = (String)object;
             String[] values = s.split(",");
             List<String> list = new ArrayList<String>();
             for (String val : values) {
-            	String actualValue = val.trim();
-            	if (actualValue.length() > 0) {
-            		list.add(actualValue);
-            	}
+                String actualValue = val.trim();
+                if (actualValue.length() > 0) {
+                    list.add(actualValue);
+                }
             }
-            return list.toArray(new String[0]);
+            return list.toArray(new String[list.size()]);
         }
 
         if (object instanceof String[]) {
@@ -50,12 +50,12 @@ public class Utils {
         }
         if (object instanceof Collection) {
             Collection col = (Collection)object;
-            ArrayList<String> ar = new ArrayList<String>(col.size());
+            List<String> ar = new ArrayList<String>(col.size());
             for (Object o : col) {
                 if (o instanceof String) {
                     String s = (String)o;
                     ar.add(s);
-                }else{
+                } else {
                     LOG.warn("stringPlus contained non string element in list ! Element was skipped");
                 }
             }

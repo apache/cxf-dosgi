@@ -18,10 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +27,11 @@ import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.junit.Test;
 import org.osgi.framework.Constants;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 
 public class UtilsTest {
 
@@ -81,7 +82,7 @@ public class UtilsTest {
 
         { // nothing should change here
             Properties overload = new Properties();
-            OsgiUtils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy, overload);
 
             assertEquals(original.size(), copy.size());
             for (Object key : Collections.list(original.keys())) {
@@ -96,14 +97,14 @@ public class UtilsTest {
             Properties overload = new Properties();
             overload.put("new", "prop");
             
-            OsgiUtils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy, overload);
 
-            assertEquals(original.size()+1, copy.size());
+            assertEquals(original.size() + 1, copy.size());
             for (Object key : Collections.list(original.keys())) {
                 assertEquals(original.get(key), copy.get(key));
             }
             assertNotNull(overload.get("new"));
-            assertEquals("prop",overload.get("new"));
+            assertEquals("prop", overload.get("new"));
         }
         
         copy.clear();
@@ -114,14 +115,14 @@ public class UtilsTest {
             overload.put("new", "prop");
             overload.put("NEW", "prop");
             
-            OsgiUtils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy, overload);
 
-            assertEquals(original.size()+1, copy.size());
+            assertEquals(original.size() + 1, copy.size());
             for (Object key : Collections.list(original.keys())) {
                 assertEquals(original.get(key), copy.get(key));
             }
             assertNotNull(overload.get("new"));
-            assertEquals("prop",overload.get("new"));
+            assertEquals("prop", overload.get("new"));
         }
         
         copy.clear();
@@ -131,7 +132,7 @@ public class UtilsTest {
             Properties overload = new Properties();
             overload.put(Constants.OBJECTCLASS, "assd");
             overload.put(Constants.SERVICE_ID, "asasdasd");
-            OsgiUtils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy, overload);
 
             assertEquals(original.size(), copy.size());
             for (Object key : Collections.list(original.keys())) {
@@ -145,14 +146,15 @@ public class UtilsTest {
         { // overwrite own prop
             Properties overload = new Properties();
             overload.put("MyProp", "newValue");
-            OsgiUtils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy, overload);
 
             assertEquals(original.size(), copy.size());
             for (Object key : Collections.list(original.keys())) {
-                if(!"MyProp".equals(key))
+                if (!"MyProp".equals(key)) {
                     assertEquals(original.get(key), copy.get(key));
+                }
             }
-            assertEquals("newValue",copy.get("MyProp"));
+            assertEquals("newValue", copy.get("MyProp"));
         }
         
         copy.clear();
@@ -161,14 +163,15 @@ public class UtilsTest {
         { // overwrite own prop in different case
             Properties overload = new Properties();
             overload.put("MYPROP", "newValue");
-            OsgiUtils.overlayProperties(copy,overload);
+            OsgiUtils.overlayProperties(copy, overload);
 
             assertEquals(original.size(), copy.size());
             for (Object key : Collections.list(original.keys())) {
-                if(!"MyProp".equals(key))
+                if (!"MyProp".equals(key)) {
                     assertEquals(original.get(key), copy.get(key));
+                }
             }
-            assertEquals("newValue",copy.get("MyProp"));
+            assertEquals("newValue", copy.get("MyProp"));
         }
 
     }

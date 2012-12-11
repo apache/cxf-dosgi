@@ -18,9 +18,6 @@
   */
 package org.apache.cxf.dosgi.dsw.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
@@ -29,10 +26,14 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class ImportRegistrationImplTest {
 
     @Test
-    public void testException(){
+    public void testException() {
         
         IMocksControl c = EasyMock.createNiceControl();
         Exception e = c.createMock(Exception.class);
@@ -47,7 +48,7 @@ public class ImportRegistrationImplTest {
     }
     
     @Test
-    public void testDefaultCtor(){
+    public void testDefaultCtor() {
         
         IMocksControl c = EasyMock.createNiceControl();
         EndpointDescription ed = c.createMock(EndpointDescription.class);
@@ -56,17 +57,17 @@ public class ImportRegistrationImplTest {
         
         c.replay();
         
-        ImportRegistrationImpl i = new ImportRegistrationImpl(ed,rsac);
+        ImportRegistrationImpl i = new ImportRegistrationImpl(ed, rsac);
         
         assertNull(i.getException());
         assertEquals(i, i.getParent());
-        assertEquals(ed,i.getImportedEndpointDescription());
+        assertEquals(ed, i.getImportedEndpointDescription());
         
     }
 
     
     @Test
-    public void testCloneAndClose(){
+    public void testCloneAndClose() {
      
         IMocksControl c = EasyMock.createControl();
         EndpointDescription ed = c.createMock(EndpointDescription.class);
@@ -78,17 +79,17 @@ public class ImportRegistrationImplTest {
         
         c.replay();
         
-        ImportRegistrationImpl i1 = new ImportRegistrationImpl(ed,rsac);
+        ImportRegistrationImpl i1 = new ImportRegistrationImpl(ed, rsac);
         
         ImportRegistrationImpl i2 = new ImportRegistrationImpl(i1);
         
         ImportRegistrationImpl i3 = new ImportRegistrationImpl(i2);
         
         
-        try{
+        try {
             i2.setImportedServiceRegistration(sr);    
             assertTrue("An exception should be thrown here !", false);
-        }catch(IllegalStateException e){
+        } catch (IllegalStateException e) {
             // must be thrown here ...
         }
         
@@ -101,9 +102,9 @@ public class ImportRegistrationImplTest {
         assertEquals(i1, i2.getParent());
         assertEquals(i1, i3.getParent());
         
-        assertEquals(ed,i1.getImportedEndpointDescription());
-        assertEquals(ed,i2.getImportedEndpointDescription());
-        assertEquals(ed,i3.getImportedEndpointDescription());
+        assertEquals(ed, i1.getImportedEndpointDescription());
+        assertEquals(ed, i2.getImportedEndpointDescription());
+        assertEquals(ed, i3.getImportedEndpointDescription());
         
         c.verify();
         c.reset();
@@ -149,14 +150,14 @@ public class ImportRegistrationImplTest {
     }
     
     @Test
-    public void testCloseAll(){
+    public void testCloseAll() {
         IMocksControl c = EasyMock.createControl();
         EndpointDescription ed = c.createMock(EndpointDescription.class);
         RemoteServiceAdminCore rsac = c.createMock(RemoteServiceAdminCore.class);
         
         c.replay();
         
-        ImportRegistrationImpl i1 = new ImportRegistrationImpl(ed,rsac);
+        ImportRegistrationImpl i1 = new ImportRegistrationImpl(ed, rsac);
         
         ImportRegistrationImpl i2 = new ImportRegistrationImpl(i1);
         

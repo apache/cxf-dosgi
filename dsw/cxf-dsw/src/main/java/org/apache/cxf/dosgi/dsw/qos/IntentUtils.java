@@ -60,8 +60,12 @@ public class IntentUtils {
     }
 
     public static String[] mergeArrays(String[] a1, String[] a2) {
-        if(a1==null) return a2;
-        if(a2==null) return a1;
+        if (a1 == null) {
+            return a2;
+        }
+        if (a2 == null) {
+            return a1;
+        }
 
         List<String> list = new ArrayList<String>(a1.length + a2.length);
 
@@ -70,8 +74,9 @@ public class IntentUtils {
         }
 
         for (String s : a2) {
-            if (!list.contains(s))
+            if (!list.contains(s)) {
                 list.add(s);
+            }
         }
 
         return list.toArray(new String[list.size()]);

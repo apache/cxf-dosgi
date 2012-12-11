@@ -19,5 +19,5 @@
 package org.apache.cxf.dosgi.dsw.handlers.simple;
 
 public interface MySimpleEchoService {
-    public String echo(String message);
+    String echo(String message);
 }

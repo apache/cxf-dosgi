@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class EventProducer {
 
-    private final static Logger LOG = LoggerFactory.getLogger(EventProducer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EventProducer.class);
     private BundleContext bctx;
     private EventAdminHelper eaHelper;
 
@@ -51,8 +51,8 @@ public class EventProducer {
     protected void publishNotifcation(ExportRegistration er) {
         RemoteServiceAdminEvent rsae = null;
         if (er.getException() != null) {
-            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_ERROR, bctx.getBundle(),(ExportReference)null, er
-                .getException());
+            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_ERROR, bctx.getBundle(), 
+                                               (ExportReference)null, er.getException());
         } else {
             rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_REGISTRATION, bctx.getBundle(),
                                                er.getExportReference(), er.getException());

@@ -113,7 +113,7 @@ public class CxfFindListenerHookTest extends Assert {
 //                        + ")(colour=blue))";
 //        doTestTrackerPropertiesSet(filter,
 //                                   "osgi.remote.discovery.interest.filters",
-//				   replacePredicate(filter),
+//                                   replacePredicate(filter),
 //                                   Collections.EMPTY_SET,
 //                                   asList(replacePredicate(filter)));
 //    }
@@ -134,7 +134,7 @@ public class CxfFindListenerHookTest extends Assert {
 //                        + ")(colour=blue))";
 //        doTestTrackerPropertiesSet(filter,
 //                                   "osgi.remote.discovery.interest.filters",
-//				   replacePredicate(filter),
+//                                   replacePredicate(filter),
 //                                   Collections.EMPTY_SET,
 //                                   asList(replacePredicate(filter)));
 //    }

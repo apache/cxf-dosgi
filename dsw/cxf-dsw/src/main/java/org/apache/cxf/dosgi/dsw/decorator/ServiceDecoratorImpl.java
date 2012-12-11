@@ -101,7 +101,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
     }
     
     void removeDecorations(Bundle bundle) {
-        for (Iterator<Rule> i = decorations.iterator(); i.hasNext(); ) {
+        for (Iterator<Rule> i = decorations.iterator(); i.hasNext();) {
             Rule r = i.next();
             if (bundle.equals(r.getBundle())) {
                 decorations.remove(r); // The iterator doesn't support 'remove'

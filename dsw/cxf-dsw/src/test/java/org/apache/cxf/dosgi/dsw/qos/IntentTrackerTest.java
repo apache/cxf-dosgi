@@ -18,7 +18,6 @@
   */
 package org.apache.cxf.dosgi.dsw.qos;
 
-import static org.easymock.EasyMock.expect;
 import junit.framework.Assert;
 
 import org.apache.cxf.dosgi.dsw.Constants;
@@ -34,6 +33,8 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
+import static org.easymock.EasyMock.expect;
+
 public class IntentTrackerTest {
     private static final String MY_INTENT_NAME = "myIntent";
 
@@ -47,13 +48,15 @@ public class IntentTrackerTest {
         final Capture<ServiceListener> capturedListener = new Capture<ServiceListener>();
         bc.addServiceListener(EasyMock.capture(capturedListener), EasyMock.<String>anyObject());
         EasyMock.expectLastCall().atLeastOnce();
-        expect(bc.getServiceReferences(EasyMock.<String>anyObject(), EasyMock.<String>anyObject())).andReturn(new ServiceReference[]{});
+        expect(bc.getServiceReferences(EasyMock.<String>anyObject(), 
+                                       EasyMock.<String>anyObject())).andReturn(new ServiceReference[]{});
         IntentMap intentMap = new IntentMap();
 
         // Create a custom intent
         ServiceReference reference = c.createMock(ServiceReference.class);
         expect(reference.getProperty(Constants.INTENT_NAME_PROP)).andReturn(MY_INTENT_NAME);
-        AbstractFeature testIntent = new AbstractFeature() {};
+        AbstractFeature testIntent = new AbstractFeature() {
+        };
         expect(bc.getService(reference)).andReturn(testIntent).atLeastOnce();
 
         c.replay();
