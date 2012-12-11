@@ -34,7 +34,7 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 public class ActivatorTest extends TestCase {
     private BundleContext getMockBundleContext(IMocksControl control) {
         Bundle b = control.createMock(Bundle.class);
-        Hashtable<String, String> ht = new Hashtable<String, String>();
+        Dictionary<String, String> ht = new Hashtable<String, String>();
         EasyMock.expect(b.getHeaders()).andReturn(ht).anyTimes();        
         BundleContext bc = control.createMock(BundleContext.class);
 

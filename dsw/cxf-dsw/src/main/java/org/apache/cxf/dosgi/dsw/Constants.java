@@ -20,7 +20,7 @@ package org.apache.cxf.dosgi.dsw;
 
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-public class Constants {
+public final class Constants {
     // Constants from RFC 119, they should ultimately be picked up from an OSGi class.
     @Deprecated
     public static final String EXPORTED_INTERFACES = RemoteConstants.SERVICE_EXPORTED_INTERFACES;
@@ -125,4 +125,8 @@ public class Constants {
     public static final String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
     public static final String HTTP_BASE = "httpBase";
     public static final String CXF_SERVLET_ALIAS = "cxfServletAlias";
+    
+    private Constants() {
+        //never constructed
+    }
 }

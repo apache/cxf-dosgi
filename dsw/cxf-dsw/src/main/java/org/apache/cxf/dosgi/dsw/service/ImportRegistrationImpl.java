@@ -177,7 +177,7 @@ public class ImportRegistrationImpl implements ImportRegistration {
         return exception != null;
     }
 
-    private void _setImportedServiceRegistration(ServiceRegistration proxyRegistration) {
+    private void setImportedServiceRegistrationInternal(ServiceRegistration proxyRegistration) {
         importedService = proxyRegistration;
     }
 
@@ -186,9 +186,9 @@ public class ImportRegistrationImpl implements ImportRegistration {
             throw new IllegalStateException("this method may only be called on the parent !");
         }
 
-        _setImportedServiceRegistration(proxyRegistration);
+        setImportedServiceRegistrationInternal(proxyRegistration);
         for (ImportRegistrationImpl ir : childs) {
-            ir._setImportedServiceRegistration(proxyRegistration);
+            ir.setImportedServiceRegistrationInternal(proxyRegistration);
         }
     }
 

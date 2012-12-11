@@ -49,12 +49,15 @@ public class HttpServiceManager {
     private String cxfServletAlias;
 
     public HttpServiceManager(BundleContext bundleContext, String httpBase, String cxfServletAlias) {
-        this(bundleContext, httpBase, cxfServletAlias, new ServiceTracker(bundleContext, HttpService.class.getName(), null));
+        this(bundleContext, httpBase, cxfServletAlias, 
+             new ServiceTracker(bundleContext, HttpService.class.getName(), null));
         this.tracker.open();
     }
 
     // Only for tests
-    public HttpServiceManager(BundleContext bundleContext, String httpBase, String cxfServletAlias, ServiceTracker tracker) {
+    public HttpServiceManager(BundleContext bundleContext, 
+                              String httpBase, String cxfServletAlias, 
+                              ServiceTracker tracker) {
         this.bundleContext = bundleContext;
         this.tracker = tracker;
         this.httpBase = getWithDefault(httpBase, "http://" + LocalHostUtil.getLocalIp() + ":8181");

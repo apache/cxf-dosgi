@@ -55,9 +55,9 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteServiceAdminCore.class);
 
-    private final LinkedHashMap<ServiceReference, Collection<ExportRegistration>> exportedServices 
+    private final Map<ServiceReference, Collection<ExportRegistration>> exportedServices 
         = new LinkedHashMap<ServiceReference, Collection<ExportRegistration>>();
-    private final LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices
+    private final Map<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices
         = new LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>>();
 
     private BundleContext bctx;
@@ -100,8 +100,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return copyExportRegistration(serviceReference);
             }
             LOG.info("interfaces selected for export: " + interfaces);
-            LinkedHashMap<String, ExportRegistrationImpl> exportRegs 
-                = new LinkedHashMap<String, ExportRegistrationImpl>(1);
+            Map<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>(1);
             Object serviceObject = bctx.getService(serviceReference);
             BundleContext callingContext = serviceReference.getBundle().getBundleContext();
             ConfigurationTypeHandler handler = null;

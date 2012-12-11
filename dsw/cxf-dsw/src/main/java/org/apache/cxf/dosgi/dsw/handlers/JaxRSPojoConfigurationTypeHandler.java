@@ -112,8 +112,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
             bean.setProviders(providers);
         }
         Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
-        Object proxy = getProxy(bean.create(), iClass);
-        return proxy;
+        return getProxy(bean.create(), iClass);
     }
     
     public ExportResult createServer(ServiceReference sref,

@@ -240,17 +240,17 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName);
         boolean in = propName.contains("in.interceptors");
         boolean out = propName.contains("out.interceptors");
-        boolean in_fault = propName.contains("in.fault.interceptors");
-        boolean out_fault = propName.contains("out.fault.interceptors");
+        boolean inFault = propName.contains("in.fault.interceptors");
+        boolean outFault = propName.contains("out.fault.interceptors");
         for (int i = 0; i < providers.size(); i++) {
             Interceptor<?> interceptor = (Interceptor<?>)providers.get(i);
             if (in) {
                 factory.getInInterceptors().add(interceptor);
             } else if (out) {
                 factory.getOutInterceptors().add(interceptor);
-            } else if (in_fault) {
+            } else if (inFault) {
                 factory.getInFaultInterceptors().add(interceptor);
-            } else if (out_fault) {
+            } else if (outFault) {
                 factory.getOutFaultInterceptors().add(interceptor);
             }
         }

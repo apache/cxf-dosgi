@@ -34,7 +34,7 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JaxRSUtils {
+public final class JaxRSUtils {
 
     public static final String MODEL_FOLDER = "/OSGI-INF/cxf/jaxrs/";
     public static final String DEFAULT_MODEL = "/OSGI-INF/cxf/jaxrs/model.xml";
@@ -49,6 +49,9 @@ public class JaxRSUtils {
             + ")";
     private static final Logger LOG = LoggerFactory.getLogger(JaxRSUtils.class);
 
+    private JaxRSUtils() {
+        //never contructed
+    }
 
     @SuppressWarnings("rawtypes")
     static List<Object> getProviders(BundleContext callingContext, BundleContext dswBC, Map sd) {

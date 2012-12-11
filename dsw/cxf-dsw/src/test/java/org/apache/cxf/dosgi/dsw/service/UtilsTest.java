@@ -80,99 +80,93 @@ public class UtilsTest {
         Properties copy = new Properties();
         copy.putAll(original);
 
-        { // nothing should change here
-            Properties overload = new Properties();
-            OsgiUtils.overlayProperties(copy, overload);
+        // nothing should change here
+        Properties overload = new Properties();
+        OsgiUtils.overlayProperties(copy, overload);
 
-            assertEquals(original.size(), copy.size());
-            for (Object key : Collections.list(original.keys())) {
-                assertEquals(original.get(key), copy.get(key));
-            }
+        assertEquals(original.size(), copy.size());
+        for (Object key : Collections.list(original.keys())) {
+            assertEquals(original.get(key), copy.get(key));
         }
         
         copy.clear();
         copy.putAll(original);
         
-        { // a property should be added
-            Properties overload = new Properties();
-            overload.put("new", "prop");
+        // a property should be added
+        overload = new Properties();
+        overload.put("new", "prop");
             
-            OsgiUtils.overlayProperties(copy, overload);
+        OsgiUtils.overlayProperties(copy, overload);
 
-            assertEquals(original.size() + 1, copy.size());
-            for (Object key : Collections.list(original.keys())) {
-                assertEquals(original.get(key), copy.get(key));
-            }
-            assertNotNull(overload.get("new"));
-            assertEquals("prop", overload.get("new"));
+        assertEquals(original.size() + 1, copy.size());
+        for (Object key : Collections.list(original.keys())) {
+            assertEquals(original.get(key), copy.get(key));
         }
-        
+        assertNotNull(overload.get("new"));
+        assertEquals("prop", overload.get("new"));
+
         copy.clear();
         copy.putAll(original);
         
-        { // only one property should be added
-            Properties overload = new Properties();
-            overload.put("new", "prop");
-            overload.put("NEW", "prop");
+        // only one property should be added
+        overload = new Properties();
+        overload.put("new", "prop");
+        overload.put("NEW", "prop");
             
-            OsgiUtils.overlayProperties(copy, overload);
+        OsgiUtils.overlayProperties(copy, overload);
 
-            assertEquals(original.size() + 1, copy.size());
-            for (Object key : Collections.list(original.keys())) {
+        assertEquals(original.size() + 1, copy.size());
+        for (Object key : Collections.list(original.keys())) {
+            assertEquals(original.get(key), copy.get(key));
+        }
+        assertNotNull(overload.get("new"));
+        assertEquals("prop", overload.get("new"));
+        
+        copy.clear();
+        copy.putAll(original);
+        
+        // nothing should change here
+        overload = new Properties();
+        overload.put(Constants.OBJECTCLASS, "assd");
+        overload.put(Constants.SERVICE_ID, "asasdasd");
+        OsgiUtils.overlayProperties(copy, overload);
+
+        assertEquals(original.size(), copy.size());
+        for (Object key : Collections.list(original.keys())) {
+            assertEquals(original.get(key), copy.get(key));
+        }
+        
+        copy.clear();
+        copy.putAll(original);
+        
+        // overwrite own prop
+        overload = new Properties();
+        overload.put("MyProp", "newValue");
+        OsgiUtils.overlayProperties(copy, overload);
+
+        assertEquals(original.size(), copy.size());
+        for (Object key : Collections.list(original.keys())) {
+            if (!"MyProp".equals(key)) {
                 assertEquals(original.get(key), copy.get(key));
             }
-            assertNotNull(overload.get("new"));
-            assertEquals("prop", overload.get("new"));
         }
+        assertEquals("newValue", copy.get("MyProp"));
         
         copy.clear();
         copy.putAll(original);
         
-        { // nothing should change here
-            Properties overload = new Properties();
-            overload.put(Constants.OBJECTCLASS, "assd");
-            overload.put(Constants.SERVICE_ID, "asasdasd");
-            OsgiUtils.overlayProperties(copy, overload);
+        // overwrite own prop in different case
+        overload = new Properties();
+        overload.put("MYPROP", "newValue");
+        OsgiUtils.overlayProperties(copy, overload);
 
-            assertEquals(original.size(), copy.size());
-            for (Object key : Collections.list(original.keys())) {
+        assertEquals(original.size(), copy.size());
+        for (Object key : Collections.list(original.keys())) {
+            if (!"MyProp".equals(key)) {
                 assertEquals(original.get(key), copy.get(key));
             }
         }
-        
-        copy.clear();
-        copy.putAll(original);
-        
-        { // overwrite own prop
-            Properties overload = new Properties();
-            overload.put("MyProp", "newValue");
-            OsgiUtils.overlayProperties(copy, overload);
-
-            assertEquals(original.size(), copy.size());
-            for (Object key : Collections.list(original.keys())) {
-                if (!"MyProp".equals(key)) {
-                    assertEquals(original.get(key), copy.get(key));
-                }
-            }
-            assertEquals("newValue", copy.get("MyProp"));
-        }
-        
-        copy.clear();
-        copy.putAll(original);
-        
-        { // overwrite own prop in different case
-            Properties overload = new Properties();
-            overload.put("MYPROP", "newValue");
-            OsgiUtils.overlayProperties(copy, overload);
-
-            assertEquals(original.size(), copy.size());
-            for (Object key : Collections.list(original.keys())) {
-                if (!"MyProp".equals(key)) {
-                    assertEquals(original.get(key), copy.get(key));
-                }
-            }
-            assertEquals("newValue", copy.get("MyProp"));
-        }
+        assertEquals("newValue", copy.get("MyProp"));
 
     }
 

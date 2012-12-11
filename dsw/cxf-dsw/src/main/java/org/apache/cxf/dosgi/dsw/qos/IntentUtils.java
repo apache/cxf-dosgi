@@ -31,8 +31,11 @@ import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-public class IntentUtils {
-
+public final class IntentUtils {
+    private IntentUtils() {
+        //never constructed
+    }
+    
     public static String formatIntents(String[] intents) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;

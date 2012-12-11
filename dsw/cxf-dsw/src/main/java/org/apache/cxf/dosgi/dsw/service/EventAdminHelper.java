@@ -133,26 +133,36 @@ public class EventAdminHelper {
     }
 
     static String remoteServiceAdminEventTypeToString(int type) {
+        String retval = null;
         switch (type) {
         case RemoteServiceAdminEvent.EXPORT_ERROR:
-            return "EXPORT_ERROR";
+            retval = "EXPORT_ERROR";
+            break;
         case RemoteServiceAdminEvent.EXPORT_REGISTRATION:
-            return "EXPORT_REGISTRATION";
+            retval = "EXPORT_REGISTRATION";
+            break;
         case RemoteServiceAdminEvent.EXPORT_UNREGISTRATION:
-            return "EXPORT_UNREGISTRATION";
+            retval = "EXPORT_UNREGISTRATION";
+            break;
         case RemoteServiceAdminEvent.EXPORT_WARNING:
-            return "EXPORT_WARNING";
+            retval = "EXPORT_WARNING";
+            break;
         case RemoteServiceAdminEvent.IMPORT_ERROR:
-            return "IMPORT_ERROR";
+            retval = "IMPORT_ERROR";
+            break;
         case RemoteServiceAdminEvent.IMPORT_REGISTRATION:
-            return "IMPORT_REGISTRATION";
+            retval = "IMPORT_REGISTRATION";
+            break;
         case RemoteServiceAdminEvent.IMPORT_UNREGISTRATION:
-            return "IMPORT_UNREGISTRATION";
+            retval = "IMPORT_UNREGISTRATION";
+            break;
         case RemoteServiceAdminEvent.IMPORT_WARNING:
-            return "IMPORT_WARNING";    
+            retval = "IMPORT_WARNING";
+            break;
         default:
-            return "UNKNOWN_EVENT";
+            retval = "UNKNOWN_EVENT";
         }
+        return retval;
     }
 
 }

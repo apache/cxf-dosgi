@@ -76,8 +76,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd);
 
             Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
-            Object proxy = getProxy(factory.create(), iClass);
-            return proxy;
+            return getProxy(factory.create(), iClass);
         } catch (Exception e) {
             LOG.warn("proxy creation failed", e);
         } finally {

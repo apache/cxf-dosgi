@@ -25,9 +25,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Utils {
+public final class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+    private Utils() {
+        //never constructed
+    }
     
     @SuppressWarnings("rawtypes")
     public static String[] normalizeStringPlus(Object object) {

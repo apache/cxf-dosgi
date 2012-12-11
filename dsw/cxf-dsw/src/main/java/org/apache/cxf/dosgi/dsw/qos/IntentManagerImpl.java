@@ -64,7 +64,7 @@ public class IntentManagerImpl implements IntentManager {
             appliedIntents.add(defaultBindingName);
         }
         appliedIntents.addAll(addSynonymIntents(appliedIntents, intentMap));
-        return appliedIntents.toArray(new String[0]);
+        return appliedIntents.toArray(new String[appliedIntents.size()]);
     }
     
     private boolean processIntent(List<Feature> features, AbstractEndpointFactory factory,
