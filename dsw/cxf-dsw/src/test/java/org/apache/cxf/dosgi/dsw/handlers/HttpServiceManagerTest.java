@@ -106,7 +106,7 @@ public class HttpServiceManagerTest extends TestCase {
 
         @SuppressWarnings("rawtypes")
         public void registerServlet(String alias, Servlet servlet, Dictionary initparams, HttpContext context)
-                throws ServletException, NamespaceException {
+            throws ServletException, NamespaceException {
             Assert.assertEquals("/myService", alias);
             servlet.init(config);
         }

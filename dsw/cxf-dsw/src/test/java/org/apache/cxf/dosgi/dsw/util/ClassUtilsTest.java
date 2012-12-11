@@ -36,22 +36,27 @@ public class ClassUtilsTest extends TestCase {
     }
     
     public void testGetInterfaceClassFromSubclass() {
-	    assertEquals(Map.class, ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.Map"));
-	    assertNull(ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.UnknownType"));
+        assertEquals(Map.class, ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.Map"));
+        assertNull(ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.UnknownType"));
     }
 
     @SuppressWarnings({ "serial", "rawtypes" })
-    private static class MyMapSubclass extends HashMap{}
+    private static class MyMapSubclass extends HashMap {
+    }
 
     @SuppressWarnings("serial")
-    static class MySubclassOne extends MyMapSubclass{}
+    static class MySubclassOne extends MyMapSubclass {
+    }
 
     @SuppressWarnings("serial")
-    static class MySubclassTwo extends MySubclassOne{}
+    static class MySubclassTwo extends MySubclassOne {
+    }
 
     @SuppressWarnings("serial")
-    static class MySubclassThree extends MySubclassTwo{}
+    static class MySubclassThree extends MySubclassTwo {
+    }
 
     @SuppressWarnings("serial")
-    static class MySubclassFour extends MySubclassThree{}
+    static class MySubclassFour extends MySubclassThree {
+    }
 }

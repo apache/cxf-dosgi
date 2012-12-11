@@ -200,11 +200,11 @@ public final class OsgiUtils {
                     LOG.info("exportService called with additional properties map that contained illegal key: "
                               + key + "   The key is ignored");
                     continue;
-                }else if(keysLowerCase.containsKey(key)){
+                } else if(keysLowerCase.containsKey(key)) {
                     String origKey = keysLowerCase.get(key);
                     serviceProperties.put(origKey, e.getValue());
                     LOG.debug("Overwriting property [{}]  with value [{}]", origKey, e.getValue());
-                }else{
+                } else {
                     serviceProperties.put(e.getKey(), e.getValue());
                     keysLowerCase.put(e.getKey().toString().toLowerCase(), e.getKey().toString());
                 }

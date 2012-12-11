@@ -34,14 +34,14 @@ import org.osgi.framework.Constants;
 
 public class UtilsTest {
 
-	@Test
-	public void testSplitString() {
-		String[] values = Utils.normalizeStringPlus("1, 2");
-		assertEquals(2, values.length);
-		assertEquals(values[0], "1");
-		assertEquals(values[1], "2");
-	}
-	
+    @Test
+    public void testSplitString() {
+        String[] values = Utils.normalizeStringPlus("1, 2");
+        assertEquals(2, values.length);
+        assertEquals(values[0], "1");
+        assertEquals(values[1], "2");
+    }
+
     @Test
     public void testNormalizeStringPlus() {
 

@@ -41,10 +41,10 @@ public class ExportRegistrationImpl implements ExportRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(ExportRegistrationImpl.class);
 
     private Server server;
-    private boolean closed = false;
-    private Throwable exception = null;
+    private boolean closed;
+    private Throwable exception;
 
-    private ExportRegistrationImpl parent = null;
+    private ExportRegistrationImpl parent;
     private volatile int instanceCount = 1;
 
     private RemoteServiceAdminCore rsaCore;
@@ -61,28 +61,31 @@ public class ExportRegistrationImpl implements ExportRegistration {
         rsaCore = parent.getRsaCore();
         parent.instanceAdded();
     }
-
-    private void instanceAdded() {
-        ++instanceCount;
-    }
-
-    public ExportRegistrationImpl(ServiceReference sref, EndpointDescription endpoint, RemoteServiceAdminCore remoteServiceAdminCore) {
+    public ExportRegistrationImpl(ServiceReference sref,
+                                  EndpointDescription endpoint,
+                                  RemoteServiceAdminCore remoteServiceAdminCore) {
         exportReference = new ExportReferenceImpl(sref, endpoint);
         parent = this;
         rsaCore = remoteServiceAdminCore;
     }
 
+    private void instanceAdded() {
+        ++instanceCount;
+    }
+
+
     public synchronized void close() {
-        if (closed)
+        if (closed) {
             return;
+        }
         closed = true;
 
         rsaCore.removeExportRegistration(this);
 
         parent.instanceClosed();
         if (server != null) {
-        	server.stop();
-        	server = null;
+            server.stop();
+            server = null;
         }
         exportReference.close();
     }
@@ -106,10 +109,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
     }
 
     public Throwable getException() {
-        if (!closed)
-            return exception;
-        else
-            return null;
+        return closed ? null : exception;
     }
 
     @Override
@@ -126,11 +126,11 @@ public class ExportRegistrationImpl implements ExportRegistration {
         if (endpointDescription == null) {
             r += "---> NULL <---- \n";
         } else {
-            Set<Map.Entry<String,Object>> props = endpointDescription.getProperties().entrySet();
-            for (Map.Entry<String,Object> entry : props) {
+            Set<Map.Entry<String, Object>> props = endpointDescription.getProperties().entrySet();
+            for (Map.Entry<String, Object> entry : props) {
                 Object value = entry.getValue();
-                r += entry.getKey() + "  => " +
-                    (value instanceof Object[] ? Arrays.toString((Object []) value) : value) + "\n";
+                r += entry.getKey() + "  => " 
+                    + (value instanceof Object[] ? Arrays.toString((Object []) value) : value) + "\n";
             }
         }
         return r;
@@ -149,7 +149,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
     }
 
     public ExportReference getExportReference() {
-    	return exportReference;
+        return exportReference;
     }
 
     /**
@@ -159,13 +159,13 @@ public class ExportRegistrationImpl implements ExportRegistration {
     public void startServiceTracker(BundleContext bctx) {
 
         // only the parent should do this
-        if(parent!=this){
+        if (parent != this) {
             parent.startServiceTracker(bctx);
             return;
         }
 
         // do it only once
-        if(serviceTracker!=null){
+        if (serviceTracker != null) {
             return;
         }
 
@@ -174,19 +174,21 @@ public class ExportRegistrationImpl implements ExportRegistration {
         try {
             f = bctx.createFilter("(" + Constants.SERVICE_ID + "=" + sid + ")");
         } catch (InvalidSyntaxException e) {
-            LOG.warn("Service tracker could not be started. The service will not be automatically unexported " + e.getMessage(), e);
+            LOG.warn("Service tracker could not be started. The service will not be automatically unexported "
+                + e.getMessage(), e);
             return;
         }
         serviceTracker = new ServiceTracker(bctx, f, new ServiceTrackerCustomizer() {
 
             public void removedService(ServiceReference sr, Object s) {
-                LOG.info("Service ["+sid+"] has been unregistered: Removing service export");
+                LOG.info("Service [" + sid + "] has been unregistered: Removing service export");
                 close();
             }
 
             public void modifiedService(ServiceReference sr, Object s) {
                 // FIXME:
-                LOG.warn("Service modifications after the service is exported are currently not supported. The export is not modified!");
+                LOG.warn("Service modifications after the service is exported are "
+                         + "currently not supported. The export is not modified!");
             }
 
             public Object addingService(ServiceReference sr) {

@@ -115,7 +115,7 @@ public class Activator implements ManagedService, BundleActivator {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	public synchronized void updated(Dictionary config) throws ConfigurationException {
+    public synchronized void updated(Dictionary config) throws ConfigurationException {
         if (rsaFactoryReg != null) {
             try {
                 stop(bc);
@@ -124,13 +124,13 @@ public class Activator implements ManagedService, BundleActivator {
             }
         }
         if (config != null) {
-            HashMap<String, Object> configMap = getMapFromDictionary(config);
+            Map<String, Object> configMap = getMapFromDictionary(config);
             start(bc, configMap);
         }
     }
 
-    private HashMap<String, Object> getMapFromDictionary(Dictionary<String, Object> config) {
-        HashMap<String, Object> configMap = new HashMap<String, Object>();
+    private Map<String, Object> getMapFromDictionary(Dictionary<String, Object> config) {
+        Map<String, Object> configMap = new HashMap<String, Object>();
         if (config == null) {
             return configMap;
         }

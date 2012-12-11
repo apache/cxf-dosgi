@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 public class EventAdminHelper {
 
-    private final static Logger LOG = LoggerFactory.getLogger(EventAdminHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EventAdminHelper.class);
     
     private BundleContext bctx;
 
@@ -43,7 +43,7 @@ public class EventAdminHelper {
     }
 
     @SuppressWarnings("rawtypes")
-	private Event createEvent(Properties props, String type) {
+    private Event createEvent(Properties props, String type) {
 
         String topic = "org/osgi/service/remoteserviceadmin/" + type;
         props.put("bundle", bctx.getBundle());
@@ -54,11 +54,11 @@ public class EventAdminHelper {
         String version = (String)bctx.getBundle().getHeaders().get("Bundle-Version");
         
         Version v;
-        if(version!=null)
+        if (version != null) {
             v = new Version(version);
-        else
+        } else {
             v = Version.emptyVersion;
-        
+        }
         setIfNotNull(props, "bundle.version", v);
 
         return new Event(topic, (Dictionary)props);
@@ -104,9 +104,10 @@ public class EventAdminHelper {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	private void setIfNotNull(Dictionary props, String key, Object o) {
-        if (o != null)
+    private void setIfNotNull(Dictionary props, String key, Object o) {
+        if (o != null) {
             props.put(key, o);
+        }
     }
 
     private EventAdmin[] getEventAdmins() {
@@ -117,8 +118,9 @@ public class EventAdminHelper {
             LOG.error("Failed to get EventAdmin: " + e.getMessage(), e);
         }
 
-        if (refs == null)
+        if (refs == null) {
             return null;
+        }
 
         EventAdmin[] eas = new EventAdmin[refs.length];
         for (int x = 0; x < refs.length; ++x) {
@@ -130,7 +132,7 @@ public class EventAdminHelper {
         return eas;
     }
 
-    static String remoteServiceAdminEventTypeToString(int type){
+    static String remoteServiceAdminEventTypeToString(int type) {
         switch (type) {
         case RemoteServiceAdminEvent.EXPORT_ERROR:
             return "EXPORT_ERROR";

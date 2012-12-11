@@ -108,17 +108,17 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
                                Class<?> iClass, 
                                Object serviceBean) {
         
-    	String location = OsgiUtils.getProperty(sd, Constants.WSDL_LOCATION);
-    	if (location == null) {
-    	    throw new RuntimeException("WSDL location property is unavailable");
-    	}
+        String location = OsgiUtils.getProperty(sd, Constants.WSDL_LOCATION);
+        if (location == null) {
+            throw new RuntimeException("WSDL location property is unavailable");
+        }
         URL wsdlURL = dswContext.getBundle().getResource(location);
         if (wsdlURL == null) {
             throw new RuntimeException("WSDL resource at " + location + " is unavailable");
-    	}
+        }
         
-    	String address = getServerAddress(sd, iClass);
-    	String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
+        String address = getServerAddress(sd, iClass);
+        String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
         if (address == null && contextRoot == null) {
             throw new RuntimeException("Remote address is unavailable");
         }
@@ -143,7 +143,9 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
 
         // The properties for the EndpointDescription
-        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[]{Constants.WS_CONFIG_TYPE}, address,intents);
+        Map<String, Object> endpointProps = createEndpointProps(sd, iClass,
+                                                                new String[]{Constants.WS_CONFIG_TYPE}, 
+                                                                address, intents);
 
         return createServerFromFactory(factory, endpointProps);
     }

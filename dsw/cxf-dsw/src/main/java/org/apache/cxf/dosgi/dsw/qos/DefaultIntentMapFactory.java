@@ -29,7 +29,7 @@ import org.apache.cxf.feature.LoggingFeature;
 
 public class DefaultIntentMapFactory {
     public Map<String, Object> create() {
-        Map<String,Object> intentMap = new HashMap<String, Object>();
+        Map<String, Object> intentMap = new HashMap<String, Object>();
         intentMap.put("logging", getLoggingFeature());
         Object soap11 = getSoapBinding(Soap11.getInstance());
         intentMap.put("SOAP", soap11);
