@@ -200,6 +200,44 @@
                     </execution>
                 </executions>
             </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-eclipse-plugin</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.cxf.build-utils</groupId>
+                            <artifactId>cxf-buildtools</artifactId>
+                            <version>${cxf.build-utils.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <buildcommands>
+                            <java.lang.String>org.eclipse.jdt.core.javabuilder</java.lang.String>
+                            <java.lang.String>net.sf.eclipsecs.core.CheckstyleBuilder</java.lang.String>
+                            <java.lang.String>net.sourceforge.pmd.eclipse.plugin.pmdBuilder</java.lang.String>
+                        </buildcommands>
+                        <projectnatures>
+                            <nature>org.eclipse.jdt.core.javanature</nature>
+                            <nature>net.sf.eclipsecs.core.CheckstyleNature</nature>
+                            <nature>net.sourceforge.pmd.eclipse.plugin.pmdNature</nature>
+                        </projectnatures>
+                        <ajdtVersion>none</ajdtVersion>
+                        <additionalConfig>
+                            <file>
+                                <name>.checkstyle</name>
+                                <location>/cxf-eclipse-checkstyle</location>
+                            </file>
+                            <file>
+                                <name>.pmd</name>
+                                <location>/cxf-eclipse-pmd</location>
+                            </file>
+                            <file>
+                                <name>.ruleset</name>
+                                <location>/cxf-pmd-ruleset.xml</location>
+                            </file>
+                        </additionalConfig>
+                    </configuration>
+                </plugin>            
             </plugins>
         </pluginManagement>
 
