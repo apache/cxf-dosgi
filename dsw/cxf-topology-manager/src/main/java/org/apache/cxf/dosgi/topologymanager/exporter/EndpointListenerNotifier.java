@@ -1,21 +1,21 @@
-/** 
-  * Licensed to the Apache Software Foundation (ASF) under one 
-  * or more contributor license agreements. See the NOTICE file 
-  * distributed with this work for additional information 
-  * regarding copyright ownership. The ASF licenses this file 
-  * to you under the Apache License, Version 2.0 (the 
-  * "License"); you may not use this file except in compliance 
-  * with the License. You may obtain a copy of the License at 
-  * 
-  * http://www.apache.org/licenses/LICENSE-2.0 
-  * 
-  * Unless required by applicable law or agreed to in writing, 
-  * software distributed under the License is distributed on an 
-  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
-  * KIND, either express or implied. See the License for the 
-  * specific language governing permissions and limitations 
-  * under the License. 
-  */
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.dosgi.topologymanager.exporter;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * Tracks EndpointListeners and allows to notify them of endpoints
  */
 public class EndpointListenerNotifier {
-    private final static Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
     private BundleContext bctx;
     private ServiceTracker stEndpointListeners;
     private ExportRepository exportRepository;
@@ -78,7 +78,7 @@ public class EndpointListenerNotifier {
     private void notifyListenerOfAllExistingExports(
             ServiceReference reference) {
         Collection<ExportRegistration> registrations = exportRepository.getAllExportRegistrations();
-        notifyListenerOfAdding(reference, registrations );
+        notifyListenerOfAdding(reference, registrations);
     }
     
     void nofifyEndpointListenersOfAdding(Collection<ExportRegistration> exportRegistrations) {
@@ -136,7 +136,7 @@ public class EndpointListenerNotifier {
         }
     }
     
-    static List<Filter> getFiltersFromEndpointListenerScope(ServiceReference sref,BundleContext bctx) {
+    static List<Filter> getFiltersFromEndpointListenerScope(ServiceReference sref, BundleContext bctx) {
         List<Filter> filters = new ArrayList<Filter>();
         try {
             Object fo = sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE);
@@ -193,38 +193,38 @@ public class EndpointListenerNotifier {
      * @return
      * @throws InvalidSyntaxException
      */
-   private static ServiceReference[] getEndpointListeners(BundleContext bctx) {
-       ServiceReference[] result = null;
-       try {
-           String filter = "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*)";
-           result = bctx.getServiceReferences(EndpointListener.class.getName(), filter);
-       } catch (InvalidSyntaxException e) {
-           LOG.error(e.getMessage(), e);
-       }
-       return (result == null) ? new ServiceReference[]{} : result;
-   }
+    private static ServiceReference[] getEndpointListeners(BundleContext bctx) {
+        ServiceReference[] result = null;
+        try {
+            String filter = "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*)";
+            result = bctx.getServiceReferences(EndpointListener.class.getName(), filter);
+        } catch (InvalidSyntaxException e) {
+            LOG.error(e.getMessage(), e);
+        }
+        return (result == null) ? new ServiceReference[]{} : result;
+    }
    
-   /**
-    * Retrieve exported Endpoint while handling null
-    * @param exReg
-    * @return exported Endpoint or null if not present
-    */
-   private EndpointDescription getExportedEndpoint(ExportRegistration exReg) {
-       ExportReference ref = (exReg == null) ? null : exReg.getExportReference();
-       return (ref == null) ? null : ref.getExportedEndpoint(); 
-   }
+    /**
+     * Retrieve exported Endpoint while handling null
+     * @param exReg
+     * @return exported Endpoint or null if not present
+     */
+    private EndpointDescription getExportedEndpoint(ExportRegistration exReg) {
+        ExportReference ref = (exReg == null) ? null : exReg.getExportReference();
+        return (ref == null) ? null : ref.getExportedEndpoint(); 
+    }
    
-   /**
-    * Retrieve endpoint properties as Dictionary
-    * 
-    * @param ep
-    * @return endpoint properties (will never return null) 
-    */
-   private Dictionary<String, Object> getEndpointProperties(EndpointDescription ep) {
-       if (ep == null || ep.getProperties() == null) {
-           return new Hashtable<String, Object>();
-       } else {
-           return new Hashtable<String, Object>(ep.getProperties());
-       }
-   }
+    /**
+     * Retrieve endpoint properties as Dictionary
+     * 
+     * @param ep
+     * @return endpoint properties (will never return null) 
+     */
+    private Dictionary<String, Object> getEndpointProperties(EndpointDescription ep) {
+        if (ep == null || ep.getProperties() == null) {
+            return new Hashtable<String, Object>();
+        } else {
+            return new Hashtable<String, Object>(ep.getProperties());
+        }
+    }
 }

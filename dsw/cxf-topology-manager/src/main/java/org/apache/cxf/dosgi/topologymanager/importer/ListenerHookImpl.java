@@ -1,21 +1,21 @@
-/** 
-  * Licensed to the Apache Software Foundation (ASF) under one 
-  * or more contributor license agreements. See the NOTICE file 
-  * distributed with this work for additional information 
-  * regarding copyright ownership. The ASF licenses this file 
-  * to you under the Apache License, Version 2.0 (the 
-  * "License"); you may not use this file except in compliance 
-  * with the License. You may obtain a copy of the License at 
-  * 
-  * http://www.apache.org/licenses/LICENSE-2.0 
-  * 
-  * Unless required by applicable law or agreed to in writing, 
-  * software distributed under the License is distributed on an 
-  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
-  * KIND, either express or implied. See the License for the 
-  * specific language governing permissions and limitations 
-  * under the License. 
-  */
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.dosgi.topologymanager.importer;
 
 import java.util.Collection;
@@ -38,12 +38,10 @@ import org.slf4j.LoggerFactory;
  */
 public class ListenerHookImpl implements ListenerHook {
     private static final Logger LOG = LoggerFactory.getLogger(ListenerHookImpl.class);
-    private BundleContext bctx;
-    private ServiceInterestListener serviceInterestListener;
 
-    private final static String CLASS_NAME_EXPRESSION = ".*\\(" + Constants.OBJECTCLASS
+    private static final String CLASS_NAME_EXPRESSION = ".*\\(" + Constants.OBJECTCLASS
                                                         + "=([a-zA-Z_0-9.]+)\\).*";
-    private final static Pattern CLASS_NAME_PATTERN = Pattern.compile(CLASS_NAME_EXPRESSION);
+    private static final Pattern CLASS_NAME_PATTERN = Pattern.compile(CLASS_NAME_EXPRESSION);
 
     // From the old impl.
     private static final Set<String> SYSTEM_PACKAGES;
@@ -57,6 +55,9 @@ public class ListenerHookImpl implements ListenerHook {
         SYSTEM_PACKAGES.add("org.springframework.osgi.context.event.OsgiBundleApplicationContextListener");
         SYSTEM_PACKAGES.add("java.net.ContentHandler");
     }
+
+    private BundleContext bctx;
+    private ServiceInterestListener serviceInterestListener;
 
     public ListenerHookImpl(BundleContext bc, ServiceInterestListener serviceInterestListener) {
         bctx = bc;
@@ -139,7 +140,7 @@ public class ListenerHookImpl implements ListenerHook {
     static String getUUID(BundleContext bctx) {
         synchronized ("org.osgi.framework.uuid") {
             String uuid = bctx.getProperty("org.osgi.framework.uuid");
-            if(uuid==null){
+            if (uuid == null) {
                 uuid = UUID.randomUUID().toString();
                 System.setProperty("org.osgi.framework.uuid", uuid);
             }

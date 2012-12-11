@@ -1,20 +1,20 @@
-/** 
- * Licensed to the Apache Software Foundation (ASF) under one 
- * or more contributor license agreements. See the NOTICE file 
- * distributed with this work for additional information 
- * regarding copyright ownership. The ASF licenses this file 
- * to you under the Apache License, Version 2.0 (the 
- * "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, 
- * software distributed under the License is distributed on an 
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
- * KIND, either express or implied. See the License for the 
- * specific language governing permissions and limitations 
- * under the License. 
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.dosgi.topologymanager.importer;
 
@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TopologyManagerImport implements EndpointListener, RemoteServiceAdminListener, ServiceInterestListener {
 
-    private final static Logger LOG = LoggerFactory.getLogger(TopologyManagerImport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TopologyManagerImport.class);
     private ExecutorService execService;
 
     private final EndpointListenerManager endpointListenerManager;
@@ -79,12 +79,14 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     /**
      * List of Endpoints by matched filter that were reported by the EndpointListener and can be imported
      */
-    private final Map<String /* filter */, List<EndpointDescription>> importPossibilities = new HashMap<String, List<EndpointDescription>>();
+    private final Map<String /* filter */, List<EndpointDescription>> importPossibilities 
+        = new HashMap<String, List<EndpointDescription>>();
     
     /**
      * List of already imported Endpoints by their matched filter
      */
-    private final Map<String /* filter */, List<ImportRegistration>> importedServices = new HashMap<String, List<ImportRegistration>>();
+    private final Map<String /* filter */, List<ImportRegistration>> importedServices 
+        = new HashMap<String, List<ImportRegistration>>();
 
     public TopologyManagerImport(BundleContext bc, RemoteServiceAdminTracker rsaTracker) {
         bctx = bc;
@@ -140,7 +142,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     }
 
     public void endpointAdded(EndpointDescription epd, String filter) {
-        if (filter==null) {
+        if (filter == null) {
             LOG.error("Endpoint is not handled because no matching filter was provided!");
             return;
         }
