@@ -1,24 +1,26 @@
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * with the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.dosgi.discovery.zookeeper.server.config;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
@@ -38,7 +40,7 @@ public class Activator implements BundleActivator {
     private ServiceTracker st;
 
     public void start(BundleContext context) throws Exception {
-        synchronized(Activator.class) {
+        synchronized (Activator.class) {
             // Only one thread gets to set the port number
             if (System.getProperty(ZOOKEEPER_PORT) == null) {
                 String port = getFreePort();
@@ -55,7 +57,7 @@ public class Activator implements BundleActivator {
                     try {
                         ConfigurationAdmin cadmin = (ConfigurationAdmin) svc;
                         Configuration cfg = cadmin.getConfiguration(PID, null);
-                        Hashtable<String, Object> props = new Hashtable<String, Object>();
+                        Dictionary<String, Object> props = new Hashtable<String, Object>();
                         String zp = System.getProperty(ZOOKEEPER_PORT);
                         props.put("clientPort", zp);
                         cfg.update(props);
@@ -73,16 +75,17 @@ public class Activator implements BundleActivator {
         ServiceReference[] refs = context.getServiceReferences(ManagedService.class.getName(), 
                 "(service.pid=org.apache.cxf.dosgi.discovery.zookeeper)");
         if (refs == null || refs.length == 0) {
-            throw new RuntimeException("This bundle must be started after the bundle with the Zookeeper Discovery Managed Service was started.");
+            throw new RuntimeException("This bundle must be started after the bundle with the Zookeeper "
+                                       + "Discovery Managed Service was started.");
         }
         Object svc = context.getService(refs[0]);
         ManagedService ms = (ManagedService) svc;
-        Hashtable<String, Object> props = new Hashtable<String, Object>();
+        Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put("zookeeper.host", "127.0.0.1");
         props.put("zookeeper.port", System.getProperty(ZOOKEEPER_PORT));
         ms.updated(props);
         LOG.debug("Passed the zookeeper.host property to the Zookeeper Client managed service.");
-	}
+    }
     
     private String getFreePort() {
         try {
@@ -96,7 +99,7 @@ public class Activator implements BundleActivator {
         }
     }    
     
-	public void stop(BundleContext context) throws Exception {
-	    st.close();
-	}
+    public void stop(BundleContext context) throws Exception {
+        st.close();
+    }
 }
