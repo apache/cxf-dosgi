@@ -1,3 +1,21 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.util.ArrayList;
@@ -29,7 +47,8 @@ public class InterfaceMonitorManager {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitorManager.class);
     
     private final ZooKeeper zooKeeper;
-    private final Map<ServiceReference, List<String> /* scopes of the epl */> handledEndpointlisteners = new HashMap<ServiceReference, List<String>>();
+    private final Map<ServiceReference, List<String> /* scopes of the epl */> handledEndpointlisteners 
+        = new HashMap<ServiceReference, List<String>>();
     private final Map<String /* scope */, Interest> interestingScopes = new HashMap<String, Interest>();
     private final BundleContext bctx;
 
@@ -72,8 +91,9 @@ public class InterfaceMonitorManager {
                     handledEndpointlisteners.put(sref, handledScopes);
                 }
 
-                if (!handledScopes.contains(scope))
+                if (!handledScopes.contains(scope)) {
                     handledScopes.add(scope);
+                }
 
             }
         }
@@ -109,7 +129,7 @@ public class InterfaceMonitorManager {
     public void removeInterest(ServiceReference sref) {
         List<String> handledScopes = handledEndpointlisteners.get(sref);
         if (handledScopes == null) {
-               return;
+            return;
         }
 
         for (String scope : handledScopes) {
@@ -129,7 +149,7 @@ public class InterfaceMonitorManager {
             List<ServiceReference> relatedServiceListeners) {
         for (ServiceReference sref : relatedServiceListeners) {
             Object service = bctx.getService(sref);
-            if (service == null || !(service instanceof EndpointListener)) {
+            if (!(service instanceof EndpointListener)) {
                 continue;
             }
             EndpointListener epl = (EndpointListener) service;

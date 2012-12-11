@@ -1,20 +1,20 @@
-/** 
- * Licensed to the Apache Software Foundation (ASF) under one 
- * or more contributor license agreements. See the NOTICE file 
- * distributed with this work for additional information 
- * regarding copyright ownership. The ASF licenses this file 
- * to you under the Apache License, Version 2.0 (the 
- * "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, 
- * software distributed under the License is distributed on an 
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
- * KIND, either express or implied. See the License for the 
- * specific language governing permissions and limitations 
- * under the License. 
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
 import org.apache.zookeeper.AsyncCallback.StatCallback;
-import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
@@ -45,7 +45,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     private final ZooKeeper zookeeper;
     private final EndpointListener epListener;
     private final boolean recursive;
-    private boolean closed = false;
+    private boolean closed;
 
     // This map is *only* accessed in the change() method
     private Map<String, EndpointDescription> nodes = new HashMap<String, EndpointDescription>();
@@ -53,7 +53,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     public InterfaceMonitor(ZooKeeper zk, String intf, EndpointListener epListener, String scope, BundleContext bctx) {
         this.zookeeper = zk;
         this.znode = Util.getZooKeeperPath(intf);
-        this.recursive = (intf == null || "".equals(intf));
+        this.recursive = intf == null || "".equals(intf);
         this.epListener = epListener;
         if (LOG.isDebugEnabled()) {
             String recursiveSt = recursive ? "recursive" : "";
@@ -156,20 +156,20 @@ public class InterfaceMonitor implements Watcher, StatCallback {
      * @return true if an endpoint was found and if the node therefore needs to
      *         be monitored for changes
      */
-    private boolean processChildren(String znode, Map<String, EndpointDescription> newNodes,
+    private boolean processChildren(String zn, Map<String, EndpointDescription> newNodes,
             Map<String, EndpointDescription> prevNodes) {
         List<String> children;
         try {
-            LOG.debug("Processing the children of {}", znode);
-            children = zookeeper.getChildren(znode, false);
+            LOG.debug("Processing the children of {}", zn);
+            children = zookeeper.getChildren(zn, false);
 
             boolean foundANode = false;
             for (String child : children) {
-                String childZNode = znode + '/' + child;
+                String childZNode = zn + '/' + child;
                 EndpointDescription epd = getEndpointDescriptionFromNode(childZNode);
                 if (epd != null) {
                     EndpointDescription prevEpd = prevNodes.get(child);
-                    LOG.info("found new node " + znode + "/[" + child + "]   ( []->child )  props: "
+                    LOG.info("found new node " + zn + "/[" + child + "]   ( []->child )  props: "
                             + epd.getProperties().values());
                     newNodes.put(child, epd);
                     prevNodes.remove(child);
@@ -184,10 +184,8 @@ public class InterfaceMonitor implements Watcher, StatCallback {
                         // TODO
                     }
                 }
-                if (recursive) {
-                    if (processChildren(childZNode, newNodes, prevNodes)) {
-                        zookeeper.getChildren(childZNode, this);
-                    }
+                if (recursive && processChildren(childZNode, newNodes, prevNodes)) {
+                    zookeeper.getChildren(childZNode, this);
                 }
             }
 

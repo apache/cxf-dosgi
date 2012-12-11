@@ -115,7 +115,7 @@ public class EndpointListenerImplTest extends TestCase {
         EasyMock.replay(ctx);
 
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Constants.OBJECTCLASS, new String[] { "org.foo.myClass" });
+        props.put(Constants.OBJECTCLASS, new String[] {"org.foo.myClass"});
         props.put(RemoteConstants.ENDPOINT_ID, "http://localhost:9876/test");
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myConfig");
         EndpointDescription ep = new EndpointDescription(props);
@@ -152,7 +152,7 @@ public class EndpointListenerImplTest extends TestCase {
         return (List<EndpointDescription>) field.get(eli);
     }
 
-    public void testClose() throws KeeperException, InterruptedException{
+    public void testClose() throws KeeperException, InterruptedException {
 
         IMocksControl c = EasyMock.createNiceControl();
 

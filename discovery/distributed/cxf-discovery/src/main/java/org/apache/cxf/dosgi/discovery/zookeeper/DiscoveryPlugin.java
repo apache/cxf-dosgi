@@ -29,8 +29,8 @@ import java.util.Map;
  * lookup process. <p/>
  *
  * DiscoveryPlugins use the OSGi WhiteBoard pattern. To add one to the system, register an instance under this interface
- * with the OSGi Service Registry. All registered DiscoveryPlugin instances are visited and given a chance to process the
- * information before it is pushed into ZooKeeper. <p/>
+ * with the OSGi Service Registry. All registered DiscoveryPlugin instances are visited and given a chance to 
+ * process the information before it is pushed into ZooKeeper. <p/>
  *
  * Note that the changes made using this plugin do not modify the local service registration.
  *
@@ -42,11 +42,12 @@ public interface DiscoveryPlugin {
      *
      * @param mutableProperties A map of service registration properties. The map is mutable and any changes to the map
      * will be reflected in the ZooKeeper registration.
-     * @param endpointKey The key under which the service is registered in ZooKeeper. This key typically has the following
-     * format: hostname#port##context. While the actual value of this key is not actually used by the system (people can use
-     * it as a hint to understand where the service is located), the value <i>must</i> be unique for all services of a given type.
-     * @return The <tt>endpointKey</tt> value to be used. If there is no need to change this simply return the value of the
-     * <tt>endpointKey</tt> parameter.
+     * @param endpointKey The key under which the service is registered in ZooKeeper. This key typically has the
+     * following format: hostname#port##context. While the actual value of this key is not actually used by the 
+     * system (people can use it as a hint to understand where the service is located), the value <i>must</i> be
+     * unique for all services of a given type.
+     * @return The <tt>endpointKey</tt> value to be used. If there is no need to change this simply return the value 
+     * of the <tt>endpointKey</tt> parameter.
      */
     String process(Map<String, Object> mutableProperties, String endpointKey);
 }

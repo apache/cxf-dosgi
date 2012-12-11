@@ -46,13 +46,13 @@ import org.slf4j.LoggerFactory;
  * Listens for local Endpoints and publishes them to Zookeeper
  */
 public class PublishingEndpointListener implements EndpointListener {
-    private final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListener.class);
 
     private final ZooKeeper zookeeper;
     private final List<DiscoveryPlugin> discoveryPlugins = new CopyOnWriteArrayList<DiscoveryPlugin>();
     private final ServiceTracker discoveryPluginTracker;
     private final List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
-    private boolean closed = false;
+    private boolean closed;
 
     public PublishingEndpointListener(ZooKeeper zooKeeper, BundleContext bctx) {
         this.zookeeper = zooKeeper;
@@ -79,8 +79,9 @@ public class PublishingEndpointListener implements EndpointListener {
     public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
         LOG.info("Local endpointDescription added: " + endpoint);
 
-        if (closed)
+        if (closed) {
             return;
+        }
 
         synchronized (endpoints) {
 
@@ -119,8 +120,9 @@ public class PublishingEndpointListener implements EndpointListener {
     public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
         LOG.info("Local endpointDescription removed: " + endpoint);
 
-        if (closed)
+        if (closed) {
             return;
+        }
 
         synchronized (endpoints) {
             if (!endpoints.contains(endpoint)) {
