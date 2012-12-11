@@ -82,7 +82,6 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
                     <instructions>
                         <Bundle-Name>CXF dOSGi Topology Manager</Bundle-Name>
                         <Bundle-Description>Default CXF Topology Manager
