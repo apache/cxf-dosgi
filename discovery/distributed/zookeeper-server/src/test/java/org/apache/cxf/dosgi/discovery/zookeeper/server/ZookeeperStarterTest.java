@@ -35,7 +35,7 @@ import org.osgi.framework.BundleContext;
 
 public class ZookeeperStarterTest extends TestCase {
     public void testUpdateConfig() throws Exception {
-        final File tempDir = new File(System.getProperty("java.io.tmpdir"));
+        final File tempDir = new File("target");
         IMocksControl control = EasyMock.createControl();
         BundleContext bc = control.createMock(BundleContext.class);
         expect(bc.getDataFile("")).andReturn(tempDir);
@@ -47,7 +47,7 @@ public class ZookeeperStarterTest extends TestCase {
             @Override
             protected void startFromConfig(QuorumPeerConfig config) throws IOException, InterruptedException {
                 assertEquals(1234, config.getClientPortAddress().getPort());
-                assertEquals(tempDir + File.separator + "zkdata", config.getDataDir());
+                assertTrue(config.getDataDir().contains(tempDir + File.separator + "zkdata"));
                 assertEquals(2000, config.getTickTime());
                 assertEquals(10, config.getInitLimit());
                 assertEquals(5, config.getSyncLimit());
