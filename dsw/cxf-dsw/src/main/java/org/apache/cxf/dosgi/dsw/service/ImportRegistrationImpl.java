@@ -32,18 +32,18 @@ import org.slf4j.LoggerFactory;
 // *************************** FIXME: some old methods might be in here ****
 public class ImportRegistrationImpl implements ImportRegistration {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ImportRegistrationImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImportRegistrationImpl.class);
 
     private Throwable exception;
     private ServiceRegistration importedService;
     private EndpointDescription importedEndpoint;
     private ClientServiceFactory clientServiceFactory;
     private RemoteServiceAdminCore rsaCore;
-    private boolean closed = false;
-    private boolean detatched = false;
+    private boolean closed;
+    private boolean detatched;
 
-    private ImportRegistrationImpl parent = null;
-    private List<ImportRegistrationImpl> childs = null;
+    private ImportRegistrationImpl parent;
+    private List<ImportRegistrationImpl> childs;
 
     private ImportReference importReference;
     
@@ -56,11 +56,6 @@ public class ImportRegistrationImpl implements ImportRegistration {
         importedEndpoint = endpoint;
         rsaCore = rsac;
         init();
-    }
-
-    private void init() {
-        parent = this;
-        childs = new ArrayList<ImportRegistrationImpl>(1);
     }
 
     /**
@@ -80,6 +75,11 @@ public class ImportRegistrationImpl implements ImportRegistration {
         parent.instanceAdded(this);
     }
 
+    private void init() {
+        parent = this;
+        childs = new ArrayList<ImportRegistrationImpl>(1);
+    }
+
     private synchronized void instanceAdded(ImportRegistrationImpl i) {
         childs.add(i);
     }
@@ -87,11 +87,13 @@ public class ImportRegistrationImpl implements ImportRegistration {
     public synchronized void close() {
         LOG.debug("close() called ");
 
-        if (isFailure())
+        if (isFailure()) {
             return;
+        }
 
-        if (closed)
+        if (closed) {
             return;
+        }
 
         closed = true;
         rsaCore.removeImportRegistration(this);
@@ -109,10 +111,12 @@ public class ImportRegistrationImpl implements ImportRegistration {
             
             LOG.debug("really closing ImportRegistartion now! ");
 
-            if (clientServiceFactory != null)
+            if (clientServiceFactory != null) {
                 clientServiceFactory.setCloseable(true);
-            if (importedService != null)
+            }
+            if (importedService != null) {
                 importedService.unregister();
+            }
         }
     }
 
@@ -126,8 +130,9 @@ public class ImportRegistrationImpl implements ImportRegistration {
             for (ImportRegistrationImpl ir : new ArrayList<ImportRegistrationImpl>(childs)) {
                 ir.close();
             }
-            if (!closed)
+            if (!closed) {
                 this.close();
+            }
         } else {
             parent.closeAll();
         }
@@ -142,20 +147,24 @@ public class ImportRegistrationImpl implements ImportRegistration {
     }
 
     public EndpointDescription getImportedEndpointDescription() {
-        if (isFailure())
+        if (isFailure()) {
             return null;
-        if (closed)
+        }
+        if (closed) {
             return null;
+        }
         
         return importedEndpoint;
     }
 
     public ServiceReference getImportedService() {
-        if (isFailure() || closed)
+        if (isFailure() || closed) {
             return null;
+        }
 
-        if (importedService == null)
+        if (importedService == null) {
             return null;
+        }
 
         return importedService.getReference();
     }
@@ -173,8 +182,9 @@ public class ImportRegistrationImpl implements ImportRegistration {
     }
 
     public synchronized void setImportedServiceRegistration(ServiceRegistration proxyRegistration) {
-        if (parent != this)
+        if (parent != this) {
             throw new IllegalStateException("this method may only be called on the parent !");
+        }
 
         _setImportedServiceRegistration(proxyRegistration);
         for (ImportRegistrationImpl ir : childs) {

@@ -37,11 +37,9 @@ import org.slf4j.LoggerFactory;
 
 public class JaxRSUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JaxRSUtils.class);
-
-    public final static String MODEL_FOLDER = "/OSGI-INF/cxf/jaxrs/";
-    public final static String DEFAULT_MODEL = "/OSGI-INF/cxf/jaxrs/model.xml";
-    public final static String PROVIDERS_FILTER = "(|" 
+    public static final String MODEL_FOLDER = "/OSGI-INF/cxf/jaxrs/";
+    public static final String DEFAULT_MODEL = "/OSGI-INF/cxf/jaxrs/model.xml";
+    public static final String PROVIDERS_FILTER = "(|" 
             + "(objectClass=javax.ws.rs.ext.MessageBodyReader)"
             + "(objectClass=javax.ws.rs.ext.MessageBodyWriter)" 
             + "(objectClass=javax.ws.rs.ext.ExceptionMapper)" 
@@ -50,6 +48,8 @@ public class JaxRSUtils {
             + "(objectClass=org.apache.cxf.jaxrs.ext.ParameterHandler)" 
             + "(objectClass=org.apache.cxf.jaxrs.ext.ResponseExceptionMapper)" 
             + ")";
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRSUtils.class);
+
 
     @SuppressWarnings("rawtypes")
     static List<Object> getProviders(BundleContext callingContext, BundleContext dswBC, Map sd) {

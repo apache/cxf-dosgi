@@ -51,20 +51,20 @@ import org.slf4j.LoggerFactory;
 // registered as spring bean -> start / stop called accordingly 
 public class Activator implements ManagedService, BundleActivator {
     private static final int DEFAULT_INTENT_TIMEOUT = 30000;
-    private final static Logger LOG = LoggerFactory.getLogger(Activator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
     private ServiceRegistration rsaFactoryReg;
     private ServiceRegistration decoratorReg;
     private IntentTracker intentTracker;
     private BundleContext bc;
 
-    public void start(BundleContext bc) throws Exception {
-        this.bc = bc;
-        start(bc, new Hashtable<String, Object>());
+    public void start(BundleContext bundlecontext) throws Exception {
+        this.bc = bundlecontext;
+        start(bundlecontext, new Hashtable<String, Object>());
     }
 
-    private void start(BundleContext bc, Map<String, Object> config) {
-        this.bc = bc;
+    private void start(BundleContext bundlecontext, Map<String, Object> config) {
+        this.bc = bundlecontext;
         String httpBase = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.HTTP_BASE);
         String cxfServletAlisas = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.CXF_SERVLET_ALIAS);
         // Disable the fast infoset as it's not compatible (yet) with OSGi
@@ -76,10 +76,11 @@ public class Activator implements ManagedService, BundleActivator {
         intentTracker.open();
         IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
         HttpServiceManager httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlisas);
-        ConfigTypeHandlerFactory configTypeHandlerFactory = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
+        ConfigTypeHandlerFactory configTypeHandlerFactory 
+            = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
         RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(rsaCore);
-        Hashtable<String, Object> props = new Hashtable<String, Object>();
+        Dictionary<String, Object> props = new Hashtable<String, Object>();
         String[] supportedIntents = intentMap.keySet().toArray(new String[] {});
         String siString = IntentUtils.formatIntents(supportedIntents);
         props.put("remote.intents.supported", siString);
@@ -89,10 +90,10 @@ public class Activator implements ManagedService, BundleActivator {
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc), null);
     }
 
-    private void registerManagedService(BundleContext bc) {
+    private void registerManagedService(BundleContext bundlecontext) {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put(Constants.SERVICE_PID, CONFIG_SERVICE_PID);
-        bc.registerService(ManagedService.class.getName(), this, props);
+        bundlecontext.registerService(ManagedService.class.getName(), this, props);
     }
 
     public void stop(BundleContext context) throws Exception {

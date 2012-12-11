@@ -103,7 +103,7 @@ public class SecurityDelegatingHttpContext implements HttpContext {
 class Chain implements FilterChain {
     private static final Logger LOG = LoggerFactory.getLogger(Chain.class);
 
-    int current = 0;
+    int current;
     Filter[] filters;
 
     Chain(Filter[] filters) {

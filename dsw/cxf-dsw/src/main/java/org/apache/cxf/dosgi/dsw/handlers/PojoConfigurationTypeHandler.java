@@ -42,7 +42,9 @@ import org.slf4j.LoggerFactory;
 public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PojoConfigurationTypeHandler.class);
 
-    public PojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, HttpServiceManager httpServiceManager) {
+    public PojoConfigurationTypeHandler(BundleContext dswBC,
+                                        IntentManager intentManager,
+                                        HttpServiceManager httpServiceManager) {
         super(dswBC, intentManager, httpServiceManager);
     }
     
@@ -84,8 +86,12 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return null;
     }
     
-    public ExportResult createServer(ServiceReference sref, BundleContext dswContext,
-                             BundleContext callingContext, Map<String, Object> sd, Class<?> iClass, Object serviceBean) throws IntentUnsatifiedException {
+    public ExportResult createServer(ServiceReference sref,
+                                     BundleContext dswContext,
+                                     BundleContext callingContext, 
+                                     Map<String, Object> sd,
+                                     Class<?> iClass, 
+                                     Object serviceBean) throws IntentUnsatifiedException {
         String address = getServerAddress(sd, iClass);
         String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
         

@@ -60,7 +60,9 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 public class PojoConfigurationTypeHandlerTest extends TestCase {
     public void testGetPojoAddressEndpointURI() {
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager, dummyHttpServiceManager());
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, 
+                                                                                intentManager, 
+                                                                                dummyHttpServiceManager());
         Map<String, Object> sd = new HashMap<String, Object>();
         String url = "http://somewhere:1234/blah";
         sd.put(RemoteConstants.ENDPOINT_ID, url);
@@ -73,7 +75,9 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
     public void testGetPojoAddressEndpointCxf() {
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager, dummyHttpServiceManager());
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null,
+                                                                                intentManager,
+                                                                                dummyHttpServiceManager());
         Map<String, Object> sd = new HashMap<String, Object>();
         String url = "http://somewhere:29/boo";
         sd.put("org.apache.cxf.ws.address", url);
@@ -82,7 +86,9 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
     public void testGetPojoAddressEndpointPojo() {
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager, dummyHttpServiceManager());
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, 
+                                                                                intentManager,
+                                                                                dummyHttpServiceManager());
         Map<String, Object> sd = new HashMap<String, Object>();
         String url = "http://somewhere:32768/foo";
         sd.put("osgi.remote.configuration.pojo.address", url);
@@ -91,7 +97,9 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     
     public void testGetDefaultPojoAddress() {
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, intentManager , dummyHttpServiceManager());
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, 
+                                                                                intentManager , 
+                                                                                dummyHttpServiceManager());
         Map<String, Object> sd = new HashMap<String, Object>(); 
         assertEquals("/java/lang/String", handler.getServerAddress(sd, String.class));
     }

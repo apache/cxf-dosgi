@@ -47,7 +47,9 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
 
     Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
 
-    public JaxRSPojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager, HttpServiceManager httpServiceManager) {
+    public JaxRSPojoConfigurationTypeHandler(BundleContext dswBC,
+                                             IntentManager intentManager, 
+                                             HttpServiceManager httpServiceManager) {
         super(dswBC, intentManager, httpServiceManager);
     }
 

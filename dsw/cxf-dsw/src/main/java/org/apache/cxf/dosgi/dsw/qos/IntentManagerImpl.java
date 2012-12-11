@@ -91,17 +91,17 @@ public class IntentManagerImpl implements IntentManager {
     }
 
     private Collection<String> addSynonymIntents(Collection<String> appliedIntents, 
-                                                 IntentMap intentMap) {
+                                                 IntentMap map) {
         // E.g. SOAP and SOAP.1_1 are synonyms
         List<Object> values = new ArrayList<Object>();
         for (String key : appliedIntents) {
-            values.add(intentMap.get(key));
+            values.add(map.get(key));
         }
-        return reverseLookup(intentMap, values);
+        return reverseLookup(map, values);
     }
 
-    private Collection<String> reverseLookup(IntentMap intentMap, Object obj) {
-        return reverseLookup(intentMap, Collections.singleton(obj));
+    private Collection<String> reverseLookup(IntentMap im, Object obj) {
+        return reverseLookup(im, Collections.singleton(obj));
     }
 
     /**
@@ -110,9 +110,9 @@ public class IntentManagerImpl implements IntentManager {
      * @param objs
      * @return
      */
-    private Collection<String> reverseLookup(IntentMap intentMap, Collection<? extends Object> objs) {
+    private Collection<String> reverseLookup(IntentMap im, Collection<? extends Object> objs) {
         Set<String> intentsFound = new HashSet<String>();
-        for (Map.Entry<String, Object> entry : intentMap.entrySet()) {
+        for (Map.Entry<String, Object> entry : im.entrySet()) {
             if (objs.contains(entry.getValue())) {
                 intentsFound.add(entry.getKey());
             }

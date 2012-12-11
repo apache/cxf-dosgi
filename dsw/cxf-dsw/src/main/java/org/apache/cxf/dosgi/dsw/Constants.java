@@ -117,7 +117,7 @@ public class Constants {
     @Deprecated
     public static final String DEFAULT_HOST_VALUE = "localhost";
     @Deprecated
-    public final static String USE_MASTER_MAP = "use.master.map";
+    public static final String USE_MASTER_MAP = "use.master.map";
     
     //DSW Identification - TODO do we really need this one?
     public static final String DSW_CLIENT_ID = PROVIDER_PREFIX + ".remote.dsw.client";

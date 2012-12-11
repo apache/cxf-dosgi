@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Utility methods to get the local address even on a linux host
  */
-public class LocalHostUtil {
+public final class LocalHostUtil {
 
     private LocalHostUtil() {
         // Util Class
@@ -46,12 +46,14 @@ public class LocalHostUtil {
      */
     public static InetAddress getLocalHost() throws UnknownHostException {
         InetAddress localHost = InetAddress.getLocalHost();
-        if (!localHost.isLoopbackAddress())
+        if (!localHost.isLoopbackAddress()) {
             return localHost;
+        }
         InetAddress[] addrs = getAllLocalUsingNetworkInterface();
         for (int i = 0; i < addrs.length; i++) {
-            if (!addrs[i].isLoopbackAddress() && !addrs[i].getHostAddress().contains(":"))
+            if (!addrs[i].isLoopbackAddress() && !addrs[i].getHostAddress().contains(":")) {
                 return addrs[i];
+            }
         }
         return localHost;
     }

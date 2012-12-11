@@ -36,20 +36,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConfigTypeHandlerFactory {
-    private static Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
+    protected static final String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
+    
     // protected because of tests
     protected final List<String> supportedConfigurationTypes;
 
-    protected final static String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
     private IntentManager intentManager;
     private PojoConfigurationTypeHandler pojoConfigurationTypeHandler;
     private JaxRSPojoConfigurationTypeHandler jaxRsPojoConfigurationTypeHandler;
     private WsdlConfigurationTypeHandler wsdlConfigurationTypeHandler;
 
-    public ConfigTypeHandlerFactory(BundleContext bc, IntentManager intentManager, HttpServiceManager httpServiceManager) {
+    public ConfigTypeHandlerFactory(BundleContext bc, IntentManager intentManager,
+                                    HttpServiceManager httpServiceManager) {
         this.intentManager = intentManager;
         this.pojoConfigurationTypeHandler = new PojoConfigurationTypeHandler(bc, intentManager, httpServiceManager);
-        this.jaxRsPojoConfigurationTypeHandler = new JaxRSPojoConfigurationTypeHandler(bc, intentManager, httpServiceManager);
+        this.jaxRsPojoConfigurationTypeHandler = new JaxRSPojoConfigurationTypeHandler(bc, 
+                                                                                       intentManager, 
+                                                                                       httpServiceManager);
         this.wsdlConfigurationTypeHandler = new WsdlConfigurationTypeHandler(bc, intentManager, httpServiceManager);
         supportedConfigurationTypes = new ArrayList<String>();
         supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
@@ -74,7 +78,8 @@ public class ConfigTypeHandlerFactory {
                                                Map<String, Object> serviceProperties) {
         intentManager.assertAllIntentsSupported(serviceProperties);
         if (configurationTypes.contains(Constants.WS_CONFIG_TYPE)
-            || configurationTypes.contains(Constants.WS_CONFIG_TYPE_OLD) || configurationTypes.contains(Constants.RS_CONFIG_TYPE)) {
+            || configurationTypes.contains(Constants.WS_CONFIG_TYPE_OLD)
+            || configurationTypes.contains(Constants.RS_CONFIG_TYPE)) {
 
             boolean jaxrs = isJaxrsRequested(configurationTypes, serviceProperties);
 
@@ -93,7 +98,8 @@ public class ConfigTypeHandlerFactory {
 
         if (types.contains(Constants.RS_CONFIG_TYPE)) {
             String intentsProperty = OsgiUtils.getProperty(serviceProperties, RemoteConstants.SERVICE_EXPORTED_INTENTS);
-            boolean hasHttpIntent = false, hasSoapIntent = false;
+            boolean hasHttpIntent = false;
+            boolean hasSoapIntent = false;
             if (intentsProperty != null) {
                 String[] intents = IntentUtils.parseIntents(intentsProperty);
                 for (int i = 0; i < intents.length; i++) {
@@ -152,10 +158,11 @@ public class ConfigTypeHandlerFactory {
         }
 
         if (usableConfigurationTypes.size() == 0) {
-            throw new RuntimeException("The supplied endpoint has no compatible configuration type. Supported types are: "
-                        + supportedConfigurationTypes
-                        + "    Types needed by the endpoint: "
-                        + remoteConfigurationTypes);
+            throw new RuntimeException("The supplied endpoint has no compatible configuration type. "
+                                       + "Supported types are: "
+                                       + supportedConfigurationTypes
+                                       + "    Types needed by the endpoint: "
+                                       + remoteConfigurationTypes);
         }
         return usableConfigurationTypes;
     }

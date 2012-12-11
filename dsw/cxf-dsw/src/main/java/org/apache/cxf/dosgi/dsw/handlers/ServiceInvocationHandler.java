@@ -33,7 +33,7 @@ import java.util.Map;
 import org.osgi.framework.ServiceException;
 
 public class ServiceInvocationHandler implements InvocationHandler {
-    private final static String REMOTE_EXCEPTION_TYPE = "REMOTE";
+    private static final String REMOTE_EXCEPTION_TYPE = "REMOTE";
     private static final Collection<Method> OBJECT_METHODS = 
         Arrays.asList(Object.class.getMethods());
 

@@ -55,23 +55,30 @@ public class ExportReferenceImpl implements ExportReference {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ExportReferenceImpl other = (ExportReferenceImpl) obj;
-        if (endpointDescription == null) {
-            if (other.endpointDescription != null)
+        if (endpointDescription == null) { 
+            if (other.endpointDescription != null) {
                 return false;
-        } else if (!endpointDescription.equals(other.endpointDescription))
+            }
+        } else if (!endpointDescription.equals(other.endpointDescription)) {
             return false;
+        }
         if (serviceReference == null) {
-            if (other.serviceReference != null)
+            if (other.serviceReference != null) {
                 return false;
-        } else if (!serviceReference.equals(other.serviceReference))
+            }
+        } else if (!serviceReference.equals(other.serviceReference)) {
             return false;
+        }
         return true;
     }
 

@@ -195,7 +195,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
 }
 
 class CommitResponseFilter implements Filter {
-    public boolean called = false;
+    boolean called;
 
     public void init(FilterConfig filterConfig) throws ServletException {
     }
@@ -211,7 +211,7 @@ class CommitResponseFilter implements Filter {
 }
 
 class DoNothingFilter implements Filter {
-    boolean called = false;
+    boolean called;
 
     public void init(FilterConfig filterConfig) throws ServletException {
     }
@@ -227,7 +227,7 @@ class DoNothingFilter implements Filter {
 }
 
 class AccessDeniedFilter implements Filter {
-    boolean called = false;
+    boolean called;
 
     public void init(FilterConfig filterConfig) throws ServletException {
     }

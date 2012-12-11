@@ -70,7 +70,8 @@ public class EventProducer {
                 for (ServiceReference sref : listenerRefs) {
                     RemoteServiceAdminListener rsal = (RemoteServiceAdminListener)bctx.getService(sref);
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("notify RemoteServiceAdminListener {} of bundle {}" + rsal, sref.getBundle().getSymbolicName());
+                        LOG.debug("notify RemoteServiceAdminListener {} of bundle {}" + rsal,
+                                  sref.getBundle().getSymbolicName());
                     }
                     rsal.remoteAdminEvent(rsae);
                 }
@@ -84,8 +85,8 @@ public class EventProducer {
     protected void publishNotifcation(ImportRegistration ir) {
         RemoteServiceAdminEvent rsae = null;
         if (ir.getException() != null) {
-            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_ERROR, bctx.getBundle(), ir.getImportReference(), ir
-                .getException());
+            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_ERROR, bctx.getBundle(),
+                                               ir.getImportReference(), ir.getException());
         } else {
             rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_REGISTRATION, bctx.getBundle(),
                                                ir.getImportReference(), ir.getException());
@@ -97,7 +98,8 @@ public class EventProducer {
 
     public void notifyRemoval(ExportRegistration eri) {
         RemoteServiceAdminEvent rsae = null;
-        rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_UNREGISTRATION, bctx.getBundle(), eri.getExportReference(), eri.getException());
+        rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_UNREGISTRATION, bctx.getBundle(),
+                                           eri.getExportReference(), eri.getException());
         
         notifyListeners(rsae);
         eaHelper.notifyEventAdmin(rsae);
@@ -106,7 +108,8 @@ public class EventProducer {
     
     public void notifyRemoval(ImportRegistration eri) {
         RemoteServiceAdminEvent rsae = null;
-        rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION, bctx.getBundle(), eri.getImportReference(), eri.getException());
+        rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION, bctx.getBundle(),
+                                           eri.getImportReference(), eri.getException());
         
         notifyListeners(rsae);
         eaHelper.notifyEventAdmin(rsae);

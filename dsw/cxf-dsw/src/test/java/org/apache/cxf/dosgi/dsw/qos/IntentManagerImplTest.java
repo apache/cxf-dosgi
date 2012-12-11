@@ -36,11 +36,8 @@ import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
-
-public class IntentManagerImplTest {
+public class IntentManagerImplTest extends Assert {
     
     @Test
     public void testIntents() throws Exception {
@@ -58,7 +55,6 @@ public class IntentManagerImplTest {
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "A");
-        //ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
 
         List<String> effectiveIntents = Arrays.asList(intentManager.applyIntents(features, factory, props));
         assertEquals(Arrays.asList("A", "SOAP"), effectiveIntents);
@@ -79,7 +75,6 @@ public class IntentManagerImplTest {
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "transactionality confidentiality.message");
-        //ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
 
         List<String> effectiveIntents = Arrays.asList(intentManager.applyIntents(features, factory, props));
         assertTrue(effectiveIntents.contains("transactionality"));        
@@ -233,7 +228,6 @@ public class IntentManagerImplTest {
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", requestedIntents);
-        //ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
         
         IntentManagerImpl intentManager = new IntentManagerImpl(intentMap);
         intentManager.applyIntents(features, factory, props);
@@ -260,7 +254,6 @@ public class IntentManagerImplTest {
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "B A");
-        //ServiceEndpointDescription sd = new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
         
         IntentManager intentManager = new IntentManagerImpl(intentMap);
         

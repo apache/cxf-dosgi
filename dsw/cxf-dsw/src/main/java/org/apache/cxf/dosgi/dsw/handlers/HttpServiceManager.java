@@ -97,9 +97,9 @@ public class HttpServiceManager {
                 Constants.RS_HTTP_SERVICE_CONTEXT);
     }
 
-    private HttpContext getHttpContext(BundleContext bundleContext, HttpService httpService) {
+    private HttpContext getHttpContext(BundleContext bc, HttpService httpService) {
         HttpContext httpContext = httpService.createDefaultHttpContext();
-        return new SecurityDelegatingHttpContext(bundleContext, httpContext);
+        return new SecurityDelegatingHttpContext(bc, httpContext);
     }
     
     /**
@@ -158,7 +158,8 @@ public class HttpServiceManager {
             final String alias = exportedAliases.remove(sid);
             if (alias == null) {
                 LOG.error(
-                        "Unable to unexport HTTP servlet for service class ''{0}'', service-id {1}: no servlet alias found",
+                        "Unable to unexport HTTP servlet for service class ''{0}'',"
+                        + " service-id {1}: no servlet alias found",
                         new Object[] {sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid});
                 return;
             }

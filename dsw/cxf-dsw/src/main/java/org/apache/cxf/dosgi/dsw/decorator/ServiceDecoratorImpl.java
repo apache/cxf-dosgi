@@ -42,9 +42,9 @@ import org.slf4j.LoggerFactory;
 public class ServiceDecoratorImpl implements ServiceDecorator {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceDecoratorImpl.class);
     
+    final List<Rule> decorations = new CopyOnWriteArrayList<Rule>();
     private final BundleContext bundleContext;
     private final BundleListenerImpl bundleListener;
-    final List<Rule> decorations = new CopyOnWriteArrayList<Rule>();
 
     public ServiceDecoratorImpl(BundleContext bc) {
         bundleContext = bc;
@@ -72,7 +72,9 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
                     m.addPropMatch(propMatch.getAttributeValue("name"), propMatch.getAttributeValue("value"));
                 }
                 for (Element addProp : (List<Element>) match.getChildren("add-property", ns)) {
-                    m.addProperty(addProp.getAttributeValue("name"), addProp.getAttributeValue("value"), addProp.getAttributeValue("type", String.class.getName()));
+                    m.addProperty(addProp.getAttributeValue("name"), 
+                                  addProp.getAttributeValue("value"),
+                                  addProp.getAttributeValue("type", String.class.getName()));
                 }
                 decorations.add(m);
             }
@@ -118,6 +120,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
             case BundleEvent.STOPPING:
                 removeDecorations(be.getBundle());
                 break;
+            default:
             }
         }        
     }
