@@ -105,7 +105,6 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed3.getInterfaces());
     }
 
-    @SuppressWarnings("unchecked")
     public void testAllEndpoints2() throws Exception {
         URL ed2URL = getClass().getResource("/ed2.xml");
 
@@ -132,7 +131,8 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         // exports should have been removed
         assertNull(props.get("service.exported.configs"));
 
-        assertEquals(normXML("<other:t1 xmlns:other='http://www.acme.org/xmlns/other/v1.0.0' xmlns='http://www.acme.org/xmlns/other/v1.0.0'><foo type='bar'>haha</foo></other:t1>"),
+        assertEquals(normXML("<other:t1 xmlns:other='http://www.acme.org/xmlns/other/v1.0.0' "
+                             + "xmlns='http://www.acme.org/xmlns/other/v1.0.0'><foo type='bar'>haha</foo></other:t1>"),
             normXML((String) props.get("someXML")));
 
         assertEquals(Long.MAX_VALUE, props.get("long"));
@@ -145,8 +145,8 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals(new Integer(42), props.get("Integer2"));
         assertEquals(new Byte((byte) 127), props.get("byte"));
         assertEquals(new Byte((byte) -128), props.get("Byte2"));
-        assertEquals(new Boolean(true), props.get("boolean"));
-        assertEquals(new Boolean(true), props.get("Boolean2"));
+        assertEquals(Boolean.TRUE, props.get("boolean"));
+        assertEquals(Boolean.TRUE, props.get("Boolean2"));
         assertEquals(new Short((short) 99), props.get("short"));
         assertEquals(new Short((short) -99), props.get("Short2"));
         assertEquals(new Character('@'), props.get("char"));
@@ -166,7 +166,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals(stringSet, props.get("string-set"));
         assertEquals("Hello", props.get("other1").toString().trim());
 
-        List l = (List) props.get("other2");
+        List<?> l = (List<?>) props.get("other2");
         assertEquals(1, l.size());
         assertEquals(normXML("<other:t2 xmlns:other='http://www.acme.org/xmlns/other/v1.0.0'/>"),
             normXML((String) l.get(0)));
@@ -218,9 +218,8 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals("5", ed1.getProperties().get("blah"));
     }
 
-    @SuppressWarnings("unchecked")
     public void testCreateXML() throws Exception {
-        Map m = new LinkedHashMap();
+        Map<String, Object> m = new LinkedHashMap<String, Object>();
         m.put("service.imported.configs", "org.apache.cxf.ws");
         m.put("endpoint.id", "foo:bar");
         m.put("objectClass", new String [] {"com.acme.HelloService", "some.other.Service"});
@@ -246,9 +245,9 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         boolList.add(true);
         boolList.add(false);
         m.put("bool-list", boolList);
-        m.put("empty-set", new HashSet());
+        m.put("empty-set", new HashSet<Object>());
 
-        Set<String> stringSet= new LinkedHashSet<String>();
+        Set<String> stringSet = new LinkedHashSet<String>();
         stringSet.add("Hello there");
         stringSet.add("How are you?");
         m.put("string-set", stringSet);
@@ -256,11 +255,11 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         int[] intArray = new int[] {1, 2};
         m.put("int-array", intArray);
 
-        String xml = "<xml>" + LF +
-                "<t1 xmlns=\"http://www.acme.org/xmlns/other/v1.0.0\">" + LF +
-                    "<foo type='bar'>haha</foo>" + LF +
-                "</t1>" + LF +
-            "</xml>";
+        String xml = "<xml>" + LF 
+            + "<t1 xmlns=\"http://www.acme.org/xmlns/other/v1.0.0\">" + LF 
+            +     "<foo type='bar'>haha</foo>" + LF
+            + "</t1>" + LF
+            + "</xml>";
         m.put("someXML", xml);
 
         String actual = LocalDiscoveryUtils.getEndpointDescriptionXML(m);

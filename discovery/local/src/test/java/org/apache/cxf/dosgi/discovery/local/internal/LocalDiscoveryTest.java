@@ -1,21 +1,21 @@
-/** 
-  * Licensed to the Apache Software Foundation (ASF) under one 
-  * or more contributor license agreements. See the NOTICE file 
-  * distributed with this work for additional information 
-  * regarding copyright ownership. The ASF licenses this file 
-  * to you under the Apache License, Version 2.0 (the 
-  * "License"); you may not use this file except in compliance 
-  * with the License. You may obtain a copy of the License at 
-  * 
-  * http://www.apache.org/licenses/LICENSE-2.0 
-  * 
-  * Unless required by applicable law or agreed to in writing, 
-  * software distributed under the License is distributed on an 
-  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
-  * KIND, either express or implied. See the License for the 
-  * specific language governing permissions and limitations 
-  * under the License. 
-  */
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.dosgi.discovery.local.internal;
 
 import java.net.URL;
@@ -33,7 +33,6 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.dosgi.discovery.local.internal.LocalDiscovery;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.osgi.framework.Bundle;
@@ -54,11 +53,13 @@ public class LocalDiscoveryTest extends TestCase {
         EasyMock.replay(filter);
         
         BundleContext bc = EasyMock.createMock(BundleContext.class);
-        EasyMock.expect(bc.createFilter("(objectClass=org.osgi.service.remoteserviceadmin.EndpointListener)")).andReturn(filter);
+        EasyMock.expect(bc.createFilter("(objectClass=org.osgi.service.remoteserviceadmin.EndpointListener)"))
+            .andReturn(filter);
         bc.addServiceListener((ServiceListener) EasyMock.anyObject(), 
             EasyMock.eq("(objectClass=org.osgi.service.remoteserviceadmin.EndpointListener)"));
         EasyMock.expectLastCall();
-        EasyMock.expect(bc.getServiceReferences("org.osgi.service.remoteserviceadmin.EndpointListener", null)).andReturn(null);
+        EasyMock.expect(bc.getServiceReferences("org.osgi.service.remoteserviceadmin.EndpointListener", null))
+            .andReturn(null);
         bc.addBundleListener((BundleListener) EasyMock.anyObject());
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {            
             public Object answer() throws Throwable {
@@ -91,11 +92,13 @@ public class LocalDiscoveryTest extends TestCase {
         EasyMock.replay(filter);
         
         BundleContext bc = EasyMock.createMock(BundleContext.class);
-        EasyMock.expect(bc.createFilter("(objectClass=org.osgi.service.remoteserviceadmin.EndpointListener)")).andReturn(filter);
+        EasyMock.expect(bc.createFilter("(objectClass=org.osgi.service.remoteserviceadmin.EndpointListener)"))
+            .andReturn(filter);
         bc.addServiceListener((ServiceListener) EasyMock.anyObject(), 
             EasyMock.eq("(objectClass=org.osgi.service.remoteserviceadmin.EndpointListener)"));
         EasyMock.expectLastCall();
-        EasyMock.expect(bc.getServiceReferences("org.osgi.service.remoteserviceadmin.EndpointListener", null)).andReturn(null);
+        EasyMock.expect(bc.getServiceReferences("org.osgi.service.remoteserviceadmin.EndpointListener", null))
+            .andReturn(null);
         bc.addBundleListener((BundleListener) EasyMock.anyObject());
         EasyMock.expectLastCall();
         
@@ -150,7 +153,7 @@ public class LocalDiscoveryTest extends TestCase {
         assertEquals(0, ld.endpointDescriptions.size());
         
         // Create an EndpointListener
-        final Hashtable<String, Object> props = new Hashtable<String, Object>();
+        final Map<String, Object> props = new Hashtable<String, Object>();
         props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(objectClass=*)");
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sr.getPropertyKeys()).andReturn(props.keySet().toArray(new String [] {})).anyTimes();
@@ -207,7 +210,7 @@ public class LocalDiscoveryTest extends TestCase {
         ld.bundleChanged(be);
         assertEquals(2, ld.endpointDescriptions.size());        
 
-        final Hashtable<String, Object> props = new Hashtable<String, Object>();
+        final Map<String, Object> props = new Hashtable<String, Object>();
         props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, new String [] {"(objectClass=org.example.ClassA)"});
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sr.getPropertyKeys()).andReturn(props.keySet().toArray(new String [] {})).anyTimes();
@@ -249,7 +252,8 @@ public class LocalDiscoveryTest extends TestCase {
         
         // Modify the EndpointListener Service
         // no need to reset the mock for this...
-        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(|(objectClass=org.example.ClassA)(objectClass=org.example.ClassB))");
+        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE,
+                  "(|(objectClass=org.example.ClassA)(objectClass=org.example.ClassB))");
         
         EasyMock.reset(el);
         final Set<String> actualEndpoints = new HashSet<String>();
@@ -289,7 +293,7 @@ public class LocalDiscoveryTest extends TestCase {
     public void testRegisterTracker() throws Exception {
         LocalDiscovery ld = getLocalDiscovery();
 
-        final Hashtable<String, Object> props = new Hashtable<String, Object>();
+        final Map<String, Object> props = new Hashtable<String, Object>();
         props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, "(objectClass=Aaaa)");
         ServiceReference sr = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sr.getPropertyKeys()).andReturn(props.keySet().toArray(new String [] {})).anyTimes();
@@ -334,8 +338,8 @@ public class LocalDiscoveryTest extends TestCase {
         assertEquals(Arrays.asList(el, el2), ld.filterToListeners.get("(objectClass=Aaaa)"));
         
         // Add another listener with a multi-value scope
-        final Hashtable<String, Object> props2 = new Hashtable<String, Object>();
-        props2.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, Arrays.asList("(objectClass=X)","(objectClass=Y)"));
+        final Map<String, Object> props2 = new Hashtable<String, Object>();
+        props2.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, Arrays.asList("(objectClass=X)", "(objectClass=Y)"));
         ServiceReference sr3 = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sr3.getPropertyKeys()).andReturn(props2.keySet().toArray(new String [] {})).anyTimes();
         EasyMock.expect(sr3.getProperty((String) EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
@@ -352,7 +356,7 @@ public class LocalDiscoveryTest extends TestCase {
         assertEquals(3, ld.listenerToFilters.size());
         assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(el));
         assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(el2));
-        assertEquals(Arrays.asList("(objectClass=X)","(objectClass=Y)"), ld.listenerToFilters.get(el3));
+        assertEquals(Arrays.asList("(objectClass=X)", "(objectClass=Y)"), ld.listenerToFilters.get(el3));
 
         assertEquals(3, ld.filterToListeners.size());
         assertEquals(Arrays.asList(el, el2), ld.filterToListeners.get("(objectClass=Aaaa)"));
@@ -393,13 +397,13 @@ public class LocalDiscoveryTest extends TestCase {
         bc.addServiceListener((ServiceListener) EasyMock.anyObject(), 
             EasyMock.eq("(objectClass=org.osgi.service.remoteserviceadmin.EndpointListener)"));
         EasyMock.expectLastCall();
-        EasyMock.expect(bc.getServiceReferences("org.osgi.service.remoteserviceadmin.EndpointListener", null)).andReturn(null);
+        EasyMock.expect(bc.getServiceReferences("org.osgi.service.remoteserviceadmin.EndpointListener", null))
+            .andReturn(null);
         bc.addBundleListener((BundleListener) EasyMock.anyObject());
         EasyMock.expectLastCall();
         EasyMock.expect(bc.getBundles()).andReturn(null);
         EasyMock.replay(bc);
                 
-        LocalDiscovery ld = new LocalDiscovery(bc);
-        return ld;
+        return new LocalDiscovery(bc);
     }    
 }

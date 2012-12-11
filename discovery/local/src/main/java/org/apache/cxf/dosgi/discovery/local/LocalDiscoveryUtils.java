@@ -1,21 +1,21 @@
 /**
-  * Licensed to the Apache Software Foundation (ASF) under one
-  * or more contributor license agreements. See the NOTICE file
-  * distributed with this work for additional information
-  * regarding copyright ownership. The ASF licenses this file
-  * to you under the Apache License, Version 2.0 (the
-  * "License"); you may not use this file except in compliance
-  * with the License. You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing,
-  * software distributed under the License is distributed on an
-  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  * KIND, either express or implied. See the License for the
-  * specific language governing permissions and limitations
-  * under the License.
-  */
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.dosgi.discovery.local;
 
 import java.io.IOException;
@@ -77,9 +77,8 @@ public final class LocalDiscoveryUtils {
 
     private static final String INTERFACE_SEPARATOR = ":";
 
-    static boolean addEndpointID = true; // for testing
-
-    private LocalDiscoveryUtils() {}
+    private LocalDiscoveryUtils() {
+    }
 
     public static List<EndpointDescription> getAllEndpointDescriptions(Bundle b) {
         List<Element> elements = getAllDescriptionElements(b);
@@ -153,7 +152,7 @@ public final class LocalDiscoveryUtils {
         }
         remoteProps.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, exportedConfigs);
 
-        for(Iterator<String> it = remoteProps.keySet().iterator(); it.hasNext(); ) {
+        for (Iterator<String> it = remoteProps.keySet().iterator(); it.hasNext();) {
             if (it.next().startsWith("service.exported.")) {
                 it.remove();
             }
@@ -203,7 +202,7 @@ public final class LocalDiscoveryUtils {
             }
             Object array = Array.newInstance(cls, values.size());
 
-            for (int i=0; i < values.size(); i++) {
+            for (int i = 0; i < values.size(); i++) {
                 Element vEl = values.get(i);
                 Object val = handleValue(vEl, type);
                 Array.set(array, i, val);
@@ -322,7 +321,7 @@ public final class LocalDiscoveryUtils {
         String javaType = "java.lang." + boxedType;
 
         try {
-            if (boxedType.equals("Character")) {
+            if ("Character".equals(boxedType)) {
                 return new Character(value.charAt(0));
             } else {
                 Class<?> cls = ClassLoader.getSystemClassLoader().loadClass(javaType);
@@ -335,11 +334,10 @@ public final class LocalDiscoveryUtils {
         }
     }
 
-    @SuppressWarnings("unchecked")
     static List<Element> getAllDescriptionElements(Bundle b) {
         Object header = null;
 
-        Dictionary headers = b.getHeaders();
+        Dictionary<?, ?> headers = b.getHeaders();
         if (headers != null) {
             header = headers.get(REMOTE_SERVICES_HEADER_NAME);
         }
@@ -351,7 +349,7 @@ public final class LocalDiscoveryUtils {
         String dir = header.toString();
         String filePattern = "*.xml";
         if (dir.endsWith("/")) {
-            dir = dir.substring(0, dir.length()-1);
+            dir = dir.substring(0, dir.length() - 1);
         } else {
             int idx = dir.lastIndexOf('/');
             if (idx >= 0 & dir.length() > idx) {
@@ -363,7 +361,7 @@ public final class LocalDiscoveryUtils {
             }
         }
 
-        Enumeration urls = b.findEntries(dir, filePattern, false);
+        Enumeration<?> urls = b.findEntries(dir, filePattern, false);
         if (urls == null) {
             return Collections.emptyList();
         }
@@ -451,8 +449,7 @@ public final class LocalDiscoveryUtils {
         return Collections.emptyList();
     }
 
-    @SuppressWarnings("unchecked")
-    public static String getEndpointDescriptionXML(Map m) {
+    public static String getEndpointDescriptionXML(Map<String, Object> m) {
         Document d = new Document();
         Namespace ns = Namespace.getNamespace("http://www.osgi.org/xmlns/rsa/v1.0.0");
         Element rootEl = new Element("endpoint-descriptions", ns);
@@ -460,7 +457,7 @@ public final class LocalDiscoveryUtils {
         Element contentEl = new Element("endpoint-description", ns);
         rootEl.addContent(contentEl);
 
-        for (Map.Entry entry : (Set<Map.Entry>) m.entrySet()) {
+        for (Map.Entry<String, Object> entry : m.entrySet()) {
             String key = entry.getKey().toString();
             Object val = entry.getValue();
 
@@ -478,20 +475,23 @@ public final class LocalDiscoveryUtils {
             } else if (val instanceof List) {
                 Element listEl = new Element("list", ns);
                 propEl.addContent(listEl);
-                handleCollectionValue(ns, (Collection) val, propEl, listEl);
+                handleCollectionValue(ns, (Collection<?>) val, propEl, listEl);
             } else if (val instanceof Set) {
                 Element setEl = new Element("set", ns);
                 propEl.addContent(setEl);
-                handleCollectionValue(ns, (Collection) val, propEl, setEl);
+                handleCollectionValue(ns, (Collection<?>) val, propEl, setEl);
             } else if (val instanceof String
-                    || val instanceof Long
+                    || val instanceof Character
+                    || val instanceof Boolean
+                    || val instanceof Byte) {
+                setValueType(propEl, val);
+                propEl.setAttribute("value", val.toString());
+            } else if (val instanceof Long
                     || val instanceof Double
                     || val instanceof Float
                     || val instanceof Integer
-                    || val instanceof Byte
-                    || val instanceof Character
-                    || val instanceof Boolean
                     || val instanceof Short) {
+                //various numbers..   maybe "val instanceof Number"?
                 setValueType(propEl, val);
                 propEl.setAttribute("value", val.toString());
             } else {
@@ -504,9 +504,8 @@ public final class LocalDiscoveryUtils {
         return new XMLOutputter(Format.getPrettyFormat()).outputString(d);
     }
 
-    @SuppressWarnings("unchecked")
     private static Object [] normalizeArray(Object val) {
-        List l = new ArrayList();
+        List<Object> l = new ArrayList<Object>();
         if (val instanceof int[]) {
             int[] ia = (int []) val;
             for (int i : ia) {
@@ -548,8 +547,7 @@ public final class LocalDiscoveryUtils {
         return l.toArray();
     }
 
-    @SuppressWarnings("unchecked")
-    private static void handleCollectionValue(Namespace ns, Collection val, Element propEl, Element listEl) {
+    private static void handleCollectionValue(Namespace ns, Collection<?> val, Element propEl, Element listEl) {
         for (Object o : val) {
             setValueType(propEl, o);
             Element valueEl = new Element("value", ns);
@@ -570,6 +568,7 @@ public final class LocalDiscoveryUtils {
         propEl.setAttribute("value-type", dataType);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Element> getElements(InputStream in) throws JDOMException, IOException {
 
         List<Element> elements = new ArrayList<Element>();
@@ -577,7 +576,7 @@ public final class LocalDiscoveryUtils {
         Document d = new SAXBuilder().build(in);
         if (d.getRootElement().getNamespaceURI().equals(REMOTE_SERVICES_ADMIN_NS)) {
             elements.addAll(d.getRootElement().getChildren(ENDPOINT_DESCRIPTION_ELEMENT,
-                    Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS)));
+                                                           Namespace.getNamespace(REMOTE_SERVICES_ADMIN_NS)));
         }
 
         Namespace nsOld = Namespace.getNamespace(REMOTE_SERVICES_NS);
