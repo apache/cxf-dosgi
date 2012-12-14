@@ -1,82 +1,77 @@
-/* 
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
+ * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
+ * regarding copyright ownership. The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * with the License. You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
+ * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
 package org.apache.felix.shell.tui;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.apache.felix.shell.ShellService;
-import org.osgi.framework.*;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
+import org.osgi.framework.ServiceReference;
 
-public class Activator implements BundleActivator
-{
+public class Activator implements BundleActivator {
     private static final String RUN_CMD = "run ";
 
-    private BundleContext m_context = null;
-    private ShellTuiRunnable m_runnable = null;
-    private Thread m_thread = null;
-    private ServiceReference m_shellRef = null;
-    private ShellService m_shell = null;
+    private BundleContext context;
+    private ShellTuiRunnable shellRunnable;
+    private Thread thread;
+    private ServiceReference shellRef;
+    private ShellService shell;
 
-    public void start(BundleContext context)
-    {
-        m_context = context;
+    public void start(BundleContext bcontext) {
+        context = bcontext;
 
         // Listen for registering/unregistering impl service.
         ServiceListener sl = new ServiceListener() {
-            public void serviceChanged(ServiceEvent event)
-            {
-                synchronized (Activator.this)
-                {
+            public void serviceChanged(ServiceEvent event) {
+                synchronized (Activator.this) {
                     // Ignore additional services if we already have one.
-                    if ((event.getType() == ServiceEvent.REGISTERED)
-                        && (m_shellRef != null))
-                    {
+                    if (event.getType() == ServiceEvent.REGISTERED && shellRef != null) {
                         return;
-                    }
-                    // Initialize the service if we don't have one.
-                    else if ((event.getType() == ServiceEvent.REGISTERED)
-                        && (m_shellRef == null))
-                    {
+                    } else if (event.getType() == ServiceEvent.REGISTERED && shellRef == null) {
+                        // Initialize the service if we don't have one.
                         initializeService();
-                    }
-                    // Unget the service if it is unregistering.
-                    else if ((event.getType() == ServiceEvent.UNREGISTERING)
-                        && event.getServiceReference().equals(m_shellRef))
-                    {
-                        m_context.ungetService(m_shellRef);
-                        m_shellRef = null;
-                        m_shell = null;
+                    } else if (event.getType() == ServiceEvent.UNREGISTERING
+                        && event.getServiceReference().equals(shellRef)) {
+                        
+                        // Unget the service if it is unregistering.
+                        context.ungetService(shellRef);
+                        shellRef = null;
+                        shell = null;
                         // Try to get another service.
                         initializeService();
                     }
                 }
             }
         };
-        try
-        {
-            m_context.addServiceListener(sl,
-                "(objectClass="
-                + org.apache.felix.shell.ShellService.class.getName()
-                + ")");
-        }
-        catch (InvalidSyntaxException ex)
-        {
+        try {
+            context.addServiceListener(sl,
+                                         "(objectClass="
+                                             + org.apache.felix.shell.ShellService.class.getName() + ")");
+        } catch (InvalidSyntaxException ex) {
             System.err.println("ShellTui: Cannot add service listener.");
             System.err.println("ShellTui: " + ex);
         }
@@ -86,115 +81,90 @@ public class Activator implements BundleActivator
         initializeService();
 
         // Start impl thread.
-        m_thread = new Thread(
-            m_runnable = new ShellTuiRunnable(),
-            "Felix Shell TUI");
-        m_thread.start();
+        shellRunnable = new ShellTuiRunnable();
+        thread = new Thread(shellRunnable, "Felix Shell TUI");
+        thread.start();
     }
 
-    private synchronized void initializeService()
-    {
-        if (m_shell != null)
-        {
+    private synchronized void initializeService() {
+        if (shell != null) {
             return;
         }
-        m_shellRef = m_context.getServiceReference(
-            org.apache.felix.shell.ShellService.class.getName());
-        if (m_shellRef == null)
-        {
+        shellRef = context.getServiceReference(org.apache.felix.shell.ShellService.class.getName());
+        if (shellRef == null) {
             return;
         }
-        m_shell = (ShellService) m_context.getService(m_shellRef);
+        shell = (ShellService)context.getService(shellRef);
     }
 
-    public void stop(BundleContext context)
-    {
-        if (m_runnable != null)
-        {
-            m_runnable.stop();
-            m_thread.interrupt();
+    public void stop(BundleContext bcontext) {
+        if (shellRunnable != null) {
+            shellRunnable.stop();
+            thread.interrupt();
         }
     }
 
-    private class ShellTuiRunnable implements Runnable
-    {
-        private boolean stop = false;
+    private class ShellTuiRunnable implements Runnable {
+        private boolean stop;
 
-        public void stop()
-        {
+        public void stop() {
             stop = true;
         }
 
-        public void run()
-        {
+        public void run() {
             String line = null;
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-            while (!stop)
-            {
+            while (!stop) {
                 System.out.print("-> ");
 
-                try
-                {
+                try {
                     line = in.readLine();
-                }
-                catch (IOException ex)
-                {
+                } catch (IOException ex) {
                     System.err.println("Could not read input, please try again.");
                     continue;
                 }
 
-                synchronized (Activator.this)
-                {
-                    if (m_shell == null)
-                    {
+                synchronized (Activator.this) {
+                    if (shell == null) {
                         System.out.println("No impl service available.");
                         continue;
                     }
 
-                    if (line == null)
-                    {
+                    if (line == null) {
                         continue;
                     }
 
                     line = line.trim();
 
-                    if (line.length() == 0)
-                    {
+                    if (line.length() == 0) {
                         continue;
                     }
 
-                    try
-                    {
+                    try {
                         if (line.startsWith(RUN_CMD)) {
-                            String path = 
-                                line.substring(RUN_CMD.length()).trim();
+                            String path = line.substring(RUN_CMD.length()).trim();
                             System.out.println("loading commands from: " + path);
                             File commands = new File(path);
                             if (commands.exists()) {
-                                BufferedReader reader = 
-                                    new BufferedReader(new FileReader(commands));
-                                String command = reader.readLine().trim(); 
+                                BufferedReader reader = new BufferedReader(new FileReader(commands));
+                                String command = reader.readLine().trim();
                                 while (command != null) {
                                     if (command.length() > 0) {
-                                        System.out.println("\nexecuting: " 
-                                                           + command);
-                                        m_shell.executeCommand(command.trim(), 
-                                                               System.out,
-                                                               System.err);
+                                        System.out.println("\nexecuting: " + command);
+                                        shell.executeCommand(command.trim(), System.out, System.err);
                                     }
                                     command = reader.readLine();
                                 }
+                                reader.close();
                             } else {
                                 System.err.println(path + " not found");
                             }
                         } else {
-                            m_shell.executeCommand(line, System.out, System.err);
+                            shell.executeCommand(line, System.out, System.err);
                         }
 
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         System.err.println("ShellTui: " + ex);
                         ex.printStackTrace();
                     }
