@@ -1,25 +1,26 @@
-/** 
- * Licensed to the Apache Software Foundation (ASF) under one 
- * or more contributor license agreements. See the NOTICE file 
- * distributed with this work for additional information 
- * regarding copyright ownership. The ASF licenses this file 
- * to you under the Apache License, Version 2.0 (the 
- * "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, 
- * software distributed under the License is distributed on an 
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
- * KIND, either express or implied. See the License for the 
- * specific language governing permissions and limitations 
- * under the License. 
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.dosgi.systests2.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.apache.cxf.dosgi.systests2.common.test2.Test2Service;
@@ -63,7 +64,7 @@ public abstract class AbstractTestDiscoveryRoundtrip {
     protected void updateZkClientConfig(final int zkPort, ConfigurationAdmin cadmin) throws IOException {
         org.osgi.service.cm.Configuration zkClientCfg = 
             cadmin.getConfiguration("org.apache.cxf.dosgi.discovery.zookeeper", null);
-        Hashtable<String, Object> cliProps = new Hashtable<String, Object>();
+        Dictionary<String, Object> cliProps = new Hashtable<String, Object>();
         cliProps.put("zookeeper.host", "127.0.0.1");
         cliProps.put("zookeeper.port", "" + zkPort);
         zkClientCfg.update(cliProps);
@@ -72,14 +73,14 @@ public abstract class AbstractTestDiscoveryRoundtrip {
     protected void updateZkServerConfig(final int zkPort, ConfigurationAdmin cadmin) throws IOException {
         org.osgi.service.cm.Configuration zkServerCfg = 
             cadmin.getConfiguration("org.apache.cxf.dosgi.discovery.zookeeper.server", null);
-        Hashtable<String, Object> svrProps = new Hashtable<String, Object>();
+        Dictionary<String, Object> svrProps = new Hashtable<String, Object>();
         svrProps.put("clientPort", zkPort);
         zkServerCfg.update(svrProps);
     }            
     
     protected ServiceReference waitService(BundleContext bc, Class<?> cls, String filter) throws Exception {        
         ServiceReference[] refs = null;
-        for (int i=0; i < 60; i++) {
+        for (int i = 0; i < 60; i++) {
             refs = bc.getServiceReferences(cls.getName(), filter);
             if (refs != null && refs.length > 0) {
                 return refs[0];
