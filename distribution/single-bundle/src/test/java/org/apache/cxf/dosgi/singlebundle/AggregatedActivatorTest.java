@@ -1,20 +1,20 @@
-/** 
- * Licensed to the Apache Software Foundation (ASF) under one 
- * or more contributor license agreements. See the NOTICE file 
- * distributed with this work for additional information 
- * regarding copyright ownership. The ASF licenses this file 
- * to you under the Apache License, Version 2.0 (the 
- * "License"); you may not use this file except in compliance 
- * with the License. You may obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, 
- * software distributed under the License is distributed on an 
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
- * KIND, either express or implied. See the License for the 
- * specific language governing permissions and limitations 
- * under the License. 
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.cxf.dosgi.singlebundle;
 
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -31,17 +32,17 @@ import org.easymock.EasyMock;
 import org.osgi.framework.BundleContext;
 
 public class AggregatedActivatorTest extends TestCase {
-    private HashMap<Object, Object> savedProps;
+    private Map<Object, Object> savedProps;
     private String oldDefaultPort;
 
     @Override
     protected void setUp() throws Exception {
-        oldDefaultPort = AggregatedActivator.DEFAULT_HTTP_PORT;
+        oldDefaultPort = AggregatedActivator.defaultHttpPort;
         // Change the default port to one that we know is available
         ServerSocket s = new ServerSocket(0);
         int availablePort = s.getLocalPort();
         s.close();
-        AggregatedActivator.DEFAULT_HTTP_PORT = "" + availablePort;        
+        AggregatedActivator.defaultHttpPort = "" + availablePort;        
         
         savedProps = new HashMap<Object, Object>(System.getProperties());
         super.setUp();
@@ -54,7 +55,7 @@ public class AggregatedActivatorTest extends TestCase {
         props.putAll(savedProps);
         System.setProperties(props);
         
-        AggregatedActivator.DEFAULT_HTTP_PORT = oldDefaultPort;
+        AggregatedActivator.defaultHttpPort = oldDefaultPort;
     }
 
     public void testReadResourcesFile() throws Exception {        
@@ -68,8 +69,7 @@ public class AggregatedActivatorTest extends TestCase {
             "org.apache.cxf.dosgi.topologymanager.Activator",
             "org.springframework.osgi.extender.internal.activator.ContextLoaderListener"};
         
-        AggregatedActivator aa = new AggregatedActivator();
-        assertEquals(Arrays.asList(expected), aa.getActivators());
+        assertEquals(Arrays.asList(expected), AggregatedActivator.getActivators());
     }
     
     public void testDefaultHttpServicePort() {
@@ -78,7 +78,7 @@ public class AggregatedActivatorTest extends TestCase {
         
         assertNull("Precondition failed", System.getProperty(AggregatedActivator.HTTP_PORT_PROPERTY));
         new AggregatedActivator().setHttpServicePort(bc);
-        assertEquals(AggregatedActivator.DEFAULT_HTTP_PORT, System.getProperty(AggregatedActivator.HTTP_PORT_PROPERTY));
+        assertEquals(AggregatedActivator.defaultHttpPort, System.getProperty(AggregatedActivator.HTTP_PORT_PROPERTY));
     }
     
     public void testHttpServicePortFromProperty() {
@@ -87,7 +87,7 @@ public class AggregatedActivatorTest extends TestCase {
             andReturn("1234").anyTimes();
         EasyMock.replay(bc);
 
-        HashMap<Object, Object> before = new HashMap<Object, Object>(System.getProperties());
+        Map<Object, Object> before = new HashMap<Object, Object>(System.getProperties());
         new AggregatedActivator().setHttpServicePort(bc);
         assertEquals("No additional properties should have been set",
                 before, new HashMap<Object, Object>(System.getProperties()));
@@ -101,7 +101,7 @@ public class AggregatedActivatorTest extends TestCase {
             andReturn("true").anyTimes();
         EasyMock.replay(bc);
 
-        HashMap<Object, Object> before = new HashMap<Object, Object>(System.getProperties());
+        Map<Object, Object> before = new HashMap<Object, Object>(System.getProperties());
         new AggregatedActivator().setHttpServicePort(bc);
         assertEquals("No additional properties should have been set",
                 before, new HashMap<Object, Object>(System.getProperties()));        
@@ -116,7 +116,7 @@ public class AggregatedActivatorTest extends TestCase {
             try {
                 // now lets block the default port
                 s = new ServerSocket(Integer.parseInt(
-                        AggregatedActivator.DEFAULT_HTTP_PORT));
+                        AggregatedActivator.defaultHttpPort));
             } catch (Exception e) {
                 // if someone else already has it, thats fine too
             }

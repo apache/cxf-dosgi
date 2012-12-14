@@ -1,21 +1,21 @@
-/** 
-  * Licensed to the Apache Software Foundation (ASF) under one 
-  * or more contributor license agreements. See the NOTICE file 
-  * distributed with this work for additional information 
-  * regarding copyright ownership. The ASF licenses this file 
-  * to you under the Apache License, Version 2.0 (the 
-  * "License"); you may not use this file except in compliance 
-  * with the License. You may obtain a copy of the License at 
-  * 
-  * http://www.apache.org/licenses/LICENSE-2.0 
-  * 
-  * Unless required by applicable law or agreed to in writing, 
-  * software distributed under the License is distributed on an 
-  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
-  * KIND, either express or implied. See the License for the 
-  * specific language governing permissions and limitations 
-  * under the License. 
-  */
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.dosgi.singlebundle;
 
 import java.io.BufferedReader;
@@ -34,14 +34,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AggregatedActivator implements BundleActivator {
-    private static final Logger LOG = LoggerFactory.getLogger(AggregatedActivator.class);
-    
     static final String HTTP_PORT_PROPERTY = "org.osgi.service.http.port";
     static final String HTTPS_PORT_PROPERTY = "org.osgi.service.http.port.secure";
     static final String HTTPS_ENABLED_PROPERTY = "org.osgi.service.http.secure.enabled";
     static final String ACTIVATOR_RESOURCE = "activators.list";
+    static String defaultHttpPort = "8080";
 
-    static String DEFAULT_HTTP_PORT = "8080";
+    private static final Logger LOG = LoggerFactory.getLogger(AggregatedActivator.class);
+
+    
     
     private List<BundleActivator> activators = new ArrayList<BundleActivator>(); 
 
@@ -65,9 +66,9 @@ public class AggregatedActivator implements BundleActivator {
         }
         
         if (port == null || port.length() == 0) {
-            port = tryPortFree(DEFAULT_HTTP_PORT);
+            port = tryPortFree(defaultHttpPort);
             if (port == null) {
-                LOG.debug("Port {} is not available. ", DEFAULT_HTTP_PORT);
+                LOG.debug("Port {} is not available. ", defaultHttpPort);
                 port = tryPortFree("0");
             }
             LOG.info("Setting HttpService port to: " + port);
@@ -76,7 +77,8 @@ public class AggregatedActivator implements BundleActivator {
             System.setProperty(prop, port);
         } else {
             if (tryPortFree(port) == null) {
-                LOG.warn("The system is configured to use HttpService port {}. However this port is already in use.", port);
+                LOG.warn("The system is configured to use HttpService port {}. However this port is already in use.",
+                         port);
             } else {
                 LOG.info("HttpService using port: {}", port);
             }
@@ -88,8 +90,8 @@ public class AggregatedActivator implements BundleActivator {
         
         ServerSocket s = null;
         try {
-             s = new ServerSocket(p);
-             return "" + s.getLocalPort(); 
+            s = new ServerSocket(p);
+            return "" + s.getLocalPort(); 
         } catch (IOException e) {
             return null;
         } finally {
@@ -133,11 +135,11 @@ public class AggregatedActivator implements BundleActivator {
 
     void stopEmbeddedActivators(BundleContext ctx) throws Exception {
         for (BundleActivator ba : activators) {
-        	try {
+            try {
                 ba.stop(ctx);
-        	} catch (Throwable ex) {
-        		LOG.warn("BundleActivator {} can not be stopped", ba.getClass().getName());
-        	}
+            } catch (Throwable ex) {
+                LOG.warn("BundleActivator {} can not be stopped", ba.getClass().getName());
+            }
         }
     }
     
