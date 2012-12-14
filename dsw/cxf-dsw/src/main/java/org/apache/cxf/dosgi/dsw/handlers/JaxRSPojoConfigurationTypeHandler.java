@@ -54,7 +54,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
     }
 
     public String[] getSupportedTypes() {
-        return new String[] {Constants.WSDL_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
+        return new String[] {Constants.RS_CONFIG_TYPE};
     }
     
     public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
