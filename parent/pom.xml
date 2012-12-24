@@ -51,7 +51,7 @@
 
         <remote.service.admin.interfaces.version>1.0.0</remote.service.admin.interfaces.version>
 
-        <servicemix.specs.version>2.1.0</servicemix.specs.version>
+        <servicemix.specs.version>2.2.0</servicemix.specs.version>
         <pax.web.version>1.0.11</pax.web.version>
         <pax.logging.version>1.7.0</pax.logging.version>
         <servlet.version>3.0</servlet.version>
