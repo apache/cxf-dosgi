@@ -122,8 +122,10 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                     LOG.info("created server for interface " + iface);
                     EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
                     ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
-                    if (exportRegistration.getException() == null) {
+                    if (exportResult.getException() == null) {
                         exportRegistration.startServiceTracker(bctx);
+                    } else {
+                        LOG.error(exportResult.getException().getMessage(), exportResult.getException());
                     }
                     exportRegs.put(iface, exportRegistration);
                 }
