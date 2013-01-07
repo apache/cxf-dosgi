@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
-    <repository>mvn:org.apache.cxf.karaf/apache-cxf/2.7.0/xml/features</repository>
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/2.7.2-SNAPSHOT/xml/features</repository>
 
     <feature name="cxf-dosgi-core" version="${project.version}">
         <feature>cxf-specs</feature>
