@@ -41,13 +41,18 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-osgi-registry</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-annotation_1.0_spec</artifactId>
             <version>1.1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-activation_1.1_spec</artifactId>
-            <version>1.1</version>
+            <groupId>org.apache.servicemix.specs</groupId>
+            <artifactId>org.apache.servicemix.specs.activation-api-1.1</artifactId>
+            <version>2.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
@@ -376,6 +381,46 @@
     </resources>
 
     <plugins>
+    <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>features-maven-plugin</artifactId>
+        <version>2.2.7</version>
+
+        <executions>
+          <execution>
+            <id>add-features-to-repo</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-features-to-repo</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>mvn:org.apache.cxf.dosgi/cxf-dosgi/${project.version}/xml/features</descriptor>
+              </descriptors>
+              <features>
+                <feature>cxf-dosgi-discovery-distributed</feature>
+              </features>
+              <repository>target/dosgi</repository>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-features-to-repo2</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-features-to-repo</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>mvn:org.apache.cxf.dosgi/cxf-dosgi/${project.version}/xml/features</descriptor>
+              </descriptors>
+              <features>
+                <feature>cxf-dosgi-discovery-distributed</feature>
+              </features>
+              <repository>target/dosgi-discovery-zookeeper</repository>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
