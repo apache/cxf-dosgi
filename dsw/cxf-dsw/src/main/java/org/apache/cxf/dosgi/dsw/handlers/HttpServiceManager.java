@@ -23,9 +23,14 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
+import org.apache.cxf.transport.http.DestinationRegistry;
+import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -70,7 +75,14 @@ public class HttpServiceManager {
     
     public Bus registerServletAndGetBus(String contextRoot, BundleContext callingContext,
             ServiceReference sref) {
-        CXFNonSpringServlet cxf = new CXFNonSpringServlet();
+        CXFNonSpringServlet cxf = new CXFNonSpringServlet() {
+            private static final long serialVersionUID = 1L;
+            protected void loadBus(ServletConfig sc) {
+                Bus b = BusFactory.newInstance().createBus();
+                b.setExtension(new DestinationRegistryImpl(), DestinationRegistry.class);
+                this.setBus(b);
+            }
+        };
         try {
             HttpService httpService = getHttpService();
             httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), 
