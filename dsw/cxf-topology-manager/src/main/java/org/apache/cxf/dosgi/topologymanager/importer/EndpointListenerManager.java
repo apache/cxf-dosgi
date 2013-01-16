@@ -92,7 +92,9 @@ public class EndpointListenerManager {
     }
 
     private void updateRegistration() {
-        serviceRegistration.setProperties(getRegistrationProperties());
+        if (serviceRegistration != null) {
+            serviceRegistration.setProperties(getRegistrationProperties());
+        }
     }
 
 }
