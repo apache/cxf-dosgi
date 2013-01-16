@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.servlet.ServletConfig;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.dosgi.dsw.Constants;
@@ -75,14 +73,10 @@ public class HttpServiceManager {
     
     public Bus registerServletAndGetBus(String contextRoot, BundleContext callingContext,
             ServiceReference sref) {
-        CXFNonSpringServlet cxf = new CXFNonSpringServlet() {
-            private static final long serialVersionUID = 1L;
-            protected void loadBus(ServletConfig sc) {
-                Bus b = BusFactory.newInstance().createBus();
-                b.setExtension(new DestinationRegistryImpl(), DestinationRegistry.class);
-                this.setBus(b);
-            }
-        };
+        Bus bus = BusFactory.newInstance().createBus();
+        bus.setExtension(new DestinationRegistryImpl(), DestinationRegistry.class);
+        CXFNonSpringServlet cxf = new CXFNonSpringServlet();
+        cxf.setBus(bus);
         try {
             HttpService httpService = getHttpService();
             httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), 
@@ -93,7 +87,7 @@ public class HttpServiceManager {
         } catch (Exception e) {
             throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
         }
-        return cxf.getBus();
+        return bus;
     }
 
     protected HttpService getHttpService() {
