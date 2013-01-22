@@ -24,12 +24,12 @@
   <artifactId>cxf-dosgi-ri-samples-spring-dm-client</artifactId>
   <packaging>bundle</packaging>
   <name>Distributed OSGI Spring-DM Sample Client Bundle</name>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.4-SNAPSHOT</version>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-bundles-spring-dm-parent</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
   </parent>
 
   <dependencies>

@@ -24,12 +24,12 @@
     <artifactId>cxf-dosgi-ri-bundles-greeter-rest</artifactId>
     <packaging>pom</packaging>
     <name>Distributed OSGI Greeter Rest Bundles</name>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-parent</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.4-SNAPSHOT</version>
       <relativePath>../../parent/pom.xml</relativePath> 
     </parent>
 

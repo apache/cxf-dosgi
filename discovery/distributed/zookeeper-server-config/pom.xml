@@ -25,12 +25,12 @@
     <packaging>bundle</packaging>
     <name>Distributed OSGI Distributed Discovery Zookeeper Server Control Configuration Bundle</name>
     <description>This bundle provides some default OSGi Configuration Admin data and is only useful for use in the OSGi CT suite</description>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-parent</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.4-SNAPSHOT</version>
       <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
