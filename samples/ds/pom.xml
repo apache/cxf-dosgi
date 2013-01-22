@@ -23,12 +23,12 @@
     <artifactId>cxf-dosgi-ri-bundles-ds-parent</artifactId>
     <packaging>pom</packaging>
     <name>Distributed OSGI Declarative Services Sample</name>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4.0</version>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-parent</artifactId>
-      <version>1.4-SNAPSHOT</version>
+      <version>1.4.0</version>
       <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     
