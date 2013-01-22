@@ -21,14 +21,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4.0</version>
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation</name>  
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/dosgi/trunk</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/dosgi/trunk</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/dosgi/tags/cxf-dosgi-ri-1.4.0</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/dosgi/tags/cxf-dosgi-ri-1.4.0</developerConnection>
     </scm>
 
     <issueManagement>

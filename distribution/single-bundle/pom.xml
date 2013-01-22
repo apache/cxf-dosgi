@@ -21,7 +21,7 @@
 
   <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-dosgi-ri-singlebundle-distribution</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4.0</version>
     <packaging>bundle</packaging>
   <name>Distributed OSGI Single-Bundle Distribution</name>
   <url>http://cxf.apache.org</url>
@@ -29,7 +29,7 @@
   <parent>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-distribution-parent</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

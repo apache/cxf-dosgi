@@ -23,12 +23,12 @@
   <artifactId>cxf-dosgi-ri-samples-discovery-client</artifactId>
   <packaging>bundle</packaging>
   <name>Distributed OSGI Discovery Sample Client Bundle</name>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.4.0</version>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-bundles-discovery-parent</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4.0</version>
   </parent>
 
   <dependencies>
