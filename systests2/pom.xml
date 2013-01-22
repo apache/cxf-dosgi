@@ -24,13 +24,13 @@
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
         <artifactId>cxf-dosgi-ri-parent</artifactId>
-        <version>1.4.0</version>
+        <version>1.5-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <groupId>org.apache.cxf.dosgi.systests</groupId>
     <artifactId>cxf-dosgi-ri-systests2</artifactId>
-    <version>1.4.0</version>
+    <version>1.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Distributed OSGi System Tests</name>

@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-discovery-distributed-parent</artifactId>
-    <version>1.4.0</version>
+    <version>1.5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Distributed OSGI Distributed Discovery Parent</name>
     <url>http://cxf.apache.org</url>
@@ -30,7 +30,7 @@
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-parent</artifactId>
-      <version>1.4.0</version>
+      <version>1.5-SNAPSHOT</version>
       <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
