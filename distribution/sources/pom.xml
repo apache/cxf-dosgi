@@ -22,14 +22,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-source-distribution</artifactId>
-    <version>1.4.0</version>
+    <version>1.5-SNAPSHOT</version>
     <name>Distributed OSGI Source Distribution</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
         <artifactId>cxf-dosgi-ri-distribution-parent</artifactId>
-        <version>1.4.0</version>
+        <version>1.5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

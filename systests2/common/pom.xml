@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
         <artifactId>cxf-dosgi-ri-parent</artifactId>
-        <version>1.4.0</version>
+        <version>1.5-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 

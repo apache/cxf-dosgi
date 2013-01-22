@@ -22,13 +22,13 @@
     <parent>
        <groupId>org.apache.cxf.dosgi</groupId>
        <artifactId>cxf-dosgi-ri</artifactId>
-       <version>1.4.0</version>
+       <version>1.5-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-parent</artifactId>
-    <version>1.4.0</version>
+    <version>1.5-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation Parent</name>

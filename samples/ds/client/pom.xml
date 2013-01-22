@@ -23,12 +23,12 @@
   <artifactId>cxf-dosgi-ri-samples-ds-client</artifactId>
   <packaging>bundle</packaging>
   <name>Distributed OSGI Declarative Services Sample Client Bundle</name>
-  <version>1.4.0</version>
+  <version>1.5-SNAPSHOT</version>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-bundles-ds-parent</artifactId>
-    <version>1.4.0</version>
+    <version>1.5-SNAPSHOT</version>
   </parent>
 
   <dependencies>
