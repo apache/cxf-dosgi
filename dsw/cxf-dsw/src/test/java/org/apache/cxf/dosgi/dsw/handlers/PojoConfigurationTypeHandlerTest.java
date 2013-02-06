@@ -60,15 +60,15 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 public class PojoConfigurationTypeHandlerTest extends TestCase {
     public void testGetPojoAddressEndpointURI() {
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, 
-                                                                                intentManager, 
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null,
+                                                                                intentManager,
                                                                                 dummyHttpServiceManager());
         Map<String, Object> sd = new HashMap<String, Object>();
         String url = "http://somewhere:1234/blah";
         sd.put(RemoteConstants.ENDPOINT_ID, url);
         assertEquals(url, handler.getServerAddress(sd, String.class));
     }
-    
+
     private HttpServiceManager dummyHttpServiceManager() {
         return new HttpServiceManager(null, null, null, null);
     }
@@ -86,7 +86,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
     public void testGetPojoAddressEndpointPojo() {
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, 
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null,
                                                                                 intentManager,
                                                                                 dummyHttpServiceManager());
         Map<String, Object> sd = new HashMap<String, Object>();
@@ -94,13 +94,13 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         sd.put("osgi.remote.configuration.pojo.address", url);
         assertEquals(url, handler.getServerAddress(sd, String.class));
     }
-    
+
     public void testGetDefaultPojoAddress() {
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null, 
-                                                                                intentManager , 
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null,
+                                                                                intentManager ,
                                                                                 dummyHttpServiceManager());
-        Map<String, Object> sd = new HashMap<String, Object>(); 
+        Map<String, Object> sd = new HashMap<String, Object>();
         assertEquals("/java/lang/String", handler.getServerAddress(sd, String.class));
     }
 
@@ -109,16 +109,16 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext bc1 = c.createMock(BundleContext.class);
         BundleContext bc2 = c.createMock(BundleContext.class);
-        
+
         ServiceReference sref = c.createMock(ServiceReference.class);
-        
+
         final ClientProxyFactoryBean cpfb = c.createMock(ClientProxyFactoryBean.class);
         ReflectionServiceFactoryBean sf = c.createMock(ReflectionServiceFactoryBean.class);
         EasyMock.expect(cpfb.getServiceFactory()).andReturn(sf).anyTimes();
         IntentManager intentManager = new IntentManagerImpl(new IntentMap()) {
             @Override
-            public String[] applyIntents(List<Feature> features, 
-                                         AbstractEndpointFactory factory, 
+            public String[] applyIntents(List<Feature> features,
+                                         AbstractEndpointFactory factory,
                                          Map<String, Object> sd) {
                 return new String[0];
             }
@@ -131,21 +131,21 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                 return cpfb;
             }
         };
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
-        
+
         props.put(RemoteConstants.ENDPOINT_ID, "http://google.de/");
         props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{"my.class"});
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, new String[]{"my.config"});
         EndpointDescription endpoint = new EndpointDescription(props);
-        
-        
+
+
         cpfb.setAddress((String)EasyMock.eq(props.get(RemoteConstants.ENDPOINT_ID)));
         EasyMock.expectLastCall().atLeastOnce();
-        
+
         cpfb.setServiceClass(EasyMock.eq(CharSequence.class));
         EasyMock.expectLastCall().atLeastOnce();
-        
+
         c.replay();
         Object proxy = p.createProxy(sref, bc1, bc2, CharSequence.class, endpoint);
         assertNotNull(proxy);
@@ -157,54 +157,54 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(dswContext);
 
-        String myService = "Hi";                
+        String myService = "Hi";
         final ServerFactoryBean sfb = createMockServerFactoryBean();
-        
+
         IntentMap intentMap = new IntentMap();
         IntentManager intentManager = new IntentManagerImpl(intentMap) {
             @Override
-            public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory, 
+            public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory,
                                          Map<String, Object> sd) {
                 return new String []{};
             }
         };
-        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, intentManager, 
+        PojoConfigurationTypeHandler p = new PojoConfigurationTypeHandler(dswContext, intentManager,
                                                                           dummyHttpServiceManager()) {
             @Override
             protected ServerFactoryBean createServerFactoryBean(Map<String, Object> sd, Class<?> iClass) {
                 return sfb;
             }
         };
-        
+
         ServiceReference sr = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext callingContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(sr);
         EasyMock.replay(callingContext);
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.WS_ADDRESS_PROPERTY, "http://alternate_host:80/myString");
 
         ExportResult exportResult = p.createServer(sr, dswContext, callingContext, props, String.class, myService);
-        
-        
+
+
         Map<String, Object> edProps = exportResult.getEndpointProps();
 
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
         assertEquals(1, ((String[])edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS)).length);
         assertEquals(Constants.WS_CONFIG_TYPE, ((String[])edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS))[0]);
         assertEquals("http://alternate_host:80/myString", edProps.get(RemoteConstants.ENDPOINT_ID));
-        
-    }    
+
+    }
 
     private ServerFactoryBean createMockServerFactoryBean() {
         ReflectionServiceFactoryBean sf = EasyMock.createNiceMock(ReflectionServiceFactoryBean.class);
         EasyMock.replay(sf);
-        
+
         final StringBuilder serverURI = new StringBuilder();
-        
+
         ServerFactoryBean sfb = EasyMock.createNiceMock(ServerFactoryBean.class);
-        Server server = createMockServer(sfb);    
-        
+        Server server = createMockServer(sfb);
+
         EasyMock.expect(sfb.getServiceFactory()).andReturn(sf).anyTimes();
         EasyMock.expect(sfb.create()).andReturn(server);
         sfb.setAddress((String) EasyMock.anyObject());
@@ -213,12 +213,12 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                 serverURI.setLength(0);
                 serverURI.append(EasyMock.getCurrentArguments()[0]);
                 return null;
-            }            
+            }
         });
         EasyMock.expect(sfb.getAddress()).andAnswer(new IAnswer<String>() {
             public String answer() throws Throwable {
                 return serverURI.toString();
-            }            
+            }
         });
         EasyMock.replay(sfb);
         return sfb;
@@ -229,44 +229,44 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.expect(addr.getValue()).andAnswer(new IAnswer<String>() {
             public String answer() throws Throwable {
                 return sfb.getAddress();
-            }            
+            }
         });
         EasyMock.replay(addr);
 
         EndpointReferenceType er = EasyMock.createMock(EndpointReferenceType.class);
         EasyMock.expect(er.getAddress()).andReturn(addr);
         EasyMock.replay(er);
-        
+
         Destination destination = EasyMock.createMock(Destination.class);
         EasyMock.expect(destination.getAddress()).andReturn(er);
-        EasyMock.replay(destination);        
-                
+        EasyMock.replay(destination);
+
         Server server = EasyMock.createNiceMock(Server.class);
         EasyMock.expect(server.getDestination()).andReturn(destination);
         EasyMock.replay(server);
         return server;
     }
-    
+
     public void testCreateEndpointProps() {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bc.getProperty("org.osgi.framework.uuid")).andReturn("some_uuid1");
         EasyMock.replay(bc);
-        
+
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
-        PojoConfigurationTypeHandler pch = new PojoConfigurationTypeHandler(bc, 
+        PojoConfigurationTypeHandler pch = new PojoConfigurationTypeHandler(bc,
                                                                             intentManager,
                                                                             dummyHttpServiceManager());
-        
+
         Map<String, Object> sd = new HashMap<String, Object>();
         sd.put(org.osgi.framework.Constants.SERVICE_ID, 42);
-        Map<String, Object> props = pch.createEndpointProps(sd, String.class, new String [] {"org.apache.cxf.ws"}, 
+        Map<String, Object> props = pch.createEndpointProps(sd, String.class, new String [] {"org.apache.cxf.ws"},
                 "http://localhost:12345", new String [] {"my_intent", "your_intent"});
-        
+
         assertFalse(props.containsKey(org.osgi.framework.Constants.SERVICE_ID));
         assertEquals(42, props.get(RemoteConstants.ENDPOINT_SERVICE_ID));
         assertEquals("some_uuid1", props.get(RemoteConstants.ENDPOINT_FRAMEWORK_UUID));
         assertEquals("http://localhost:12345", props.get(RemoteConstants.ENDPOINT_ID));
-        assertEquals(Arrays.asList("java.lang.String"), 
+        assertEquals(Arrays.asList("java.lang.String"),
                      Arrays.asList((Object []) props.get(org.osgi.framework.Constants.OBJECTCLASS)));
         assertEquals(Arrays.asList("org.apache.cxf.ws"),
                      Arrays.asList((Object []) props.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS)));
@@ -274,18 +274,21 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                      Arrays.asList((Object []) props.get(RemoteConstants.SERVICE_INTENTS)));
         assertEquals("0.0.0", props.get("endpoint.package.version.java.lang"));
     }
-    
+
     public void testCreateJaxWsEndpointWithoutIntents() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext dswBC = c.createMock(BundleContext.class);
         IntentManager intentManager = new DummyIntentManager();
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(dswBC, 
-                                                                                intentManager, 
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(dswBC,
+                                                                                intentManager,
                                                                                 dummyHttpServiceManager());
+
+
         Object serviceBean = new MyJaxWsEchoServiceImpl();
         ServiceReference sref = c.createMock(ServiceReference.class);
 
         Map<String, Object> sd = new HashMap<String, Object>();
+        sd.put(Constants.WS_ADDRESS_PROPERTY, "/somewhere");
 
         c.replay();
         ExportResult exportResult = handler.createServer(sref, dswBC, null, sd, MyJaxWsEchoService.class, serviceBean);
@@ -298,24 +301,25 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Assert.assertEquals(new QName("http://jaxws.handlers.dsw.dosgi.cxf.apache.org/",
                                       "MyJaxWsEchoServiceServiceSoapBinding"),
                             bindingName);
-        
+
     }
-    
+
     public void testCreateSimpleEndpointWithoutIntents() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext dswBC = c.createMock(BundleContext.class);
         IntentManager intentManager = new DummyIntentManager();
-        PojoConfigurationTypeHandler handler 
+        PojoConfigurationTypeHandler handler
             = new PojoConfigurationTypeHandler(dswBC, intentManager, dummyHttpServiceManager());
         Object serviceBean = new MySimpleEchoServiceImpl();
         ServiceReference sref = c.createMock(ServiceReference.class);
         Map<String, Object> sd = new HashMap<String, Object>();
+        sd.put(Constants.WS_ADDRESS_PROPERTY, "/somewhere_else");
 
         c.replay();
         ExportResult exportResult = handler.createServer(sref, dswBC, null, sd, MySimpleEchoService.class, serviceBean);
         Server server = exportResult.getServer();
         c.verify();
-        
+
         Endpoint ep = server.getEndpoint();
         QName bindingName = ep.getEndpointInfo().getBinding().getName();
         Assert.assertEquals(EndpointImpl.class, ep.getClass());
@@ -323,11 +327,11 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                                       "MySimpleEchoServiceSoapBinding"),
                             bindingName);
     }
-    
+
     public static class DummyIntentManager implements IntentManager {
 
         @Override
-        public String[] applyIntents(List<Feature> features, 
+        public String[] applyIntents(List<Feature> features,
                                      AbstractEndpointFactory factory,
                                      Map<String, Object> props) {
             return new String[]{};
@@ -335,8 +339,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         @Override
         public void assertAllIntentsSupported(Map<String, Object> serviceProperties) {
-            
+
         }
-        
+
     }
 }

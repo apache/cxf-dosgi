@@ -47,7 +47,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
                                         HttpServiceManager httpServiceManager) {
         super(dswBC, intentManager, httpServiceManager);
     }
-    
+
     public String[] getSupportedTypes() {
         return new String[] {Constants.WS_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
     }
@@ -84,37 +84,57 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         }
         return null;
     }
-    
+
     public ExportResult createServer(ServiceReference sref,
                                      BundleContext dswContext,
-                                     BundleContext callingContext, 
+                                     BundleContext callingContext,
                                      Map<String, Object> sd,
-                                     Class<?> iClass, 
+                                     Class<?> iClass,
                                      Object serviceBean) throws IntentUnsatifiedException {
-        String address = getServerAddress(sd, iClass);
-        String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
-        
-        ServerFactoryBean factory = createServerFactoryBean(sd, iClass);
-        factory.setDataBinding(getDataBinding(sd, iClass));
-        if (contextRoot != null) {
-            Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref);
-            factory.setBus(bus);
+        try {
+            String address = getPojoAddress(sd, iClass);
+            String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
+
+            ServerFactoryBean factory = createServerFactoryBean(sd, iClass);
+            factory.setDataBinding(getDataBinding(sd, iClass));
+            if (contextRoot != null) {
+                Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref);
+                factory.setBus(bus);
+            }
+            factory.setServiceClass(iClass);
+            factory.setAddress(address);
+            factory.setServiceBean(serviceBean);
+            addWsInterceptorsFeaturesProps(factory, callingContext, sd);
+            setWsdlProperties(factory, callingContext, sd, false);
+            String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
+
+            String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(dswContext, contextRoot, address);
+
+            // The properties for the EndpointDescription
+            Map<String, Object> endpointProps = createEndpointProps(sd, iClass,
+                                                                    new String[]{Constants.WS_CONFIG_TYPE},
+                                                                    completeEndpointAddress, intents);
+
+            return createServerFromFactory(factory, endpointProps);
+        } catch (RuntimeException re) {
+            return new ExportResult(sd, re);
         }
-        factory.setServiceClass(iClass);
-        factory.setAddress(address);
-        factory.setServiceBean(serviceBean);
-        addWsInterceptorsFeaturesProps(factory, callingContext, sd);
-        setWsdlProperties(factory, callingContext, sd, false);
-        String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
-        
-        String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(dswContext, contextRoot, address);
+    }
 
-        // The properties for the EndpointDescription
-        Map<String, Object> endpointProps = createEndpointProps(sd, iClass,
-                                                                new String[]{Constants.WS_CONFIG_TYPE},
-                                                                completeEndpointAddress, intents);
+    private String getPojoAddress(Map<String, Object> sd, Class<?> iClass) {
+        String address = getClientAddress(sd, iClass);
+        if (address != null)
+            return address;
 
-        return createServerFromFactory(factory, endpointProps);
+        // If the property is not of type string this will cause an ClassCastException which
+        // will be propagated to the ExportRegistration exception property.
+        String port = (String) sd.get(Constants.WS_PORT_PROPERTY);
+        if (port == null)
+            port = "9000";
+
+        address = "http://localhost:" + port + "/" + iClass.getName().replace('.', '/');
+        LOG.info("Using a default address : " + address);
+        return address;
     }
 
     private DataBinding getDataBinding(Map<String, Object> sd, Class<?> iClass) {
@@ -123,8 +143,8 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
     private boolean isJAXB(Map<String, Object> sd, Class<?> iClass) {
         String dataBindingName = (String)sd.get(Constants.WS_DATABINDING_PROP_KEY);
-        return (iClass.getAnnotation(WebService.class) != null 
-            || Constants.WS_DATA_BINDING_JAXB.equals(dataBindingName)) 
+        return (iClass.getAnnotation(WebService.class) != null
+            || Constants.WS_DATA_BINDING_JAXB.equals(dataBindingName))
             && !Constants.WS_DATA_BINDING_AEGIS.equals(dataBindingName);
     }
 
@@ -137,11 +157,11 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     protected ServerFactoryBean createServerFactoryBean(Map<String, Object> sd, Class<?> iClass) {
         return isJAXWS(sd, iClass) ? new JaxWsServerFactoryBean() : new ServerFactoryBean();
     }
-    
+
     private boolean isJAXWS(Map<String, Object> sd, Class<?> iClass) {
         String frontEnd = (String)sd.get(Constants.WS_FRONTEND_PROP_KEY);
         return (iClass.getAnnotation(WebService.class) != null
-            || Constants.WS_FRONTEND_JAXWS.equals(frontEnd)) 
+            || Constants.WS_FRONTEND_JAXWS.equals(frontEnd))
             && !Constants.WS_FRONTEND_SIMPLE.equals(frontEnd);
     }
 

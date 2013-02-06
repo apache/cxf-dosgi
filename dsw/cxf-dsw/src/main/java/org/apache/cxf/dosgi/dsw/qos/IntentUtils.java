@@ -35,27 +35,9 @@ public final class IntentUtils {
     private IntentUtils() {
         //never constructed
     }
-    
-    public static String formatIntents(String[] intents) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (String intent : intents) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(' ');
-            }
-            sb.append(intent);
-        }
-        return sb.toString();
-    }
-
-    public static String[] parseIntents(String intentsSequence) {
-        return intentsSequence == null ? new String[] {} : intentsSequence.split(" ");
-    }
 
     @SuppressWarnings("rawtypes")
-    public static String[] getInetntsImplementedByTheService(Map serviceProperties) {
+    public static String[] getIntentsImplementedByTheService(Map serviceProperties) {
         // Get the Intents that are implemented by the service
         String[] serviceIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_INTENTS));
 
@@ -84,18 +66,28 @@ public final class IntentUtils {
 
         return list.toArray(new String[list.size()]);
     }
-    
+
     public static Set<String> getRequestedIntents(Map<?, ?> sd) {
-        Collection<String> intents = Arrays.asList(
-            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, RemoteConstants.SERVICE_EXPORTED_INTENTS)));        
+        Collection<String> intents = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
+        Collection<String> intents2 = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
         @SuppressWarnings("deprecation")
-        Collection<String> oldIntents = Arrays.asList(
-            IntentUtils.parseIntents(OsgiUtils.getProperty(sd, Constants.EXPORTED_INTENTS_OLD))); 
-        
-        Set<String> allIntents = new HashSet<String>(intents.size() + oldIntents.size());
-        allIntents.addAll(intents);
-        allIntents.addAll(oldIntents);
+        Collection<String> oldIntents = OsgiUtils.getMultiValueProperty(sd.get(Constants.EXPORTED_INTENTS_OLD));
+        Set<String> allIntents = new HashSet<String>();
+        if (intents != null)
+            allIntents.addAll(parseIntents(intents));
+        if (intents2 != null)
+            allIntents.addAll(parseIntents(intents2));
+        if (oldIntents != null)
+            allIntents.addAll(parseIntents(oldIntents));
+
         return allIntents;
     }
 
+    private static Collection<String> parseIntents(Collection<String> intents) {
+        List<String> parsed = new ArrayList<String>();
+        for (String intent : intents) {
+            parsed.addAll(Arrays.asList(intent.split("[ ]")));
+        }
+        return parsed;
+    }
 }

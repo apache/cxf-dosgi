@@ -46,29 +46,22 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List /* ExportRegistration */exportService(ServiceReference ref, Map properties)
+    public List /* ExportRegistration */exportService(final ServiceReference ref, final Map properties)
         throws IllegalArgumentException, UnsupportedOperationException {
 
         SecurityManager sm = System.getSecurityManager();
-        EndpointPermission epp = new EndpointPermission("*", EndpointPermission.EXPORT);
-
-
         if (sm != null) {
+            EndpointPermission epp = new EndpointPermission("*", EndpointPermission.EXPORT);
             sm.checkPermission(epp);
         }
 
-
-        final ServiceReference refFinal = ref;
-        final Map propertiesFinal = properties;
-
         return AccessController.doPrivileged(new PrivilegedAction<List>() {
             public List<ExportRegistration> run() {
-
                 if (closed) {
                     return Collections.emptyList();
                 }
 
-                return rsaCore.exportService(refFinal, propertiesFinal);
+                return rsaCore.exportService(ref, properties);
             }
         });
     }

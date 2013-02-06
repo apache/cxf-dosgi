@@ -93,7 +93,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
             }
         }
 
-        String[] allIntents = IntentUtils.mergeArrays(intents, IntentUtils.getInetntsImplementedByTheService(sd));
+        String[] allIntents = IntentUtils.mergeArrays(intents, IntentUtils.getIntentsImplementedByTheService(sd));
         props.put(RemoteConstants.SERVICE_INTENTS, allIntents);
         props.put(RemoteConstants.ENDPOINT_ID, address);
         return props;

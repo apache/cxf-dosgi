@@ -19,19 +19,51 @@
 package org.apache.cxf.dosgi.dsw.qos;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import junit.framework.Assert;
+import org.apache.cxf.dosgi.dsw.Constants;
+import org.junit.Assert;
+import org.junit.Test;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
+
 
 public class IntentUtilsTest {
-    
-    public void testIntentsParsingAndFormatting() {
-        String initial = "A SOAP_1.1 integrity";
+    @Test
+    public void testMergeArrays() {
+        Assert.assertNull(IntentUtils.mergeArrays(null, null));
 
-        String[] expected = {"A", "SOAP_1.1", "integrity"};
-        String[] actual = IntentUtils.parseIntents(initial);
-        Assert.assertTrue(Arrays.equals(expected, actual));
-        
-        Assert.assertEquals(initial, IntentUtils.formatIntents(actual));
+        String[] sa1 = {};
+        Assert.assertEquals(0, IntentUtils.mergeArrays(sa1, null).length);
+
+        String[] sa2 = {"X"};
+        Assert.assertEquals(1, IntentUtils.mergeArrays(null, sa2).length);
+        Assert.assertEquals("X", IntentUtils.mergeArrays(null, sa2)[0]);
+
+        String[] sa3 = {"Y", "Z"};
+        String[] sa4 = {"A", "Z"};
+        Assert.assertEquals(3, IntentUtils.mergeArrays(sa3, sa4).length);
+        Assert.assertEquals(new HashSet<String>(Arrays.asList("A", "Y", "Z")),
+                new HashSet<String>(Arrays.asList(IntentUtils.mergeArrays(sa3, sa4))));
     }
 
+    @Test
+    public void testRequestedIntents() {
+        Map<String, Object> props = new HashMap<String, Object>();
+        Assert.assertEquals(0, IntentUtils.getRequestedIntents(props).size());
+
+        props.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, "one");
+        Assert.assertEquals(Collections.singleton("one"), IntentUtils.getRequestedIntents(props));
+
+        props.put(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA, new String[] {"two", "three"});
+        Set<String> expected1 = new HashSet<String>(Arrays.asList("one", "two", "three"));
+        Assert.assertEquals(expected1, IntentUtils.getRequestedIntents(props));
+
+        props.put(Constants.EXPORTED_INTENTS_OLD, "A B C");
+        Set<String> expected2 = new HashSet<String>(Arrays.asList("one", "two", "three", "A", "B", "C"));
+        Assert.assertEquals(expected2, IntentUtils.getRequestedIntents(props));
+    }
 }

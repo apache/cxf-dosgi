@@ -21,11 +21,8 @@ package org.apache.cxf.dosgi.dsw.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 import java.util.UUID;
 
 import org.osgi.framework.Bundle;
@@ -38,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class OsgiUtils {
-    
+
     public static final Logger LOG = LoggerFactory.getLogger(OsgiUtils.class);
 
     private OsgiUtils() {
@@ -92,7 +89,7 @@ public final class OsgiUtils {
         }
         return null;
     }
-    
+
     public static String getFirstNonEmptyStringProperty(@SuppressWarnings("rawtypes") Map dict, String ... keys) {
         for (String key : keys) {
             String value = getStringProperty(dict, key);
@@ -102,7 +99,7 @@ public final class OsgiUtils {
         }
         return null;
     }
-    
+
     @SuppressWarnings("rawtypes")
     private static String getStringProperty(Map dict, String name) {
         Object o = dict.get(name);
@@ -110,8 +107,6 @@ public final class OsgiUtils {
         if (o != null) {
             if (o instanceof String) {
                 return (String)o;
-            } else {
-                throw new RuntimeException("Could not use property " + name + " as the value is not a String");
             }
         }
         return null;
@@ -119,7 +114,7 @@ public final class OsgiUtils {
 
     /**
      * Tries to retrieve the version of iClass via the PackageAdmin
-     * 
+     *
      * @param iClass - The interface for which the version should be found
      * @param bc - any valid BundleContext
      * @return the version of the interface or "0.0.0" if no version information could be found or an error
@@ -175,42 +170,28 @@ public final class OsgiUtils {
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static void overlayProperties(Properties serviceProperties, Map additionalProperties) {
-        Enumeration<Object> keys = serviceProperties.keys();
-        // Maps lower case key to original key
+    public static void overlayProperties(Map<String, Object> serviceProperties, Map<String, Object> additionalProperties) {
         Map<String, String> keysLowerCase = new HashMap<String, String>();
-        while (keys.hasMoreElements()) {
-            Object o = keys.nextElement(); 
-            if (o instanceof String) {
-                String ks = (String)o;
-                keysLowerCase.put(ks.toLowerCase(), ks);
-            }
+        for (String key : serviceProperties.keySet()) {
+            keysLowerCase.put(key.toLowerCase(), key);
         }
-        
-        Set<Map.Entry> adProps = additionalProperties.entrySet();
-        for (Map.Entry e : adProps) {
-            // objectClass and service.id must not be overwritten
-            Object keyObj = e.getKey();
-            if (keyObj instanceof String) {
-                String key = ((String)keyObj).toLowerCase();
-                if (org.osgi.framework.Constants.SERVICE_ID.toLowerCase().equals(key)
-                    || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(key)) {
-                    LOG.info("exportService called with additional properties map that contained illegal key: "
-                              + key + "   The key is ignored");
-                    continue;
-                } else if (keysLowerCase.containsKey(key)) {
-                    String origKey = keysLowerCase.get(key);
-                    serviceProperties.put(origKey, e.getValue());
-                    LOG.debug("Overwriting property [{}]  with value [{}]", origKey, e.getValue());
-                } else {
-                    serviceProperties.put(e.getKey(), e.getValue());
-                    keysLowerCase.put(e.getKey().toString().toLowerCase(), e.getKey().toString());
-                }
+
+        for (Map.Entry<String, Object> e : additionalProperties.entrySet()) {
+            String key = e.getKey().toLowerCase();
+            if (org.osgi.framework.Constants.SERVICE_ID.toLowerCase().equals(key)
+                || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(key)) {
+                // objectClass and service.id must not be overwritten
+                LOG.info("exportService called with additional properties map that contained illegal key: "
+                          + key + "   The key is ignored");
+                continue;
+            } else if (keysLowerCase.containsKey(key)) {
+                String origKey = keysLowerCase.get(key);
+                serviceProperties.put(origKey, e.getValue());
+                LOG.debug("Overwriting property [{}]  with value [{}]", origKey, e.getValue());
+            } else {
+                serviceProperties.put(e.getKey(), e.getValue());
+                keysLowerCase.put(e.getKey().toString().toLowerCase(), e.getKey().toString());
             }
-            
-            
         }
     }
-    
 }

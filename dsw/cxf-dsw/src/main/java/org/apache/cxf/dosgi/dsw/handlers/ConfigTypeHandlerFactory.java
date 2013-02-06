@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.BundleContext;
@@ -38,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class ConfigTypeHandlerFactory {
     protected static final String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
     private static final Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
-    
+
     // protected because of tests
     protected final List<String> supportedConfigurationTypes;
 
@@ -51,8 +50,8 @@ public class ConfigTypeHandlerFactory {
                                     HttpServiceManager httpServiceManager) {
         this.intentManager = intentManager;
         this.pojoConfigurationTypeHandler = new PojoConfigurationTypeHandler(bc, intentManager, httpServiceManager);
-        this.jaxRsPojoConfigurationTypeHandler = new JaxRSPojoConfigurationTypeHandler(bc, 
-                                                                                       intentManager, 
+        this.jaxRsPojoConfigurationTypeHandler = new JaxRSPojoConfigurationTypeHandler(bc,
+                                                                                       intentManager,
                                                                                        httpServiceManager);
         this.wsdlConfigurationTypeHandler = new WsdlConfigurationTypeHandler(bc, intentManager, httpServiceManager);
         supportedConfigurationTypes = new ArrayList<String>();
@@ -61,13 +60,13 @@ public class ConfigTypeHandlerFactory {
         supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE);
         supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
     }
-    
+
     public ConfigurationTypeHandler getHandler(BundleContext dswBC,
             Map<String, Object> serviceProperties) {
         List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
         return getHandler(dswBC, configurationTypes, serviceProperties);
     }
-    
+
     public ConfigurationTypeHandler getHandler(BundleContext dswBC, EndpointDescription endpoint) {
         List<String> configurationTypes = determineConfigTypesForImport(endpoint);
         return getHandler(dswBC, configurationTypes, endpoint.getProperties());
@@ -97,28 +96,28 @@ public class ConfigTypeHandlerFactory {
         }
 
         if (types.contains(Constants.RS_CONFIG_TYPE)) {
-            String intentsProperty = OsgiUtils.getProperty(serviceProperties, RemoteConstants.SERVICE_EXPORTED_INTENTS);
+            Collection<String> intentsProperty = OsgiUtils.getMultiValueProperty(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
             boolean hasHttpIntent = false;
             boolean hasSoapIntent = false;
             if (intentsProperty != null) {
-                String[] intents = IntentUtils.parseIntents(intentsProperty);
-                for (int i = 0; i < intents.length; i++) {
-                    if (intents[i].indexOf("SOAP") > -1) {
+                for (String intent : intentsProperty) {
+                    if (intent.indexOf("SOAP") > -1) {
                         hasSoapIntent = true;
                         break;
                     }
-                    if ("HTTP".equals(intents[i])) {
+
+                    if (intent.indexOf("HTTP") > -1) {
                         hasHttpIntent = true;
                     }
                 }
             }
-            if (intentsProperty != null && hasHttpIntent && !hasSoapIntent || intentsProperty == null) {
+            if ((hasHttpIntent && !hasSoapIntent) || intentsProperty == null) {
                 return true;
             }
         }
         return false;
     }
-    
+
     /**
      * determine which configuration types should be used / if the requested are
      * supported
@@ -142,7 +141,7 @@ public class ConfigTypeHandlerFactory {
         }
         return configurationTypes;
     }
-    
+
     private List<String> determineConfigTypesForImport(EndpointDescription endpoint) {
         List<String> remoteConfigurationTypes = endpoint.getConfigurationTypes();
 

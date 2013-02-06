@@ -23,7 +23,6 @@ import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
@@ -49,14 +48,9 @@ public class EventProducer {
     }
 
     protected void publishNotifcation(ExportRegistration er) {
-        RemoteServiceAdminEvent rsae = null;
-        if (er.getException() != null) {
-            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_ERROR, bctx.getBundle(), 
-                                               (ExportReference)null, er.getException());
-        } else {
-            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_REGISTRATION, bctx.getBundle(),
-                                               er.getExportReference(), er.getException());
-        }
+        int type = er.getException() == null ? RemoteServiceAdminEvent.EXPORT_REGISTRATION : RemoteServiceAdminEvent.EXPORT_ERROR;
+        RemoteServiceAdminEvent rsae = new RemoteServiceAdminEvent(type, bctx.getBundle(), er.getExportReference(),
+                er.getException());
 
         notifyListeners(rsae);
         eaHelper.notifyEventAdmin(rsae);
@@ -100,19 +94,19 @@ public class EventProducer {
         RemoteServiceAdminEvent rsae = null;
         rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_UNREGISTRATION, bctx.getBundle(),
                                            eri.getExportReference(), eri.getException());
-        
+
         notifyListeners(rsae);
         eaHelper.notifyEventAdmin(rsae);
     }
-     
-    
+
+
     public void notifyRemoval(ImportRegistration eri) {
         RemoteServiceAdminEvent rsae = null;
         rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION, bctx.getBundle(),
                                            eri.getImportReference(), eri.getException());
-        
+
         notifyListeners(rsae);
         eaHelper.notifyEventAdmin(rsae);
     }
-    
+
 }

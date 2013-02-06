@@ -18,10 +18,12 @@
  */
 package org.apache.cxf.dosgi.dsw;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
@@ -35,7 +37,6 @@ import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.qos.IntentTracker;
-import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
 import org.osgi.framework.BundleActivator;
@@ -48,7 +49,7 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// registered as spring bean -> start / stop called accordingly 
+// registered as spring bean -> start / stop called accordingly
 public class Activator implements ManagedService, BundleActivator {
     private static final int DEFAULT_INTENT_TIMEOUT = 30000;
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
@@ -76,18 +77,29 @@ public class Activator implements ManagedService, BundleActivator {
         intentTracker.open();
         IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
         HttpServiceManager httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlisas);
-        ConfigTypeHandlerFactory configTypeHandlerFactory 
+        ConfigTypeHandlerFactory configTypeHandlerFactory
             = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
         RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(rsaCore);
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         String[] supportedIntents = intentMap.keySet().toArray(new String[] {});
-        String siString = IntentUtils.formatIntents(supportedIntents);
-        props.put("remote.intents.supported", siString);
-        props.put("remote.configs.supported", configTypeHandlerFactory.getSupportedConfigurationTypes());
+        props.put("remote.intents.supported", supportedIntents);
+        props.put("remote.configs.supported", obtainSupportedConfigTypes(configTypeHandlerFactory.getSupportedConfigurationTypes()));
         LOG.info("Registering RemoteServiceAdminFactory...");
         rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc), null);
+    }
+
+    // The CT sometimes uses the first element returned to register a service, but does not provide any additional configuration
+    // Return the configuration type that works without additional configuration as the first in the list.
+    private String[] obtainSupportedConfigTypes(List<String> types) {
+        List<String> l = new ArrayList<String>(types);
+        if (l.contains(org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE)) {
+            // make sure its the first element...
+            l.remove(org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE);
+            l.add(0, org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE);
+        }
+        return l.toArray(new String[] {});
     }
 
     private void registerManagedService(BundleContext bundlecontext) {
@@ -137,7 +149,7 @@ public class Activator implements ManagedService, BundleActivator {
         }
         Enumeration<String> keys = config.keys();
         while (keys.hasMoreElements()) {
-            String key = (String) keys.nextElement();
+            String key = keys.nextElement();
             configMap.put(key, config.get(key));
         }
         return configMap;

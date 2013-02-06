@@ -129,7 +129,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
             Set<Map.Entry<String, Object>> props = endpointDescription.getProperties().entrySet();
             for (Map.Entry<String, Object> entry : props) {
                 Object value = entry.getValue();
-                r += entry.getKey() + "  => " 
+                r += entry.getKey() + "  => "
                     + (value instanceof Object[] ? Arrays.toString((Object []) value) : value) + "\n";
             }
         }

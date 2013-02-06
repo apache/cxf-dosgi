@@ -18,19 +18,19 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.junit.Test;
 import org.osgi.framework.Constants;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 
 public class UtilsTest {
@@ -72,34 +72,34 @@ public class UtilsTest {
     @Test
     public void testOverlayProperties() {
 
-        Properties original = new Properties();
+        Map<String, Object> original = new HashMap<String, Object>();
 
         original.put("MyProp", "my value");
         original.put(Constants.OBJECTCLASS, "myClass");
 
-        Properties copy = new Properties();
+        Map<String, Object> copy = new HashMap<String, Object>();
         copy.putAll(original);
 
         // nothing should change here
-        Properties overload = new Properties();
+        Map<String, Object> overload = new HashMap<String, Object>();
         OsgiUtils.overlayProperties(copy, overload);
 
         assertEquals(original.size(), copy.size());
-        for (Object key : Collections.list(original.keys())) {
+        for (Object key : original.keySet()) {
             assertEquals(original.get(key), copy.get(key));
         }
-        
+
         copy.clear();
         copy.putAll(original);
-        
+
         // a property should be added
-        overload = new Properties();
+        overload = new HashMap<String, Object>();
         overload.put("new", "prop");
-            
+
         OsgiUtils.overlayProperties(copy, overload);
 
         assertEquals(original.size() + 1, copy.size());
-        for (Object key : Collections.list(original.keys())) {
+        for (Object key : original.keySet()) {
             assertEquals(original.get(key), copy.get(key));
         }
         assertNotNull(overload.get("new"));
@@ -107,61 +107,61 @@ public class UtilsTest {
 
         copy.clear();
         copy.putAll(original);
-        
+
         // only one property should be added
-        overload = new Properties();
+        overload = new HashMap<String, Object>();
         overload.put("new", "prop");
         overload.put("NEW", "prop");
-            
+
         OsgiUtils.overlayProperties(copy, overload);
 
         assertEquals(original.size() + 1, copy.size());
-        for (Object key : Collections.list(original.keys())) {
+        for (Object key : original.keySet()) {
             assertEquals(original.get(key), copy.get(key));
         }
         assertNotNull(overload.get("new"));
         assertEquals("prop", overload.get("new"));
-        
+
         copy.clear();
         copy.putAll(original);
-        
+
         // nothing should change here
-        overload = new Properties();
+        overload = new HashMap<String, Object>();
         overload.put(Constants.OBJECTCLASS, "assd");
         overload.put(Constants.SERVICE_ID, "asasdasd");
         OsgiUtils.overlayProperties(copy, overload);
 
         assertEquals(original.size(), copy.size());
-        for (Object key : Collections.list(original.keys())) {
+        for (Object key : original.keySet()) {
             assertEquals(original.get(key), copy.get(key));
         }
-        
+
         copy.clear();
         copy.putAll(original);
-        
+
         // overwrite own prop
-        overload = new Properties();
+        overload = new HashMap<String, Object>();
         overload.put("MyProp", "newValue");
         OsgiUtils.overlayProperties(copy, overload);
 
         assertEquals(original.size(), copy.size());
-        for (Object key : Collections.list(original.keys())) {
+        for (Object key : original.keySet()) {
             if (!"MyProp".equals(key)) {
                 assertEquals(original.get(key), copy.get(key));
             }
         }
         assertEquals("newValue", copy.get("MyProp"));
-        
+
         copy.clear();
         copy.putAll(original);
-        
+
         // overwrite own prop in different case
-        overload = new Properties();
+        overload = new HashMap<String, Object>();
         overload.put("MYPROP", "newValue");
         OsgiUtils.overlayProperties(copy, overload);
 
         assertEquals(original.size(), copy.size());
-        for (Object key : Collections.list(original.keys())) {
+        for (Object key : original.keySet()) {
             if (!"MyProp".equals(key)) {
                 assertEquals(original.get(key), copy.get(key));
             }
