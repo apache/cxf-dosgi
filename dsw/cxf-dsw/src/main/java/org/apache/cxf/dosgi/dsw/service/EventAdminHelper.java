@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class EventAdminHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventAdminHelper.class);
-    
+
     private BundleContext bctx;
 
     public EventAdminHelper(BundleContext bc) {
@@ -49,10 +49,9 @@ public class EventAdminHelper {
         props.put("bundle", bctx.getBundle());
         props.put("bundle.id", bctx.getBundle().getBundleId());
         props.put("bundle.symbolicname", bctx.getBundle().getSymbolicName());
-        // FIXME is this correct?
-        
+
         String version = (String)bctx.getBundle().getHeaders().get("Bundle-Version");
-        
+
         Version v;
         if (version != null) {
             v = new Version(version);
@@ -71,7 +70,7 @@ public class EventAdminHelper {
         Properties props = new Properties();
         setIfNotNull(props, "cause", rsae.getException());
 
-        
+
         EndpointDescription epd = null;
         if (rsae.getImportReference() != null) {
             epd = ((ImportReferenceImpl)rsae.getImportReference()).getImportedEndpointAlways();
