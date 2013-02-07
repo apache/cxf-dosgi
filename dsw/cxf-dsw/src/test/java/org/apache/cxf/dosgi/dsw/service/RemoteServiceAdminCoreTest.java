@@ -24,7 +24,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -178,6 +180,7 @@ public class RemoteServiceAdminCoreTest {
         final Map<String, Object> sProps = new HashMap<String, Object>();
         sProps.put("objectClass", new String[] {"java.lang.Runnable"});
         sProps.put("service.id", 51L);
+        sProps.put("myProp", "myVal");
         sProps.put("service.exported.interfaces", "*");
         ServiceReference sref = mockServiceReference(sProps);
 
@@ -194,6 +197,7 @@ public class RemoteServiceAdminCoreTest {
         Map<String, Object> sPropsMod = new HashMap<String, Object>();
         sPropsMod.put("objectClass", Collections.singletonList("java.lang.Runnable"));
         sPropsMod.put("service.id", 51L);
+        sPropsMod.put("myProp", "myVal");
         sPropsMod.put("service.exported.interfaces", "*");
 
         HashMap<String, Object> eProps = new HashMap<String, Object>(sProps);
@@ -202,14 +206,15 @@ public class RemoteServiceAdminCoreTest {
         ExportResult er = new ExportResult(eProps, (Server) null);
 
         ConfigurationTypeHandler handler = EasyMock.createNiceMock(ConfigurationTypeHandler.class);
-        EasyMock.expect(handler.createServer(sref, bc, sref.getBundle().getBundleContext(), sPropsMod, Runnable.class, svcObject)).andReturn(er);
+        EasyMock.expect(handler.createServer(sref, bc, sref.getBundle().getBundleContext(), sPropsMod, Runnable.class, svcObject)).andReturn(er).once();
         EasyMock.replay(handler);
 
         ConfigTypeHandlerFactory handlerFactory = EasyMock.createNiceMock(ConfigTypeHandlerFactory.class);
-        EasyMock.expect(handlerFactory.getHandler(bc, sPropsMod)).andReturn(handler).anyTimes();
+        EasyMock.expect(handlerFactory.getHandler(bc, sPropsMod)).andReturn(handler).once(); // Second time shouldn't get there because it should simply copy
         EasyMock.replay(handlerFactory);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handlerFactory) {};
 
+        // Export the service for the first time
         List<ExportRegistration> ereg = rsaCore.exportService(sref, null);
         assertEquals(1, ereg.size());
         assertNull(ereg.get(0).getException());
@@ -221,6 +226,43 @@ public class RemoteServiceAdminCoreTest {
         assertNotNull(edProps.get("service.imported"));
         assertTrue(Arrays.equals(new String [] {"java.lang.Runnable"}, (Object[]) edProps.get("objectClass")));
         assertTrue(Arrays.equals(new String[] {"org.apache.cxf.ws"}, (Object[]) edProps.get("service.imported.configs")));
+
+        // Ask to export the same service again, this should not go through the whole process again but simply return
+        // a copy of the first instance.
+        final Map<String, Object> sProps2 = new HashMap<String, Object>();
+        sProps2.put("objectClass", new String[] {"java.lang.Runnable"});
+        sProps2.put("service.id", 51L);
+        sProps2.put("service.exported.interfaces", "*");
+        ServiceReference sref2 = mockServiceReference(sProps2);
+        Map<String, Object> props2 = new HashMap<String, Object>();
+        props2.put("myProp", "myVal");
+        List<ExportRegistration> ereg2 = rsaCore.exportService(sref2, props2);
+
+        assertEquals(1, ereg2.size());
+        assertNull(ereg2.get(0).getException());
+        assertEquals(ereg.get(0).getExportReference().getExportedEndpoint().getProperties(),
+                ereg2.get(0).getExportReference().getExportedEndpoint().getProperties());
+
+        // Look at the exportedServices data structure
+        Field field = RemoteServiceAdminCore.class.getDeclaredField("exportedServices");
+        field.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<Map<String, Object>, Collection<ExportRegistration>> exportedServices =
+                (Map<Map<String, Object>, Collection<ExportRegistration>>) field.get(rsaCore);
+
+        assertEquals("One service was exported", 1, exportedServices.size());
+        assertEquals("There are 2 export registrations (identical copies)",
+                2, exportedServices.values().iterator().next().size());
+
+        // Unregister one of the exports
+        rsaCore.removeExportRegistration((ExportRegistrationImpl) ereg.get(0));
+        assertEquals("One service was exported", 1, exportedServices.size());
+        assertEquals("There 1 export registrations left",
+                1, exportedServices.values().iterator().next().size());
+
+        // Unregister the other export
+        rsaCore.removeExportRegistration((ExportRegistrationImpl) ereg2.get(0));
+        assertEquals("No more exported services", 0, exportedServices.size());
     }
 
     @Test
@@ -271,11 +313,32 @@ public class RemoteServiceAdminCoreTest {
         assertEquals(1, ereg.size());
         assertTrue(ereg.get(0).getException() instanceof TestException);
         assertSame(sref, ereg.get(0).getExportReference().getExportedService());
+
+        // Look at the exportedServices data structure
+        Field field = RemoteServiceAdminCore.class.getDeclaredField("exportedServices");
+        field.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<Map<String, Object>, Collection<ExportRegistration>> exportedServices =
+                (Map<Map<String, Object>, Collection<ExportRegistration>>) field.get(rsaCore);
+
+        assertEquals("One service was exported", 1, exportedServices.size());
+        assertEquals("There is 1 export registration",
+                1, exportedServices.values().iterator().next().size());
+
+        // Remove all export registrations from the service bundle
+        rsaCore.removeExportRegistrations(sref.getBundle().getBundleContext());
+        assertEquals("No more exported services", 0, exportedServices.size());
     }
 
     private ServiceReference mockServiceReference(final Map<String, Object> sProps) {
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+
         Bundle b = EasyMock.createNiceMock(Bundle.class);
+        EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
         EasyMock.replay(b);
+
+        EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
+        EasyMock.replay(bc);
 
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         EasyMock.expect(sref.getBundle()).andReturn(b).anyTimes();
