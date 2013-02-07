@@ -184,7 +184,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
     }
 
     protected String getClientAddress(Map<String, Object> sd, Class<?> iClass) {
-        return OsgiUtils.getFirstNonEmptyStringProperty(sd, RemoteConstants.ENDPOINT_ID, Constants.WS_ADDRESS_PROPERTY,
+        return OsgiUtils.getFirstNonEmptyStringProperty(sd, RemoteConstants.ENDPOINT_ID,
                                                         Constants.WS_ADDRESS_PROPERTY,
                                                         Constants.WS_ADDRESS_PROPERTY_OLD,
                                                         Constants.RS_ADDRESS_PROPERTY);
@@ -201,7 +201,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         return address == null ? httpServiceManager.getDefaultAddress(iClass) : address;
     }
 
-    protected final ExportResult createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {
+    protected ExportResult createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());

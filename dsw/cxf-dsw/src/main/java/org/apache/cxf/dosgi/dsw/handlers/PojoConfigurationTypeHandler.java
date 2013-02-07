@@ -128,7 +128,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         // If the property is not of type string this will cause an ClassCastException which
         // will be propagated to the ExportRegistration exception property.
-        String port = (String) sd.get(Constants.WS_PORT_PROPERTY);
+        Object port = sd.get(Constants.WS_PORT_PROPERTY);
         if (port == null)
             port = "9000";
 
