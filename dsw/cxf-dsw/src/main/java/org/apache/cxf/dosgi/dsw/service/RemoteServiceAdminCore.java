@@ -122,6 +122,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                     EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
                     ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
                     if (exportResult.getException() == null) {
+                        exportRegistration.setServer(exportResult.getServer());
                         exportRegistration.startServiceTracker(bctx);
                     } else {
                         LOG.error(exportResult.getException().getMessage(), exportResult.getException());
