@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,13 +79,9 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         if (additionalProperties != null) {
             OsgiUtils.overlayProperties(serviceProperties, additionalProperties);
         }
+        Map<String, Object> key = makeKey(serviceProperties);
 
         List<String> interfaces = getInterfaces(serviceProperties);
-        if (interfaces.size() == 0) {
-            LOG.error("export failed: no provided service interfaces found or service_exported_interfaces is null !!");
-            // TODO: publish error event ? not sure
-            return Collections.emptyList();
-        }
 
         if (isCreatedByThisRSA(serviceReference)) {
             LOG.debug("Skipping export of this service as we created it ourself as a proxy {}", interfaces);
@@ -94,9 +91,10 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
         synchronized (exportedServices) {
             // check if it is already exported ....
-            if (exportedServices.containsKey(serviceProperties)) {
+            Collection<ExportRegistration> existingRegs = exportedServices.get(key);
+            if (existingRegs != null) {
                 LOG.debug("already exported this service. Returning existing exportRegs {} ", interfaces);
-                return copyExportRegistration(serviceProperties);
+                return copyExportRegistration(existingRegs);
             }
             LOG.info("interfaces selected for export: " + interfaces);
             List<ExportRegistration> exportRegs = new ArrayList<ExportRegistration>(1);
@@ -133,69 +131,95 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
 
             // enlist initial export Registrations in global list of exportRegistrations
-            exportedServices.put(serviceProperties, new ArrayList<ExportRegistration>(exportRegs));
+            exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
             eventProducer.publishNotifcation(exportRegs);
             return exportRegs;
         }
     }
 
     /**
-     * Determine which interfaces should be exported
+     * Determines which interfaces should be exported.
      *
-     * @param serviceProperties
-     * @return interfaces to be exported
+     * @param serviceProperties the exported service properties
+     * @return the interfaces to be exported
+     * @throws IllegalArgumentException if the service parameters are invalid
+     * @see RemoteServiceAdmin#exportService
+     * @see org.osgi.framework.Constants#OBJECTCLASS
+     * @see RemoteConstants#SERVICE_EXPORTED_INTERFACES
      */
     private List<String> getInterfaces(Map<String, Object> serviceProperties) {
-        List<String> interfaces = new ArrayList<String>(1);
-
-        // Earlier in this class we have converted objectClass from String[] to List<String>...
-        @SuppressWarnings("unchecked")
-        List<String> providedInterfaces = (List<String>) serviceProperties.get(org.osgi.framework.Constants.OBJECTCLASS);
+        String[] providedInterfaces = (String[])serviceProperties.get(org.osgi.framework.Constants.OBJECTCLASS);
+        if (providedInterfaces == null || providedInterfaces.length == 0) {
+            throw new IllegalArgumentException("service is missing the objectClass property");
+        }
 
         String[] allowedInterfaces
             = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTERFACES));
-        if (providedInterfaces == null || allowedInterfaces == null) {
-            return Collections.emptyList();
+        if (allowedInterfaces == null || allowedInterfaces.length == 0) {
+            throw new IllegalArgumentException("service is missing the service.exported.interfaces property");
         }
 
+        List<String> interfaces = new ArrayList<String>(1);
         if (allowedInterfaces.length == 1 && "*".equals(allowedInterfaces[0])) {
-            for (String i : providedInterfaces) {
-                interfaces.add(i);
-            }
+            // FIXME: according to the spec, this should only return the interfaces, and not
+            // non-interface classes (which are valid OBJECTCLASS values, even if discouraged)
+            Collections.addAll(interfaces, providedInterfaces);
         } else {
-            for (String x : allowedInterfaces) {
-                for (String i : providedInterfaces) {
-                    if (x.equals(i)) {
-                        interfaces.add(i);
-                    }
-                }
+            List<String> providedList = Arrays.asList(providedInterfaces);
+            List<String> allowedList = Arrays.asList(allowedInterfaces);
+            if (!providedList.containsAll(allowedList)) {
+                throw new IllegalArgumentException(String.format(
+                    "exported interfaces %s must be a subset of the service's registered types %s",
+                    allowedList, providedList));
             }
+
+            Collections.addAll(interfaces, allowedInterfaces);
         }
         return interfaces;
     }
 
+    /**
+     * Returns a service's properties as a map.
+     *
+     * @param serviceReference a service reference
+     * @return the service's properties as a map
+     */
     private Map<String, Object> getProperties(ServiceReference serviceReference) {
-        Map<String, Object> serviceProperties = new HashMap<String, Object>();
-        for (String key : serviceReference.getPropertyKeys()) {
+        String[] keys = serviceReference.getPropertyKeys();
+        Map<String, Object> props = new HashMap<String, Object>(keys.length);
+        for (String key : keys) {
             Object val = serviceReference.getProperty(key);
-            if (val instanceof Object[]) {
-                // If we are dealing with an array, turn it into a list because otherwise the equals method on the map key won't work
-                Object[] arr = (Object[]) val;
-                List<Object> l = new ArrayList<Object>();
-                for (Object o : arr)
-                    l.add(o);
-
-                serviceProperties.put(key, l);
-            } else {
-                serviceProperties.put(key, val);
-            }
+            props.put(key, val);
         }
-        return serviceProperties;
+        return props;
     }
 
-    private List<ExportRegistration> copyExportRegistration(Map<String, Object> serviceProperties) {
-        Collection<ExportRegistration> regs = exportedServices.get(serviceProperties);
+    /**
+     * Converts the given properties map into one that can be used as a map key itself.
+     * For example, if a value is an array, it is converted into a list so that the
+     * equals method will compare it properly.
+     *
+     * @param properties a properties map
+     * @return a map that represents the given map, but can be safely used as a map key itself
+     */
+    private Map<String, Object> makeKey(Map<String, Object> properties) {
+        // FIXME: we should also make logically equal values actually compare as equal
+        // (e.g. String+ values should be normalized)
+        Map<String, Object> converted = new HashMap<String, Object>(properties.size());
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            Object val = entry.getValue();
+            if (val instanceof Object[]) {
+                Object[] arr = (Object[])val;
+                List<Object> list = new ArrayList<Object>(arr.length);
+                Collections.addAll(list, arr);
+                val = list;
+            }
+            converted.put(entry.getKey(), val);
+        }
+        return converted;
+    }
 
+    private List<ExportRegistration> copyExportRegistration(Collection<ExportRegistration> regs) {
         List<EndpointDescription> copiedEndpoints = new ArrayList<EndpointDescription>();
 
         // / create a new list with copies of the exportRegistrations
@@ -220,6 +244,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
 
     private boolean isCreatedByThisRSA(ServiceReference sref) {
+        Bundle serviceBundle = sref.getBundle();
         return (sref.getBundle() != null) && sref.getBundle().equals(bctx.getBundle());
     }
 
