@@ -99,7 +99,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return copyExportRegistration(serviceProperties);
             }
             LOG.info("interfaces selected for export: " + interfaces);
-            Map<String, ExportRegistrationImpl> exportRegs = new LinkedHashMap<String, ExportRegistrationImpl>(1);
+            List<ExportRegistration> exportRegs = new ArrayList<ExportRegistration>(1);
             Object serviceObject = bctx.getService(serviceReference);
             BundleContext callingContext = serviceReference.getBundle().getBundleContext();
             ConfigurationTypeHandler handler = null;
@@ -128,17 +128,14 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                         LOG.error(exportResult.getException().getMessage(), exportResult.getException());
                         exportRegistration.setException(exportResult.getException());
                     }
-                    exportRegs.put(iface, exportRegistration);
+                    exportRegs.add(exportRegistration);
                 }
             }
 
             // enlist initial export Registrations in global list of exportRegistrations
-            exportedServices.put(serviceProperties, new ArrayList<ExportRegistration>(exportRegs.values()));
-
-            List<ExportRegistration> lExpReg = new ArrayList<ExportRegistration>(exportRegs.values());
-            eventProducer.publishNotifcation(lExpReg);
-
-            return lExpReg;
+            exportedServices.put(serviceProperties, new ArrayList<ExportRegistration>(exportRegs));
+            eventProducer.publishNotifcation(exportRegs);
+            return exportRegs;
         }
     }
 
