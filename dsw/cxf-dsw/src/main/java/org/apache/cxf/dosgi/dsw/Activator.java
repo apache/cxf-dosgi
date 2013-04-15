@@ -60,18 +60,18 @@ public class Activator implements ManagedService, BundleActivator {
     private BundleContext bc;
 
     public void start(BundleContext bundlecontext) throws Exception {
+        LOG.debug("RemoteServiceAdmin Implementation is starting up");
         this.bc = bundlecontext;
-        start(bundlecontext, new Hashtable<String, Object>());
-    }
-
-    private void start(BundleContext bundlecontext, Map<String, Object> config) {
-        this.bc = bundlecontext;
-        String httpBase = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.HTTP_BASE);
-        String cxfServletAlisas = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.CXF_SERVLET_ALIAS);
         // Disable the fast infoset as it's not compatible (yet) with OSGi
         System.setProperty("org.apache.cxf.nofastinfoset", "true");
-
+        init(new Hashtable<String, Object>());
         registerManagedService(bc);
+    }
+
+    private synchronized void init(Map<String, Object> config) {
+        String httpBase = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.HTTP_BASE);
+        String cxfServletAlisas = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.CXF_SERVLET_ALIAS);
+
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         intentTracker = new IntentTracker(bc, intentMap);
         intentTracker.open();
@@ -105,40 +105,47 @@ public class Activator implements ManagedService, BundleActivator {
     private void registerManagedService(BundleContext bundlecontext) {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put(Constants.SERVICE_PID, CONFIG_SERVICE_PID);
+        // No need to store the registration. Will be unregistered in stop by framework
         bundlecontext.registerService(ManagedService.class.getName(), this, props);
     }
 
     public void stop(BundleContext context) throws Exception {
         LOG.debug("RemoteServiceAdmin Implementation is shutting down now");
-        if (intentTracker != null) {
-            intentTracker.close();
-            // This also triggers the unimport and unexport of the remote services
-            rsaFactoryReg.unregister();
-            decoratorReg.unregister();
-            // shutdown the CXF Bus -> Causes also the shutdown of the embedded HTTP server
-            Bus b = BusFactory.getDefaultBus();
-            if (b != null) {
-                LOG.debug("Shutting down the CXF Bus");
-                b.shutdown(true);
-            }
-            intentTracker = null;
-            rsaFactoryReg = null;
-            decoratorReg = null;
+        uninit();
+        shutdownCXFBus();
+    }
+
+    private synchronized void uninit() {
+        intentTracker.close();
+        // This also triggers the unimport and unexport of the remote services
+        rsaFactoryReg.unregister();
+        decoratorReg.unregister();
+        intentTracker = null;
+        rsaFactoryReg = null;
+        decoratorReg = null;
+    }
+
+    /**
+     * Causes also the shutdown of the embedded HTTP server
+     */
+    private void shutdownCXFBus() {
+        Bus b = BusFactory.getDefaultBus();
+        if (b != null) {
+            LOG.debug("Shutting down the CXF Bus");
+            b.shutdown(true);
         }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public synchronized void updated(Dictionary config) throws ConfigurationException {
-        if (rsaFactoryReg != null) {
+        LOG.debug("RemoteServiceAdmin Implementation configuration is updated with {}", config);
+        if (config != null) {
             try {
-                stop(bc);
+                uninit();
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
             }
-        }
-        if (config != null) {
-            Map<String, Object> configMap = getMapFromDictionary(config);
-            start(bc, configMap);
+            init(getMapFromDictionary(config));
         }
     }
 
@@ -154,6 +161,4 @@ public class Activator implements ManagedService, BundleActivator {
         }
         return configMap;
     }
-
-
 }
