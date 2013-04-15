@@ -60,6 +60,9 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private final Map<EndpointDescription, Collection<ImportRegistrationImpl>> importedServices
         = new LinkedHashMap<EndpointDescription, Collection<ImportRegistrationImpl>>();
 
+    // Is stored in exportedServices while the export is in progress as a marker
+    private final List<ExportRegistration> exportInProgress = Collections.emptyList();
+
     private BundleContext bctx;
     private EventProducer eventProducer;
 
@@ -90,51 +93,85 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         }
 
         synchronized (exportedServices) {
-            // check if it is already exported ....
+            // check if it is already exported...
             Collection<ExportRegistration> existingRegs = exportedServices.get(key);
+
+            // if the export is already in progress, wait for it to be complete
+            while (existingRegs == exportInProgress) {
+                try {
+                    exportedServices.wait();
+                    existingRegs = exportedServices.get(key);
+                } catch (InterruptedException ie) {
+                    LOG.debug("interrupted while waiting for export in progress");
+                    return Collections.emptyList();
+                }
+            }
+
+            // if the export is complete, return a copy of existing export
             if (existingRegs != null) {
                 LOG.debug("already exported this service. Returning existing exportRegs {} ", interfaces);
                 return copyExportRegistration(existingRegs);
             }
-            LOG.info("interfaces selected for export: " + interfaces);
-            List<ExportRegistration> exportRegs = new ArrayList<ExportRegistration>(1);
-            Object serviceObject = bctx.getService(serviceReference);
-            BundleContext callingContext = serviceReference.getBundle().getBundleContext();
-            ConfigurationTypeHandler handler = null;
-            try {
-                handler = configTypeHandlerFactory.getHandler(bctx, serviceProperties);
-            } catch (RuntimeException e) {
-                LOG.error(e.getMessage(), e);
-                return Collections.emptyList();
-            }
 
-            // FIXME: move out of synchronized ... -> blocks until publication is finished
-            for (String iface : interfaces) {
-                LOG.info("creating server for interface " + iface);
-                // this is an extra sanity check, but do we really need it now ?
-                Class<?> interfaceClass = ClassUtils.getInterfaceClass(serviceObject, iface);
-                if (interfaceClass != null) {
-                    ExportResult exportResult = handler.createServer(serviceReference, bctx, callingContext,
-                            serviceProperties, interfaceClass, serviceObject);
-                    LOG.info("created server for interface " + iface);
-                    EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
-                    ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
-                    if (exportResult.getException() == null) {
-                        exportRegistration.setServer(exportResult.getServer());
-                        exportRegistration.startServiceTracker(bctx);
-                    } else {
-                        LOG.error(exportResult.getException().getMessage(), exportResult.getException());
-                        exportRegistration.setException(exportResult.getException());
-                    }
-                    exportRegs.add(exportRegistration);
-                }
-            }
+            // mark export as being in progress
+            exportedServices.put(key, exportInProgress);
+        }
 
-            // enlist initial export Registrations in global list of exportRegistrations
-            exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
+        try {
+            // do the export
+            List<ExportRegistration> exportRegs = exportInterfaces(interfaces, serviceReference, serviceProperties);
+
+            // enlist initial export registrations in global list of exportRegistrations
+            synchronized (exportedServices) {
+                exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
+            }
             eventProducer.publishNotifcation(exportRegs);
             return exportRegs;
+        } finally {
+            synchronized (exportedServices) {
+                if (exportedServices.get(key) == exportInProgress) {
+                    exportedServices.remove(key);
+                }
+                exportedServices.notifyAll(); // in any case, always notify waiting threads
+            }
         }
+    }
+
+    private List<ExportRegistration> exportInterfaces(List<String> interfaces,
+            ServiceReference serviceReference, Map<String, Object> serviceProperties) {
+        LOG.info("interfaces selected for export: " + interfaces);
+        ConfigurationTypeHandler handler;
+        try {
+            handler = configTypeHandlerFactory.getHandler(bctx, serviceProperties);
+        } catch (RuntimeException e) {
+            LOG.error(e.getMessage(), e);
+            return Collections.emptyList();
+        }
+        List<ExportRegistration> exportRegs = new ArrayList<ExportRegistration>(1);
+        Object serviceObject = bctx.getService(serviceReference);
+        BundleContext callingContext = serviceReference.getBundle().getBundleContext();
+
+        for (String iface : interfaces) {
+            LOG.info("creating server for interface " + iface);
+            // this is an extra sanity check, but do we really need it now ?
+            Class<?> interfaceClass = ClassUtils.getInterfaceClass(serviceObject, iface);
+            if (interfaceClass != null) {
+                ExportResult exportResult = handler.createServer(serviceReference, bctx, callingContext,
+                    serviceProperties, interfaceClass, serviceObject);
+                LOG.info("created server for interface " + iface);
+                EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
+                ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
+                if (exportResult.getException() == null) {
+                    exportRegistration.setServer(exportResult.getServer());
+                    exportRegistration.startServiceTracker(bctx);
+                } else {
+                    LOG.error(exportResult.getException().getMessage(), exportResult.getException());
+                    exportRegistration.setException(exportResult.getException());
+                }
+                exportRegs.add(exportRegistration);
+            }
+        }
+        return exportRegs;
     }
 
     /**
