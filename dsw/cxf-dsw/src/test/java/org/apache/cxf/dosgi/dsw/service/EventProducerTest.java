@@ -59,7 +59,7 @@ public class EventProducerTest {
         final Bundle bundle = EasyMock.createNiceMock(Bundle.class);
         EasyMock.expect(bundle.getBundleId()).andReturn(42L).anyTimes();
         EasyMock.expect(bundle.getSymbolicName()).andReturn("test.bundle").anyTimes();
-        Hashtable<String, Object> headers = new Hashtable<String, Object>();
+        Hashtable<String, String> headers = new Hashtable<String, String>();
         headers.put("Bundle-Version", "1.2.3.test");
         EasyMock.expect(bundle.getHeaders()).andReturn(headers).anyTimes();
         EasyMock.replay(bundle);
@@ -128,7 +128,7 @@ public class EventProducerTest {
         final Bundle bundle = EasyMock.createNiceMock(Bundle.class);
         EasyMock.expect(bundle.getBundleId()).andReturn(42L).anyTimes();
         EasyMock.expect(bundle.getSymbolicName()).andReturn("test.bundle").anyTimes();
-        EasyMock.expect(bundle.getHeaders()).andReturn(new Hashtable<String, Object>()).anyTimes();
+        EasyMock.expect(bundle.getHeaders()).andReturn(new Hashtable<String, String>()).anyTimes();
         EasyMock.replay(bundle);
 
         final Exception exportException = new Exception();

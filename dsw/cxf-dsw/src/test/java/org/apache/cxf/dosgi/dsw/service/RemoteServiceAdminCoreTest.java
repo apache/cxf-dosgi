@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
@@ -69,7 +68,7 @@ public class RemoteServiceAdminCoreTest {
 
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
 
-        Dictionary<?, ?> d = new Properties();
+        Dictionary<String, String> d = new Hashtable<String, String>();
         EasyMock.expect(b.getHeaders()).andReturn(d).anyTimes();
 
         ServiceReference sref = c.createMock(ServiceReference.class);
@@ -103,7 +102,7 @@ public class RemoteServiceAdminCoreTest {
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
 
-        Dictionary<?, ?> d = new Properties();
+        Dictionary<String, String> d = new Hashtable<String, String>();
         EasyMock.expect(b.getHeaders()).andReturn(d).anyTimes();
 
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();

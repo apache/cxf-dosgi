@@ -41,7 +41,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <osgi.version>4.2.0</osgi.version>
-
+        <osgi.enterprise.version>4.2.0</osgi.enterprise.version>
         <cxf.version>2.7.2</cxf.version>
         <cxf.build-utils.version>2.5.0</cxf.build-utils.version>
         <felix.version>3.0.8</felix.version>
@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.enterprise</artifactId>
-                <version>${osgi.version}</version>
+                <version>${osgi.enterprise.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

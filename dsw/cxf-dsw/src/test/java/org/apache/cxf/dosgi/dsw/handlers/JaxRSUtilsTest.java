@@ -136,7 +136,7 @@ public class JaxRSUtilsTest extends TestCase {
     public void testCustomGlobalProvider() throws Exception {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        bc.getServiceReferences(null, JaxRSUtils.PROVIDERS_FILTER);
+        bc.getServiceReferences((String)null, JaxRSUtils.PROVIDERS_FILTER);
         EasyMock.expectLastCall().andReturn(new ServiceReference[] {
             sref
         });
@@ -158,7 +158,7 @@ public class JaxRSUtilsTest extends TestCase {
     public void testNoCustomGlobalProvider() throws Exception {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        bc.getServiceReferences(null, JaxRSUtils.PROVIDERS_FILTER);
+        bc.getServiceReferences((String)null, JaxRSUtils.PROVIDERS_FILTER);
         EasyMock.expectLastCall().andReturn(new ServiceReference[] {
             sref
         });
@@ -180,7 +180,7 @@ public class JaxRSUtilsTest extends TestCase {
     public void testCustomGlobalProviderExpected() throws Exception {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        bc.getServiceReferences(null, JaxRSUtils.PROVIDERS_FILTER);
+        bc.getServiceReferences((String)null, JaxRSUtils.PROVIDERS_FILTER);
         EasyMock.expectLastCall().andReturn(new ServiceReference[] {
             sref
         });

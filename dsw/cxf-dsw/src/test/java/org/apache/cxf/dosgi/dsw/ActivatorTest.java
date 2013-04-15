@@ -51,7 +51,7 @@ public class ActivatorTest extends TestCase {
         EasyMock.expectLastCall().atLeastOnce();
         ServiceRegistration sr = control.createMock(ServiceRegistration.class);
         EasyMock.expect(bc.registerService(EasyMock.eq(RemoteServiceAdmin.class.getName()),
-                                           EasyMock.anyObject(), (Dictionary<?, ?>)EasyMock.anyObject()))
+                                           EasyMock.anyObject(), (Dictionary<String, String>)EasyMock.anyObject()))
                                            .andReturn(sr).atLeastOnce();
         
         control.replay();

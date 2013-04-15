@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
+import java.util.Dictionary;
 import java.util.List;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -43,7 +43,7 @@ public class EndpointListenerFactoryTest extends TestCase {
 
         EasyMock.expect(
                         ctx.registerService(EasyMock.eq(EndpointListener.class.getName()), EasyMock.eq(eplf),
-                                            (Properties)EasyMock.anyObject())).andReturn(sreg).once();
+                                            (Dictionary<String, String>)EasyMock.anyObject())).andReturn(sreg).once();
         
         EasyMock.expect(ctx.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("myUUID")
             .anyTimes();
@@ -73,7 +73,7 @@ public class EndpointListenerFactoryTest extends TestCase {
 
         EasyMock.expect(
                         ctx.registerService(EasyMock.eq(EndpointListener.class.getName()), EasyMock.eq(eplf),
-                                            (Properties)EasyMock.anyObject())).andReturn(sreg).once();
+                                (Dictionary<String, String>)EasyMock.anyObject())).andReturn(sreg).once();
 
         
         EasyMock.expect(ctx.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("myUUID")
