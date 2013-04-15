@@ -33,10 +33,10 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
 
     private static final Logger LOG = LoggerFactory.getLogger(ImportRegistrationImpl.class);
 
-    private Throwable exception;
-    private ServiceRegistration importedService; // used only in parent
+    private volatile Throwable exception;
+    private volatile ServiceRegistration importedService; // used only in parent
     private EndpointDescription importedEndpoint;
-    private ClientServiceFactory clientServiceFactory;
+    private volatile ClientServiceFactory clientServiceFactory;
     private RemoteServiceAdminCore rsaCore;
     private boolean closed;
     private boolean detached; // used only in parent
@@ -88,31 +88,34 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
      *
      * @param iri the child
      */
-    private synchronized void instanceClosed(ImportRegistrationImpl iri) {
-        children.remove(iri);
-
-        if (children.isEmpty() && !detached && closed) {
+    private void instanceClosed(ImportRegistrationImpl iri) {
+        synchronized (this) {
+            children.remove(iri);
+            if (!children.isEmpty() || detached || !closed) {
+                return;
+            }
             detached = true;
+        }
 
-            LOG.debug("really closing ImportRegistartion now");
+        LOG.debug("really closing ImportRegistartion now");
 
-            if (clientServiceFactory != null) {
-                clientServiceFactory.setCloseable(true);
-            }
-            if (importedService != null) {
-                importedService.unregister();
-            }
+        if (clientServiceFactory != null) {
+            clientServiceFactory.setCloseable(true);
+        }
+        if (importedService != null) {
+            importedService.unregister();
         }
     }
 
-    public synchronized void close() {
+    public void close() {
         LOG.debug("close() called");
 
-        if (isInvalid()) {
-            return;
+        synchronized (this) {
+            if (isInvalid()) {
+                return;
+            }
+            closed = true;
         }
-
-        closed = true;
         rsaCore.removeImportRegistration(this);
         parent.instanceClosed(this);
     }
@@ -120,18 +123,24 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
     /**
      * Closes all ImportRegistrations which share the same parent as this one.
      */
-    public synchronized void closeAll() {
+    public void closeAll() {
         if (this == parent) {
             LOG.info("closing down all child ImportRegistrations");
 
             // we must iterate over a copy of children since close() removes the child
             // from the list (which would cause a ConcurrentModificationException)
-            for (ImportRegistrationImpl ir : new ArrayList<ImportRegistrationImpl>(children)) {
+            for (ImportRegistrationImpl ir : copyChildren()) {
                 ir.close();
             }
             this.close();
         } else {
             parent.closeAll();
+        }
+    }
+
+    private List<ImportRegistrationImpl> copyChildren() {
+        synchronized (this) {
+            return new ArrayList<ImportRegistrationImpl>(children);
         }
     }
 
@@ -163,11 +172,11 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
         exception = ex;
     }
 
-    private boolean isInvalid() {
+    private synchronized boolean isInvalid() {
         return exception != null || closed;
     }
 
-    public synchronized void setImportedServiceRegistration(ServiceRegistration proxyRegistration) {
+    public void setImportedServiceRegistration(ServiceRegistration proxyRegistration) {
         if (parent != this) {
             throw new IllegalStateException("this method may only be called on the parent");
         }
