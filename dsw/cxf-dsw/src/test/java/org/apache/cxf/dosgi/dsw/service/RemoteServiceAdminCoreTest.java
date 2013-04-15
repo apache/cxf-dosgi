@@ -317,7 +317,7 @@ public class RemoteServiceAdminCoreTest {
                 1, exportedServices.values().iterator().next().size());
 
         // Remove all export registrations from the service bundle
-        rsaCore.removeExportRegistrations(sref.getBundle().getBundleContext());
+        rsaCore.removeExportRegistrations(sref.getBundle());
         assertEquals("No more exported services", 0, exportedServices.size());
     }
 

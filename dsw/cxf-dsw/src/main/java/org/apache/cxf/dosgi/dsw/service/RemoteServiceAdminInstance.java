@@ -122,6 +122,6 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
     public void close() {
         closed = true;
 
-        rsaCore.removeExportRegistrations(bctx);
+        rsaCore.removeExportRegistrations(bctx.getBundle());
     }
 }

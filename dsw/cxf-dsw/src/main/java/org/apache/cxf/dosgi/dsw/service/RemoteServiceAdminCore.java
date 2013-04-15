@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
@@ -427,29 +426,25 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
     // Remove all export registrations associated with the given bundle
-    protected void removeExportRegistrations(BundleContext exportingBundleCtx) {
-        Bundle exportingBundle = exportingBundleCtx.getBundle();
+    protected void removeExportRegistrations(Bundle exportingBundle) {
+        List<ExportRegistration> bundleExports = getExportsForBundle(exportingBundle);
+        for (ExportRegistration export : bundleExports) {
+            export.close();
+        }
+    }
 
-        // Work on a copy as the map gets modified as part of the behaviour by underlying methods
-        Map<Map<String, Object>, Collection<ExportRegistration>> exportCopy
-            = new HashMap<Map<String, Object>, Collection<ExportRegistration>>(exportedServices);
-
-        for (Iterator<Map.Entry<Map<String, Object>, Collection<ExportRegistration>>> it
-                = exportCopy.entrySet().iterator(); it.hasNext();) {
-
-            Entry<Map<String, Object>, Collection<ExportRegistration>> entry = it.next();
-            Bundle regBundle = null;
-            Iterator<ExportRegistration> it2 = entry.getValue().iterator();
-            if (it2.hasNext())
-                regBundle = it2.next().getExportReference().getExportedService().getBundle();
-
-            if (exportingBundle.equals(regBundle)) {
-                // Again work on a copy, as the value gets modified by the behaviour inside export.close()
-                for (ExportRegistration export : new ArrayList<ExportRegistration>(entry.getValue())) {
-                    // This will remove the registration from the real map of exports
-                    export.close();
+    private List<ExportRegistration> getExportsForBundle(Bundle exportingBundle) {
+        synchronized (exportedServices) {
+            List<ExportRegistration> bundleRegs = new ArrayList<ExportRegistration>();
+            for (Collection<ExportRegistration> regs : exportedServices.values()) {
+                if (!regs.isEmpty()) {
+                    Bundle regBundle = regs.iterator().next().getExportReference().getExportedService().getBundle();
+                    if (exportingBundle.equals(regBundle)) {
+                        bundleRegs.addAll(regs);
+                    }
                 }
             }
+            return bundleRegs;
         }
     }
 
