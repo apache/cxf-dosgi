@@ -29,87 +29,72 @@ import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// *************************** FIXME: some old methods might be in here ****
-public class ImportRegistrationImpl implements ImportRegistration {
+public class ImportRegistrationImpl implements ImportRegistration, ImportReference {
 
     private static final Logger LOG = LoggerFactory.getLogger(ImportRegistrationImpl.class);
 
     private Throwable exception;
-    private ServiceRegistration importedService;
+    private ServiceRegistration importedService; // used only in parent
     private EndpointDescription importedEndpoint;
     private ClientServiceFactory clientServiceFactory;
     private RemoteServiceAdminCore rsaCore;
     private boolean closed;
-    private boolean detatched;
+    private boolean detached; // used only in parent
 
     private ImportRegistrationImpl parent;
-    private List<ImportRegistrationImpl> childs;
+    private List<ImportRegistrationImpl> children; // used only in parent
 
-    private ImportReference importReference;
-    
     public ImportRegistrationImpl(Throwable ex) {
         exception = ex;
-        init();
+        initParent();
     }
 
     public ImportRegistrationImpl(EndpointDescription endpoint, RemoteServiceAdminCore rsac) {
         importedEndpoint = endpoint;
         rsaCore = rsac;
-        init();
+        initParent();
     }
 
     /**
-     * Create a clone of this object which is linked to this object
+     * Creates a clone of the given parent instance.
      */
     public ImportRegistrationImpl(ImportRegistrationImpl ir) {
         // we always want a link to the parent ...
-        ir = ir.getParent();
-
-        parent = ir;
-        exception = ir.getException();
-        importedEndpoint = ir.getImportedEndpointDescription();
-        importedService = ir.getImportedServiceRegistration();
-        clientServiceFactory = ir.getClientServiceFactory();
-        rsaCore = ir.getRsaCore();
+        parent = ir.getParent();
+        exception = parent.getException();
+        importedEndpoint = parent.getImportedEndpointDescription();
+        clientServiceFactory = parent.clientServiceFactory;
+        rsaCore = parent.rsaCore;
 
         parent.instanceAdded(this);
     }
 
-    private void init() {
+    private void initParent() {
         parent = this;
-        childs = new ArrayList<ImportRegistrationImpl>(1);
-    }
-
-    private synchronized void instanceAdded(ImportRegistrationImpl i) {
-        childs.add(i);
-    }
-
-    public synchronized void close() {
-        LOG.debug("close() called ");
-
-        if (isFailure()) {
-            return;
-        }
-
-        if (closed) {
-            return;
-        }
-
-        closed = true;
-        rsaCore.removeImportRegistration(this);
-        parent.instanceClosed(this);
+        children = new ArrayList<ImportRegistrationImpl>(1);
     }
 
     /**
-     * only called on the parent object
+     * Called on parent when a child is added.
+     *
+     * @param iri the child
      */
-    private synchronized void instanceClosed(ImportRegistrationImpl i) {
-        childs.remove(i);
+    private synchronized void instanceAdded(ImportRegistrationImpl iri) {
+        children.add(iri);
+    }
 
-        if (childs.isEmpty() && !detatched && closed) {
-            detatched = true; 
-            
-            LOG.debug("really closing ImportRegistartion now! ");
+    /**
+     * Called on parent when a child is closed.
+     *
+     * @param iri the child
+     */
+    private synchronized void instanceClosed(ImportRegistrationImpl iri) {
+        children.remove(iri);
+
+        if (children.isEmpty() && !detached && closed) {
+            detached = true;
+
+            LOG.debug("really closing ImportRegistartion now");
 
             if (clientServiceFactory != null) {
                 clientServiceFactory.setCloseable(true);
@@ -120,109 +105,90 @@ public class ImportRegistrationImpl implements ImportRegistration {
         }
     }
 
+    public synchronized void close() {
+        LOG.debug("close() called");
+
+        if (isInvalid()) {
+            return;
+        }
+
+        closed = true;
+        rsaCore.removeImportRegistration(this);
+        parent.instanceClosed(this);
+    }
+
     /**
-     * used to close all ImportRegistrations in the case of an error ...
+     * Closes all ImportRegistrations which share the same parent as this one.
      */
     public synchronized void closeAll() {
         if (this == parent) {
             LOG.info("closing down all child ImportRegistrations");
 
-            for (ImportRegistrationImpl ir : new ArrayList<ImportRegistrationImpl>(childs)) {
+            // we must iterate over a copy of children since close() removes the child
+            // from the list (which would cause a ConcurrentModificationException)
+            for (ImportRegistrationImpl ir : new ArrayList<ImportRegistrationImpl>(children)) {
                 ir.close();
             }
-            if (!closed) {
-                this.close();
-            }
+            this.close();
         } else {
             parent.closeAll();
         }
     }
 
-    private ServiceRegistration getImportedServiceRegistration() {
-        return importedService;
+    public EndpointDescription getImportedEndpointDescription() {
+        return isInvalid() ? null : importedEndpoint;
     }
 
+    @Override
+    public EndpointDescription getImportedEndpoint() {
+        return getImportedEndpointDescription();
+    }
+
+    @Override
+    public ServiceReference getImportedService() {
+        return isInvalid() || parent.importedService == null ? null : parent.importedService.getReference();
+    }
+
+    @Override
+    public ImportReference getImportReference() {
+        return this;
+    }
+
+    @Override
     public Throwable getException() {
         return exception;
-    }
-
-    public EndpointDescription getImportedEndpointDescription() {
-        if (isFailure()) {
-            return null;
-        }
-        if (closed) {
-            return null;
-        }
-        
-        return importedEndpoint;
-    }
-
-    public ServiceReference getImportedService() {
-        if (isFailure() || closed) {
-            return null;
-        }
-
-        if (importedService == null) {
-            return null;
-        }
-
-        return importedService.getReference();
     }
 
     public void setException(Throwable ex) {
         exception = ex;
     }
 
-    private boolean isFailure() {
-        return exception != null;
-    }
-
-    private void setImportedServiceRegistrationInternal(ServiceRegistration proxyRegistration) {
-        importedService = proxyRegistration;
+    private boolean isInvalid() {
+        return exception != null || closed;
     }
 
     public synchronized void setImportedServiceRegistration(ServiceRegistration proxyRegistration) {
         if (parent != this) {
-            throw new IllegalStateException("this method may only be called on the parent !");
+            throw new IllegalStateException("this method may only be called on the parent");
         }
 
-        setImportedServiceRegistrationInternal(proxyRegistration);
-        for (ImportRegistrationImpl ir : childs) {
-            ir.setImportedServiceRegistrationInternal(proxyRegistration);
-        }
+        importedService = proxyRegistration;
     }
 
     public void setClientServiceFactory(ClientServiceFactory csf) {
         clientServiceFactory = csf;
     }
 
-    public RemoteServiceAdminCore getRsaCore() {
-        return rsaCore;
-    }
-
-    public void setRsaCore(RemoteServiceAdminCore rsaCore) {
-        this.rsaCore = rsaCore;
-    }
-
-    public ClientServiceFactory getClientServiceFactory() {
-        return clientServiceFactory;
-    }
-
-    public void setParent(ImportRegistrationImpl parent) {
-        this.parent = parent;
-    }
-
     public ImportRegistrationImpl getParent() {
         return parent;
     }
 
-    public ImportReference getImportReference() {
-        if (importReference == null) {
-            importReference = new ImportReferenceImpl(this);
-        }
-        return importReference;
-    }
-
+    /**
+     * Returns the imported endpoint even if this
+     * instance is closed or has an exception.
+     *
+     * @return the imported endpoint
+     */
     public EndpointDescription getImportedEndpointAlways() {
         return importedEndpoint;
     }
