@@ -18,20 +18,21 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
-import java.io.IOException;
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.provision;
+import static org.ops4j.pax.exam.CoreOptions.streamBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+
 import java.io.InputStream;
-import java.net.Socket;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
 import junit.framework.Assert;
 
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
-import org.apache.cxf.dosgi.systests2.common.AbstractTestExportService;
 import org.apache.cxf.dosgi.systests2.multi.customintent.AddGreetingPhraseInterceptor;
 import org.apache.cxf.dosgi.systests2.multi.customintent.CustomFeature;
 import org.apache.cxf.dosgi.systests2.multi.customintent.CustomIntentActivator;
@@ -44,19 +45,12 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.swissbox.tinybundles.core.TinyBundles;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.provision;
-import static org.ops4j.pax.exam.CoreOptions.streamBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-
 
 @RunWith(JUnit4TestRunner.class)
-public class TestCustomIntent extends AbstractTestExportService {
+public class TestCustomIntent extends AbstractDosgiTest {
     @Inject
     BundleContext bundleContext;
 
@@ -100,16 +94,11 @@ public class TestCustomIntent extends AbstractTestExportService {
         Thread.sleep(2000);
         getBundleByName(bundleContext, "CustomIntent").start();
         waitPort(9090);
-        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-        factory.setServiceClass(GreeterService.class);
-        factory.setAddress("http://localhost:9090/greeter");
-        factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-        factory.setServiceClass(GreeterService.class);
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
         try {
-            GreeterService greeterService = (GreeterService) factory.create();
+            GreeterService greeterService = createGreeterServiceProxy("http://localhost:9090/greeter");
             Map<GreetingPhrase, String> result = greeterService.greetMe("Chris");
             Assert.assertEquals(1, result.size());
             GreetingPhrase phrase = result.keySet().iterator().next();
@@ -118,37 +107,5 @@ public class TestCustomIntent extends AbstractTestExportService {
             Thread.currentThread().setContextClassLoader(cl);
         }
     }
-    
-    private Bundle getBundleByName(BundleContext bc, String sn) {
-        for (Bundle bundle : bc.getBundles()) {
-            if (bundle.getSymbolicName().equals(sn)) {
-                return bundle;
-            }
-        }
-        return null;
-    }
 
-    private void waitPort(int port) throws Exception {
-        for (int i = 0; i < 20; i++) {
-            Socket s = null;
-            try {
-                s = new Socket((String) null, port);
-                // yep, its available
-                return;
-            } catch (IOException e) {
-                // wait 
-            } finally {
-                if (s != null) {
-                    try {
-                        s.close();
-                    } catch (IOException e) {
-                        //ignore
-                    }
-                }
-            }
-            System.out.println("Waiting for server to appear on port: " + port);
-            Thread.sleep(10000);            
-        }
-        throw new TimeoutException();
-    }
 }

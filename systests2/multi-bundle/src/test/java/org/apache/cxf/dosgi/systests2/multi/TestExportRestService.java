@@ -19,9 +19,9 @@
 package org.apache.cxf.dosgi.systests2.multi;
 
 
-import java.io.IOException;
-import java.net.Socket;
-import java.util.concurrent.TimeoutException;
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 import javax.inject.Inject;
 
@@ -32,12 +32,8 @@ import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
 
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-
 @RunWith(JUnit4TestRunner.class)
-public class TestExportRestService {
+public class TestExportRestService extends AbstractDosgiTest {
     @Inject
     BundleContext bundleContext;
 
@@ -52,39 +48,13 @@ public class TestExportRestService {
                     .artifactId("cxf-dosgi-ri-samples-greeter-rest-interface").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                     .artifactId("cxf-dosgi-ri-samples-greeter-rest-impl").versionAsInProject(),
-                //mavenBundle().groupId("org.apache.cxf.dosgi.systests")
-                //    .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
                 frameworkStartLevel(100)
         };
     }
     
     @Test
-    public void testAccessEndpoint() throws Exception {
-        // call into base test. Inheriting the test doesn't properly report failures.
+    public void testEndpointAvailable() throws Exception {
         waitPort(8080);
     }
-    
-    private void waitPort(int port) throws Exception {
-        for (int i = 0; i < 20; i++) {
-            Socket s = null;
-            try {
-                s = new Socket((String) null, port);
-                // yep, its available
-                return;
-            } catch (IOException e) {
-                // wait 
-            } finally {
-                if (s != null) {
-                    try {
-                        s.close();
-                    } catch (IOException e) {
-                        //ignore
-                    }
-                }
-            }
-            System.out.println("Waiting for server to appear on port: " + port);
-            Thread.sleep(1000);            
-        }
-        throw new TimeoutException();
-    }
+
 }
