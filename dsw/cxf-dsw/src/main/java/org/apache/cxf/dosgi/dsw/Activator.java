@@ -70,13 +70,13 @@ public class Activator implements ManagedService, BundleActivator {
 
     private synchronized void init(Map<String, Object> config) {
         String httpBase = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.HTTP_BASE);
-        String cxfServletAlisas = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.CXF_SERVLET_ALIAS);
+        String cxfServletAlias = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.CXF_SERVLET_ALIAS);
 
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         intentTracker = new IntentTracker(bc, intentMap);
         intentTracker.open();
         IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
-        HttpServiceManager httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlisas);
+        HttpServiceManager httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlias);
         ConfigTypeHandlerFactory configTypeHandlerFactory
             = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);

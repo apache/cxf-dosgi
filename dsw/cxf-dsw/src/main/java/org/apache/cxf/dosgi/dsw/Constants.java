@@ -123,8 +123,20 @@ public final class Constants {
     public static final String DSW_CLIENT_ID = PROVIDER_PREFIX + ".remote.dsw.client";
 
     public static final String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
+    
+    /**
+     * Prefix to create an absolute URL from a relative URL.
+     * See HttpServiceManager.getAbsoluteAddress 
+     * 
+     * Defaults to: http://<host name>:8181
+     */
     public static final String HTTP_BASE = "httpBase";
+    
+    /**
+     * Name of the cxf servlet alias
+     */
     public static final String CXF_SERVLET_ALIAS = "cxfServletAlias";
+    public static final String DEFAULT_CXF_SERVLET_ALIAS = "/cxf";
     
     private Constants() {
         //never constructed
