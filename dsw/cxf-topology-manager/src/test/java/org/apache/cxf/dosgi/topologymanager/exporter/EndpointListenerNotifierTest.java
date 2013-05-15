@@ -19,6 +19,8 @@
 package org.apache.cxf.dosgi.topologymanager.exporter;
 
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,10 +38,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
-import org.osgi.service.remoteserviceadmin.ExportReference;
-import org.osgi.service.remoteserviceadmin.ExportRegistration;
-
-import static org.junit.Assert.assertEquals;
 
 public class EndpointListenerNotifierTest {
 
@@ -50,14 +48,9 @@ public class EndpointListenerNotifierTest {
 
         BundleContext bc = c.createMock(BundleContext.class);
         ServiceReference sref = c.createMock(ServiceReference.class);
-        ExportRegistration exReg = c.createMock(ExportRegistration.class);
-        ExportRegistration exReg2 = c.createMock(ExportRegistration.class);
         EndpointListener epl = EasyMock.createMock(EndpointListener.class);
         EndpointDescription epd = c.createMock(EndpointDescription.class);
         EndpointDescription epd2 = c.createMock(EndpointDescription.class);
-        ExportReference exRef = c.createMock(ExportReference.class);
-        ExportReference exRef2 = c.createMock(ExportReference.class);
-        
         
         Map<String, Object> props = new HashMap<String, Object>();
         String[] oc = new String[1];
@@ -80,19 +73,14 @@ public class EndpointListenerNotifierTest {
             .andReturn("(objectClass=myClass)").anyTimes();
 
         
-        EasyMock.expect(exReg.getExportReference()).andReturn(exRef).anyTimes();
-        EasyMock.expect(exRef.getExportedEndpoint()).andReturn(epd).anyTimes();
         EasyMock.expect(epd.getProperties()).andReturn(props).anyTimes();
-        
-        EasyMock.expect(exReg2.getExportReference()).andReturn(exRef2).anyTimes();
-        EasyMock.expect(exRef2.getExportedEndpoint()).andReturn(epd2).anyTimes();
         EasyMock.expect(epd2.getProperties()).andReturn(props2).anyTimes();
         
         // must only be called for the first EndpointDestription ! 
         epl.endpointRemoved(EasyMock.eq(epd), EasyMock.eq("(objectClass=myClass)"));
         EasyMock.expectLastCall().once();
         
-        ExportRepository exportRepository = EasyMock.createMock(ExportRepository.class);
+        EndpointRepository exportRepository = EasyMock.createMock(EndpointRepository.class);
         
         c.replay();
         EasyMock.replay(epl);
@@ -101,11 +89,11 @@ public class EndpointListenerNotifierTest {
         EndpointListenerNotifier tm = new EndpointListenerNotifier(bc, exportRepository);
 
 
-        List<ExportRegistration> exRegs = new ArrayList<ExportRegistration>();
-        exRegs.add(exReg);
-        exRegs.add(exReg2);
+        List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
+        endpoints.add(epd);
+        endpoints.add(epd2);
 
-        tm.notifyListenersOfRemoval(sref, exRegs);
+        tm.notifyListenersOfRemoval(sref, endpoints);
 
         c.verify();
         EasyMock.verify(epl);

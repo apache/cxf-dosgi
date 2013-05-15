@@ -43,24 +43,24 @@ public class EndpointListenerNotifier {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
     private BundleContext bctx;
     private ServiceTracker stEndpointListeners;
-    private ExportRepository exportRepository;
+    private EndpointRepository exportRepository;
 
-    public EndpointListenerNotifier(BundleContext bctx, ExportRepository exportRepository) {
+    public EndpointListenerNotifier(BundleContext bctx, EndpointRepository exportRepository) {
         this.bctx = bctx;
         this.exportRepository = exportRepository;
         this.stEndpointListeners = new ServiceTracker(bctx, EndpointListener.class.getName(), null) {
             @Override
-            public Object addingService(ServiceReference reference) {
+            public Object addingService(ServiceReference epListenerRef) {
                 LOG.debug("new EndpointListener detected");
-                notifyListenerOfAllExistingExports(reference);
-                return super.addingService(reference);
+                notifyListenerOfAllExistingExports(epListenerRef);
+                return super.addingService(epListenerRef);
             }
 
             @Override
-            public void modifiedService(ServiceReference reference, Object service) {
+            public void modifiedService(ServiceReference epListenerRef, Object service) {
                 LOG.debug("EndpointListener modified");
-                notifyListenerOfAllExistingExports(reference);
-                super.modifiedService(reference, service);
+                notifyListenerOfAllExistingExports(epListenerRef);
+                super.modifiedService(epListenerRef, service);
             }
 
         };
@@ -77,27 +77,27 @@ public class EndpointListenerNotifier {
     
     private void notifyListenerOfAllExistingExports(
             ServiceReference reference) {
-        Collection<ExportRegistration> registrations = exportRepository.getAllExportRegistrations();
+        Collection<EndpointDescription> registrations = exportRepository.getAllEndpoints();
         notifyListenerOfAdding(reference, registrations);
     }
     
-    void nofifyEndpointListenersOfAdding(Collection<ExportRegistration> exportRegistrations) {
+    void nofifyEndpointListenersOfAdding(Collection<EndpointDescription> endpoints) {
         ServiceReference[] epListeners = getEndpointListeners(bctx);
-        for (ServiceReference sref : epListeners) {
-            notifyListenerOfAdding(sref, exportRegistrations);
+        for (ServiceReference eplistener : epListeners) {
+            notifyListenerOfAdding(eplistener, endpoints);
         }
     }
     
-    void notifyAllListenersOfRemoval(Collection<ExportRegistration> endpoints) {
+    void notifyAllListenersOfRemoval(Collection<EndpointDescription> endpoints) {
         ServiceReference[] refs = getEndpointListeners(bctx);
         for (ServiceReference epListenerReference : refs) {
             notifyListenersOfRemoval(epListenerReference, endpoints);
         }
     }
     
-    void notifyListenersOfRemoval(Collection<ExportRegistration> registrations) {
+    void notifyListenersOfRemoval(Collection<EndpointDescription> endpoints) {
         for (ServiceReference epListenerReference : stEndpointListeners.getServiceReferences()) {
-            notifyListenersOfRemoval(epListenerReference, registrations);
+            notifyListenersOfRemoval(epListenerReference, endpoints);
         }
     }
     
@@ -105,16 +105,15 @@ public class EndpointListenerNotifier {
      * Notifies the listener if he is interested in the provided registrations
      * 
      * @param sref The ServiceReference for an EndpointListener
-     * @param exportRegistrations the registrations, the listener should be informed about
+     * @param endpoints the registrations, the listener should be informed about
      */
     private void notifyListenerOfAdding(ServiceReference epListenerReference,
-                                        Collection<ExportRegistration> exportRegistrations) {
+                                        Collection<EndpointDescription> endpoints) {
         EndpointListener epl = (EndpointListener)bctx.getService(epListenerReference);
         List<Filter> filters = getFiltersFromEndpointListenerScope(epListenerReference, bctx);
 
         LOG.debug("notifyListenerOfAdding");
-        for (ExportRegistration exReg : exportRegistrations) {
-            EndpointDescription endpoint = getExportedEndpoint(exReg);
+        for (EndpointDescription endpoint : endpoints) {
             List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
             for (Filter filter : matchingFilters) {
                 epl.endpointAdded(endpoint, filter.toString());
@@ -124,11 +123,10 @@ public class EndpointListenerNotifier {
     }
 
     void notifyListenersOfRemoval(ServiceReference epListenerReference,
-                                          Collection<ExportRegistration> exportRegistrations) {
+                                          Collection<EndpointDescription> endpoints) {
         EndpointListener epl = (EndpointListener)bctx.getService(epListenerReference);
         List<Filter> filters = getFiltersFromEndpointListenerScope(epListenerReference, bctx);
-        for (ExportRegistration exReg : exportRegistrations) {
-            EndpointDescription endpoint = getExportedEndpoint(exReg);
+        for (EndpointDescription endpoint : endpoints) {
             List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
             for (Filter filter : matchingFilters) {
                 epl.endpointRemoved(endpoint, filter.toString());
@@ -202,16 +200,6 @@ public class EndpointListenerNotifier {
             LOG.error(e.getMessage(), e);
         }
         return (result == null) ? new ServiceReference[]{} : result;
-    }
-   
-    /**
-     * Retrieve exported Endpoint while handling null
-     * @param exReg
-     * @return exported Endpoint or null if not present
-     */
-    private EndpointDescription getExportedEndpoint(ExportRegistration exReg) {
-        ExportReference ref = (exReg == null) ? null : exReg.getExportReference();
-        return (ref == null) ? null : ref.getExportedEndpoint(); 
     }
    
     /**

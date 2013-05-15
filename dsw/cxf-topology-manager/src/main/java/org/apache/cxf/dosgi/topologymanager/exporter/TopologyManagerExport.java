@@ -36,6 +36,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * <li>This class keeps a list of currently imported and exported endpoints <li>It requests the import/export
  * from RemoteAdminServices
  */
-public class TopologyManagerExport implements ExportRepository {
+public class TopologyManagerExport implements EndpointRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(TopologyManagerExport.class);
 
@@ -76,8 +77,8 @@ public class TopologyManagerExport implements ExportRepository {
      * </pre>
      */
     private final Map<ServiceReference, 
-                      Map<RemoteServiceAdmin, Collection<ExportRegistration>>> exportedServices = 
-        new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<ExportRegistration>>>();
+                      Map<RemoteServiceAdmin, Collection<EndpointDescription>>> exportedServices = 
+        new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>>();
 
     public TopologyManagerExport(BundleContext ctx, RemoteServiceAdminTracker rsaTracker) {
         execService = new ThreadPoolExecutor(5, 10, 50, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
@@ -112,6 +113,16 @@ public class TopologyManagerExport implements ExportRepository {
     }
     
     /**
+     * Retrieve exported Endpoint while handling null
+     * @param exReg
+     * @return exported Endpoint or null if not present
+     */
+    private EndpointDescription getExportedEndpoint(ExportRegistration exReg) {
+        ExportReference ref = (exReg == null) ? null : exReg.getExportReference();
+        return (ref == null) ? null : ref.getExportedEndpoint(); 
+    }
+    
+    /**
      * checks if a Service is intended to be exported
      */
     private boolean shouldExportService(ServiceReference sref) {
@@ -127,10 +138,10 @@ public class TopologyManagerExport implements ExportRepository {
      */
     protected void removeRemoteServiceAdmin(RemoteServiceAdmin rsa) {
         synchronized (exportedServices) {
-            for (Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports : exportedServices
+            for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices
                 .values()) {
                 if (exports.containsKey(rsa)) {
-                    Collection<ExportRegistration> endpoints = exports.get(rsa);
+                    Collection<EndpointDescription> endpoints = exports.get(rsa);
                     this.epListenerNotifier.notifyAllListenersOfRemoval(endpoints);
                     exports.remove(rsa);
                 }
@@ -143,7 +154,7 @@ public class TopologyManagerExport implements ExportRepository {
 
         synchronized (exportedServices) {
             for (ServiceReference serviceRef : exportedServices.keySet()) {
-                Map<RemoteServiceAdmin, Collection<ExportRegistration>> rsaExports = exportedServices.get(serviceRef);
+                Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsaExports = exportedServices.get(serviceRef);
                 String bundleName = serviceRef.getBundle().getSymbolicName();
                 if (rsaExports.containsKey(rsa)) {
                     // already handled....
@@ -179,16 +190,11 @@ public class TopologyManagerExport implements ExportRepository {
     void removeService(ServiceReference sref) {
         synchronized (exportedServices) {
             if (exportedServices.containsKey(sref)) {
-                Map<RemoteServiceAdmin, Collection<ExportRegistration>> rsas = exportedServices.get(sref);
-                for (Map.Entry<RemoteServiceAdmin, Collection<ExportRegistration>> entry : rsas.entrySet()) {
+                Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsas = exportedServices.get(sref);
+                for (Map.Entry<RemoteServiceAdmin, Collection<EndpointDescription>> entry : rsas.entrySet()) {
                     if (entry.getValue() != null) {
-                        Collection<ExportRegistration> registrations = entry.getValue();
+                        Collection<EndpointDescription> registrations = entry.getValue();
                         this.epListenerNotifier.notifyListenersOfRemoval(registrations);
-                        for (ExportRegistration exReg : registrations) {
-                            if (exReg != null) {
-                                exReg.close();
-                            }
-                        }
                     }
                 }
 
@@ -203,7 +209,7 @@ public class TopologyManagerExport implements ExportRepository {
             LOG.info("TopologyManager: adding service to exportedServices list to export it --- from bundle:  "
                       + sref.getBundle().getSymbolicName());
             exportedServices.put(sref,
-                                 new LinkedHashMap<RemoteServiceAdmin, Collection<ExportRegistration>>());
+                                 new LinkedHashMap<RemoteServiceAdmin, Collection<EndpointDescription>>());
         }
         triggerExport(sref);
     }
@@ -219,7 +225,7 @@ public class TopologyManagerExport implements ExportRepository {
     private void doExportService(final ServiceReference sref) {
         LOG.debug("Exporting service");
 
-        Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports = null;
+        Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = null;
 
         synchronized (exportedServices) {
             exports = Collections.synchronizedMap(exportedServices.get(sref));
@@ -247,13 +253,17 @@ public class TopologyManagerExport implements ExportRepository {
             } else {
                 // TODO: additional parameter Map ?
                 LOG.debug("exporting ...");
-                Collection<ExportRegistration> endpoints = remoteServiceAdmin
+                Collection<ExportRegistration> exportRegs = remoteServiceAdmin
                         .exportService(sref, null);
-                if (endpoints == null) {
+                if (exportRegs == null) {
                     // TODO export failed -> What should be done here?
                     LOG.error("export failed");
                     exports.put(remoteServiceAdmin, null);
                 } else {
+                	List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
+                	for (ExportRegistration exportReg : exportRegs) {
+						endpoints.add(getExportedEndpoint(exportReg));
+					}
                     LOG.info("TopologyManager: export sucessful Endpoints: {}", endpoints);
                     // enqueue in local list of endpoints
                     exports.put(remoteServiceAdmin, endpoints);
@@ -264,11 +274,11 @@ public class TopologyManagerExport implements ExportRepository {
         }
     }
     
-    public Collection<ExportRegistration> getAllExportRegistrations() {
-        List<ExportRegistration> registrations = new ArrayList<ExportRegistration>();
+    public Collection<EndpointDescription> getAllEndpoints() {
+        List<EndpointDescription> registrations = new ArrayList<EndpointDescription>();
         synchronized (exportedServices) {
-            for (Map<RemoteServiceAdmin, Collection<ExportRegistration>> exports : exportedServices.values()) {
-                for (Collection<ExportRegistration> regs : exports.values()) {
+            for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
+                for (Collection<EndpointDescription> regs : exports.values()) {
                     if (regs != null) {
                         registrations.addAll(regs);
                     }
@@ -294,9 +304,9 @@ public class TopologyManagerExport implements ExportRepository {
         if (sref != null) {
             synchronized (exportedServices) {
 
-                Map<RemoteServiceAdmin, Collection<ExportRegistration>> ex = exportedServices.get(sref);
+                Map<RemoteServiceAdmin, Collection<EndpointDescription>> ex = exportedServices.get(sref);
                 if (ex != null) {
-                    for (Map.Entry<RemoteServiceAdmin, Collection<ExportRegistration>> export : ex.entrySet()) {
+                    for (Map.Entry<RemoteServiceAdmin, Collection<EndpointDescription>> export : ex.entrySet()) {
                         export.getValue().contains(exportRegistration);
                     }
                 }

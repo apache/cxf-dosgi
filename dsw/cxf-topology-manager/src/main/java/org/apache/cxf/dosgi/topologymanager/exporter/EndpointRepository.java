@@ -20,8 +20,8 @@ package org.apache.cxf.dosgi.topologymanager.exporter;
 
 import java.util.Collection;
 
-import org.osgi.service.remoteserviceadmin.ExportRegistration;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-public interface ExportRepository {
-    Collection<ExportRegistration> getAllExportRegistrations();
+public interface EndpointRepository {
+    Collection<EndpointDescription> getAllEndpoints();
 }
