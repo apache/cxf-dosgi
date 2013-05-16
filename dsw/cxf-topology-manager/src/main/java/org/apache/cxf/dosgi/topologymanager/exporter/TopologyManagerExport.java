@@ -41,40 +41,35 @@ import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
-import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <li>This class keeps a list of currently imported and exported endpoints <li>It requests the import/export
- * from RemoteAdminServices
+ * Manages exported endpoints of DOSGi services and notifies EndpointListeners of changes.
+ * 
+ * <li> Tracks local RemoteServiceAdmin instances by using a ServiceTracker
+ * <li> Uses a ServiceListener to track local OSGi services
+ * <li> When a service is published that is supported by DOSGi the
+ *      known RemoteServiceAdmins are instructed to export the service and
+ *      the EndpointListeners are notified
+ * <li> When a service is unpublished the EndpointListeners are notified.
+ *      The endpoints are not closed as the ExportRegistration takes care of this  
  */
 public class TopologyManagerExport implements EndpointRepository {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TopologyManagerExport.class);
+    private static final String DOSGI_SERVICES = "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)";
+
+	private static final Logger LOG = LoggerFactory.getLogger(TopologyManagerExport.class);
 
     private final BundleContext bctx;
     private final EndpointListenerNotifier epListenerNotifier;
     private final ExecutorService execService;
     private final RemoteServiceAdminTracker remoteServiceAdminTracker;
-    private final ServiceListener serviceListerner;
+    private final ServiceListener serviceListener;
 
     /**
      * Holds all services that are exported by this TopologyManager for each ServiceReference that should be
      * exported a map is maintained which contains information on the endpoints for each RemoteAdminService
-     * 
-     * <pre>
-     * Bsp.:
-     * ServiceToExort_1
-     * ---&gt; RemoteAdminService_1 (CXF HTTP)
-     * --------&gt; List&lt;EndpointDescription&gt; -&gt; {http://localhost:1234/greeter, http://localhost:8080/hello}
-     * ---&gt; RemoteAdminService_2 (ActiveMQ JMS/OpenWire)
-     * --------&gt; List&lt;EndpointDescription&gt; -&gt; {OpenWire://127.0.0.1:123/testQueue}
-     * ServiceToExort_2
-     * ---&gt; RemoteAdminService_1 (CXF HTTP)
-     * --------&gt; List&lt;EndpointDescription&gt; -&gt; {empty} // not exported yet or not suitable
-     * 
-     * </pre>
      */
     private final Map<ServiceReference, 
                       Map<RemoteServiceAdmin, Collection<EndpointDescription>>> exportedServices = 
@@ -94,7 +89,7 @@ public class TopologyManagerExport implements EndpointRepository {
                 removeRemoteServiceAdmin(rsa);
             }
         });
-        serviceListerner = new ServiceListener() {
+        serviceListener = new ServiceListener() {
             public void serviceChanged(ServiceEvent event) {
                 ServiceReference sref = event.getServiceReference();
                 if (event.getType() == ServiceEvent.REGISTERED) {
@@ -113,23 +108,10 @@ public class TopologyManagerExport implements EndpointRepository {
     }
     
     /**
-     * Retrieve exported Endpoint while handling null
-     * @param exReg
-     * @return exported Endpoint or null if not present
-     */
-    private EndpointDescription getExportedEndpoint(ExportRegistration exReg) {
-        ExportReference ref = (exReg == null) ? null : exReg.getExportReference();
-        return (ref == null) ? null : ref.getExportedEndpoint(); 
-    }
-    
-    /**
      * checks if a Service is intended to be exported
      */
     private boolean shouldExportService(ServiceReference sref) {
-        if (sref.getProperty(RemoteConstants.SERVICE_EXPORTED_INTERFACES) != null) {
-            return true;
-        }
-        return false;
+        return sref.getProperty(RemoteConstants.SERVICE_EXPORTED_INTERFACES) != null;
     }
 
     /**
@@ -171,19 +153,15 @@ public class TopologyManagerExport implements EndpointRepository {
 
     public void start() {
         epListenerNotifier.start();
-        bctx.addServiceListener(serviceListerner);
+        bctx.addServiceListener(serviceListener);
         remoteServiceAdminTracker.open();
-        try {
-            exportExistingServices();
-        } catch (InvalidSyntaxException e) {
-            LOG.debug("Failed to export existing services.", e);
-        }
+        exportExistingServices();
     }
 
     public void stop() {
         execService.shutdown();
         remoteServiceAdminTracker.close();
-        bctx.removeServiceListener(serviceListerner);
+        bctx.removeServiceListener(serviceListener);
         epListenerNotifier.stop();
     }
 
@@ -274,6 +252,16 @@ public class TopologyManagerExport implements EndpointRepository {
         }
     }
     
+    /**
+     * Retrieve exported Endpoint while handling null
+     * @param exReg
+     * @return exported Endpoint or null if not present
+     */
+    private EndpointDescription getExportedEndpoint(ExportRegistration exReg) {
+        ExportReference ref = (exReg == null) ? null : exReg.getExportReference();
+        return (ref == null) ? null : ref.getExportedEndpoint(); 
+    }
+    
     public Collection<EndpointDescription> getAllEndpoints() {
         List<EndpointDescription> registrations = new ArrayList<EndpointDescription>();
         synchronized (exportedServices) {
@@ -288,48 +276,17 @@ public class TopologyManagerExport implements EndpointRepository {
         return registrations;
     }
 
-    private void exportExistingServices() throws InvalidSyntaxException {
-        String filter = "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)";
-        ServiceReference[] references = bctx.getServiceReferences(null, filter);
-
-        if (references != null) {
-            for (ServiceReference sref : references) {
-                exportService(sref);
-            }
-        }
-    }
-
-    public void removeExportRegistration(ExportRegistration exportRegistration) {
-        ServiceReference sref = exportRegistration.getExportReference().getExportedService();
-        if (sref != null) {
-            synchronized (exportedServices) {
-
-                Map<RemoteServiceAdmin, Collection<EndpointDescription>> ex = exportedServices.get(sref);
-                if (ex != null) {
-                    for (Map.Entry<RemoteServiceAdmin, Collection<EndpointDescription>> export : ex.entrySet()) {
-                        export.getValue().contains(exportRegistration);
-                    }
-                }
-            }
-        } else {
-            // the manager will be notified by its own service listener about this case
-        }
-    }
-
-    /**
-     * This method is called once a RemoteServiceAdminEvent for an removed export reference is received.
-     * However the current implementation has no special support for multiple topology managers, therefore this method
-     * does nothing for the moment.
-     */
-    public void removeExportReference(ExportReference anyObject) {
-        // TODO Auto-generated method stub
-        // LOG.severe("NOT implemented !!!");
-    }
-
-    public void remoteAdminEvent(RemoteServiceAdminEvent event) {
-        if (event.getType() == RemoteServiceAdminEvent.EXPORT_UNREGISTRATION) {
-            removeExportReference(event.getExportReference());
-        }
+    private void exportExistingServices() {
+        try {
+			ServiceReference[] references = bctx.getServiceReferences(null, DOSGI_SERVICES);
+			if (references != null) {
+			    for (ServiceReference sref : references) {
+			        exportService(sref);
+			    }
+			}
+		} catch (InvalidSyntaxException e) {
+			LOG.error("Error in filter {}. This should not occur !", DOSGI_SERVICES);
+		}
     }
 
 }
