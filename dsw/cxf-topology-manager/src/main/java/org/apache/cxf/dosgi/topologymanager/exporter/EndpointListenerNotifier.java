@@ -25,6 +25,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -38,26 +39,33 @@ import org.slf4j.LoggerFactory;
  * Tracks EndpointListeners and allows to notify them of endpoints
  */
 public class EndpointListenerNotifier {
-    private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
+    private static final String ENDPOINT_LISTENER_FILTER =
+    		"(&(" + Constants.OBJECTCLASS + "=" + EndpointListener.class.getName() + ")"
+    		+ "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*))";
+	private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
     private BundleContext bctx;
     private ServiceTracker stEndpointListeners;
-    private EndpointRepository exportRepository;
 
-    public EndpointListenerNotifier(BundleContext bctx, EndpointRepository exportRepository) {
+    public EndpointListenerNotifier(BundleContext bctx, final EndpointRepository endpointRepository) {
         this.bctx = bctx;
-        this.exportRepository = exportRepository;
-        this.stEndpointListeners = new ServiceTracker(bctx, EndpointListener.class.getName(), null) {
+        Filter filter;
+		try {
+			filter = bctx.createFilter(ENDPOINT_LISTENER_FILTER);
+		} catch (InvalidSyntaxException e) {
+			throw new RuntimeException("Unexpected exception creating filter", e);
+		}
+        this.stEndpointListeners = new ServiceTracker(bctx, filter, null) {
             @Override
             public Object addingService(ServiceReference epListenerRef) {
                 LOG.debug("new EndpointListener detected");
-                notifyListenerOfAllExistingExports(epListenerRef);
+                notifyListenerOfAdding(epListenerRef, endpointRepository.getAllEndpoints());
                 return super.addingService(epListenerRef);
             }
 
             @Override
             public void modifiedService(ServiceReference epListenerRef, Object service) {
                 LOG.debug("EndpointListener modified");
-                notifyListenerOfAllExistingExports(epListenerRef);
+                notifyListenerOfAdding(epListenerRef, endpointRepository.getAllEndpoints());
                 super.modifiedService(epListenerRef, service);
             }
 
@@ -73,29 +81,15 @@ public class EndpointListenerNotifier {
         stEndpointListeners.close();
     }
     
-    private void notifyListenerOfAllExistingExports(
-            ServiceReference reference) {
-        Collection<EndpointDescription> registrations = exportRepository.getAllEndpoints();
-        notifyListenerOfAdding(reference, registrations);
-    }
-    
     void nofifyEndpointListenersOfAdding(Collection<EndpointDescription> endpoints) {
-        ServiceReference[] epListeners = getEndpointListeners(bctx);
-        for (ServiceReference eplistener : epListeners) {
+        for (ServiceReference eplistener : stEndpointListeners.getServiceReferences()) {
             notifyListenerOfAdding(eplistener, endpoints);
-        }
-    }
-    
-    void notifyAllListenersOfRemoval(Collection<EndpointDescription> endpoints) {
-        ServiceReference[] refs = getEndpointListeners(bctx);
-        for (ServiceReference epListenerReference : refs) {
-            notifyListenersOfRemoval(epListenerReference, endpoints);
         }
     }
     
     void notifyListenersOfRemoval(Collection<EndpointDescription> endpoints) {
         for (ServiceReference epListenerReference : stEndpointListeners.getServiceReferences()) {
-            notifyListenersOfRemoval(epListenerReference, endpoints);
+            notifyListenerOfRemoval(epListenerReference, endpoints);
         }
     }
     
@@ -120,7 +114,7 @@ public class EndpointListenerNotifier {
 
     }
 
-    void notifyListenersOfRemoval(ServiceReference epListenerReference,
+    void notifyListenerOfRemoval(ServiceReference epListenerReference,
                                           Collection<EndpointDescription> endpoints) {
         EndpointListener epl = (EndpointListener)bctx.getService(epListenerReference);
         List<Filter> filters = getFiltersFromEndpointListenerScope(epListenerReference, bctx);
@@ -181,23 +175,6 @@ public class EndpointListenerNotifier {
             }
         }
         return matchingFilters;
-    }
-
-    /** 
-     * Find all EndpointListeners; They must have the Scope property otherwise they have to be ignored
-     * @param bctx
-     * @return
-     * @throws InvalidSyntaxException
-     */
-    private static ServiceReference[] getEndpointListeners(BundleContext bctx) {
-        ServiceReference[] result = null;
-        try {
-            String filter = "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*)";
-            result = bctx.getServiceReferences(EndpointListener.class.getName(), filter);
-        } catch (InvalidSyntaxException e) {
-            LOG.error(e.getMessage(), e);
-        }
-        return (result == null) ? new ServiceReference[]{} : result;
     }
    
     /**

@@ -93,7 +93,7 @@ public class EndpointListenerNotifierTest {
         endpoints.add(epd);
         endpoints.add(epd2);
 
-        tm.notifyListenersOfRemoval(sref, endpoints);
+        tm.notifyListenerOfRemoval(sref, endpoints);
 
         c.verify();
         EasyMock.verify(epl);

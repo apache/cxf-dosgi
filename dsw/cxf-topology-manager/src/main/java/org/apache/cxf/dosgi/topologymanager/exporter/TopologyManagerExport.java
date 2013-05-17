@@ -20,10 +20,7 @@ package org.apache.cxf.dosgi.topologymanager.exporter;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -55,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * <li> When a service is unpublished the EndpointListeners are notified.
  *      The endpoints are not closed as the ExportRegistration takes care of this  
  */
-public class TopologyManagerExport implements EndpointRepository {
+public class TopologyManagerExport {
 
     private static final String DOSGI_SERVICES = "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)";
 
@@ -66,27 +63,22 @@ public class TopologyManagerExport implements EndpointRepository {
     private final ExecutorService execService;
     private final RemoteServiceAdminTracker remoteServiceAdminTracker;
     private final ServiceListener serviceListener;
-
-    /**
-     * Holds all services that are exported by this TopologyManager for each ServiceReference that should be
-     * exported a map is maintained which contains information on the endpoints for each RemoteAdminService
-     */
-    private final Map<ServiceReference, 
-                      Map<RemoteServiceAdmin, Collection<EndpointDescription>>> exportedServices = 
-        new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>>();
+	private final EndpointRepository endpointRepo;
 
     public TopologyManagerExport(BundleContext ctx, RemoteServiceAdminTracker rsaTracker) {
+        endpointRepo = new EndpointRepository();
+        epListenerNotifier = createEndpointListenerNotifier(ctx, endpointRepo);
         execService = new ThreadPoolExecutor(5, 10, 50, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         bctx = ctx;
         this.remoteServiceAdminTracker = rsaTracker;
         this.remoteServiceAdminTracker.addListener(new RemoteServiceAdminLifeCycleListener() {
-
             public void added(RemoteServiceAdmin rsa) {
                 triggerExportForRemoteServiceAdmin(rsa);
             }
 
             public void removed(RemoteServiceAdmin rsa) {
-                removeRemoteServiceAdmin(rsa);
+                List<EndpointDescription> endpoints = endpointRepo.removeRemoteServiceAdmin(rsa);
+                epListenerNotifier.notifyListenersOfRemoval(endpoints);
             }
         });
         serviceListener = new ServiceListener() {
@@ -99,12 +91,17 @@ public class TopologyManagerExport implements EndpointRepository {
                     }
                 } else if (event.getType() == ServiceEvent.UNREGISTERING) {
                     LOG.debug("Received UNREGISTERING ServiceEvent: {}", event);
-                    removeService(sref);
+                    List<EndpointDescription> endpoints = endpointRepo.removeService(sref);
+                    epListenerNotifier.notifyListenersOfRemoval(endpoints);
                 }
             }
         };
+
         
-        epListenerNotifier = new EndpointListenerNotifier(ctx, this);
+    }
+    
+    protected EndpointListenerNotifier createEndpointListenerNotifier(BundleContext ctx, EndpointRepository endpointRepository) {
+    	return new EndpointListenerNotifier(ctx, endpointRepository);
     }
     
     /**
@@ -114,85 +111,36 @@ public class TopologyManagerExport implements EndpointRepository {
         return sref.getProperty(RemoteConstants.SERVICE_EXPORTED_INTERFACES) != null;
     }
 
-    /**
-     * Remove all services exported by the given rsa and notify listeners
-     * @param rsa
-     */
-    protected void removeRemoteServiceAdmin(RemoteServiceAdmin rsa) {
-        synchronized (exportedServices) {
-            for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices
-                .values()) {
-                if (exports.containsKey(rsa)) {
-                    Collection<EndpointDescription> endpoints = exports.get(rsa);
-                    this.epListenerNotifier.notifyAllListenersOfRemoval(endpoints);
-                    exports.remove(rsa);
-                }
-            }
-        }
-    }
-
-    protected void triggerExportForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
-        LOG.debug("triggerExportImportForRemoteSericeAdmin()");
-
-        synchronized (exportedServices) {
-            for (ServiceReference serviceRef : exportedServices.keySet()) {
-                Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsaExports = exportedServices.get(serviceRef);
-                String bundleName = serviceRef.getBundle().getSymbolicName();
-                if (rsaExports.containsKey(rsa)) {
-                    // already handled....
-                    LOG.debug("service from bundle {} is already handled by this RSA", bundleName);
-                } else {
-                    // trigger export of this service....
-                    LOG.debug("service from bundle {} is to be exported by this RSA", bundleName);
-                    exportService(serviceRef);
-                }
-            }
-        }
-
-    }
+	protected void triggerExportForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
+		for (ServiceReference serviceRef : endpointRepo.getServices()) {
+			String bundleName = serviceRef.getBundle().getSymbolicName();
+			if (endpointRepo.isAlreadyExportedForRsa(serviceRef, rsa)) {
+				LOG.debug("service from bundle {} is already handled by this RSA", bundleName);
+			} else {
+				LOG.debug("service from bundle {} is to be exported by this RSA", bundleName);
+				exportService(serviceRef);
+			}
+		}
+	}
 
     public void start() {
         epListenerNotifier.start();
         bctx.addServiceListener(serviceListener);
-        remoteServiceAdminTracker.open();
         exportExistingServices();
     }
 
     public void stop() {
         execService.shutdown();
-        remoteServiceAdminTracker.close();
         bctx.removeServiceListener(serviceListener);
         epListenerNotifier.stop();
     }
-
-    void removeService(ServiceReference sref) {
-        synchronized (exportedServices) {
-            if (exportedServices.containsKey(sref)) {
-                Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsas = exportedServices.get(sref);
-                for (Map.Entry<RemoteServiceAdmin, Collection<EndpointDescription>> entry : rsas.entrySet()) {
-                    if (entry.getValue() != null) {
-                        Collection<EndpointDescription> registrations = entry.getValue();
-                        this.epListenerNotifier.notifyListenersOfRemoval(registrations);
-                    }
-                }
-
-                exportedServices.remove(sref);
-            }
-        }
-    }
     
     protected void exportService(ServiceReference sref) {
-        // add to local list of services that should/are be exported
-        synchronized (exportedServices) {
-            LOG.info("TopologyManager: adding service to exportedServices list to export it --- from bundle:  "
-                      + sref.getBundle().getSymbolicName());
-            exportedServices.put(sref,
-                                 new LinkedHashMap<RemoteServiceAdmin, Collection<EndpointDescription>>());
-        }
+    	endpointRepo.addService(sref);
         triggerExport(sref);
     }
 
-    private void triggerExport(final ServiceReference sref) {
+    protected void triggerExport(final ServiceReference sref) {
         execService.execute(new Runnable() {
             public void run() {
                 doExportService(sref);
@@ -200,32 +148,21 @@ public class TopologyManagerExport implements EndpointRepository {
         });
     }
 
-    private void doExportService(final ServiceReference sref) {
+    protected void doExportService(final ServiceReference sref) {
         LOG.debug("Exporting service");
-
-        Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = null;
-
-        synchronized (exportedServices) {
-            exports = Collections.synchronizedMap(exportedServices.get(sref));
-        }
-        // FIXME: Not thread safe...?
-        if (exports == null) {
-            return;
-        }
-        if (remoteServiceAdminTracker == null || remoteServiceAdminTracker.size() == 0) {
+        List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getList();
+        if (rsaList.size() == 0) {
             LOG.error(
                     "No RemoteServiceAdmin available! Unable to export service from bundle {}, interfaces: {}",
                     sref.getBundle().getSymbolicName(),
                     sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS));
         }
 
-
-        for (final RemoteServiceAdmin remoteServiceAdmin : remoteServiceAdminTracker
-                .getList()) {
+        for (final RemoteServiceAdmin remoteServiceAdmin : rsaList) {
             LOG.info("TopologyManager: handling remoteServiceAdmin "
                     + remoteServiceAdmin);
 
-            if (exports.containsKey(remoteServiceAdmin)) {
+            if (endpointRepo.isAlreadyExportedForRsa(sref, remoteServiceAdmin)) {
                 // already handled by this remoteServiceAdmin
                 LOG.debug("already handled by this remoteServiceAdmin -> skipping");
             } else {
@@ -233,21 +170,18 @@ public class TopologyManagerExport implements EndpointRepository {
                 LOG.debug("exporting ...");
                 Collection<ExportRegistration> exportRegs = remoteServiceAdmin
                         .exportService(sref, null);
+            	List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
                 if (exportRegs == null) {
                     // TODO export failed -> What should be done here?
                     LOG.error("export failed");
-                    exports.put(remoteServiceAdmin, null);
                 } else {
-                	List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
                 	for (ExportRegistration exportReg : exportRegs) {
 						endpoints.add(getExportedEndpoint(exportReg));
 					}
                     LOG.info("TopologyManager: export sucessful Endpoints: {}", endpoints);
-                    // enqueue in local list of endpoints
-                    exports.put(remoteServiceAdmin, endpoints);
-
                     epListenerNotifier.nofifyEndpointListenersOfAdding(endpoints);
                 }
+                endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
             }
         }
     }
@@ -262,20 +196,6 @@ public class TopologyManagerExport implements EndpointRepository {
         return (ref == null) ? null : ref.getExportedEndpoint(); 
     }
     
-    public Collection<EndpointDescription> getAllEndpoints() {
-        List<EndpointDescription> registrations = new ArrayList<EndpointDescription>();
-        synchronized (exportedServices) {
-            for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
-                for (Collection<EndpointDescription> regs : exports.values()) {
-                    if (regs != null) {
-                        registrations.addAll(regs);
-                    }
-                }
-            }
-        }
-        return registrations;
-    }
-
     private void exportExistingServices() {
         try {
 			ServiceReference[] references = bctx.getServiceReferences(null, DOSGI_SERVICES);
