@@ -73,7 +73,9 @@ public class TopologyManagerExport {
         this.remoteServiceAdminTracker = rsaTracker;
         this.remoteServiceAdminTracker.addListener(new RemoteServiceAdminLifeCycleListener() {
             public void added(RemoteServiceAdmin rsa) {
-                triggerExportForRemoteServiceAdmin(rsa);
+        		for (ServiceReference serviceRef : endpointRepo.getServicesToBeExportedFor(rsa)) {
+        			triggerExport(serviceRef);
+        		}
             }
 
             public void removed(RemoteServiceAdmin rsa) {
@@ -87,7 +89,7 @@ public class TopologyManagerExport {
                 if (event.getType() == ServiceEvent.REGISTERED) {
                     LOG.debug("Received REGISTERED ServiceEvent: {}", event);
                     if (shouldExportService(sref)) {
-                        exportService(sref);
+                        triggerExport(sref);
                     }
                 } else if (event.getType() == ServiceEvent.UNREGISTERING) {
                     LOG.debug("Received UNREGISTERING ServiceEvent: {}", event);
@@ -111,18 +113,6 @@ public class TopologyManagerExport {
         return sref.getProperty(RemoteConstants.SERVICE_EXPORTED_INTERFACES) != null;
     }
 
-	protected void triggerExportForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
-		for (ServiceReference serviceRef : endpointRepo.getServices()) {
-			String bundleName = serviceRef.getBundle().getSymbolicName();
-			if (endpointRepo.isAlreadyExportedForRsa(serviceRef, rsa)) {
-				LOG.debug("service from bundle {} is already handled by this RSA", bundleName);
-			} else {
-				LOG.debug("service from bundle {} is to be exported by this RSA", bundleName);
-				exportService(serviceRef);
-			}
-		}
-	}
-
     public void start() {
         epListenerNotifier.start();
         bctx.addServiceListener(serviceListener);
@@ -135,11 +125,6 @@ public class TopologyManagerExport {
         epListenerNotifier.stop();
     }
     
-    protected void exportService(ServiceReference sref) {
-    	endpointRepo.addService(sref);
-        triggerExport(sref);
-    }
-
     protected void triggerExport(final ServiceReference sref) {
         execService.execute(new Runnable() {
             public void run() {
@@ -149,7 +134,7 @@ public class TopologyManagerExport {
     }
 
     protected void doExportService(final ServiceReference sref) {
-        LOG.debug("Exporting service");
+    	endpointRepo.addService(sref);
         List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getList();
         if (rsaList.size() == 0) {
             LOG.error(
@@ -166,25 +151,31 @@ public class TopologyManagerExport {
                 // already handled by this remoteServiceAdmin
                 LOG.debug("already handled by this remoteServiceAdmin -> skipping");
             } else {
-                // TODO: additional parameter Map ?
-                LOG.debug("exporting ...");
-                Collection<ExportRegistration> exportRegs = remoteServiceAdmin
-                        .exportService(sref, null);
-            	List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
-                if (exportRegs == null) {
-                    // TODO export failed -> What should be done here?
-                    LOG.error("export failed");
-                } else {
-                	for (ExportRegistration exportReg : exportRegs) {
-						endpoints.add(getExportedEndpoint(exportReg));
-					}
-                    LOG.info("TopologyManager: export sucessful Endpoints: {}", endpoints);
-                    epListenerNotifier.nofifyEndpointListenersOfAdding(endpoints);
-                }
-                endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
+                exportServiceUsingRemoteServiceAdmin(sref, remoteServiceAdmin);
             }
         }
     }
+
+	private void exportServiceUsingRemoteServiceAdmin(
+			final ServiceReference sref,
+			final RemoteServiceAdmin remoteServiceAdmin) {
+		// TODO: additional parameter Map ?
+		LOG.debug("exporting ...");
+		Collection<ExportRegistration> exportRegs = remoteServiceAdmin
+		        .exportService(sref, null);
+		List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
+		if (exportRegs == null) {
+		    // TODO export failed -> What should be done here?
+		    LOG.error("export failed");
+		} else {
+			for (ExportRegistration exportReg : exportRegs) {
+				endpoints.add(getExportedEndpoint(exportReg));
+			}
+		    LOG.info("TopologyManager: export sucessful Endpoints: {}", endpoints);
+		    epListenerNotifier.nofifyEndpointListenersOfAdding(endpoints);
+		}
+		endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
+	}
     
     /**
      * Retrieve exported Endpoint while handling null
@@ -201,7 +192,7 @@ public class TopologyManagerExport {
 			ServiceReference[] references = bctx.getServiceReferences(null, DOSGI_SERVICES);
 			if (references != null) {
 			    for (ServiceReference sref : references) {
-			        exportService(sref);
+			        triggerExport(sref);
 			    }
 			}
 		} catch (InvalidSyntaxException e) {

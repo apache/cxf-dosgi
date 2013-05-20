@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.topologymanager.exporter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * For each ServiceReference that is exported a map is maintained which contains information
  * on the endpoints for each RemoteAdminService that created the endpoints 
  */
-public class EndpointRepository {
+class EndpointRepository {
 	private static final Logger LOG = LoggerFactory.getLogger(EndpointRepository.class);
 
     private final Map<ServiceReference, 
@@ -75,20 +76,22 @@ public class EndpointRepository {
     }
     
     synchronized void addService(ServiceReference sref) {
-    	LOG.info("TopologyManager: adding service to exportedServices list to export it --- from bundle:  "
-    			+ sref.getBundle().getSymbolicName());
-    	exportedServices.put(sref,
+    	if (!exportedServices.containsKey(sref)) {
+        	LOG.info("Marking service from bundle {} for export", sref.getBundle().getSymbolicName());
+    		exportedServices.put(sref,
     			new LinkedHashMap<RemoteServiceAdmin, Collection<EndpointDescription>>());
+    	}
     }
     
     synchronized void addEndpoints(ServiceReference sref, RemoteServiceAdmin rsa, List<EndpointDescription> endpoints) {
+    	addService(sref);
     	Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = exportedServices.get(sref);
     	exports.put(rsa, endpoints);
     }
     
     synchronized boolean isAlreadyExportedForRsa(ServiceReference sref, RemoteServiceAdmin rsa) {
     	Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = exportedServices.get(sref);
-    	return exports.containsKey(rsa);
+    	return exports != null && exports.containsKey(rsa);
     }
     
     synchronized Collection<EndpointDescription> getAllEndpoints() {
@@ -103,8 +106,13 @@ public class EndpointRepository {
     	return endpoints;
     }
 
-    synchronized Set<ServiceReference> getServices() {
-    	return exportedServices.keySet();
-	}
-
+    synchronized Set<ServiceReference> getServicesToBeExportedFor(RemoteServiceAdmin rsa) {
+    	Set<ServiceReference> servicesToBeExported = new HashSet<ServiceReference>();
+    	for (ServiceReference sref : exportedServices.keySet()) {
+    		if (!isAlreadyExportedForRsa(sref, rsa)) {
+				servicesToBeExported.add(sref);
+			}
+		}
+		return servicesToBeExported;
+    }
 }
