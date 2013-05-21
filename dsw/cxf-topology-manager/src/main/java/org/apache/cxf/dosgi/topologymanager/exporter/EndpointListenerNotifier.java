@@ -40,20 +40,20 @@ import org.slf4j.LoggerFactory;
  */
 public class EndpointListenerNotifier {
     private static final String ENDPOINT_LISTENER_FILTER =
-    		"(&(" + Constants.OBJECTCLASS + "=" + EndpointListener.class.getName() + ")"
-    		+ "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*))";
-	private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
+        "(&(" + Constants.OBJECTCLASS + "=" + EndpointListener.class.getName() + ")"
+        + "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*))";
+    private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
     private BundleContext bctx;
     private ServiceTracker stEndpointListeners;
 
     public EndpointListenerNotifier(BundleContext bctx, final EndpointRepository endpointRepository) {
         this.bctx = bctx;
         Filter filter;
-		try {
-			filter = bctx.createFilter(ENDPOINT_LISTENER_FILTER);
-		} catch (InvalidSyntaxException e) {
-			throw new RuntimeException("Unexpected exception creating filter", e);
-		}
+        try {
+            filter = bctx.createFilter(ENDPOINT_LISTENER_FILTER);
+        } catch (InvalidSyntaxException e) {
+            throw new RuntimeException("Unexpected exception creating filter", e);
+        }
         this.stEndpointListeners = new ServiceTracker(bctx, filter, null) {
             @Override
             public Object addingService(ServiceReference epListenerRef) {

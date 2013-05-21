@@ -32,74 +32,74 @@ import org.osgi.framework.ServiceReference;
 
 public class AbstractDosgiTest {
 
-	protected ServiceReference waitService(BundleContext bc, Class<?> cls,
-			String filter, int timeout) throws Exception {
-		ServiceReference[] refs = null;
-		for (int i = 0; i < timeout; i++) {
-			refs = bc.getServiceReferences(cls.getName(), filter);
-			if (refs != null && refs.length > 0) {
-				return refs[0];
-			}
-			System.out.println("Waiting for service: " + cls + filter);
-			Thread.sleep(1000);
-		}
-		throw new Exception("Service not found: " + cls + filter);
-	}
+    protected ServiceReference waitService(BundleContext bc, Class<?> cls, String filter, int timeout)
+        throws Exception {
+        ServiceReference[] refs = null;
+        for (int i = 0; i < timeout; i++) {
+            refs = bc.getServiceReferences(cls.getName(), filter);
+            if (refs != null && refs.length > 0) {
+                return refs[0];
+            }
+            System.out.println("Waiting for service: " + cls + filter);
+            Thread.sleep(1000);
+        }
+        throw new Exception("Service not found: " + cls + filter);
+    }
 
-	protected int getIntSysProperty(String key, int defaultValue) {
-		String valueSt = System.getProperty(key);
+    protected int getIntSysProperty(String key, int defaultValue) {
+        String valueSt = System.getProperty(key);
         int value = valueSt == null ? 0 : Integer.valueOf(valueSt);
         return (value > 0) ? value : defaultValue;
-	}
-	
-	protected void waitPort(int port) throws Exception {
-	    for (int i = 0; i < 20; i++) {
-	        Socket s = null;
-	        try {
-	            s = new Socket((String) null, port);
-	            // yep, its available
-	            return;
-	        } catch (IOException e) {
-	            // wait 
-	        } finally {
-	            if (s != null) {
-	                try {
-	                    s.close();
-	                } catch (IOException e) {
-	                    //ignore
-	                }
-	            }
-	        }
-	        System.out.println("Waiting for server to appear on port: " + port);
-	        Thread.sleep(1000);            
-	    }
-	    throw new TimeoutException();
-	}
+    }
 
-	protected GreeterService createGreeterServiceProxy(String serviceUri) {
-		ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-		factory.setServiceClass(GreeterService.class);
-		factory.setAddress(serviceUri);
-		factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-		return (GreeterService)factory.create();
-	}
+    protected void waitPort(int port) throws Exception {
+        for (int i = 0; i < 20; i++) {
+            Socket s = null;
+            try {
+                s = new Socket((String)null, port);
+                // yep, its available
+                return;
+            } catch (IOException e) {
+                // wait
+            } finally {
+                if (s != null) {
+                    try {
+                        s.close();
+                    } catch (IOException e) {
+                        // ignore
+                    }
+                }
+            }
+            System.out.println("Waiting for server to appear on port: " + port);
+            Thread.sleep(1000);
+        }
+        throw new TimeoutException();
+    }
 
-	protected Bundle getBundleByName(BundleContext bc, String sn) {
-	    for (Bundle bundle : bc.getBundles()) {
-	        if (bundle.getSymbolicName().equals(sn)) {
-	            return bundle;
-	        }
-	    }
-	    return null;
-	}
+    protected GreeterService createGreeterServiceProxy(String serviceUri) {
+        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+        factory.setServiceClass(GreeterService.class);
+        factory.setAddress(serviceUri);
+        factory.getServiceFactory().setDataBinding(new AegisDatabinding());
+        return (GreeterService)factory.create();
+    }
 
-	protected int getFreePort() throws IOException {
-	    ServerSocket socket = new ServerSocket(0);
-	    try {
-	        return socket.getLocalPort();
-	    } finally {
-	        socket.close();
-	    }
-	}
+    protected Bundle getBundleByName(BundleContext bc, String sn) {
+        for (Bundle bundle : bc.getBundles()) {
+            if (bundle.getSymbolicName().equals(sn)) {
+                return bundle;
+            }
+        }
+        return null;
+    }
+
+    protected int getFreePort() throws IOException {
+        ServerSocket socket = new ServerSocket(0);
+        try {
+            return socket.getLocalPort();
+        } finally {
+            socket.close();
+        }
+    }
 
 }

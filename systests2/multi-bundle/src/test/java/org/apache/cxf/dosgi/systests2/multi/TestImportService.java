@@ -18,12 +18,6 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
-
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.provision;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-
 import java.io.InputStream;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -53,6 +47,12 @@ import org.ops4j.pax.swissbox.tinybundles.core.TinyBundles;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
+
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.provision;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+
 
 @RunWith(JUnit4TestRunner.class)
 public class TestImportService extends AbstractDosgiTest {

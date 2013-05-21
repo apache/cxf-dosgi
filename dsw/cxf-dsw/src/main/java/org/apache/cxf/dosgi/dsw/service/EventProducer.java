@@ -48,7 +48,9 @@ public class EventProducer {
     }
 
     protected void publishNotifcation(ExportRegistration er) {
-        int type = er.getException() == null ? RemoteServiceAdminEvent.EXPORT_REGISTRATION : RemoteServiceAdminEvent.EXPORT_ERROR;
+        int type = er.getException() == null 
+            ? RemoteServiceAdminEvent.EXPORT_REGISTRATION 
+            : RemoteServiceAdminEvent.EXPORT_ERROR;
         RemoteServiceAdminEvent rsae = new RemoteServiceAdminEvent(type, bctx.getBundle(), er.getExportReference(),
                 er.getException());
 

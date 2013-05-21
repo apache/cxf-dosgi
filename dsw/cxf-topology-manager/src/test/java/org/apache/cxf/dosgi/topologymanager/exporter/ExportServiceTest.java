@@ -40,20 +40,20 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
-
 public class ExportServiceTest {
 
-    
     /**
-     * This tests if the topology manager handles a service marked to be exported correctly by exporting it to
-     * an available RemoteServiceAdmin and by notifying an EndpointListener Afterwards
-     * @throws Exception 
+     * This tests if the topology manager handles a service marked to be
+     * exported correctly by exporting it to an available RemoteServiceAdmin and
+     * by notifying an EndpointListener Afterwards
+     * 
+     * @throws Exception
      */
     @SuppressWarnings("unchecked")
-	@Test
+    @Test
     public void testServiceExport() throws Exception {
         IMocksControl c = EasyMock.createControl();
-        
+
         BundleContext bctx = c.createMock(BundleContext.class);
         RemoteServiceAdmin rsa = c.createMock(RemoteServiceAdmin.class);
         final EndpointListenerNotifier mockEpListenerNotifier = c.createMock(EndpointListenerNotifier.class);
@@ -62,51 +62,43 @@ public class ExportServiceTest {
 
         final ServiceReference sref = createUserServiceBundle(c);
 
-        EasyMock.expect(bctx.getServiceReferences(EasyMock.<String>anyObject(), EasyMock.<String>anyObject()))
-        	.andReturn(null).atLeastOnce();
+        EasyMock
+            .expect(bctx.getServiceReferences(EasyMock.<String> anyObject(), EasyMock.<String> anyObject()))
+            .andReturn(null).atLeastOnce();
 
         RemoteServiceAdminTracker rsaTracker = createSingleRsaTracker(c, rsa);
 
-		EndpointDescription endpoint = createEndpoint(c);
-		ExportRegistration exportRegistration = createExportRegistration(c, endpoint);
+        EndpointDescription endpoint = createEndpoint(c);
+        ExportRegistration exportRegistration = createExportRegistration(c, endpoint);
 
-		// Main assertions
+        // Main assertions
         simulateUserServicePublished(bctx, sref);
         EasyMock.expect(rsa.exportService(EasyMock.same(sref), (Map<String, Object>)EasyMock.anyObject()))
-        	.andReturn(Collections.singletonList(exportRegistration)).once();
-        mockEpListenerNotifier.nofifyEndpointListenersOfAdding(EasyMock.eq(Collections.singletonList(endpoint)));
+            .andReturn(Collections.singletonList(exportRegistration)).once();
+        mockEpListenerNotifier.nofifyEndpointListenersOfAdding(EasyMock.eq(Collections
+            .singletonList(endpoint)));
         EasyMock.expectLastCall().once();
 
         c.replay();
-        
-		TopologyManagerExport topManager = new TopologyManagerExport(bctx, rsaTracker) {
 
-			/**
-			 * Replace epListenerNotifier with mock
-			 */
-			@Override
-			protected EndpointListenerNotifier createEndpointListenerNotifier(BundleContext ctx, 
-					EndpointRepository endpointRepository) {
-				return mockEpListenerNotifier;
-			}
+        TopologyManagerExport topManager = new TopologyManagerExport(bctx, rsaTracker, mockEpListenerNotifier) {
 
-			/**
-			 * To avoid async call
-			 */
-			@Override
-			protected void triggerExport(ServiceReference sref) {
-				doExportService(sref);
-			}
-        	
+            /**
+             * To avoid async call
+             */
+            @Override
+            protected void triggerExport(ServiceReference sref) {
+                doExportService(sref);
+            }
+
         };
         topManager.start();
         c.verify();
 
     }
 
-	private void simulateUserServicePublished(BundleContext bctx,
-			final ServiceReference sref) {
-		bctx.addServiceListener((ServiceListener)EasyMock.anyObject());
+    private void simulateUserServicePublished(BundleContext bctx, final ServiceReference sref) {
+        bctx.addServiceListener((ServiceListener)EasyMock.anyObject());
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
             public Object answer() throws Throwable {
                 System.out.println("Simulating publishing the user service");
@@ -116,42 +108,40 @@ public class ExportServiceTest {
                 return null;
             }
         }).once();
-	}
+    }
 
-	private RemoteServiceAdminTracker createSingleRsaTracker(IMocksControl c,
-			RemoteServiceAdmin rsa) {
-		RemoteServiceAdminTracker rsaTracker = c.createMock(RemoteServiceAdminTracker.class);
-        rsaTracker.addListener(EasyMock.<RemoteServiceAdminLifeCycleListener>anyObject());
+    private RemoteServiceAdminTracker createSingleRsaTracker(IMocksControl c, RemoteServiceAdmin rsa) {
+        RemoteServiceAdminTracker rsaTracker = c.createMock(RemoteServiceAdminTracker.class);
+        rsaTracker.addListener(EasyMock.<RemoteServiceAdminLifeCycleListener> anyObject());
         EasyMock.expectLastCall().once();
         EasyMock.expect(rsaTracker.getList()).andReturn(Collections.singletonList(rsa));
-		return rsaTracker;
-	}
+        return rsaTracker;
+    }
 
-	private ExportRegistration createExportRegistration(IMocksControl c,
-			EndpointDescription endpoint) {
-		ExportRegistration exportRegistration = c.createMock(ExportRegistration.class);
+    private ExportRegistration createExportRegistration(IMocksControl c, EndpointDescription endpoint) {
+        ExportRegistration exportRegistration = c.createMock(ExportRegistration.class);
         ExportReference exportReference = c.createMock(ExportReference.class);
         EasyMock.expect(exportRegistration.getExportReference()).andReturn(exportReference).anyTimes();
         EasyMock.expect(exportReference.getExportedEndpoint()).andReturn(endpoint).anyTimes();
-		return exportRegistration;
-	}
+        return exportRegistration;
+    }
 
-	private EndpointDescription createEndpoint(IMocksControl c) {
+    private EndpointDescription createEndpoint(IMocksControl c) {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(RemoteConstants.ENDPOINT_ID, "1");
-        props.put(Constants.OBJECTCLASS, new String[]{"abc"});
+        props.put(Constants.OBJECTCLASS, new String[] {"abc"});
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "cxf");
-		return new EndpointDescription(props);
-	}
+        return new EndpointDescription(props);
+    }
 
-	private ServiceReference createUserServiceBundle(IMocksControl c) {
-		final ServiceReference sref = c.createMock(ServiceReference.class);
+    private ServiceReference createUserServiceBundle(IMocksControl c) {
+        final ServiceReference sref = c.createMock(ServiceReference.class);
         EasyMock.expect(sref.getProperty(EasyMock.same(RemoteConstants.SERVICE_EXPORTED_INTERFACES)))
             .andReturn("*").anyTimes();
         Bundle srefBundle = c.createMock(Bundle.class);
         EasyMock.expect(sref.getBundle()).andReturn(srefBundle).atLeastOnce();
         EasyMock.expect(srefBundle.getSymbolicName()).andReturn("serviceBundleName").atLeastOnce();
-		return sref;
-	}
+        return sref;
+    }
 
 }

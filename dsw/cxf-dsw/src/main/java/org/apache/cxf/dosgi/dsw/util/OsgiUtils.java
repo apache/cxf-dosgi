@@ -104,10 +104,8 @@ public final class OsgiUtils {
     private static String getStringProperty(Map dict, String name) {
         Object o = dict.get(name);
 
-        if (o != null) {
-            if (o instanceof String) {
-                return (String)o;
-            }
+        if (o instanceof String) {
+            return (String)o;
         }
         return null;
     }
@@ -170,7 +168,8 @@ public final class OsgiUtils {
         }
     }
 
-    public static void overlayProperties(Map<String, Object> serviceProperties, Map<String, Object> additionalProperties) {
+    public static void overlayProperties(Map<String, Object> serviceProperties,
+                                         Map<String, Object> additionalProperties) {
         Map<String, String> keysLowerCase = new HashMap<String, String>();
         for (String key : serviceProperties.keySet()) {
             keysLowerCase.put(key.toLowerCase(), key);

@@ -69,16 +69,20 @@ public final class IntentUtils {
 
     public static Set<String> getRequestedIntents(Map<?, ?> sd) {
         Collection<String> intents = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
-        Collection<String> intents2 = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
+        Collection<String> intents2 
+            = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
         @SuppressWarnings("deprecation")
         Collection<String> oldIntents = OsgiUtils.getMultiValueProperty(sd.get(Constants.EXPORTED_INTENTS_OLD));
         Set<String> allIntents = new HashSet<String>();
-        if (intents != null)
+        if (intents != null) {
             allIntents.addAll(parseIntents(intents));
-        if (intents2 != null)
+        }
+        if (intents2 != null) {
             allIntents.addAll(parseIntents(intents2));
-        if (oldIntents != null)
+        }
+        if (oldIntents != null) {
             allIntents.addAll(parseIntents(oldIntents));
+        }
 
         return allIntents;
     }

@@ -52,9 +52,10 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 @RunWith(JUnit4TestRunner.class)
 public class TestDiscoveryExport extends AbstractDosgiTest {
 
-    private static final String GREETER_ZOOKEEPER_NODE = "/osgi/service_registry/org/apache/cxf/dosgi/samples/greeter/GreeterService/localhost#9090##greeter";
+    private static final String GREETER_ZOOKEEPER_NODE 
+        = "/osgi/service_registry/org/apache/cxf/dosgi/samples/greeter/GreeterService/localhost#9090##greeter";
 
-	@Inject
+    @Inject
     BundleContext bundleContext;
 
     @Inject
@@ -120,10 +121,10 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
             .build(TinyBundles.withBnd());
     }
 
-    protected void configureZookeeper(ConfigurationAdmin configAdmin, int zkPort) throws IOException {
+    protected void configureZookeeper(ConfigurationAdmin ca, int zkPort) throws IOException {
         System.out.println("*** Port for Zookeeper Server: " + zkPort);
-        updateZkServerConfig(zkPort, configAdmin);                            
-        updateZkClientConfig(zkPort, configAdmin);
+        updateZkServerConfig(zkPort, ca);                            
+        updateZkClientConfig(zkPort, ca);
     }
     
     protected void updateZkClientConfig(final int zkPort, ConfigurationAdmin cadmin) throws IOException {

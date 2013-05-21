@@ -40,7 +40,8 @@ import org.slf4j.LoggerFactory;
 class EndpointRepository {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointRepository.class);
 
-    private final Map<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>> exportedServices = new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>>();
+    private final Map<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>> exportedServices 
+        = new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>>();
 
     /**
      * Remove all services exported by the given rsa and notify listeners

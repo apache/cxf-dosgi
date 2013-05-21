@@ -19,8 +19,6 @@
 package org.apache.cxf.dosgi.topologymanager.exporter;
 
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,6 +36,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
+
+import static org.junit.Assert.assertEquals;
 
 public class EndpointListenerNotifierTest {
 

@@ -199,19 +199,19 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     public void testAddressing() {
         runAddressingTest(new HashMap<String, Object>(), "http://localhost:9000/java/lang/Runnable");
 
-        HashMap<String, Object> p1 = new HashMap<String, Object>();
+        Map<String, Object> p1 = new HashMap<String, Object>();
         p1.put("org.apache.cxf.ws.address", "http://somewhere");
         runAddressingTest(p1, "http://somewhere");
 
-        HashMap<String, Object> p2 = new HashMap<String, Object>();
+        Map<String, Object> p2 = new HashMap<String, Object>();
         p2.put("org.apache.cxf.rs.address", "https://somewhereelse");
         runAddressingTest(p2, "https://somewhereelse");
 
-        HashMap<String, Object> p3 = new HashMap<String, Object>();
+        Map<String, Object> p3 = new HashMap<String, Object>();
         p3.put("org.apache.cxf.ws.port", 65535);
         runAddressingTest(p3, "http://localhost:65535/java/lang/Runnable");
 
-        HashMap<String, Object> p4 = new HashMap<String, Object>();
+        Map<String, Object> p4 = new HashMap<String, Object>();
         p4.put("org.apache.cxf.ws.port", "8181");
         runAddressingTest(p4, "http://localhost:8181/java/lang/Runnable");
     }
@@ -223,9 +223,12 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         IntentManager intentManager = EasyMock.createNiceMock(IntentManager.class);
         EasyMock.replay(intentManager);
 
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(dswContext, intentManager, dummyHttpServiceManager()) {
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(dswContext, 
+                                                                                intentManager, 
+                                                                                dummyHttpServiceManager()) {
             @Override
-            protected ExportResult createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {
+            protected ExportResult createServerFromFactory(ServerFactoryBean factory,
+                                                           Map<String, Object> endpointProps) {
                 return new ExportResult(endpointProps, (Server) null);
             }
         };
@@ -253,9 +256,12 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         IntentManager intentManager = EasyMock.createNiceMock(IntentManager.class);
         EasyMock.replay(intentManager);
 
-        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(dswContext, intentManager, dummyHttpServiceManager()) {
+        PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(dswContext, 
+                                                                                intentManager, 
+                                                                                dummyHttpServiceManager()) {
             @Override
-            protected ExportResult createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {
+            protected ExportResult createServerFromFactory(ServerFactoryBean factory, 
+                                                           Map<String, Object> endpointProps) {
                 throw new TestException();
             }
         };
@@ -419,5 +425,6 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     }
 
     @SuppressWarnings("serial")
-    public static class TestException extends RuntimeException {}
+    public static class TestException extends RuntimeException {
+    }
 }

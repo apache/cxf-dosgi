@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -408,16 +408,16 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
      */
     protected void removeExportRegistration(ExportRegistrationImpl eri) {
         synchronized (exportedServices) {
-            for (Iterator<Collection<ExportRegistration>> it = exportedServices.values().iterator(); it.hasNext(); ) {
+            for (Iterator<Collection<ExportRegistration>> it = exportedServices.values().iterator(); it.hasNext();) {
                 Collection<ExportRegistration> value = it.next();
-                for (Iterator<ExportRegistration> it2 = value.iterator(); it2.hasNext(); ) {
+                for (Iterator<ExportRegistration> it2 = value.iterator(); it2.hasNext();) {
                     ExportRegistration er = it2.next();
                     if (er.equals(eri)) {
                         eventProducer.notifyRemoval(eri);
                         it2.remove();
-                        if (value.size() == 0)
+                        if (value.size() == 0) {
                             it.remove();
-
+                        }
                         return;
                     }
                 }

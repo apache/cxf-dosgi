@@ -18,11 +18,6 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
-
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-
 import javax.inject.Inject;
 
 import org.junit.Test;
@@ -31,6 +26,10 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
+
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 @RunWith(JUnit4TestRunner.class)
 public class TestExportRestService extends AbstractDosgiTest {

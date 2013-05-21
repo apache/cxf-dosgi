@@ -56,26 +56,34 @@ public class TopologyManagerExport {
 
     private static final String DOSGI_SERVICES = "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)";
 
-	private static final Logger LOG = LoggerFactory.getLogger(TopologyManagerExport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TopologyManagerExport.class);
 
     private final BundleContext bctx;
     private final EndpointListenerNotifier epListenerNotifier;
     private final ExecutorService execService;
     private final RemoteServiceAdminTracker remoteServiceAdminTracker;
     private final ServiceListener serviceListener;
-	private final EndpointRepository endpointRepo;
+    private final EndpointRepository endpointRepo;
 
     public TopologyManagerExport(BundleContext ctx, RemoteServiceAdminTracker rsaTracker) {
+        this(ctx, rsaTracker, null);
+    }
+    public TopologyManagerExport(BundleContext ctx, RemoteServiceAdminTracker rsaTracker,
+                                 EndpointListenerNotifier notif) {
         endpointRepo = new EndpointRepository();
-        epListenerNotifier = createEndpointListenerNotifier(ctx, endpointRepo);
+        if (notif == null) {
+            epListenerNotifier = new EndpointListenerNotifier(ctx, endpointRepo);
+        } else {
+            epListenerNotifier = notif;
+        }
         execService = new ThreadPoolExecutor(5, 10, 50, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         bctx = ctx;
         this.remoteServiceAdminTracker = rsaTracker;
         this.remoteServiceAdminTracker.addListener(new RemoteServiceAdminLifeCycleListener() {
             public void added(RemoteServiceAdmin rsa) {
-        		for (ServiceReference serviceRef : endpointRepo.getServicesToBeExportedFor(rsa)) {
-        			triggerExport(serviceRef);
-        		}
+                for (ServiceReference serviceRef : endpointRepo.getServicesToBeExportedFor(rsa)) {
+                    triggerExport(serviceRef);
+                }
             }
 
             public void removed(RemoteServiceAdmin rsa) {
@@ -100,10 +108,6 @@ public class TopologyManagerExport {
         };
 
         
-    }
-    
-    protected EndpointListenerNotifier createEndpointListenerNotifier(BundleContext ctx, EndpointRepository endpointRepository) {
-    	return new EndpointListenerNotifier(ctx, endpointRepository);
     }
     
     /**
@@ -134,7 +138,7 @@ public class TopologyManagerExport {
     }
 
     protected void doExportService(final ServiceReference sref) {
-    	endpointRepo.addService(sref);
+        endpointRepo.addService(sref);
         List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getList();
         if (rsaList.size() == 0) {
             LOG.error(

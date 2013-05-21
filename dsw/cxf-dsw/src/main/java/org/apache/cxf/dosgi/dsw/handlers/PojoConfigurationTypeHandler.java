@@ -123,14 +123,16 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
     private String getPojoAddress(Map<String, Object> sd, Class<?> iClass) {
         String address = getClientAddress(sd, iClass);
-        if (address != null)
+        if (address != null) {
             return address;
+        }
 
         // If the property is not of type string this will cause an ClassCastException which
         // will be propagated to the ExportRegistration exception property.
         Object port = sd.get(Constants.WS_PORT_PROPERTY);
-        if (port == null)
+        if (port == null) {
             port = "9000";
+        }
 
         address = "http://localhost:" + port + "/" + iClass.getName().replace('.', '/');
         LOG.info("Using a default address : " + address);

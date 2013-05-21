@@ -18,10 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,6 +27,10 @@ import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.junit.Test;
 import org.osgi.framework.Constants;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class UtilsTest {

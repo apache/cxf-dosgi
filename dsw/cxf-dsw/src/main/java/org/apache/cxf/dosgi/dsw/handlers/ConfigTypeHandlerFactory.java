@@ -96,7 +96,8 @@ public class ConfigTypeHandlerFactory {
         }
 
         if (types.contains(Constants.RS_CONFIG_TYPE)) {
-            Collection<String> intentsProperty = OsgiUtils.getMultiValueProperty(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
+            Collection<String> intentsProperty 
+                = OsgiUtils.getMultiValueProperty(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
             boolean hasHttpIntent = false;
             boolean hasSoapIntent = false;
             if (intentsProperty != null) {

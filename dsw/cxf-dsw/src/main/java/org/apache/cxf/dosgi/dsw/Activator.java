@@ -84,13 +84,15 @@ public class Activator implements ManagedService, BundleActivator {
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         String[] supportedIntents = intentMap.keySet().toArray(new String[] {});
         props.put("remote.intents.supported", supportedIntents);
-        props.put("remote.configs.supported", obtainSupportedConfigTypes(configTypeHandlerFactory.getSupportedConfigurationTypes()));
+        props.put("remote.configs.supported", 
+                  obtainSupportedConfigTypes(configTypeHandlerFactory.getSupportedConfigurationTypes()));
         LOG.info("Registering RemoteServiceAdminFactory...");
         rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc), null);
     }
 
-    // The CT sometimes uses the first element returned to register a service, but does not provide any additional configuration
+    // The CT sometimes uses the first element returned to register a service, but 
+    // does not provide any additional configuration.
     // Return the configuration type that works without additional configuration as the first in the list.
     private String[] obtainSupportedConfigTypes(List<String> types) {
         List<String> l = new ArrayList<String>(types);

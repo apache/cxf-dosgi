@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
@@ -59,7 +60,7 @@ public class EventProducerTest {
         final Bundle bundle = EasyMock.createNiceMock(Bundle.class);
         EasyMock.expect(bundle.getBundleId()).andReturn(42L).anyTimes();
         EasyMock.expect(bundle.getSymbolicName()).andReturn("test.bundle").anyTimes();
-        Hashtable<String, String> headers = new Hashtable<String, String>();
+        Dictionary<String, String> headers = new Hashtable<String, String>();
         headers.put("Bundle-Version", "1.2.3.test");
         EasyMock.expect(bundle.getHeaders()).andReturn(headers).anyTimes();
         EasyMock.replay(bundle);
@@ -75,14 +76,15 @@ public class EventProducerTest {
                 Assert.assertSame(bundle, event.getProperty("bundle"));
                 Assert.assertEquals(new Long(42), event.getProperty("bundle.id"));
                 Assert.assertEquals("test.bundle", event.getProperty("bundle.symbolicname"));
-                Assert.assertEquals(new Version(1,2,3,"test"), event.getProperty("bundle.version"));
+                Assert.assertEquals(new Version(1, 2, 3, "test"), event.getProperty("bundle.version"));
                 Assert.assertNull(event.getProperty("cause"));
                 Assert.assertEquals(endpoint, event.getProperty("export.registration"));
 
                 Assert.assertEquals(new Long(Long.MAX_VALUE), event.getProperty("service.remote.id"));
                 Assert.assertEquals(uuid, event.getProperty("service.remote.uuid"));
                 Assert.assertEquals("foo://bar", event.getProperty("service.remote.uri"));
-                Assert.assertTrue(Arrays.equals(interfaces.toArray(new String[] {}), (String[]) event.getProperty("objectClass")));
+                Assert.assertTrue(Arrays.equals(interfaces.toArray(new String[] {}),
+                                                (String[]) event.getProperty("objectClass")));
 
                 Assert.assertNotNull(event.getProperty("timestamp"));
 
@@ -147,7 +149,8 @@ public class EventProducerTest {
                 Assert.assertEquals(new Version("0"), event.getProperty("bundle.version"));
                 Assert.assertSame(exportException, event.getProperty("cause"));
                 Assert.assertEquals(endpoint, event.getProperty("export.registration"));
-                Assert.assertTrue(Arrays.equals(new String[] {"org.foo.Bar"}, (String[]) event.getProperty("objectClass")));
+                Assert.assertTrue(Arrays.equals(new String[] {"org.foo.Bar"}, 
+                                                (String[]) event.getProperty("objectClass")));
 
                 RemoteServiceAdminEvent rsae = (RemoteServiceAdminEvent) event.getProperty("event");
                 Assert.assertSame(exportException, rsae.getException());
