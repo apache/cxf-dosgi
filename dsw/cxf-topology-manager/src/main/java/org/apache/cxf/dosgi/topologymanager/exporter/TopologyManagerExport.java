@@ -156,27 +156,27 @@ public class TopologyManagerExport {
         }
     }
 
-	private void exportServiceUsingRemoteServiceAdmin(
-			final ServiceReference sref,
-			final RemoteServiceAdmin remoteServiceAdmin) {
-		// TODO: additional parameter Map ?
-		LOG.debug("exporting ...");
-		Collection<ExportRegistration> exportRegs = remoteServiceAdmin
-		        .exportService(sref, null);
-		List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
-		if (exportRegs == null) {
-		    // TODO export failed -> What should be done here?
-		    LOG.error("export failed");
-		} else {
-			for (ExportRegistration exportReg : exportRegs) {
-				endpoints.add(getExportedEndpoint(exportReg));
-			}
-		    LOG.info("TopologyManager: export sucessful Endpoints: {}", endpoints);
-		    epListenerNotifier.nofifyEndpointListenersOfAdding(endpoints);
-		}
-		endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
-	}
-    
+    private void exportServiceUsingRemoteServiceAdmin(
+                                                      final ServiceReference sref,
+                                                      final RemoteServiceAdmin remoteServiceAdmin) {
+        // TODO: additional parameter Map ?
+        LOG.debug("exporting ...");
+        Collection<ExportRegistration> exportRegs = remoteServiceAdmin
+            .exportService(sref, null);
+        List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
+        if (exportRegs == null) {
+            // TODO export failed -> What should be done here?
+            LOG.error("export failed");
+        } else {
+            for (ExportRegistration exportReg : exportRegs) {
+                endpoints.add(getExportedEndpoint(exportReg));
+            }
+            LOG.info("TopologyManager: export sucessful Endpoints: {}", endpoints);
+            epListenerNotifier.nofifyEndpointListenersOfAdding(endpoints);
+        }
+        endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
+    }
+
     /**
      * Retrieve exported Endpoint while handling null
      * @param exReg
@@ -189,15 +189,15 @@ public class TopologyManagerExport {
     
     private void exportExistingServices() {
         try {
-			ServiceReference[] references = bctx.getServiceReferences(null, DOSGI_SERVICES);
-			if (references != null) {
-			    for (ServiceReference sref : references) {
-			        triggerExport(sref);
-			    }
-			}
-		} catch (InvalidSyntaxException e) {
-			LOG.error("Error in filter {}. This should not occur !", DOSGI_SERVICES);
-		}
+            ServiceReference[] references = bctx.getServiceReferences(null, DOSGI_SERVICES);
+            if (references != null) {
+                for (ServiceReference sref : references) {
+                    triggerExport(sref);
+                }
+            }
+        } catch (InvalidSyntaxException e) {
+            LOG.error("Error in filter {}. This should not occur !", DOSGI_SERVICES);
+        }
     }
 
 }

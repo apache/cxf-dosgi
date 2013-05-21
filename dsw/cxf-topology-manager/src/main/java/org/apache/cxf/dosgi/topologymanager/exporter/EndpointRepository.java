@@ -33,86 +33,85 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Holds all endpoints that are exported by a TopologyManager.
- * For each ServiceReference that is exported a map is maintained which contains information
- * on the endpoints for each RemoteAdminService that created the endpoints 
+ * Holds all endpoints that are exported by a TopologyManager. For each ServiceReference that is exported a
+ * map is maintained which contains information on the endpoints for each RemoteAdminService that created the
+ * endpoints
  */
 class EndpointRepository {
-	private static final Logger LOG = LoggerFactory.getLogger(EndpointRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EndpointRepository.class);
 
-    private final Map<ServiceReference, 
-                      Map<RemoteServiceAdmin, Collection<EndpointDescription>>> exportedServices = 
-        new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>>();
-    
+    private final Map<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>> exportedServices = new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>>();
+
     /**
      * Remove all services exported by the given rsa and notify listeners
+     * 
      * @param rsa
      * @return list of removed endpoints
      */
     synchronized List<EndpointDescription> removeRemoteServiceAdmin(RemoteServiceAdmin rsa) {
-    	List<EndpointDescription> removedEndpoints = new ArrayList<EndpointDescription>();
-    	for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices
-    			.values()) {
-    		if (exports.containsKey(rsa)) {
-    			removedEndpoints.addAll(exports.get(rsa));
-    			exports.remove(rsa);
-    		}
-    	}
-    	return removedEndpoints;
+        List<EndpointDescription> removedEndpoints = new ArrayList<EndpointDescription>();
+        for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
+            if (exports.containsKey(rsa)) {
+                removedEndpoints.addAll(exports.get(rsa));
+                exports.remove(rsa);
+            }
+        }
+        return removedEndpoints;
     }
-    
+
     synchronized List<EndpointDescription> removeService(ServiceReference sref) {
-    	List<EndpointDescription> removedEndpoints = new ArrayList<EndpointDescription>();
-    	if (exportedServices.containsKey(sref)) {
-    		Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsas = exportedServices.get(sref);
-    		for (Map.Entry<RemoteServiceAdmin, Collection<EndpointDescription>> entry : rsas.entrySet()) {
-    			if (entry.getValue() != null) {
-    				removedEndpoints.addAll(entry.getValue());
-    			}
-    		}
-    		exportedServices.remove(sref);
-    	}
-    	return removedEndpoints;
+        List<EndpointDescription> removedEndpoints = new ArrayList<EndpointDescription>();
+        if (exportedServices.containsKey(sref)) {
+            Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsas = exportedServices.get(sref);
+            for (Map.Entry<RemoteServiceAdmin, Collection<EndpointDescription>> entry : rsas.entrySet()) {
+                if (entry.getValue() != null) {
+                    removedEndpoints.addAll(entry.getValue());
+                }
+            }
+            exportedServices.remove(sref);
+        }
+        return removedEndpoints;
     }
-    
+
     synchronized void addService(ServiceReference sref) {
-    	if (!exportedServices.containsKey(sref)) {
-        	LOG.info("Marking service from bundle {} for export", sref.getBundle().getSymbolicName());
-    		exportedServices.put(sref,
-    			new LinkedHashMap<RemoteServiceAdmin, Collection<EndpointDescription>>());
-    	}
+        if (!exportedServices.containsKey(sref)) {
+            LOG.info("Marking service from bundle {} for export", sref.getBundle().getSymbolicName());
+            exportedServices.put(sref,
+                                 new LinkedHashMap<RemoteServiceAdmin, Collection<EndpointDescription>>());
+        }
     }
-    
-    synchronized void addEndpoints(ServiceReference sref, RemoteServiceAdmin rsa, List<EndpointDescription> endpoints) {
-    	addService(sref);
-    	Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = exportedServices.get(sref);
-    	exports.put(rsa, endpoints);
+
+    synchronized void addEndpoints(ServiceReference sref, RemoteServiceAdmin rsa,
+                                   List<EndpointDescription> endpoints) {
+        addService(sref);
+        Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = exportedServices.get(sref);
+        exports.put(rsa, endpoints);
     }
-    
+
     synchronized boolean isAlreadyExportedForRsa(ServiceReference sref, RemoteServiceAdmin rsa) {
-    	Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = exportedServices.get(sref);
-    	return exports != null && exports.containsKey(rsa);
+        Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = exportedServices.get(sref);
+        return exports != null && exports.containsKey(rsa);
     }
-    
+
     synchronized Collection<EndpointDescription> getAllEndpoints() {
-    	List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
-    	for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
-    		for (Collection<EndpointDescription> regs : exports.values()) {
-    			if (regs != null) {
-    				endpoints.addAll(regs);
-    			}
-    		}
-    	}
-    	return endpoints;
+        List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
+        for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
+            for (Collection<EndpointDescription> regs : exports.values()) {
+                if (regs != null) {
+                    endpoints.addAll(regs);
+                }
+            }
+        }
+        return endpoints;
     }
 
     synchronized Set<ServiceReference> getServicesToBeExportedFor(RemoteServiceAdmin rsa) {
-    	Set<ServiceReference> servicesToBeExported = new HashSet<ServiceReference>();
-    	for (ServiceReference sref : exportedServices.keySet()) {
-    		if (!isAlreadyExportedForRsa(sref, rsa)) {
-				servicesToBeExported.add(sref);
-			}
-		}
-		return servicesToBeExported;
+        Set<ServiceReference> servicesToBeExported = new HashSet<ServiceReference>();
+        for (ServiceReference sref : exportedServices.keySet()) {
+            if (!isAlreadyExportedForRsa(sref, rsa)) {
+                servicesToBeExported.add(sref);
+            }
+        }
+        return servicesToBeExported;
     }
 }
