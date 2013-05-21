@@ -160,18 +160,11 @@ public class EndpointListenerNotifier {
         Dictionary<String, Object> d = getEndpointProperties(endpoint);
 
         for (Filter filter : filters) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Matching: {} against {}", filter, d);
-            }
             if (filter.match(d)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Filter {} matches endpoint {}", filter, d);
-                }
+                LOG.debug("Filter {} matches endpoint {}", filter, d);
                 matchingFilters.add(filter);
             } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Filter {} does not match endpoint {}", filter, d);
-                }
+                LOG.debug("Filter {} does not match endpoint {}", filter, d);
             }
         }
         return matchingFilters;
