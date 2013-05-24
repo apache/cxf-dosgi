@@ -193,7 +193,8 @@ public class TopologyManagerExport {
     
     private void exportExistingServices() {
         try {
-            ServiceReference[] references = bctx.getServiceReferences(null, DOSGI_SERVICES);
+            // cast to String is necessary for compiling against OSGi core version >= 4.3
+            ServiceReference[] references = bctx.getServiceReferences((String)null, DOSGI_SERVICES);
             if (references != null) {
                 for (ServiceReference sref : references) {
                     triggerExport(sref);

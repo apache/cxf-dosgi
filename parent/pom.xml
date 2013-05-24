@@ -36,6 +36,12 @@
     <!-- Some versions of libraries used are different to the ones from CXF, this is 
          generally caused by the fact that not all versions are available yet as 
          OSGi bundles. -->
+
+    <!-- Note: the Felix Framework bundle contains the org.osgi core packages,
+         which may override the standalone org.osgi dependency bundles -
+         so if the org.osgi bundle versions are modified below, the
+         corresponding Felix Framework version must be updated as well. -->
+
     <properties>
         <!-- portable text resource processing -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

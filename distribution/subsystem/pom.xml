@@ -69,10 +69,9 @@
       <version>1.1.1</version>
     </dependency>
     <dependency>
-	<groupId>org.osgi</groupId>
-	<artifactId>org.osgi.enterprise</artifactId>
-	<version>${osgi.version}</version>
-    </dependency> 
+	  <groupId>org.osgi</groupId>
+	  <artifactId>org.osgi.enterprise</artifactId>
+    </dependency>
     <dependency>  
         <groupId>org.slf4j</groupId>  
         <artifactId>slf4j-api</artifactId>  
