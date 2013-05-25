@@ -74,7 +74,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
      * counter. If an interest is removed, the related ServiceInterest object is used to reduce the reference
      * counter until it reaches zero. in this case the interest is removed.
      */
-    private final RefManager importInterests = new RefManager();
+    private final ReferenceCounter<String> importInterestsCounter = new ReferenceCounter<String>();
 
     /**
      * List of Endpoints by matched filter that were reported by the EndpointListener and can be imported
@@ -118,7 +118,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
      * @see org.apache.cxf.dosgi.topologymanager.ServiceInterestListener#addServiceInterest(java.lang.String)
      */
     public void addServiceInterest(String filter) {
-        if (importInterests.addReference(filter) == 1) {
+        if (importInterestsCounter.add(filter) == 1) {
             endpointListenerManager.extendScope(filter);
         }
     }
@@ -127,8 +127,8 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
      * @see org.apache.cxf.dosgi.topologymanager.ServiceInterestListener#removeServiceInterest(java.lang.String)
      */
     public void removeServiceInterest(String filter) {
-        if (importInterests.removeReference(filter) <= 0) {
-            LOG.debug("last reference to import interest is gone -> removing interest  filter: {}", filter);
+        if (importInterestsCounter.remove(filter) == 0) {
+            LOG.debug("last reference to import interest is gone -> removing interest filter: {}", filter);
             endpointListenerManager.reduceScope(filter);
             List<ImportRegistration> irs = importedServices.remove(filter);
             if (irs != null) {
