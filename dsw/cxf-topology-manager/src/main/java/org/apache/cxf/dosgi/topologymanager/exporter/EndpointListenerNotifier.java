@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tracks EndpointListeners and allows to notify them of endpoints
+ * Tracks EndpointListeners and allows to notify them of endpoints.
  */
 public class EndpointListenerNotifier {
     private static final String ENDPOINT_LISTENER_FILTER =
@@ -94,10 +94,10 @@ public class EndpointListenerNotifier {
     }
     
     /**
-     * Notifies the listener if he is interested in the provided registrations
+     * Notifies the listener if he is interested in the provided registrations.
      * 
-     * @param sref The ServiceReference for an EndpointListener
-     * @param endpoints the registrations, the listener should be informed about
+     * @param epListenerReference the ServiceReference for an EndpointListener
+     * @param endpoints the registrations the listener should be informed about
      */
     private void notifyListenerOfAdding(ServiceReference epListenerReference,
                                         Collection<EndpointDescription> endpoints) {
@@ -111,11 +111,10 @@ public class EndpointListenerNotifier {
                 epl.endpointAdded(endpoint, filter.toString());
             }
         }
-
     }
 
     void notifyListenerOfRemoval(ServiceReference epListenerReference,
-                                          Collection<EndpointDescription> endpoints) {
+                                 Collection<EndpointDescription> endpoints) {
         EndpointListener epl = (EndpointListener)bctx.getService(epListenerReference);
         List<Filter> filters = getFiltersFromEndpointListenerScope(epListenerReference, bctx);
         for (EndpointDescription endpoint : endpoints) {
@@ -171,9 +170,9 @@ public class EndpointListenerNotifier {
     }
    
     /**
-     * Retrieve endpoint properties as Dictionary
+     * Retrieves an endpoint's properties as a Dictionary.
      * 
-     * @param ep
+     * @param ep an endpoint description
      * @return endpoint properties (will never return null) 
      */
     private Dictionary<String, Object> getEndpointProperties(EndpointDescription ep) {

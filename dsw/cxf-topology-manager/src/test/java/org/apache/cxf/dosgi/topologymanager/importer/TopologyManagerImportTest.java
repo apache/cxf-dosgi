@@ -55,7 +55,7 @@ public class TopologyManagerImportTest {
         BundleContext bc = c.createMock(BundleContext.class);
         RemoteServiceAdminTracker rsaTracker = c.createMock(RemoteServiceAdminTracker.class);
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
-        EasyMock.expect(bc.registerService((String)EasyMock.anyObject(), 
+        EasyMock.expect(bc.registerService((String)EasyMock.anyObject(),
                                            EasyMock.anyObject(), 
                                            (Dictionary)EasyMock.anyObject())).andReturn(sreg).anyTimes();
         

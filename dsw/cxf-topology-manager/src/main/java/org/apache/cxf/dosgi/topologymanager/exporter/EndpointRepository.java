@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Holds all endpoints that are exported by a TopologyManager. For each ServiceReference that is exported a
  * map is maintained which contains information on the endpoints for each RemoteAdminService that created the
- * endpoints
+ * endpoints.
  */
 class EndpointRepository {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointRepository.class);
@@ -44,9 +44,9 @@ class EndpointRepository {
         = new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>>();
 
     /**
-     * Remove all services exported by the given rsa and notify listeners
+     * Remove all services exported by the given rsa.
      * 
-     * @param rsa
+     * @param rsa the RemoteServiceAdmin to remove
      * @return list of removed endpoints
      */
     synchronized List<EndpointDescription> removeRemoteServiceAdmin(RemoteServiceAdmin rsa) {

@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manages an EndpointListener add adjusts its scope according to requested service filters
+ * Manages an EndpointListener and adjusts its scope according to requested service filters.
  */
 public class EndpointListenerManager {
 
@@ -59,7 +59,7 @@ public class EndpointListenerManager {
         if (filter == null) {
             return;
         }
-        LOG.debug("EndpointListenxtending scope by {}", filter);
+        LOG.debug("EndpointListener: extending scope by {}", filter);
         synchronized (filters) {
             filters.add(filter);
         }

@@ -66,7 +66,7 @@ public class EventProducer {
                 for (ServiceReference sref : listenerRefs) {
                     RemoteServiceAdminListener rsal = (RemoteServiceAdminListener)bctx.getService(sref);
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("notify RemoteServiceAdminListener {} of bundle {}" + rsal,
+                        LOG.debug("notify RemoteServiceAdminListener {} of bundle {}", rsal,
                                   sref.getBundle().getSymbolicName());
                     }
                     rsal.remoteAdminEvent(rsae);

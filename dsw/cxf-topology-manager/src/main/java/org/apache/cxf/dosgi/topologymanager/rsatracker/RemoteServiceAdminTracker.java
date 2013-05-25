@@ -37,7 +37,7 @@ public class RemoteServiceAdminTracker extends ServiceTracker {
         super(bc, RemoteServiceAdmin.class.getName(), null);
         this.listeners = new ArrayList<RemoteServiceAdminLifeCycleListener>();
     }
-    
+
     public void addListener(RemoteServiceAdminLifeCycleListener listener) {
         listeners.add(listener);
     }

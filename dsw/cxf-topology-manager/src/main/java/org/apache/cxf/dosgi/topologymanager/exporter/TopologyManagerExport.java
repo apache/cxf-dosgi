@@ -106,8 +106,6 @@ public class TopologyManagerExport {
                 }
             }
         };
-
-        
     }
     
     /**
@@ -160,13 +158,11 @@ public class TopologyManagerExport {
         }
     }
 
-    private void exportServiceUsingRemoteServiceAdmin(
-                                                      final ServiceReference sref,
+    private void exportServiceUsingRemoteServiceAdmin(final ServiceReference sref,
                                                       final RemoteServiceAdmin remoteServiceAdmin) {
         // TODO: additional parameter Map ?
         LOG.debug("exporting ...");
-        Collection<ExportRegistration> exportRegs = remoteServiceAdmin
-            .exportService(sref, null);
+        Collection<ExportRegistration> exportRegs = remoteServiceAdmin.exportService(sref, null);
         List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
         if (exportRegs == null) {
             // TODO export failed -> What should be done here?
@@ -175,15 +171,16 @@ public class TopologyManagerExport {
             for (ExportRegistration exportReg : exportRegs) {
                 endpoints.add(getExportedEndpoint(exportReg));
             }
-            LOG.info("TopologyManager: export sucessful Endpoints: {}", endpoints);
+            LOG.info("TopologyManager: export successful Endpoints: {}", endpoints);
             epListenerNotifier.nofifyEndpointListenersOfAdding(endpoints);
         }
         endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
     }
 
     /**
-     * Retrieve exported Endpoint while handling null
-     * @param exReg
+     * Retrieves an exported Endpoint (while safely handling nulls).
+     *
+     * @param exReg an export registration
      * @return exported Endpoint or null if not present
      */
     private EndpointDescription getExportedEndpoint(ExportRegistration exReg) {

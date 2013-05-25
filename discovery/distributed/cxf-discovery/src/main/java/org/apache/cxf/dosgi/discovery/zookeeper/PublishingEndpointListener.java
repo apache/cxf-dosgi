@@ -77,7 +77,7 @@ public class PublishingEndpointListener implements EndpointListener {
     }
 
     public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
-        LOG.info("Local endpointDescription added: " + endpoint);
+        LOG.info("Local EndpointDescription added: " + endpoint);
 
         if (closed) {
             return;
@@ -118,7 +118,7 @@ public class PublishingEndpointListener implements EndpointListener {
     }
 
     public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
-        LOG.info("Local endpointDescription removed: " + endpoint);
+        LOG.info("Local EndpointDescription removed: " + endpoint);
 
         if (closed) {
             return;
@@ -131,7 +131,6 @@ public class PublishingEndpointListener implements EndpointListener {
 
             try {
                 removeEndpoint(endpoint);
-
                 endpoints.remove(endpoint);
             } catch (Exception ex) {
                 LOG.error("Exception while processing the removal of a ServicePublication.", ex);
@@ -140,8 +139,8 @@ public class PublishingEndpointListener implements EndpointListener {
 
     }
 
-    private void removeEndpoint(EndpointDescription endpoint) throws UnknownHostException,
-        URISyntaxException, InterruptedException, KeeperException {
+    private void removeEndpoint(EndpointDescription endpoint) throws UnknownHostException, URISyntaxException,
+                                                                     InterruptedException, KeeperException {
         Collection<String> interfaces = endpoint.getInterfaces();
         String endpointKey = getKey(endpoint.getId());
 

@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Creates local Endpointlisteners that publish to Zookeeper 
+ * Creates local EndpointListeners that publish to Zookeeper.
  */
 public class PublishingEndpointListenerFactory implements ServiceFactory {
     public static final String DISCOVERY_ZOOKEEPER_ID = "org.apache.cxf.dosgi.discovery.zookeeper";

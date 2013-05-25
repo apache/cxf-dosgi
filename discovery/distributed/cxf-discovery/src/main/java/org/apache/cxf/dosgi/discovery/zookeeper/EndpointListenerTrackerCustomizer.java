@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Tracks interest in EndpointListeners. Delegates to InterfaceMonitorManager to manage 
- * interest in the scopes of each EndpointListener
+ * interest in the scopes of each EndpointListener.
  */
 public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomizer {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerTrackerCustomizer.class);
@@ -61,7 +61,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
                 LOG.debug("modifiedService: property: " + key + " => " + sref.getProperty(key));
             }
         }
-        
+
         String[] scopes = Util.getScopes(sref);
         for (String scope : scopes) {
             String objClass = getObjectClass(scope);

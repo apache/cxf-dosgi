@@ -76,7 +76,7 @@ public class InterfaceMonitorManager {
                 }
 
                 if (interest.im != null) {
-                    // close old Monitor
+                    // close old InterfaceMonitor
                     interest.im.close();
                     interest.im = null;
                 }
@@ -159,12 +159,12 @@ public class InterfaceMonitorManager {
                 if (matches(currentScope, epd)) {
                     LOG.debug("Matched {} against {}", epd, currentScope);
                     if (isAdded) {
-                        LOG.info("calling EndpointListener.endpointAdded: " + epl + "from bundle "
-                                + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
+                        LOG.info("calling EndpointListener.endpointAdded: " + epl + " from bundle "
+                            + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
                         epl.endpointAdded(epd, currentScope);
                     } else {
-                        LOG.info("calling EndpointListener.endpointRemoved: " + epl + "from bundle "
-                                + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
+                        LOG.info("calling EndpointListener.endpointRemoved: " + epl + " from bundle "
+                            + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
                         epl.endpointRemoved(epd, currentScope);
                     }
                     break;
@@ -179,7 +179,7 @@ public class InterfaceMonitorManager {
             Dictionary<String, Object> dict = mapToDictionary(epd.getProperties());
             return f.match(dict);
         } catch (InvalidSyntaxException e) {
-            LOG.error("Currentscope [" + scope + "] resulted in" + " a bad filter!", e);
+            LOG.error("Scope [" + scope + "] resulted in an invalid filter!", e);
             return false;
         }
     }
