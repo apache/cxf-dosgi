@@ -23,7 +23,6 @@ import java.util.Dictionary;
 
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -68,31 +67,29 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
             return;
         }
         curConfiguration = configuration;
-        try {
-            zooKeeper = createZooKeeper(configuration);
-        } catch (IOException e) {
-            LOG.error("Failed to start the Zookeeper Discovery component.", e);
-        }
+        createZooKeeper(configuration);
     }
 
-    private void startModules() {
+    private void start() {
+        LOG.debug("starting ZookeeperDiscovery");
         endpointListenerFactory = new PublishingEndpointListenerFactory(zooKeeper, bctx);
         endpointListenerFactory.start();
         imManager = new InterfaceMonitorManager(bctx, zooKeeper);
-        EndpointListenerTrackerCustomizer customizer = new EndpointListenerTrackerCustomizer(bctx, imManager);
+        EndpointListenerTrackerCustomizer customizer = new EndpointListenerTrackerCustomizer(imManager);
         endpointListenerTracker = new ServiceTracker(bctx, EndpointListener.class.getName(), customizer);
         endpointListenerTracker.open();
     }
 
     public synchronized void stop() {
         if (endpointListenerFactory != null) {
+            LOG.debug("stopping ZookeeperDiscovery");
             endpointListenerFactory.stop();
-        }
-        if (imManager != null) {
-            imManager.close();
         }
         if (endpointListenerTracker != null) {
             endpointListenerTracker.close();
+        }
+        if (imManager != null) {
+            imManager.close();
         }
         if (zooKeeper != null) {
             try {
@@ -104,22 +101,21 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
     }
 
     @SuppressWarnings("rawtypes")
-    private ZooKeeper createZooKeeper(Dictionary props) throws IOException {
+    private void createZooKeeper(Dictionary props) {
         String zkHost = getProp(props, "zookeeper.host", "localhost");
         String zkPort = getProp(props, "zookeeper.port", "2181");
         int zkTimeout = Integer.parseInt(getProp(props, "zookeeper.timeout", "3000"));
-        return new ZooKeeper(zkHost + ":" + zkPort, zkTimeout, this);
+        try {
+            zooKeeper = new ZooKeeper(zkHost + ":" + zkPort, zkTimeout, this);
+        } catch (IOException e) {
+            LOG.error("Failed to start the Zookeeper Discovery component.", e);
+        }
     }
 
     @SuppressWarnings("rawtypes")
     private static String getProp(Dictionary props, String key, String def) {
         Object val = props.get(key);
-        String rv;
-        if (val == null) {
-            rv = def;
-        } else {
-            rv = val.toString();
-        }
+        String rv = val == null ? def : val.toString();
 
         LOG.debug("Reading Config Admin property: {} value returned: {}", key, rv);
         return rv;
@@ -127,19 +123,21 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
 
     /* Callback for ZooKeeper */
     public void process(WatchedEvent event) {
-        KeeperState state = event.getState();
-        if (state == KeeperState.SyncConnected) {
+        switch (event.getState()) {
+        case SyncConnected:
             LOG.info("Connection to zookeeper established");
-            startModules();
-        }
-        if (state == KeeperState.Expired) {
+            start();
+            break;
+
+        case Expired:
             LOG.info("Connection to zookeeper expired. Trying to create a new connection");
             stop();
-            try {
-                zooKeeper = createZooKeeper(curConfiguration);
-            } catch (IOException e) {
-                LOG.error("Failed to start the Zookeeper Discovery component.", e);
-            }
+            createZooKeeper(curConfiguration);
+            break;
+
+        default:
+            // ignore other events
+            break;
         }
     }
 }

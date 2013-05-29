@@ -31,7 +31,6 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 
 import static org.easymock.EasyMock.eq;
@@ -43,7 +42,6 @@ public class InterfaceMonitorTest extends TestCase {
 
         IMocksControl c = EasyMock.createControl();
 
-        BundleContext ctx = c.createMock(BundleContext.class);
         ZooKeeper zk = c.createMock(ZooKeeper.class);
         expect(zk.getState()).andReturn(ZooKeeper.States.CONNECTED).anyTimes();
 
@@ -52,7 +50,7 @@ public class InterfaceMonitorTest extends TestCase {
         String node = Util.getZooKeeperPath(interf);
 
         EndpointListener epListener = c.createMock(EndpointListener.class);
-        InterfaceMonitor im = new InterfaceMonitor(zk, interf, epListener, scope, ctx);
+        InterfaceMonitor im = new InterfaceMonitor(zk, interf, epListener, scope);
         zk.exists(eq(node), eq(im), eq(im), EasyMock.anyObject());
         EasyMock.expectLastCall().once();
 

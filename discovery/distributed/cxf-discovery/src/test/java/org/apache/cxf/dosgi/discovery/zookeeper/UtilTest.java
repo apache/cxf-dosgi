@@ -18,10 +18,7 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -31,28 +28,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 
 public class UtilTest extends TestCase {
-    
-    public void testMultiValuePropertyAsString() {
-        assertEquals(Collections.singleton("hi"), 
-            Util.getMultiValueProperty("hi"));            
-    }
-    
-    public void testMultiValuePropertyAsArray() {
-        assertEquals(Arrays.asList("a", "b"), 
-            Util.getMultiValueProperty(new String [] {"a", "b"}));
-    }
-    
-    public void testMultiValuePropertyAsCollection() {
-        List<String> list = new ArrayList<String>();
-        list.add("1");
-        list.add("2");
-        list.add("3");
-        assertEquals(list, Util.getMultiValueProperty(list)); 
-        
-        assertEquals(Collections.emptySet(), Util.getMultiValueProperty(null));
-        
-    }
-    
+
     public void testGetZooKeeperPath() {
         assertEquals(Util.PATH_PREFIX + '/' + "org/example/Test", 
             Util.getZooKeeperPath("org.example.Test"));
@@ -61,30 +37,57 @@ public class UtilTest extends TestCase {
         assertEquals(Util.PATH_PREFIX, Util.getZooKeeperPath(null));
         assertEquals(Util.PATH_PREFIX, Util.getZooKeeperPath(""));
     }
-    
-    
+
     @SuppressWarnings("unchecked")
     public void testGetStringPlusProperty() {
-        Object in = "MyString";
-        String[] out = Util.getStringPlusProperty(in);
+        String[] out = Util.getStringPlusProperty("MyString");
         assertEquals(1, out.length);
         assertEquals("MyString", out[0]);
         
-        
-        in = new String[]{"MyString"};
-        out = Util.getStringPlusProperty(in);
+        out = Util.getStringPlusProperty(new String[]{"MyString"});
         assertEquals(1, out.length);
         assertEquals("MyString", out[0]);
         
-        in = new ArrayList<String>();
-        ((List<String>)in).add("MyString");
-        out = Util.getStringPlusProperty(in);
+        out = Util.getStringPlusProperty(Arrays.asList("MyString"));
         assertEquals(1, out.length);
         assertEquals("MyString", out[0]);
-        
-        in = new Object();
-        out = Util.getStringPlusProperty(in);
+
+        out = Util.getStringPlusProperty(Arrays.asList(1));
         assertEquals(0, out.length);
+
+        out = Util.getStringPlusProperty(new Object());
+        assertEquals(0, out.length);
+
+        out = Util.getStringPlusProperty(null);
+        assertEquals(0, out.length);
+    }
+
+    public void testRemoveEmpty() {
+        String[] out = Util.removeEmpty(new String[0]);
+        assertEquals(0, out.length);
+
+        out = Util.removeEmpty(new String[] {null});
+        assertEquals(0, out.length);
+
+        out = Util.removeEmpty(new String[] {""});
+        assertEquals(0, out.length);
+
+        out = Util.removeEmpty(new String[] {"hi"});
+        assertEquals(1, out.length);
+        assertEquals("hi", out[0]);
+
+        out = Util.removeEmpty(new String[] {"", "hi", null});
+        assertEquals(1, out.length);
+        assertEquals("hi", out[0]);
+
+        out = Util.removeEmpty(new String[] {"hi", null, "", ""});
+        assertEquals(1, out.length);
+        assertEquals("hi", out[0]);
+
+        out = Util.removeEmpty(new String[] {"", "hi", null, "", "", "bye", null});
+        assertEquals(2, out.length);
+        assertEquals("hi", out[0]);
+        assertEquals("bye", out[1]);
     }
     
     public void testGetScopes() {

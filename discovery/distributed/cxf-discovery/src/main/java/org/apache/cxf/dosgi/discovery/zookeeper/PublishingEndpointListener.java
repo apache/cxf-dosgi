@@ -91,30 +91,33 @@ public class PublishingEndpointListener implements EndpointListener {
             }
 
             try {
-
-                Collection<String> interfaces = endpoint.getInterfaces();
-                String endpointKey = getKey(endpoint.getId());
-
-                for (String name : interfaces) {
-                    Map<String, Object> props = new HashMap<String, Object>(endpoint.getProperties());
-                    for (DiscoveryPlugin plugin : discoveryPlugins) {
-                        endpointKey = plugin.process(props, endpointKey);
-                    }
-
-                    String path = Util.getZooKeeperPath(name);
-                    ensurePath(path, zookeeper);
-
-                    String fullPath = path + '/' + endpointKey;
-                    LOG.debug("Creating ZooKeeper node: {}", fullPath);
-                    zookeeper.create(fullPath, getData(props), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
-                }
-
+                addEndpoint(endpoint);
                 endpoints.add(endpoint);
             } catch (Exception ex) {
                 LOG.error("Exception while processing the addition of an endpoint.", ex);
             }
         }
 
+    }
+
+    private void addEndpoint(EndpointDescription endpoint) throws URISyntaxException, KeeperException,
+                                                                  InterruptedException, IOException {
+        Collection<String> interfaces = endpoint.getInterfaces();
+        String endpointKey = getKey(endpoint.getId());
+
+        for (String name : interfaces) {
+            Map<String, Object> props = new HashMap<String, Object>(endpoint.getProperties());
+            for (DiscoveryPlugin plugin : discoveryPlugins) {
+                endpointKey = plugin.process(props, endpointKey);
+            }
+
+            String path = Util.getZooKeeperPath(name);
+            ensurePath(path, zookeeper);
+
+            String fullPath = path + '/' + endpointKey;
+            LOG.debug("Creating ZooKeeper node: {}", fullPath);
+            zookeeper.create(fullPath, getData(props), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+        }
     }
 
     public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
@@ -174,8 +177,7 @@ public class PublishingEndpointListener implements EndpointListener {
     }
 
     static byte[] getData(Map<String, Object> props) throws IOException {
-        String s = LocalDiscoveryUtils.getEndpointDescriptionXML(props);
-        return s.getBytes();
+        return LocalDiscoveryUtils.getEndpointDescriptionXML(props).getBytes();
     }
 
     static String getKey(String endpoint) throws UnknownHostException, URISyntaxException {

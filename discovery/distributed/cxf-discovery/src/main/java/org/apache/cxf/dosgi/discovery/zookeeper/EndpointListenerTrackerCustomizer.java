@@ -21,7 +21,6 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
 
     private InterfaceMonitorManager imManager;
 
-    public EndpointListenerTrackerCustomizer(BundleContext bc, InterfaceMonitorManager imManager) {
+    public EndpointListenerTrackerCustomizer(InterfaceMonitorManager imManager) {
         this.imManager = imManager;
     }
 
@@ -62,8 +61,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
             }
         }
 
-        String[] scopes = Util.getScopes(sref);
-        for (String scope : scopes) {
+        for (String scope : Util.getScopes(sref)) {
             String objClass = getObjectClass(scope);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Adding interest in scope: " + scope + " objectClass: " + objClass);
@@ -78,9 +76,6 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
     }
 
     private String getObjectClass(String scope) {
-        if (scope == null) {
-            return null;
-        }
         Matcher m = OBJECTCLASS_PATTERN.matcher(scope);
         return m.matches() ? m.group(1) : null;
     }

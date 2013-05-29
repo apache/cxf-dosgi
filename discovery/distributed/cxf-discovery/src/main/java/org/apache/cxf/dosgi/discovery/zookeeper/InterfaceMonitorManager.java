@@ -117,7 +117,7 @@ public class InterfaceMonitorManager {
                 notifyListeners(endpoint, true, interest.relatedServiceListeners);
             }
         };
-        return new InterfaceMonitor(zooKeeper, objClass, epListener, scope, bctx);
+        return new InterfaceMonitor(zooKeeper, objClass, epListener, scope);
     }
 
     public void removeInterest(ServiceReference sref) {

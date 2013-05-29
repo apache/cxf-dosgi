@@ -32,12 +32,19 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.jdom.Element;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Monitors ZooKeeper for changes in published endpoints.
+ * <p>
+ * Specifically, it monitors the node path associated with a given interface class,
+ * whose data is a serialized version of an EndpointDescription, and notifies an
+ * EndpointListener when changes are detected (which can then propagate the
+ * notification to other EndpointListeners with a matching scope).
+ */
 public class InterfaceMonitor implements Watcher, StatCallback {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitor.class);
 
@@ -50,7 +57,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     // This map reference changes, so don't synchronize on it
     private Map<String, EndpointDescription> nodes = new HashMap<String, EndpointDescription>();
 
-    public InterfaceMonitor(ZooKeeper zk, String intf, EndpointListener epListener, String scope, BundleContext bctx) {
+    public InterfaceMonitor(ZooKeeper zk, String intf, EndpointListener epListener, String scope) {
         this.zookeeper = zk;
         this.znode = Util.getZooKeeperPath(intf);
         this.recursive = intf == null || intf.isEmpty();
