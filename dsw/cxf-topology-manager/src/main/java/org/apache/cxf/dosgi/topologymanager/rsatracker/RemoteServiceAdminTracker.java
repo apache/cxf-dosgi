@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.topologymanager.rsatracker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -35,7 +36,7 @@ public class RemoteServiceAdminTracker extends ServiceTracker {
 
     public RemoteServiceAdminTracker(BundleContext bc) {
         super(bc, RemoteServiceAdmin.class.getName(), null);
-        this.listeners = new ArrayList<RemoteServiceAdminLifeCycleListener>();
+        this.listeners = new CopyOnWriteArrayList<RemoteServiceAdminLifeCycleListener>();
     }
 
     public void addListener(RemoteServiceAdminLifeCycleListener listener) {

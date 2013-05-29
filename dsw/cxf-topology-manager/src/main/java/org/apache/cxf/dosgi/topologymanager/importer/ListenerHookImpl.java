@@ -56,11 +56,11 @@ public class ListenerHookImpl implements ListenerHook {
         SYSTEM_PACKAGES.add("java.net.ContentHandler");
     }
 
-    private BundleContext bctx;
-    private ServiceInterestListener serviceInterestListener;
+    private final BundleContext bctx;
+    private final ServiceInterestListener serviceInterestListener;
 
     public ListenerHookImpl(BundleContext bc, ServiceInterestListener serviceInterestListener) {
-        bctx = bc;
+        this.bctx = bc;
         this.serviceInterestListener = serviceInterestListener;
     }
 
@@ -114,7 +114,7 @@ public class ListenerHookImpl implements ListenerHook {
 
     }
 
-    private String getClassNameFromFilter(String filter) {
+    private static String getClassNameFromFilter(String filter) {
         if (filter != null) {
             Matcher matcher = CLASS_NAME_PATTERN.matcher(filter);
             if (matcher.matches() && matcher.groupCount() >= 1) {

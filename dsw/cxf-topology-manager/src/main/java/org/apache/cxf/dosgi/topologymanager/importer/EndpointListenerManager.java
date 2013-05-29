@@ -37,9 +37,9 @@ public class EndpointListenerManager {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerManager.class);
     
     private final BundleContext bctx;
-    private ServiceRegistration serviceRegistration;
-    private List<String> filters = new ArrayList<String>();
-    private EndpointListener endpointListener;
+    private volatile ServiceRegistration serviceRegistration;
+    private final List<String> filters = new ArrayList<String>();
+    private final EndpointListener endpointListener;
 
     protected EndpointListenerManager(BundleContext bc, EndpointListener endpointListener) {
         this.bctx = bc;
@@ -52,7 +52,9 @@ public class EndpointListenerManager {
     }
     
     public void stop() {
-        serviceRegistration.unregister();
+        if (serviceRegistration != null) {
+            serviceRegistration.unregister();
+        }
     }
 
     protected void extendScope(String filter) {
@@ -84,8 +86,7 @@ public class EndpointListenerManager {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Current filter: " + filters);
             }
-            // TODO: make a copy of the filter list
-            p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, filters);
+            p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, new ArrayList<String>(filters));
         }
 
         return p;
