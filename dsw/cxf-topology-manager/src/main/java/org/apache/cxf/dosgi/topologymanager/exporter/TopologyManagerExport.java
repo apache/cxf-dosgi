@@ -164,7 +164,7 @@ public class TopologyManagerExport {
         LOG.debug("exporting ...");
         Collection<ExportRegistration> exportRegs = remoteServiceAdmin.exportService(sref, null);
         List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
-        if (exportRegs == null) {
+        if (exportRegs.isEmpty()) {
             // TODO export failed -> What should be done here?
             LOG.error("export failed");
         } else {

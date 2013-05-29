@@ -24,11 +24,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
@@ -256,15 +258,15 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
     private List<ExportRegistration> copyExportRegistration(Collection<ExportRegistration> regs) {
-        List<EndpointDescription> copiedEndpoints = new ArrayList<EndpointDescription>();
+        Set<EndpointDescription> copiedEndpoints = new HashSet<EndpointDescription>();
 
-        // / create a new list with copies of the exportRegistrations
+        // create a new list with copies of the exportRegistrations
         List<ExportRegistration> copy = new ArrayList<ExportRegistration>(regs.size());
         for (ExportRegistration exportRegistration : regs) {
             if (exportRegistration instanceof ExportRegistrationImpl) {
                 ExportRegistrationImpl exportRegistrationImpl = (ExportRegistrationImpl) exportRegistration;
                 EndpointDescription epd = exportRegistration.getExportReference().getExportedEndpoint();
-                //create one copy for each distinct endpoint description
+                // create one copy for each distinct endpoint description
                 if (!copiedEndpoints.contains(epd)) {
                     copiedEndpoints.add(epd);
                     copy.add(new ExportRegistrationImpl(exportRegistrationImpl));
