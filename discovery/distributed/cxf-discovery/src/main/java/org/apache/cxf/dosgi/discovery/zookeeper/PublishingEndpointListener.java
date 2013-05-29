@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
 import org.apache.zookeeper.CreateMode;
@@ -35,7 +34,6 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.util.tracker.ServiceTracker;
@@ -49,42 +47,23 @@ public class PublishingEndpointListener implements EndpointListener {
     private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListener.class);
 
     private final ZooKeeper zookeeper;
-    private final List<DiscoveryPlugin> discoveryPlugins = new CopyOnWriteArrayList<DiscoveryPlugin>();
     private final ServiceTracker discoveryPluginTracker;
     private final List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
     private boolean closed;
 
     public PublishingEndpointListener(ZooKeeper zooKeeper, BundleContext bctx) {
         this.zookeeper = zooKeeper;
-
-        discoveryPluginTracker = new ServiceTracker(bctx, DiscoveryPlugin.class.getName(), null) {
-            @Override
-            public Object addingService(ServiceReference reference) {
-                Object svc = super.addingService(reference);
-                if (svc instanceof DiscoveryPlugin) {
-                    discoveryPlugins.add((DiscoveryPlugin) svc);
-                }
-                return svc;
-            }
-
-            @Override
-            public void removedService(ServiceReference reference, Object service) {
-                discoveryPlugins.remove(service);
-                super.removedService(reference, service);
-            }
-        };
+        discoveryPluginTracker = new ServiceTracker(bctx, DiscoveryPlugin.class.getName(), null);
         discoveryPluginTracker.open();
     }
 
     public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
         LOG.info("Local EndpointDescription added: " + endpoint);
 
-        if (closed) {
-            return;
-        }
-
         synchronized (endpoints) {
-
+            if (closed) {
+                return;
+            }
             if (endpoints.contains(endpoint)) {
                 // TODO -> Should the published endpoint be updated here ?
                 return;
@@ -104,18 +83,23 @@ public class PublishingEndpointListener implements EndpointListener {
                                                                   InterruptedException, IOException {
         Collection<String> interfaces = endpoint.getInterfaces();
         String endpointKey = getKey(endpoint.getId());
+        Map<String, Object> props = new HashMap<String, Object>(endpoint.getProperties());
+
+        // process plugins
+        Object[] plugins = discoveryPluginTracker.getServices();
+        if (plugins != null) {
+            for (Object plugin : plugins) {
+                if (plugin instanceof DiscoveryPlugin) {
+                    endpointKey = ((DiscoveryPlugin)plugin).process(props, endpointKey);
+                }
+            }
+        }
 
         for (String name : interfaces) {
-            Map<String, Object> props = new HashMap<String, Object>(endpoint.getProperties());
-            for (DiscoveryPlugin plugin : discoveryPlugins) {
-                endpointKey = plugin.process(props, endpointKey);
-            }
-
             String path = Util.getZooKeeperPath(name);
-            ensurePath(path, zookeeper);
-
             String fullPath = path + '/' + endpointKey;
             LOG.debug("Creating ZooKeeper node: {}", fullPath);
+            ensurePath(path, zookeeper);
             zookeeper.create(fullPath, getData(props), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
         }
     }
@@ -123,11 +107,10 @@ public class PublishingEndpointListener implements EndpointListener {
     public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
         LOG.info("Local EndpointDescription removed: " + endpoint);
 
-        if (closed) {
-            return;
-        }
-
         synchronized (endpoints) {
+            if (closed) {
+                return;
+            }
             if (!endpoints.contains(endpoint)) {
                 return;
             }
@@ -195,6 +178,7 @@ public class PublishingEndpointListener implements EndpointListener {
     public void close() {
         LOG.debug("closing - removing all endpoints");
         synchronized (endpoints) {
+            closed = true;
             for (EndpointDescription ed : endpoints) {
                 try {
                     removeEndpoint(ed);

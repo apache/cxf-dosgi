@@ -34,7 +34,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerTrackerCustomizer.class);
     private static final Pattern OBJECTCLASS_PATTERN = Pattern.compile(".*\\(objectClass=([^)]+)\\).*");
 
-    private InterfaceMonitorManager imManager;
+    private final InterfaceMonitorManager imManager;
 
     public EndpointListenerTrackerCustomizer(InterfaceMonitorManager imManager) {
         this.imManager = imManager;

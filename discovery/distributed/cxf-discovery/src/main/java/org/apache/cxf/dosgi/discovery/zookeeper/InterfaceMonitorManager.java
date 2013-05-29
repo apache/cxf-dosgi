@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
@@ -46,13 +47,13 @@ public class InterfaceMonitorManager {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitorManager.class);
     
     private final ZooKeeper zooKeeper;
-    private final Map<ServiceReference, List<String> /* scopes of the epl */> handledEndpointlisteners 
+    private final Map<ServiceReference, List<String> /* scopes of the epl */> handledEndpointlisteners
         = new HashMap<ServiceReference, List<String>>();
     private final Map<String /* scope */, Interest> interestingScopes = new HashMap<String, Interest>();
     private final BundleContext bctx;
 
     protected static class Interest {
-        List<ServiceReference> relatedServiceListeners = new ArrayList<ServiceReference>(1);
+        List<ServiceReference> relatedServiceListeners = new CopyOnWriteArrayList<ServiceReference>();
         InterfaceMonitor im;
     }
     
@@ -60,54 +61,50 @@ public class InterfaceMonitorManager {
         this.bctx = bctx;
         this.zooKeeper = zooKeeper;
     }
-    
-    public void addInterest(ServiceReference sref, String scope, String objClass) {
-        synchronized (interestingScopes) {
-            synchronized (handledEndpointlisteners) {
-                Interest interest = interestingScopes.get(scope);
-                if (interest == null) {
-                    interest = new Interest();
-                    interestingScopes.put(scope, interest);
-                }
-                
-                if (!interest.relatedServiceListeners.contains(sref)) {
-                    interest.relatedServiceListeners.add(sref);
-                }
 
-                if (interest.im == null) {
-                    interest.im = createInterfaceMonitor(scope, objClass, interest);
-                    interest.im.start();
-                }
+    public synchronized void addInterest(ServiceReference sref, String scope, String objClass) {
+        Interest interest = interestingScopes.get(scope);
+        if (interest == null) {
+            interest = new Interest();
+            interestingScopes.put(scope, interest);
+        }
 
-                List<String> handledScopes = handledEndpointlisteners.get(sref);
-                if (handledScopes == null) {
-                    handledScopes = new ArrayList<String>(1);
-                    handledEndpointlisteners.put(sref, handledScopes);
-                }
+        if (!interest.relatedServiceListeners.contains(sref)) {
+            interest.relatedServiceListeners.add(sref);
+        }
 
-                if (!handledScopes.contains(scope)) {
-                    handledScopes.add(scope);
-                }
+        if (interest.im == null) {
+            interest.im = createInterfaceMonitor(scope, objClass, interest);
+            interest.im.start();
+        }
 
-            }
+        List<String> handledScopes = handledEndpointlisteners.get(sref);
+        if (handledScopes == null) {
+            handledScopes = new ArrayList<String>(1);
+            handledEndpointlisteners.put(sref, handledScopes);
+        }
+
+        if (!handledScopes.contains(scope)) {
+            handledScopes.add(scope);
         }
     }
     
     /**
      * Only for test case !
      * */
-    protected Map<String, Interest> getInterestingScopes() {
+    protected synchronized Map<String, Interest> getInterestingScopes() {
         return interestingScopes;
     }
 
     /**
      * Only for test case !
      * */
-    protected Map<ServiceReference, List<String>>  getHandledEndpointlisteners() {
+    protected synchronized Map<ServiceReference, List<String>> getHandledEndpointlisteners() {
         return handledEndpointlisteners;
     }
     
     private InterfaceMonitor createInterfaceMonitor(String scope, String objClass, final Interest interest) {
+        // holding this object's lock in the callbacks can lead to a deadlock with InterfaceMonitor
         EndpointListener epListener = new EndpointListener() {
             public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
                 notifyListeners(endpoint, false, interest.relatedServiceListeners);
@@ -120,7 +117,7 @@ public class InterfaceMonitorManager {
         return new InterfaceMonitor(zooKeeper, objClass, epListener, scope);
     }
 
-    public void removeInterest(ServiceReference sref) {
+    public synchronized void removeInterest(ServiceReference sref) {
         List<String> handledScopes = handledEndpointlisteners.get(sref);
         if (handledScopes == null) {
             return;
@@ -178,7 +175,7 @@ public class InterfaceMonitorManager {
         }
     }
 
-    public void close() {
+    public synchronized void close() {
         for (Interest interest : interestingScopes.values()) {
             interest.im.close();
         }

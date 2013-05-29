@@ -59,9 +59,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
             LOG.debug("Received configuration update for Zookeeper Discovery: " + configuration);
         }
 
-        synchronized (this) {
-            stop();
-        }
+        stop();
 
         if (configuration == null) {
             return;
@@ -70,7 +68,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         createZooKeeper(configuration);
     }
 
-    private void start() {
+    private synchronized void start() {
         LOG.debug("starting ZookeeperDiscovery");
         endpointListenerFactory = new PublishingEndpointListenerFactory(zooKeeper, bctx);
         endpointListenerFactory.start();
@@ -101,7 +99,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
     }
 
     @SuppressWarnings("rawtypes")
-    private void createZooKeeper(Dictionary props) {
+    private synchronized void createZooKeeper(Dictionary props) {
         String zkHost = getProp(props, "zookeeper.host", "localhost");
         String zkPort = getProp(props, "zookeeper.port", "2181");
         int zkTimeout = Integer.parseInt(getProp(props, "zookeeper.timeout", "3000"));

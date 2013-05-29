@@ -52,7 +52,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     private final ZooKeeper zookeeper;
     private final EndpointListener epListener;
     private final boolean recursive;
-    private boolean closed;
+    private volatile boolean closed;
 
     // This map reference changes, so don't synchronize on it
     private Map<String, EndpointDescription> nodes = new HashMap<String, EndpointDescription>();
@@ -130,7 +130,8 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         }
     }
 
-    public void close() {
+    public synchronized void close() {
+        closed = true;
         for (EndpointDescription epd : nodes.values()) {
             epListener.endpointRemoved(epd, null);
         }
@@ -138,6 +139,9 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     }
 
     private synchronized void refreshNodes() {
+        if (closed) {
+            return;
+        }
         LOG.info("Processing change on node: {}", znode);
 
         Map<String, EndpointDescription> newNodes = new HashMap<String, EndpointDescription>();

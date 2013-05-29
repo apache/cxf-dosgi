@@ -41,9 +41,9 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
     public static final String DISCOVERY_ZOOKEEPER_ID = "org.apache.cxf.dosgi.discovery.zookeeper";
     private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListenerFactory.class);
 
-    private BundleContext bctx;
-    private ZooKeeper zookeeper;
-    private List<PublishingEndpointListener> listeners = new ArrayList<PublishingEndpointListener>();
+    private final BundleContext bctx;
+    private final ZooKeeper zookeeper;
+    private final List<PublishingEndpointListener> listeners = new ArrayList<PublishingEndpointListener>();
     private ServiceRegistration serviceRegistration;
 
     public PublishingEndpointListenerFactory(ZooKeeper zooKeeper, BundleContext bctx) {
@@ -82,18 +82,22 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
         if (serviceRegistration != null) {
             serviceRegistration.unregister();
         }
-        
-        for (PublishingEndpointListener epl : listeners) {
-            epl.close();
+
+        synchronized (listeners) {
+            for (PublishingEndpointListener epl : listeners) {
+                epl.close();
+            }
+            listeners.clear();
         }
-        listeners.clear();
     }
 
     /**
      * only for the test case !
      */
     protected List<PublishingEndpointListener> getListeners() {
-        return listeners;
+        synchronized (listeners) {
+            return listeners;
+        }
     }
     
 }
