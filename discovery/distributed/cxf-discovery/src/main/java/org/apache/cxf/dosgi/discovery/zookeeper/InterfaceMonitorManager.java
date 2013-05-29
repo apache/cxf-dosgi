@@ -75,15 +75,10 @@ public class InterfaceMonitorManager {
                     interest.relatedServiceListeners.add(sref);
                 }
 
-                if (interest.im != null) {
-                    // close old InterfaceMonitor
-                    interest.im.close();
-                    interest.im = null;
+                if (interest.im == null) {
+                    interest.im = createInterfaceMonitor(scope, objClass, interest);
+                    interest.im.start();
                 }
-                
-                InterfaceMonitor dm = createInterfaceMonitor(scope, objClass, interest);
-                dm.start();
-                interest.im = dm;
 
                 List<String> handledScopes = handledEndpointlisteners.get(sref);
                 if (handledScopes == null) {
