@@ -315,9 +315,9 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         LOG.debug("importService() Endpoint: {}", endpoint.getProperties());
 
         synchronized (importedServices) {
-            if (importedServices.containsKey(endpoint) && importedServices.get(endpoint).size() > 0) {
+            Collection<ImportRegistrationImpl> imRegs = importedServices.get(endpoint);
+            if (imRegs != null && imRegs.size() > 0) {
                 LOG.debug("creating copy of existing import registrations");
-                Collection<ImportRegistrationImpl> imRegs = importedServices.get(endpoint);
                 ImportRegistrationImpl irParent = imRegs.iterator().next();
                 ImportRegistrationImpl ir = new ImportRegistrationImpl(irParent);
                 imRegs.add(ir);
@@ -325,7 +325,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return ir;
             }
 
-            ConfigurationTypeHandler handler = null;
+            ConfigurationTypeHandler handler;
             try {
                 handler = configTypeHandlerFactory.getHandler(bctx, endpoint);
             } catch (RuntimeException e) {
@@ -335,8 +335,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
             LOG.debug("Handler: {}", handler);
 
-            // // TODO: somehow select the interfaces that should be imported ----> job of the TopologyManager
-            // ?
+            // TODO: somehow select the interfaces that should be imported ---> job of the TopologyManager?
             List<String> matchingInterfaces = endpoint.getInterfaces();
 
             LOG.info("Matching Interfaces for import: " + matchingInterfaces);
@@ -347,7 +346,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 ImportRegistrationImpl imReg = new ImportRegistrationImpl(endpoint, this);
 
                 proxifyMatchingInterface(matchingInterfaces.get(0), imReg, handler, bctx);
-                Collection<ImportRegistrationImpl> imRegs = importedServices.get(endpoint);
                 if (imRegs == null) {
                     imRegs = new ArrayList<ImportRegistrationImpl>();
                     importedServices.put(endpoint, imRegs);
@@ -359,7 +357,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return null;
             }
         }
-
     }
 
     protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,

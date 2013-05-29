@@ -176,20 +176,22 @@ public final class OsgiUtils {
         }
 
         for (Map.Entry<String, Object> e : additionalProperties.entrySet()) {
-            String key = e.getKey().toLowerCase();
-            if (org.osgi.framework.Constants.SERVICE_ID.toLowerCase().equals(key)
-                || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(key)) {
+            String key = e.getKey();
+            String lowerKey = key.toLowerCase();
+            if (org.osgi.framework.Constants.SERVICE_ID.toLowerCase().equals(lowerKey)
+                || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(lowerKey)) {
                 // objectClass and service.id must not be overwritten
                 LOG.info("exportService called with additional properties map that contained illegal key: "
-                          + key + "   The key is ignored");
-                continue;
-            } else if (keysLowerCase.containsKey(key)) {
-                String origKey = keysLowerCase.get(key);
-                serviceProperties.put(origKey, e.getValue());
-                LOG.debug("Overwriting property [{}]  with value [{}]", origKey, e.getValue());
+                          + key + ", the key is ignored");
             } else {
-                serviceProperties.put(e.getKey(), e.getValue());
-                keysLowerCase.put(e.getKey().toString().toLowerCase(), e.getKey().toString());
+                String origKey = keysLowerCase.get(lowerKey);
+                if (origKey != null) {
+                    LOG.debug("Overwriting property [{}] with value [{}]", origKey, e.getValue());
+                } else {
+                    origKey = key;
+                    keysLowerCase.put(lowerKey, origKey);
+                }
+                serviceProperties.put(origKey, e.getValue());
             }
         }
     }

@@ -134,8 +134,9 @@ public class LocalDiscovery implements BundleListener {
         
         listenerToFilters.put(listener, filters);
         for (String filter : filters) {
-            if (filterToListeners.containsKey(filter)) {
-                filterToListeners.get(filter).add(listener);
+            Collection<EndpointListener> listeners = filterToListeners.get(filter);
+            if (listeners != null) {
+                listeners.add(listener);
             } else {
                 List<EndpointListener> list = new ArrayList<EndpointListener>();
                 list.add(listener);
@@ -154,10 +155,9 @@ public class LocalDiscovery implements BundleListener {
         
         for (String filter : filters) {
             Collection<EndpointListener> listeners = filterToListeners.get(filter);
-            if (listeners == null) {
-                continue;
+            if (listeners != null) {
+                listeners.remove(listener);
             }
-            listeners.remove(listener);
         }        
     }
 

@@ -52,8 +52,9 @@ class EndpointRepository {
     synchronized List<EndpointDescription> removeRemoteServiceAdmin(RemoteServiceAdmin rsa) {
         List<EndpointDescription> removedEndpoints = new ArrayList<EndpointDescription>();
         for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
-            if (exports.containsKey(rsa)) {
-                removedEndpoints.addAll(exports.get(rsa));
+            Collection<EndpointDescription> endpoints = exports.get(rsa);
+            if (endpoints != null) {
+                removedEndpoints.addAll(endpoints);
                 exports.remove(rsa);
             }
         }
@@ -62,12 +63,10 @@ class EndpointRepository {
 
     synchronized List<EndpointDescription> removeService(ServiceReference sref) {
         List<EndpointDescription> removedEndpoints = new ArrayList<EndpointDescription>();
-        if (exportedServices.containsKey(sref)) {
-            Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsas = exportedServices.get(sref);
-            for (Map.Entry<RemoteServiceAdmin, Collection<EndpointDescription>> entry : rsas.entrySet()) {
-                if (entry.getValue() != null) {
-                    removedEndpoints.addAll(entry.getValue());
-                }
+        Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsas = exportedServices.get(sref);
+        if (rsas != null) {
+            for (Collection<EndpointDescription> endpoints : rsas.values()) {
+                removedEndpoints.addAll(endpoints);
             }
             exportedServices.remove(sref);
         }
@@ -84,6 +83,9 @@ class EndpointRepository {
 
     synchronized void addEndpoints(ServiceReference sref, RemoteServiceAdmin rsa,
                                    List<EndpointDescription> endpoints) {
+        if (endpoints == null) {
+            throw new NullPointerException();
+        }
         addService(sref);
         Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = exportedServices.get(sref);
         exports.put(rsa, endpoints);
@@ -98,9 +100,7 @@ class EndpointRepository {
         List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
         for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
             for (Collection<EndpointDescription> regs : exports.values()) {
-                if (regs != null) {
-                    endpoints.addAll(regs);
-                }
+                endpoints.addAll(regs);
             }
         }
         return endpoints;
@@ -108,9 +108,10 @@ class EndpointRepository {
 
     synchronized Set<ServiceReference> getServicesToBeExportedFor(RemoteServiceAdmin rsa) {
         Set<ServiceReference> servicesToBeExported = new HashSet<ServiceReference>();
-        for (ServiceReference sref : exportedServices.keySet()) {
-            if (!isAlreadyExportedForRsa(sref, rsa)) {
-                servicesToBeExported.add(sref);
+        for (Map.Entry<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>> entry
+                : exportedServices.entrySet()) {
+            if (!entry.getValue().containsKey(rsa)) {
+                servicesToBeExported.add(entry.getKey());
             }
         }
         return servicesToBeExported;
