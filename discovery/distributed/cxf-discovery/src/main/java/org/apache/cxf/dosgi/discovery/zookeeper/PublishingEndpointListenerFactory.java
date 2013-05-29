@@ -60,13 +60,11 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
         }
     }
 
-    public void ungetService(Bundle b, ServiceRegistration sr, Object s) {
+    public void ungetService(Bundle b, ServiceRegistration sr, Object service) {
         LOG.debug("remove EndpointListener");
         synchronized (listeners) {
-            if (listeners.contains(s)) {
-                PublishingEndpointListener epl = (PublishingEndpointListener)s;
-                epl.close();
-                listeners.remove(epl);
+            if (listeners.remove(service)) {
+                ((PublishingEndpointListener)service).close();
             }
         }
     }
@@ -88,6 +86,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
         for (PublishingEndpointListener epl : listeners) {
             epl.close();
         }
+        listeners.clear();
     }
 
     /**

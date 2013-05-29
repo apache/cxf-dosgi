@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
@@ -62,7 +61,7 @@ public class InterfaceMonitorManager {
         this.zooKeeper = zooKeeper;
     }
     
-    void addInterest(ServiceReference sref, String scope, String objClass) {
+    public void addInterest(ServiceReference sref, String scope, String objClass) {
         synchronized (interestingScopes) {
             synchronized (handledEndpointlisteners) {
                 Interest interest = interestingScopes.get(scope);
@@ -108,7 +107,7 @@ public class InterfaceMonitorManager {
         return handledEndpointlisteners;
     }
     
-    protected InterfaceMonitor createInterfaceMonitor(String scope, String objClass, final Interest interest) {
+    private InterfaceMonitor createInterfaceMonitor(String scope, String objClass, final Interest interest) {
         EndpointListener epListener = new EndpointListener() {
             public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
                 notifyListeners(endpoint, false, interest.relatedServiceListeners);
@@ -131,7 +130,7 @@ public class InterfaceMonitorManager {
             Interest i = interestingScopes.get(scope);
             if (i != null) {
                 i.relatedServiceListeners.remove(sref);
-                if (i.relatedServiceListeners.size() == 0) {
+                if (i.relatedServiceListeners.isEmpty()) {
                     i.im.close();
                     interestingScopes.remove(scope);
                 }
@@ -168,10 +167,10 @@ public class InterfaceMonitorManager {
         }
     }
     
-    private boolean matches(String scope, EndpointDescription epd) {
+    private static boolean matches(String scope, EndpointDescription epd) {
         try {
             Filter f = FrameworkUtil.createFilter(scope);
-            Dictionary<String, Object> dict = mapToDictionary(epd.getProperties());
+            Dictionary<String, Object> dict = new Hashtable<String, Object>(epd.getProperties());
             return f.match(dict);
         } catch (InvalidSyntaxException e) {
             LOG.error("Scope [" + scope + "] resulted in an invalid filter!", e);
@@ -179,19 +178,11 @@ public class InterfaceMonitorManager {
         }
     }
 
-    private Dictionary<String, Object> mapToDictionary(Map<String, Object> map) {
-        Dictionary<String, Object> d = new Hashtable<String, Object>();
-        Set<Map.Entry<String, Object>> entries = map.entrySet();
-        for (Map.Entry<String, Object> entry : entries) {
-            d.put(entry.getKey(), entry.getValue());
-        }
-        return d;
-    }
-
     public void close() {
-        for (String scope : interestingScopes.keySet()) {
-            Interest interest = interestingScopes.get(scope);
+        for (Interest interest : interestingScopes.values()) {
             interest.im.close();
         }
+        interestingScopes.clear();
+        handledEndpointlisteners.clear();
     }
 }

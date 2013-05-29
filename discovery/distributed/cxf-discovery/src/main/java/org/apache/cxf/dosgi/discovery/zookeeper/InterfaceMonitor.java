@@ -47,18 +47,17 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     private final boolean recursive;
     private boolean closed;
 
-    // This map is *only* accessed in the change() method
+    // This map reference changes, so don't synchronize on it
     private Map<String, EndpointDescription> nodes = new HashMap<String, EndpointDescription>();
 
     public InterfaceMonitor(ZooKeeper zk, String intf, EndpointListener epListener, String scope, BundleContext bctx) {
         this.zookeeper = zk;
         this.znode = Util.getZooKeeperPath(intf);
-        this.recursive = intf == null || "".equals(intf);
+        this.recursive = intf == null || intf.isEmpty();
         this.epListener = epListener;
         if (LOG.isDebugEnabled()) {
-            String recursiveSt = recursive ? "recursive" : "";
-            LOG.debug("Creating new InterfaceMonitor " + recursiveSt + "for scope [" + scope
-                + "] and objectClass [" + intf + "] ");
+            LOG.debug("Creating new InterfaceMonitor " + (recursive ? "(recursive)" : "")
+                + " for scope [" + scope + "] and objectClass [" + intf + "]");
         }
     }
 
@@ -72,7 +71,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     }
 
     /**
-     * Zookeeper watcher
+     * Zookeeper Watcher interface callback.
      */
     public void process(WatchedEvent event) {
         LOG.debug("ZooKeeper watcher callback for event {}", event);
@@ -80,7 +79,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     }
 
     /**
-     * Zookeeper StatCallback
+     * Zookeeper StatCallback interface callback.
      */
     @SuppressWarnings("deprecation")
     public void processResult(int rc, String path, Object ctx, Stat stat) {
@@ -89,7 +88,8 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         switch (rc) {
         case Code.Ok:
         case Code.NoNode:
-            break;
+            processDelta();
+            return;
 
         case Code.SessionExpired:
         case Code.NoAuth:
@@ -98,10 +98,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
         default:
             watch();
-            return;
         }
-
-        processDelta();
     }
 
     private void processDelta() {
@@ -117,12 +114,12 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         try {
             if (zookeeper.exists(znode, false) != null) {
                 zookeeper.getChildren(znode, this);
-                change();
+                refreshNodes();
             } else {
                 LOG.debug("znode {} doesn't exist -> not processing any changes", znode);
             }
-        } catch (Exception ke) {
-            LOG.error("Error getting ZooKeeper data.", ke);
+        } catch (Exception e) {
+            LOG.error("Error getting ZooKeeper data.", e);
         }
     }
 
@@ -133,8 +130,8 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         nodes.clear();
     }
 
-    public synchronized void change() {
-        LOG.info("Zookeeper callback on node: {}", znode);
+    private synchronized void refreshNodes() {
+        LOG.info("Processing change on node: {}", znode);
 
         Map<String, EndpointDescription> newNodes = new HashMap<String, EndpointDescription>();
         Map<String, EndpointDescription> prevNodes = nodes;
@@ -149,10 +146,10 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     }
 
     /**
-     * iterates through all child nodes of the given node and tries to find
+     * Iterates through all child nodes of the given node and tries to find
      * endpoints. If the recursive flag is set it also traverses into the child
      * nodes.
-     * 
+     *
      * @return true if an endpoint was found and if the node therefore needs to
      *         be monitored for changes
      */
@@ -199,10 +196,9 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     }
 
     /**
-     * Scan the node data for Endpoint information and publish it to the related
-     * service listeners
-     * 
-     * @param node
+     * Retrieves data from the given node and parses it into an EndpointDescription.
+     *
+     * @param node a node path
      * @return endpoint found in the node or null if no endpoint was found
      */
     private EndpointDescription getEndpointDescriptionFromNode(String node) {
@@ -212,16 +208,15 @@ public class InterfaceMonitor implements Watcher, StatCallback {
                 return null;
             }
             byte[] data = zookeeper.getData(node, false, null);
-            LOG.debug("Child: {}", node);
+            LOG.debug("Got data for node: {}", node);
 
             List<Element> elements = LocalDiscoveryUtils.getElements(new ByteArrayInputStream(data));
             if (elements.size() > 0) {
                 return LocalDiscoveryUtils.getEndpointDescription(elements.get(0));
-            } else {
-                LOG.warn("No Discovery information found for node: {}", node);
             }
+            LOG.warn("No Discovery information found for node: {}", node);
         } catch (Exception e) {
-            LOG.error("Problem processing Zookeeper callback", e);
+            LOG.error("Problem getting EndpointDescription from node " + node, e);
         }
         return null;
     }

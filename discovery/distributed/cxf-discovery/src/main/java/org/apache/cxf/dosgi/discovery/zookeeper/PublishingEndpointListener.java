@@ -111,7 +111,7 @@ public class PublishingEndpointListener implements EndpointListener {
 
                 endpoints.add(endpoint);
             } catch (Exception ex) {
-                LOG.error("Exception while processing the addition of a ServicePublication.", ex);
+                LOG.error("Exception while processing the addition of an endpoint.", ex);
             }
         }
 
@@ -133,7 +133,7 @@ public class PublishingEndpointListener implements EndpointListener {
                 removeEndpoint(endpoint);
                 endpoints.remove(endpoint);
             } catch (Exception ex) {
-                LOG.error("Exception while processing the removal of a ServicePublication.", ex);
+                LOG.error("Exception while processing the removal of an endpoint", ex);
             }
         }
 
@@ -191,13 +191,13 @@ public class PublishingEndpointListener implements EndpointListener {
     }
 
     public void close() {
-        LOG.debug("removing all service publications");
+        LOG.debug("closing - removing all endpoints");
         synchronized (endpoints) {
             for (EndpointDescription ed : endpoints) {
                 try {
                     removeEndpoint(ed);
                 } catch (Exception ex) {
-                    LOG.error("Exception while processing the removal of a ServicePublication.", ex);
+                    LOG.error("Exception while removing endpoint during close", ex);
                 }
             }
             endpoints.clear();
