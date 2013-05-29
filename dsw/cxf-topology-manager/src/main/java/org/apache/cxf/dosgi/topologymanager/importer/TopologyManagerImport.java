@@ -164,8 +164,11 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
                 ips = new ArrayList<EndpointDescription>();
                 importPossibilities.put(filter, ips);
             }
-
-            ips.add(epd);
+            // prevent adding the same endpoint multiple times, which can happen sometimes,
+            // and which causes imports to remain available even when services are actually down
+            if (!ips.contains(epd)) {
+                ips.add(epd);
+            }
         }
     }
 
@@ -214,7 +217,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     
     private void unexportNotAvailableServices(String filter) {
         List<ImportRegistration> importRegistrations = getImportedServices(filter);
-        if (importRegistrations.size() == 0) {
+        if (importRegistrations.isEmpty()) {
             return;
         }
             
@@ -227,6 +230,10 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
                 ir.close();
                 it.remove();
             }
+        }
+
+        if (importRegistrations.isEmpty()) {
+            importedServices.remove(filter);
         }
     }
     
