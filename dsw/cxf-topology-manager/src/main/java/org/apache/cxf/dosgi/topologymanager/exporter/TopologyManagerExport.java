@@ -172,7 +172,7 @@ public class TopologyManagerExport {
                 endpoints.add(getExportedEndpoint(exportReg));
             }
             LOG.info("TopologyManager: export successful Endpoints: {}", endpoints);
-            epListenerNotifier.nofifyEndpointListenersOfAdding(endpoints);
+            epListenerNotifier.notifyListenersOfAdding(endpoints);
         }
         endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
     }

@@ -57,6 +57,7 @@ public class Activator implements ManagedService, BundleActivator {
     private ServiceRegistration rsaFactoryReg;
     private ServiceRegistration decoratorReg;
     private IntentTracker intentTracker;
+    private HttpServiceManager httpServiceManager;
     private BundleContext bc;
 
     public void start(BundleContext bundlecontext) throws Exception {
@@ -76,7 +77,7 @@ public class Activator implements ManagedService, BundleActivator {
         intentTracker = new IntentTracker(bc, intentMap);
         intentTracker.open();
         IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
-        HttpServiceManager httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlias);
+        httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlias);
         ConfigTypeHandlerFactory configTypeHandlerFactory
             = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
@@ -122,6 +123,8 @@ public class Activator implements ManagedService, BundleActivator {
         // This also triggers the unimport and unexport of the remote services
         rsaFactoryReg.unregister();
         decoratorReg.unregister();
+        httpServiceManager.close();
+        httpServiceManager = null;
         intentTracker = null;
         rsaFactoryReg = null;
         decoratorReg = null;

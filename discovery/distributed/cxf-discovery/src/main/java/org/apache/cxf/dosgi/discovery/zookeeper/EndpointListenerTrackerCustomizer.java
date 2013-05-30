@@ -49,6 +49,11 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
         handleEndpointListener(sref);
     }
 
+    public void removedService(ServiceReference sref, Object service) {
+        LOG.info("removedService: {}", sref);
+        imManager.removeInterest(sref);
+    }
+
     private void handleEndpointListener(ServiceReference sref) {
         if (isOurOwnEndpointListener(sref)) {
             LOG.debug("Skipping our own endpointListener");
@@ -68,19 +73,13 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
         }
     }
 
-    private boolean isOurOwnEndpointListener(ServiceReference sref) {
+    private static boolean isOurOwnEndpointListener(ServiceReference sref) {
         return Boolean.parseBoolean(String.valueOf(
                 sref.getProperty(PublishingEndpointListenerFactory.DISCOVERY_ZOOKEEPER_ID)));
     }
 
-    private String getObjectClass(String scope) {
+    private static String getObjectClass(String scope) {
         Matcher m = OBJECTCLASS_PATTERN.matcher(scope);
         return m.matches() ? m.group(1) : null;
     }
-
-    public void removedService(ServiceReference sref, Object service) {
-        LOG.info("removedService: {}", sref);
-        imManager.removeInterest(sref);
-    }
-
 }

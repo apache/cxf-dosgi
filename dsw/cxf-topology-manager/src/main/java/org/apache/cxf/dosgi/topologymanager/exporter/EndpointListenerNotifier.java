@@ -81,15 +81,21 @@ public class EndpointListenerNotifier {
         stEndpointListeners.close();
     }
     
-    void nofifyEndpointListenersOfAdding(Collection<EndpointDescription> endpoints) {
-        for (ServiceReference eplistener : stEndpointListeners.getServiceReferences()) {
-            notifyListenerOfAdding(eplistener, endpoints);
+    void notifyListenersOfAdding(Collection<EndpointDescription> endpoints) {
+        ServiceReference[] listeners = stEndpointListeners.getServiceReferences();
+        if (listeners != null) {
+            for (ServiceReference eplistener : listeners) {
+                notifyListenerOfAdding(eplistener, endpoints);
+            }
         }
     }
     
     void notifyListenersOfRemoval(Collection<EndpointDescription> endpoints) {
-        for (ServiceReference epListenerReference : stEndpointListeners.getServiceReferences()) {
-            notifyListenerOfRemoval(epListenerReference, endpoints);
+        ServiceReference[] listeners = stEndpointListeners.getServiceReferences();
+        if (listeners != null) {
+            for (ServiceReference epListenerReference : listeners) {
+                notifyListenerOfRemoval(epListenerReference, endpoints);
+            }
         }
     }
     

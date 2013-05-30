@@ -38,11 +38,11 @@ public class Activator implements BundleActivator {
         tracker = new ServiceTracker(bc, GreeterService.class.getName(), null) {
             @Override
             public Object addingService(ServiceReference reference) {
-                Object result = super.addingService(reference);
-
-                useGreeterService(bc, reference);
-                
-                return result;
+                Object service = super.addingService(reference);
+                if (service instanceof GreeterService) {
+                    useGreeterService((GreeterService) service);
+                }
+                return service;
             }
         };
         tracker.open();
@@ -50,47 +50,35 @@ public class Activator implements BundleActivator {
         tracker2 = new ServiceTracker(bc, GreeterService2.class.getName(), null) {
             @Override
             public Object addingService(ServiceReference reference) {
-                Object result = super.addingService(reference);
-
-                useGreeterService2(bc, reference);
-                
-                return result;
+                Object service = super.addingService(reference);
+                if (service instanceof GreeterService2) {
+                    useGreeterService2((GreeterService2) service);
+                }
+                return service;
             }
         };
         tracker2.open();
     }
 
-    protected void useGreeterService(final BundleContext bc, ServiceReference reference) {
-        Object svc = bc.getService(reference);
-        if (!(svc instanceof GreeterService)) {
-            return;
-        }
-        final GreeterService greeter = (GreeterService) svc;
-
+    protected void useGreeterService(final GreeterService greeter) {
         Thread t = new Thread(new Runnable() {
             public void run() {
-                greeterUI(bc, greeter);
+                greeterUI(greeter);
             }
         });
         t.start();
     }
     
-    protected void useGreeterService2(final BundleContext bc, ServiceReference reference) {
-        Object svc = bc.getService(reference);
-        if (!(svc instanceof GreeterService2)) {
-            return;
-        }
-        final GreeterService2 greeter = (GreeterService2) svc;
-
+    protected void useGreeterService2(final GreeterService2 greeter) {
         Thread t = new Thread(new Runnable() {
             public void run() {
-                greeter2UI(bc, greeter);
+                greeter2UI(greeter);
             }
         });
         t.start();
     }
 
-    private void greeterUI(final BundleContext bc, final GreeterService greeter) {
+    private void greeterUI(final GreeterService greeter) {
         while (true) {
             System.out.println("*** Opening greeter client dialog ***");
             String name = JOptionPane.showInputDialog("Enter name:");
@@ -113,7 +101,7 @@ public class Activator implements BundleActivator {
         }
     }
     
-    private void greeter2UI(final BundleContext bc, final GreeterService2 greeter) {
+    private void greeter2UI(final GreeterService2 greeter) {
         while (true) {
             System.out.println("*** Opening greeter2 client dialog ***");
             String name = JOptionPane.showInputDialog("Greeter2 : Enter name");

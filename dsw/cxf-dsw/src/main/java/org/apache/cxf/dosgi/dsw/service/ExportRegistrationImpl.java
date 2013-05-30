@@ -88,6 +88,11 @@ public class ExportRegistrationImpl implements ExportRegistration {
             server = null;
         }
         exportReference.close();
+
+        if (serviceTracker != null) {
+            serviceTracker.close();
+            serviceTracker = null;
+        }
     }
 
     private void instanceClosed() {
