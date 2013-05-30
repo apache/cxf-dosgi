@@ -141,9 +141,7 @@ public final class OsgiUtils {
                 for (ExportedPackage p : ep) {
                     if (p != null
                         && pack.equals(p.getName())) {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("found package -> Version: {}", p.getVersion());
-                        }
+                        LOG.debug("found package -> Version: {}", p.getVersion());
                         return p.getVersion().toString();
                     }
                 }

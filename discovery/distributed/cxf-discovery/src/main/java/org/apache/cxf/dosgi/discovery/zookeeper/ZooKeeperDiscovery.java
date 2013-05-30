@@ -55,9 +55,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
 
     @SuppressWarnings("rawtypes")
     public synchronized void updated(Dictionary configuration) throws ConfigurationException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Received configuration update for Zookeeper Discovery: " + configuration);
-        }
+        LOG.debug("Received configuration update for Zookeeper Discovery: {}", configuration);
 
         stop();
 

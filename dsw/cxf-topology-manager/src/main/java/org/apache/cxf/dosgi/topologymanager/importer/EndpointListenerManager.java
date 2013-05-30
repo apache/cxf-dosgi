@@ -83,9 +83,7 @@ public class EndpointListenerManager {
         Dictionary<String, Object> p = new Hashtable<String, Object>();
 
         synchronized (filters) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Current filter: " + filters);
-            }
+            LOG.debug("Current filter: {}", filters);
             p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, new ArrayList<String>(filters));
         }
 

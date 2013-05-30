@@ -58,7 +58,7 @@ public class PublishingEndpointListener implements EndpointListener {
     }
 
     public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
-        LOG.info("Local EndpointDescription added: " + endpoint);
+        LOG.info("Local EndpointDescription added: {}", endpoint);
 
         synchronized (endpoints) {
             if (closed) {
@@ -105,7 +105,7 @@ public class PublishingEndpointListener implements EndpointListener {
     }
 
     public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
-        LOG.info("Local EndpointDescription removed: " + endpoint);
+        LOG.info("Local EndpointDescription removed: {}", endpoint);
 
         synchronized (endpoints) {
             if (closed) {

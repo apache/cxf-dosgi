@@ -66,9 +66,7 @@ public class ListenerHookImpl implements ListenerHook {
 
     @SuppressWarnings("rawtypes")
     public void added(Collection/* <ListenerInfo> */ listeners) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("added listeners {}", listeners);
-        }
+        LOG.debug("added listeners {}", listeners);
         for (Object li : listeners) {
             ListenerInfo listenerInfo = (ListenerInfo)li;
             LOG.debug("Filter {}", listenerInfo.getFilter());
@@ -98,9 +96,7 @@ public class ListenerHookImpl implements ListenerHook {
 
     @SuppressWarnings("rawtypes")
     public void removed(Collection/* <ListenerInfo> */ listeners) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("removed: " + listeners);
-        }
+        LOG.debug("removed listeners {}", listeners);
 
         for (Object li : listeners) {
             ListenerInfo listenerInfo = (ListenerInfo)li;

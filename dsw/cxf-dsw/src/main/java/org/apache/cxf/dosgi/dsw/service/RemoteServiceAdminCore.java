@@ -393,10 +393,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             ServiceRegistration proxyReg = actualContext.registerService(interfaceName, csf, serviceProps);
             imReg.setImportedServiceRegistration(proxyReg);
         } catch (Exception ex) {
-            if (LOG.isDebugEnabled()) {
-                // Only logging at debug level as this might be written to the log at the TopologyManager
-                LOG.debug("Can not proxy service with interface " + interfaceName + ": " + ex.getMessage(), ex);
-            }
+            // Only logging at debug level as this might be written to the log at the TopologyManager
+            LOG.debug("Can not proxy service with interface " + interfaceName + ": " + ex.getMessage(), ex);
             imReg.setException(ex);
         }
     }

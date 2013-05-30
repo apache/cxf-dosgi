@@ -63,9 +63,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
 
         for (String scope : Util.getScopes(sref)) {
             String objClass = getObjectClass(scope);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Adding interest in scope: " + scope + " objectClass: " + objClass);
-            }
+            LOG.debug("Adding interest in scope {}, objectClass {}", scope, objClass);
             imManager.addInterest(sref, scope, objClass);
         }
     }
@@ -81,7 +79,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
     }
 
     public void removedService(ServiceReference sref, Object service) {
-        LOG.info("removedService: " + sref);
+        LOG.info("removedService: {}", sref);
         imManager.removeInterest(sref);
     }
 

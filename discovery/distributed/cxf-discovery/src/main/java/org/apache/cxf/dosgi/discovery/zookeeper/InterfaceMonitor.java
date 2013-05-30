@@ -62,10 +62,8 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         this.znode = Util.getZooKeeperPath(intf);
         this.recursive = intf == null || intf.isEmpty();
         this.epListener = epListener;
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Creating new InterfaceMonitor " + (recursive ? "(recursive)" : "")
-                + " for scope [" + scope + "] and objectClass [" + intf + "]");
-        }
+        LOG.debug("Creating new InterfaceMonitor {} for scope [{}] and objectClass [{}]",
+                new Object[] {recursive ? "(recursive)" : "", scope, intf});
     }
 
     public void start() {
@@ -182,9 +180,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
                     newNodes.put(child, epd);
                     prevNodes.remove(child);
                     foundANode = true;
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Properties: " + epd.getProperties());
-                    }
+                    LOG.debug("Properties: {}", epd.getProperties());
                     if (prevEpd == null) {
                         // This guy is new
                         epListener.endpointAdded(epd, null);
