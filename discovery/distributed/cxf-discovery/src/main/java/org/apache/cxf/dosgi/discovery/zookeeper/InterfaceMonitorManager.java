@@ -103,15 +103,15 @@ public class InterfaceMonitorManager {
         return handledEndpointlisteners;
     }
     
-    private InterfaceMonitor createInterfaceMonitor(String scope, String objClass, final Interest interest) {
+    private InterfaceMonitor createInterfaceMonitor(final String scope, String objClass, final Interest interest) {
         // holding this object's lock in the callbacks can lead to a deadlock with InterfaceMonitor
         EndpointListener epListener = new EndpointListener() {
             public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
-                notifyListeners(endpoint, false, interest.relatedServiceListeners);
+                notifyListeners(endpoint, scope, false, interest.relatedServiceListeners);
             }
             
             public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
-                notifyListeners(endpoint, true, interest.relatedServiceListeners);
+                notifyListeners(endpoint, scope, true, interest.relatedServiceListeners);
             }
         };
         return new InterfaceMonitor(zooKeeper, objClass, epListener, scope);
@@ -136,7 +136,7 @@ public class InterfaceMonitorManager {
         handledEndpointlisteners.remove(sref);
     }
     
-    private void notifyListeners(EndpointDescription epd, boolean isAdded,
+    private void notifyListeners(EndpointDescription epd, String currentScope, boolean isAdded,
             List<ServiceReference> relatedServiceListeners) {
         for (ServiceReference sref : relatedServiceListeners) {
             Object service = bctx.getService(sref);
@@ -144,21 +144,17 @@ public class InterfaceMonitorManager {
                 continue;
             }
             EndpointListener epl = (EndpointListener) service;
-            String[] scopes = Util.getScopes(sref);
-            for (final String currentScope : scopes) {
-                LOG.debug("matching {} against {}", epd, currentScope);
-                if (matches(currentScope, epd)) {
-                    LOG.debug("Matched {} against {}", epd, currentScope);
-                    if (isAdded) {
-                        LOG.info("calling EndpointListener.endpointAdded: " + epl + " from bundle "
-                            + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
-                        epl.endpointAdded(epd, currentScope);
-                    } else {
-                        LOG.info("calling EndpointListener.endpointRemoved: " + epl + " from bundle "
-                            + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
-                        epl.endpointRemoved(epd, currentScope);
-                    }
-                    break;
+            LOG.debug("matching {} against {}", epd, currentScope);
+            if (matches(currentScope, epd)) {
+                LOG.debug("Matched {} against {}", epd, currentScope);
+                if (isAdded) {
+                    LOG.info("calling EndpointListener.endpointAdded: " + epl + " from bundle "
+                        + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
+                    epl.endpointAdded(epd, currentScope);
+                } else {
+                    LOG.info("calling EndpointListener.endpointRemoved: " + epl + " from bundle "
+                        + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
+                    epl.endpointRemoved(epd, currentScope);
                 }
             }
         }
