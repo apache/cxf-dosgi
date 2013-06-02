@@ -140,21 +140,27 @@ public class InterfaceMonitorManager {
             List<ServiceReference> relatedServiceListeners) {
         for (ServiceReference sref : relatedServiceListeners) {
             Object service = bctx.getService(sref);
-            if (!(service instanceof EndpointListener)) {
-                continue;
-            }
-            EndpointListener epl = (EndpointListener) service;
-            LOG.debug("matching {} against {}", epd, currentScope);
-            if (matches(currentScope, epd)) {
-                LOG.debug("Matched {} against {}", epd, currentScope);
-                if (isAdded) {
-                    LOG.info("calling EndpointListener.endpointAdded: " + epl + " from bundle "
-                        + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
-                    epl.endpointAdded(epd, currentScope);
-                } else {
-                    LOG.info("calling EndpointListener.endpointRemoved: " + epl + " from bundle "
-                        + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
-                    epl.endpointRemoved(epd, currentScope);
+            try {
+                if (!(service instanceof EndpointListener)) { // including null
+                    continue;
+                }
+                EndpointListener epl = (EndpointListener) service;
+                LOG.debug("matching {} against {}", epd, currentScope);
+                if (matches(currentScope, epd)) {
+                    LOG.debug("Matched {} against {}", epd, currentScope);
+                    if (isAdded) {
+                        LOG.info("calling EndpointListener.endpointAdded: " + epl + " from bundle "
+                            + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
+                        epl.endpointAdded(epd, currentScope);
+                    } else {
+                        LOG.info("calling EndpointListener.endpointRemoved: " + epl + " from bundle "
+                            + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
+                        epl.endpointRemoved(epd, currentScope);
+                    }
+                }
+            } finally {
+                if (service != null) {
+                    bctx.ungetService(sref);
                 }
             }
         }

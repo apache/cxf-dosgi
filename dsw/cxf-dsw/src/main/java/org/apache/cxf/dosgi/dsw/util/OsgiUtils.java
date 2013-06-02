@@ -123,27 +123,32 @@ public final class OsgiUtils {
         ServiceReference paRef = bc.getServiceReference(PackageAdmin.class.getName());
         if (paRef != null) {
             PackageAdmin pa = (PackageAdmin)bc.getService(paRef);
+            try {
+                Bundle b = pa.getBundle(iClass);
+                if (b == null) {
+                    LOG.info("Unable to find interface version for interface " + iClass.getName()
+                            + ". Falling back to 0.0.0");
+                    return "0.0.0";
+                }
+                LOG.debug("Interface source bundle: {}", b.getSymbolicName());
 
-            Bundle b = pa.getBundle(iClass);
-            if (b == null) {
-                LOG.info("Unable to find interface version for interface " + iClass.getName()
-                        + ". Falling back to 0.0.0");
-                return "0.0.0";
-            }
-            LOG.debug("Interface source bundle: {}", b.getSymbolicName());
+                ExportedPackage[] ep = pa.getExportedPackages(b);
+                LOG.debug("Exported Packages of the source bundle: {}", ep);
 
-            ExportedPackage[] ep = pa.getExportedPackages(b);
-            LOG.debug("Exported Packages of the source bundle: {}", ep);
-
-            String pack = iClass.getPackage().getName();
-            LOG.debug("Looking for Package: {}", pack);
-            if (ep != null) {
-                for (ExportedPackage p : ep) {
-                    if (p != null
-                        && pack.equals(p.getName())) {
-                        LOG.debug("found package -> Version: {}", p.getVersion());
-                        return p.getVersion().toString();
+                String pack = iClass.getPackage().getName();
+                LOG.debug("Looking for Package: {}", pack);
+                if (ep != null) {
+                    for (ExportedPackage p : ep) {
+                        if (p != null
+                            && pack.equals(p.getName())) {
+                            LOG.debug("found package -> Version: {}", p.getVersion());
+                            return p.getVersion().toString();
+                        }
                     }
+                }
+            } finally {
+                if (pa != null) {
+                    bc.ungetService(paRef);
                 }
             }
         } else {

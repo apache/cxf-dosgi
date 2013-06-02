@@ -44,10 +44,10 @@ public class IntentTracker extends ServiceTracker {
     @Override
     public Object addingService(ServiceReference reference) {
         String intentName = (String) reference.getProperty(Constants.INTENT_NAME_PROP);
-        Object intent = context.getService(reference);
+        Object intent = super.addingService(reference);
         IntentManagerImpl.LOG.info("Adding custom intent " + intentName);
         intentMap.put(intentName, intent);
-        return super.addingService(reference);
+        return intent;
     }
 
     @Override

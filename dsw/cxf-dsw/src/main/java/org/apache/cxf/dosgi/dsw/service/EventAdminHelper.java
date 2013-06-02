@@ -90,16 +90,8 @@ public class EventAdminHelper {
         props.put("timestamp", System.currentTimeMillis());
         props.put("event", rsae);
 
-        Event ev = createEvent(props, topic);
-
-        EventAdmin[] eas = getEventAdmins();
-        if (eas != null) {
-            LOG.debug("Publishing event to {} EventAdmins;  Topic:[{}]", eas.length, topic);
-            for (EventAdmin eventAdmin : eas) {
-                eventAdmin.postEvent(ev);
-            }
-        }
-
+        Event event = createEvent(props, topic);
+        notifyEventAdmins(topic, event);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -109,7 +101,7 @@ public class EventAdminHelper {
         }
     }
 
-    private EventAdmin[] getEventAdmins() {
+    private void notifyEventAdmins(String topic, Event event) {
         ServiceReference[] refs = null;
         try {
             refs = bctx.getAllServiceReferences(EventAdmin.class.getName(), null);
@@ -117,18 +109,19 @@ public class EventAdminHelper {
             LOG.error("Failed to get EventAdmin: " + e.getMessage(), e);
         }
 
-        if (refs == null) {
-            return null;
+        if (refs != null) {
+            LOG.debug("Publishing event to {} EventAdmins;  Topic:[{}]", refs.length, topic);
+            for (ServiceReference serviceReference : refs) {
+                EventAdmin eventAdmin = (EventAdmin) bctx.getService(serviceReference);
+                try {
+                    eventAdmin.postEvent(event);
+                } finally {
+                    if (eventAdmin != null) {
+                        bctx.ungetService(serviceReference);
+                    }
+                }
+            }
         }
-
-        EventAdmin[] eas = new EventAdmin[refs.length];
-        for (int x = 0; x < refs.length; ++x) {
-
-            ServiceReference serviceReference = refs[x];
-            eas[x] = (EventAdmin)bctx.getService(serviceReference);
-        }
-
-        return eas;
     }
 
     static String remoteServiceAdminEventTypeToString(int type) {

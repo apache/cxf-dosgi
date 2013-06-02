@@ -84,15 +84,23 @@ public class SecurityDelegatingHttpContext implements HttpContext {
             return !requireFilter;
         }
         Filter[] filters = new Filter[refs.length];
-        for (int i = 0; i < refs.length; i++) {
-            filters[i] = (Filter)bundleContext.getService(refs[i]);
-        }
         try {
-            new Chain(filters).doFilter(request, response);
-            return !response.isCommitted();
-        } catch (ServletException e) {
-            LOG.warn(e.getMessage(), e);
-            return false;
+            for (int i = 0; i < refs.length; i++) {
+                filters[i] = (Filter)bundleContext.getService(refs[i]);
+            }
+            try {
+                new Chain(filters).doFilter(request, response);
+                return !response.isCommitted();
+            } catch (ServletException e) {
+                LOG.warn(e.getMessage(), e);
+                return false;
+            }
+        } finally {
+            for (int i = 0; i < refs.length; i++) {
+                if (filters[i] != null) {
+                    bundleContext.ungetService(refs[i]);
+                }
+            }
         }
     }
 }

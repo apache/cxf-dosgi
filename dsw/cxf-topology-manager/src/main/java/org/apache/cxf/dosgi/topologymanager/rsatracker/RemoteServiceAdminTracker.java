@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.topologymanager.rsatracker;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -45,27 +46,28 @@ public class RemoteServiceAdminTracker extends ServiceTracker {
 
     @Override
     public Object addingService(ServiceReference reference) {
+        RemoteServiceAdmin rsa = (RemoteServiceAdmin) super.addingService(reference);
         for (RemoteServiceAdminLifeCycleListener listener : listeners) {
-            listener.added((RemoteServiceAdmin) context.getService(reference));
+            listener.added(rsa);
         }
-        return super.addingService(reference);
+        return rsa;
     }
 
     @Override
     public void removedService(ServiceReference reference, Object service) {
+        RemoteServiceAdmin rsa = (RemoteServiceAdmin) service;
         for (RemoteServiceAdminLifeCycleListener listener : listeners) {
-            listener.removed((RemoteServiceAdmin) context.getService(reference));
+            listener.removed(rsa);
         }
         super.removedService(reference, service);
     }
 
+    @SuppressWarnings("unchecked")
     public List<RemoteServiceAdmin> getList() {
-        List<RemoteServiceAdmin> list = new ArrayList<RemoteServiceAdmin>();
-        ServiceReference[] refs = getServiceReferences();
-        if (refs != null) {
-            for (ServiceReference ref : refs) {
-                list.add((RemoteServiceAdmin) context.getService(ref));
-            }
+        Object[] services = getServices();
+        List list = new ArrayList();
+        if (services != null) {
+            Collections.addAll(list, services);
         }
         return list;
     }

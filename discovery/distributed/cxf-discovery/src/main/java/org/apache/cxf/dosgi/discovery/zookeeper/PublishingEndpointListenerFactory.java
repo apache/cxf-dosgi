@@ -81,6 +81,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
     public synchronized void stop() {
         if (serviceRegistration != null) {
             serviceRegistration.unregister();
+            serviceRegistration = null;
         }
 
         synchronized (listeners) {

@@ -78,12 +78,19 @@ public class Activator implements BundleActivator {
             throw new RuntimeException("This bundle must be started after the bundle with the Zookeeper "
                                        + "Discovery Managed Service was started.");
         }
-        Object svc = context.getService(refs[0]);
-        ManagedService ms = (ManagedService) svc;
+
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put("zookeeper.host", "127.0.0.1");
         props.put("zookeeper.port", System.getProperty(ZOOKEEPER_PORT));
-        ms.updated(props);
+
+        ManagedService ms = (ManagedService) context.getService(refs[0]);
+        try {
+            ms.updated(props);
+        } finally {
+            if (ms != null) {
+                context.ungetService(refs[0]);
+            }
+        }
         LOG.debug("Passed the zookeeper.host property to the Zookeeper Client managed service.");
     }
     
