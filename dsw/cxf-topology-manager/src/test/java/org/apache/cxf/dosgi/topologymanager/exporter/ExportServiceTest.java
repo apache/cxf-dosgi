@@ -75,7 +75,7 @@ public class ExportServiceTest {
         simulateUserServicePublished(bctx, sref);
         EasyMock.expect(rsa.exportService(EasyMock.same(sref), (Map<String, Object>)EasyMock.anyObject()))
             .andReturn(Collections.singletonList(exportRegistration)).once();
-        mockEpListenerNotifier.notifyListenersOfAdding(EasyMock.eq(Collections.singletonList(endpoint)));
+        mockEpListenerNotifier.notifyListeners(EasyMock.eq(true), EasyMock.eq(Collections.singletonList(endpoint)));
         EasyMock.expectLastCall().once();
 
         c.replay();

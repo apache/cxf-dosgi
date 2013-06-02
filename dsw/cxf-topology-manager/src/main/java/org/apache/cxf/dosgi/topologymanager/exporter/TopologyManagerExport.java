@@ -88,7 +88,7 @@ public class TopologyManagerExport {
 
             public void removed(RemoteServiceAdmin rsa) {
                 List<EndpointDescription> endpoints = endpointRepo.removeRemoteServiceAdmin(rsa);
-                epListenerNotifier.notifyListenersOfRemoval(endpoints);
+                epListenerNotifier.notifyListeners(false, endpoints);
             }
         });
         serviceListener = new ServiceListener() {
@@ -102,7 +102,7 @@ public class TopologyManagerExport {
                 } else if (event.getType() == ServiceEvent.UNREGISTERING) {
                     LOG.debug("Received UNREGISTERING ServiceEvent: {}", event);
                     List<EndpointDescription> endpoints = endpointRepo.removeService(sref);
-                    epListenerNotifier.notifyListenersOfRemoval(endpoints);
+                    epListenerNotifier.notifyListeners(false, endpoints);
                 }
             }
         };
@@ -172,7 +172,7 @@ public class TopologyManagerExport {
                 endpoints.add(getExportedEndpoint(exportReg));
             }
             LOG.info("TopologyManager: export successful Endpoints: {}", endpoints);
-            epListenerNotifier.notifyListenersOfAdding(endpoints);
+            epListenerNotifier.notifyListeners(true, endpoints);
         }
         endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
     }

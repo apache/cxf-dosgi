@@ -58,14 +58,17 @@ public class EndpointListenerNotifier {
             @Override
             public Object addingService(ServiceReference epListenerRef) {
                 LOG.debug("new EndpointListener detected");
-                notifyListenerOfAdding(epListenerRef, endpointRepository.getAllEndpoints());
-                return super.addingService(epListenerRef);
+                // the super.addingService call must come before notifyListener, since we need
+                // to keep at least one service reference alive when ungetService is called
+                Object service = super.addingService(epListenerRef);
+                notifyListener(true, epListenerRef, endpointRepository.getAllEndpoints());
+                return service;
             }
 
             @Override
             public void modifiedService(ServiceReference epListenerRef, Object service) {
                 LOG.debug("EndpointListener modified");
-                notifyListenerOfAdding(epListenerRef, endpointRepository.getAllEndpoints());
+                notifyListener(true, epListenerRef, endpointRepository.getAllEndpoints());
                 super.modifiedService(epListenerRef, service);
             }
 
@@ -80,53 +83,48 @@ public class EndpointListenerNotifier {
     public void stop() {
         stEndpointListeners.close();
     }
-    
-    void notifyListenersOfAdding(Collection<EndpointDescription> endpoints) {
-        ServiceReference[] listeners = stEndpointListeners.getServiceReferences();
-        if (listeners != null) {
-            for (ServiceReference eplistener : listeners) {
-                notifyListenerOfAdding(eplistener, endpoints);
-            }
-        }
-    }
-    
-    void notifyListenersOfRemoval(Collection<EndpointDescription> endpoints) {
-        ServiceReference[] listeners = stEndpointListeners.getServiceReferences();
-        if (listeners != null) {
-            for (ServiceReference epListenerReference : listeners) {
-                notifyListenerOfRemoval(epListenerReference, endpoints);
-            }
-        }
-    }
-    
+
     /**
-     * Notifies the listener if he is interested in the provided registrations.
-     * 
-     * @param epListenerReference the ServiceReference for an EndpointListener
-     * @param endpoints the registrations the listener should be informed about
+     * Notifies all endpoint listeners about endpoints being added or removed.
+     *
+     * @param added specifies whether endpoints were added (true) or removed (false)
+     * @param endpoints the endpoints the listeners should be notified about
      */
-    private void notifyListenerOfAdding(ServiceReference epListenerReference,
-                                        Collection<EndpointDescription> endpoints) {
-        EndpointListener epl = (EndpointListener)bctx.getService(epListenerReference);
-        List<Filter> filters = getFiltersFromEndpointListenerScope(epListenerReference, bctx);
-
-        LOG.debug("notifyListenerOfAdding");
-        for (EndpointDescription endpoint : endpoints) {
-            List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
-            for (Filter filter : matchingFilters) {
-                epl.endpointAdded(endpoint, filter.toString());
+    void notifyListeners(boolean added, Collection<EndpointDescription> endpoints) {
+        ServiceReference[] listeners = stEndpointListeners.getServiceReferences();
+        if (listeners != null) {
+            for (ServiceReference eplReference : listeners) {
+                notifyListener(added, eplReference, endpoints);
             }
         }
     }
 
-    void notifyListenerOfRemoval(ServiceReference epListenerReference,
-                                 Collection<EndpointDescription> endpoints) {
-        EndpointListener epl = (EndpointListener)bctx.getService(epListenerReference);
-        List<Filter> filters = getFiltersFromEndpointListenerScope(epListenerReference, bctx);
-        for (EndpointDescription endpoint : endpoints) {
-            List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
-            for (Filter filter : matchingFilters) {
-                epl.endpointRemoved(endpoint, filter.toString());
+    /**
+     * Notifies an endpoint listener about endpoints being added or removed.
+     *
+     * @param added specifies whether endpoints were added (true) or removed (false)
+     * @param eplReference the ServiceReference of an EndpointListener to notify
+     * @param endpoints the endpoints the listener should be notified about
+     */
+    void notifyListener(boolean added, ServiceReference eplReference,
+                                Collection<EndpointDescription> endpoints) {
+        List<Filter> filters = getFiltersFromEndpointListenerScope(eplReference, bctx);
+        EndpointListener epl = (EndpointListener)bctx.getService(eplReference);
+        try {
+            LOG.debug("notifyListener (added={})", added);
+            for (EndpointDescription endpoint : endpoints) {
+                List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
+                for (Filter filter : matchingFilters) {
+                    if (added) {
+                        epl.endpointAdded(endpoint, filter.toString());
+                    } else {
+                        epl.endpointRemoved(endpoint, filter.toString());
+                    }
+                }
+            }
+        } finally {
+            if (epl != null) {
+                bctx.ungetService(eplReference);
             }
         }
     }
