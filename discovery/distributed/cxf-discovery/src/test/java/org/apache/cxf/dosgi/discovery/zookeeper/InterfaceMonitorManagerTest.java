@@ -19,20 +19,23 @@
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
-
-import junit.framework.TestCase;
+import java.util.Map;
 
 import org.apache.zookeeper.ZooKeeper;
 import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
-public class InterfaceMonitorManagerTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+
+public class InterfaceMonitorManagerTest {
     
+    @Test
     public void testEndpointListenerTrackerCustomizer() {
         
         IMocksControl c = EasyMock.createNiceControl();
@@ -43,31 +46,31 @@ public class InterfaceMonitorManagerTest extends TestCase {
         ServiceReference sref = c.createMock(ServiceReference.class);
         ServiceReference sref2 = c.createMock(ServiceReference.class);
         
-        final Properties p = new Properties(); 
+        final Map<String, ?> p = new HashMap<String, Object>();
         
         EasyMock.expect(sref.getPropertyKeys()).andAnswer(new IAnswer<String[]>() {
             public String[] answer() throws Throwable {
-                return p.keySet().toArray(new String[p.keySet().size()]);
+                return p.keySet().toArray(new String[p.size()]);
             }
         }).anyTimes();
         
         EasyMock.expect(sref.getProperty((String)EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
             public Object answer() throws Throwable {
                 String key = (String)(EasyMock.getCurrentArguments()[0]);
-                return p.getProperty(key);
+                return p.get(key);
             }
         }).anyTimes();
         
         EasyMock.expect(sref2.getPropertyKeys()).andAnswer(new IAnswer<String[]>() {
             public String[] answer() throws Throwable {
-                return p.keySet().toArray(new String[p.keySet().size()]);
+                return p.keySet().toArray(new String[p.size()]);
             }
         }).anyTimes();
         
         EasyMock.expect(sref2.getProperty((String)EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
             public Object answer() throws Throwable {
                 String key = (String)(EasyMock.getCurrentArguments()[0]);
-                return p.getProperty(key);
+                return p.get(key);
             }
         }).anyTimes();
         

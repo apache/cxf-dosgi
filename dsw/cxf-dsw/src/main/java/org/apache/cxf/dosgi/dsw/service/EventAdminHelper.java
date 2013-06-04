@@ -76,7 +76,7 @@ public class EventAdminHelper {
             epd = ((ImportRegistrationImpl)rsae.getImportReference()).getImportedEndpointAlways();
             setIfNotNull(props, "import.registration", epd);
         } else if (rsae.getExportReference() != null) {
-            epd = ((ExportReferenceImpl)rsae.getExportReference()).getExportedEndpoint();
+            epd = rsae.getExportReference().getExportedEndpoint();
             setIfNotNull(props, "export.registration", epd);
         }
 
@@ -125,7 +125,7 @@ public class EventAdminHelper {
     }
 
     static String remoteServiceAdminEventTypeToString(int type) {
-        String retval = null;
+        String retval;
         switch (type) {
         case RemoteServiceAdminEvent.EXPORT_ERROR:
             retval = "EXPORT_ERROR";

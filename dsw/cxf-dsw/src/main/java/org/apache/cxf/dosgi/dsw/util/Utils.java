@@ -29,7 +29,7 @@ public final class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
     private Utils() {
-        //never constructed
+        // never constructed
     }
     
     @SuppressWarnings("rawtypes")
@@ -41,7 +41,7 @@ public final class Utils {
             List<String> list = new ArrayList<String>();
             for (String val : values) {
                 String actualValue = val.trim();
-                if (actualValue.length() > 0) {
+                if (!actualValue.isEmpty()) {
                     list.add(actualValue);
                 }
             }

@@ -102,12 +102,12 @@ public class ConfigTypeHandlerFactory {
             boolean hasSoapIntent = false;
             if (intentsProperty != null) {
                 for (String intent : intentsProperty) {
-                    if (intent.indexOf("SOAP") > -1) {
+                    if (intent.contains("SOAP")) {
                         hasSoapIntent = true;
                         break;
                     }
 
-                    if (intent.indexOf("HTTP") > -1) {
+                    if (intent.contains("HTTP")) {
                         hasHttpIntent = true;
                     }
                 }
@@ -137,7 +137,7 @@ public class ConfigTypeHandlerFactory {
             }
         }
         LOG.info("configuration types selected for export: " + configurationTypes);
-        if (configurationTypes.size() == 0) {
+        if (configurationTypes.isEmpty()) {
             throw new RuntimeException("the requested configuration types are not supported");
         }
         return configurationTypes;
@@ -157,7 +157,7 @@ public class ConfigTypeHandlerFactory {
             }
         }
 
-        if (usableConfigurationTypes.size() == 0) {
+        if (usableConfigurationTypes.isEmpty()) {
             throw new RuntimeException("The supplied endpoint has no compatible configuration type. "
                                        + "Supported types are: "
                                        + supportedConfigurationTypes

@@ -49,9 +49,9 @@ public final class LocalHostUtil {
             return localHost;
         }
         InetAddress[] addrs = getAllLocalUsingNetworkInterface();
-        for (int i = 0; i < addrs.length; i++) {
-            if (!addrs[i].isLoopbackAddress() && !addrs[i].getHostAddress().contains(":")) {
-                return addrs[i];
+        for (InetAddress addr : addrs) {
+            if (!addr.isLoopbackAddress() && !addr.getHostAddress().contains(":")) {
+                return addr;
             }
         }
         return localHost;
@@ -70,7 +70,7 @@ public final class LocalHostUtil {
             List<InetAddress> addresses = new ArrayList<InetAddress>();
             Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
             while (e.hasMoreElements()) {
-                NetworkInterface ni = (NetworkInterface) e.nextElement();
+                NetworkInterface ni = e.nextElement();
                 for (Enumeration<InetAddress> e2 = ni.getInetAddresses(); e2.hasMoreElements();) {
                     addresses.add(e2.nextElement());
                 }
@@ -81,19 +81,10 @@ public final class LocalHostUtil {
         }
     }
 
-    public static Object getLocalHostAddress() {
-        try {
-            String host = LocalHostUtil.getLocalHost().getHostAddress();
-            return (host == null) ? "localhost" : host;
-        } catch (Exception e) {
-            return "localhost";
-        }
-    }
-    
     public static String getLocalIp() {
         String localIP;
         try {
-            localIP = LocalHostUtil.getLocalHost().getHostAddress();
+            localIP = getLocalHost().getHostAddress();
         } catch (Exception e) {
             localIP = "localhost";
         }

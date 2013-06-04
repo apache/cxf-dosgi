@@ -136,21 +136,21 @@ public class LocalDiscoveryUtilsTest extends TestCase {
             normXML((String) props.get("someXML")));
 
         assertEquals(Long.MAX_VALUE, props.get("long"));
-        assertEquals(new Long(-1), props.get("long2"));
+        assertEquals(-1L, props.get("long2"));
         assertEquals(Double.MAX_VALUE, props.get("double"));
-        assertEquals(new Double(1.0d), props.get("Double2"));
-        assertEquals(new Float(42.24f), props.get("float"));
-        assertEquals(new Float(1.0f), props.get("Float2"));
-        assertEquals(new Integer(17), props.get("int"));
-        assertEquals(new Integer(42), props.get("Integer2"));
-        assertEquals(new Byte((byte) 127), props.get("byte"));
-        assertEquals(new Byte((byte) -128), props.get("Byte2"));
+        assertEquals(1.0d, props.get("Double2"));
+        assertEquals(42.24f, props.get("float"));
+        assertEquals(1.0f, props.get("Float2"));
+        assertEquals(17, props.get("int"));
+        assertEquals(42, props.get("Integer2"));
+        assertEquals((byte) 127, props.get("byte"));
+        assertEquals((byte) -128, props.get("Byte2"));
         assertEquals(Boolean.TRUE, props.get("boolean"));
         assertEquals(Boolean.TRUE, props.get("Boolean2"));
-        assertEquals(new Short((short) 99), props.get("short"));
-        assertEquals(new Short((short) -99), props.get("Short2"));
-        assertEquals(new Character('@'), props.get("char"));
-        assertEquals(new Character('X'), props.get("Character2"));
+        assertEquals((short) 99, props.get("short"));
+        assertEquals((short) -99, props.get("Short2"));
+        assertEquals('@', props.get("char"));
+        assertEquals('X', props.get("Character2"));
 
         int [] intArray = (int []) props.get("int-array");
         assertTrue(Arrays.equals(new int[] {1, 2}, intArray));
@@ -288,7 +288,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
     public static void drainStream(InputStream is, OutputStream os) throws IOException {
         byte[] bytes = new byte[8192];
 
-        int length = 0;
+        int length;
         int offset = 0;
 
         while ((length = is.read(bytes, offset, bytes.length - offset)) != -1) {

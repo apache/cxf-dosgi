@@ -125,8 +125,7 @@ public class PublishingEndpointListener implements EndpointListener {
 
     }
 
-    private void removeEndpoint(EndpointDescription endpoint) throws UnknownHostException, URISyntaxException,
-                                                                     InterruptedException, KeeperException {
+    private void removeEndpoint(EndpointDescription endpoint) throws UnknownHostException, URISyntaxException {
         Collection<String> interfaces = endpoint.getInterfaces();
         String endpointKey = getKey(endpoint.getId());
 
@@ -145,25 +144,21 @@ public class PublishingEndpointListener implements EndpointListener {
     private static void ensurePath(String path, ZooKeeper zk) throws KeeperException, InterruptedException {
         StringBuilder current = new StringBuilder();
 
-        String[] tree = path.split("/");
-        for (int i = 0; i < tree.length; i++) {
-            if (tree[i].length() == 0) {
-                continue;
-            }
-
+        String[] parts = Util.removeEmpty(path.split("/"));
+        for (String part : parts) {
             current.append('/');
-            current.append(tree[i]);
+            current.append(part);
             if (zk.exists(current.toString(), false) == null) {
                 zk.create(current.toString(), new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             }
         }
     }
 
-    static byte[] getData(Map<String, Object> props) throws IOException {
+    static byte[] getData(Map<String, Object> props) {
         return LocalDiscoveryUtils.getEndpointDescriptionXML(props).getBytes();
     }
 
-    static String getKey(String endpoint) throws UnknownHostException, URISyntaxException {
+    static String getKey(String endpoint) throws URISyntaxException {
         URI uri = new URI(endpoint);
 
         StringBuilder sb = new StringBuilder();

@@ -79,8 +79,7 @@ public final class JaxRSUtils {
             if (refs != null) {
                 for (ServiceReference ref : refs) {
                     if (!cxfProvidersOnly
-                        || cxfProvidersOnly
-                        && OsgiUtils.toBoolean(ref
+                        || OsgiUtils.toBoolean(ref
                             .getProperty(org.apache.cxf.dosgi.dsw.Constants.RS_PROVIDER_PROP_KEY))) {
                         providers.add(callingContext.getService(ref));
                     }

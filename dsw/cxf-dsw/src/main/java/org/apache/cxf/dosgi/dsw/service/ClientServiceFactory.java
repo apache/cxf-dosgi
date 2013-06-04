@@ -55,7 +55,7 @@ public class ClientServiceFactory implements ServiceFactory {
     }
 
     public Object getService(final Bundle requestingBundle, final ServiceRegistration sreg) {
-        String interfaceName = sd.getInterfaces() != null && sd.getInterfaces().size() > 0 ? (String)sd
+        String interfaceName = sd.getInterfaces() != null && !sd.getInterfaces().isEmpty() ? (String)sd
             .getInterfaces().toArray()[0] : null;
 
         LOG.debug("getService() from serviceFactory for {}", interfaceName);
@@ -91,7 +91,7 @@ public class ClientServiceFactory implements ServiceFactory {
         if (objectClass != null) {
             sb.append(", interfaces: ");
             for (String s : (String[])objectClass) {
-                sb.append(" " + s);
+                sb.append(' ').append(s);
             }
         }
         LOG.info(sb.toString());
@@ -118,9 +118,4 @@ public class ClientServiceFactory implements ServiceFactory {
             }
         }
     }
-
-    public boolean isCloseable() {
-        return closeable;
-    }
-
 }

@@ -167,7 +167,8 @@ public class IntentManagerImplTest extends Assert {
         assertTrue(effectiveIntents.contains("SOAP"));
         assertTrue(effectiveIntents.contains("SOAP.1_1"));
     }
-    
+
+    @Test
     public void testExplicitBindingIntent() {
         IMocksControl control = EasyMock.createNiceControl();
 
@@ -197,7 +198,7 @@ public class IntentManagerImplTest extends Assert {
         assertTrue(effectiveIntents.contains("A"));
         assertTrue(effectiveIntents.contains("SOAP.1_2"));        
     }
-    
+
     public void testInheritMasterIntentMapDefault() {
         List<String> features = runTestInheritMasterIntentMap("A B");
         
@@ -205,7 +206,7 @@ public class IntentManagerImplTest extends Assert {
         assertTrue(features.contains("appFeatureA"));
         assertTrue(features.contains("masterFeatureB"));
     }
-    
+
     public void testInheritMasterIntentMap() {
         List<String> features = runTestInheritMasterIntentMap("A B");
         

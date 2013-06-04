@@ -119,7 +119,7 @@ public final class Constants {
     @Deprecated
     public static final String USE_MASTER_MAP = "use.master.map";
     
-    //DSW Identification - TODO do we really need this one?
+    // DSW Identification - TODO do we really need this one?
     public static final String DSW_CLIENT_ID = PROVIDER_PREFIX + ".remote.dsw.client";
 
     public static final String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
@@ -139,6 +139,6 @@ public final class Constants {
     public static final String DEFAULT_CXF_SERVLET_ALIAS = "/cxf";
     
     private Constants() {
-        //never constructed
+        // never constructed
     }
 }

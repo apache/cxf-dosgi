@@ -90,7 +90,7 @@ public class IntentManagerImpl implements IntentManager {
         return false;
     }
 
-    private Collection<String> addSynonymIntents(Collection<String> appliedIntents, 
+    private static Collection<String> addSynonymIntents(Collection<String> appliedIntents,
                                                  IntentMap map) {
         // E.g. SOAP and SOAP.1_1 are synonyms
         List<Object> values = new ArrayList<Object>();
@@ -100,20 +100,21 @@ public class IntentManagerImpl implements IntentManager {
         return reverseLookup(map, values);
     }
 
-    private Collection<String> reverseLookup(IntentMap im, Object obj) {
+    private static Collection<String> reverseLookup(IntentMap im, Object obj) {
         return reverseLookup(im, Collections.singleton(obj));
     }
 
     /**
-     * Retrieves all keys that have a value that can be found in objs
-     * @param intentMap
-     * @param objs
-     * @return
+     * Retrieves all keys whose mapped values are found in the given collection.
+     *
+     * @param im an intent map
+     * @param values a collection of potential values
+     * @return all keys whose mapped values are found in the given collection
      */
-    private Collection<String> reverseLookup(IntentMap im, Collection<? extends Object> objs) {
+    private static Collection<String> reverseLookup(IntentMap im, Collection<?> values) {
         Set<String> intentsFound = new HashSet<String>();
         for (Map.Entry<String, Object> entry : im.entrySet()) {
-            if (objs.contains(entry.getValue())) {
+            if (values.contains(entry.getValue())) {
                 intentsFound.add(entry.getKey());
             }
         }
@@ -132,7 +133,7 @@ public class IntentManagerImpl implements IntentManager {
                 }
             }
             long remainingSeconds = (endTime - System.currentTimeMillis()) / 1000;
-            if (unsupportedIntents.size() > 0 && remainingSeconds > 0) {
+            if (!unsupportedIntents.isEmpty() && remainingSeconds > 0) {
                 LOG.debug("Waiting for custom intents " + unsupportedIntents + " timeout in " + remainingSeconds);
                 try {
                     synchronized (intentMap) {
@@ -142,9 +143,9 @@ public class IntentManagerImpl implements IntentManager {
                     LOG.warn(e.getMessage(), e);
                 }
             }
-        } while (unsupportedIntents.size() > 0 && System.currentTimeMillis() < endTime);
+        } while (!unsupportedIntents.isEmpty() && System.currentTimeMillis() < endTime);
         
-        if (unsupportedIntents.size() > 0) {
+        if (!unsupportedIntents.isEmpty()) {
             throw new RuntimeException("service cannot be exported because the following "
                                        + "intents are not supported by this RSA: "
                                        + unsupportedIntents);

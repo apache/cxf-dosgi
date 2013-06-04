@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.dsw.qos;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,15 +34,13 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public final class IntentUtils {
     private IntentUtils() {
-        //never constructed
+        // never constructed
     }
 
     @SuppressWarnings("rawtypes")
     public static String[] getIntentsImplementedByTheService(Map serviceProperties) {
         // Get the Intents that are implemented by the service
-        String[] serviceIntents = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_INTENTS));
-
-        return serviceIntents;
+        return Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_INTENTS));
     }
 
     public static String[] mergeArrays(String[] a1, String[] a2) {
@@ -53,11 +52,7 @@ public final class IntentUtils {
         }
 
         List<String> list = new ArrayList<String>(a1.length + a2.length);
-
-        for (String s : a1) {
-            list.add(s);
-        }
-
+        Collections.addAll(list, a1);
         for (String s : a2) {
             if (!list.contains(s)) {
                 list.add(s);

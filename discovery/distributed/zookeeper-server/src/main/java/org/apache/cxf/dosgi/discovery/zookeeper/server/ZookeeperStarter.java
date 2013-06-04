@@ -127,7 +127,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
         return config;
     }
 
-    protected void startFromConfig(final QuorumPeerConfig config) throws IOException, InterruptedException {
+    protected void startFromConfig(final QuorumPeerConfig config) {
         int numServers = config.getServers().size();
         if (numServers > 1) {
             main = new MyQuorumPeerMain(config);

@@ -138,7 +138,7 @@ public class TopologyManagerExport {
     protected void doExportService(final ServiceReference sref) {
         endpointRepo.addService(sref);
         List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getList();
-        if (rsaList.size() == 0) {
+        if (rsaList.isEmpty()) {
             LOG.error(
                     "No RemoteServiceAdmin available! Unable to export service from bundle {}, interfaces: {}",
                     sref.getBundle().getSymbolicName(),

@@ -20,7 +20,6 @@ package org.apache.cxf.dosgi.discovery.local.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -128,7 +127,7 @@ public class LocalDiscovery implements BundleListener {
             EndpointListener listener) {
         List<String> filters = 
             LocalDiscoveryUtils.getStringPlusProperty(reference, EndpointListener.ENDPOINT_LISTENER_SCOPE);
-        if (filters.size() == 0) {
+        if (filters.isEmpty()) {
             return filters;
         }
         
@@ -237,13 +236,7 @@ public class LocalDiscovery implements BundleListener {
 
     private boolean filterMatches(String match, EndpointDescription ed) {
         Filter filter = createFilter(match);
-        
-        Dictionary<String, Object> props = 
-            new Hashtable<String, Object>(ed.getProperties());
-        
-        return filter != null
-            ? filter.match(props)
-            : false;
+        return filter != null && filter.match(new Hashtable<String, Object>(ed.getProperties()));
     } 
     
     private Filter createFilter(String filterValue) {        

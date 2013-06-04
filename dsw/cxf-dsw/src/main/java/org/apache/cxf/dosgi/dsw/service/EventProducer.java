@@ -83,7 +83,7 @@ public class EventProducer {
     }
 
     protected void publishNotifcation(ImportRegistration ir) {
-        RemoteServiceAdminEvent rsae = null;
+        RemoteServiceAdminEvent rsae;
         if (ir.getException() != null) {
             rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_ERROR, bctx.getBundle(),
                                                ir.getImportReference(), ir.getException());
@@ -97,7 +97,7 @@ public class EventProducer {
     }
 
     public void notifyRemoval(ExportRegistration eri) {
-        RemoteServiceAdminEvent rsae = null;
+        RemoteServiceAdminEvent rsae;
         rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_UNREGISTRATION, bctx.getBundle(),
                                            eri.getExportReference(), eri.getException());
 
@@ -107,9 +107,8 @@ public class EventProducer {
 
 
     public void notifyRemoval(ImportRegistration eri) {
-        RemoteServiceAdminEvent rsae = null;
-        rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION, bctx.getBundle(),
-                                           eri.getImportReference(), eri.getException());
+        RemoteServiceAdminEvent rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION,
+                bctx.getBundle(), eri.getImportReference(), eri.getException());
 
         notifyListeners(rsae);
         eaHelper.notifyEventAdmin(rsae);

@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -103,10 +102,9 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
     }
     
     void removeDecorations(Bundle bundle) {
-        for (Iterator<Rule> i = decorations.iterator(); i.hasNext();) {
-            Rule r = i.next();
+        for (Rule r : decorations) {
             if (bundle.equals(r.getBundle())) {
-                decorations.remove(r); // The iterator doesn't support 'remove'
+                decorations.remove(r); // the iterator doesn't support 'remove'
             }
         }
     }

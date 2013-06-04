@@ -318,7 +318,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
         synchronized (importedServices) {
             Collection<ImportRegistrationImpl> imRegs = importedServices.get(endpoint);
-            if (imRegs != null && imRegs.size() > 0) {
+            if (imRegs != null && !imRegs.isEmpty()) {
                 LOG.debug("creating copy of existing import registrations");
                 ImportRegistrationImpl irParent = imRegs.iterator().next();
                 ImportRegistrationImpl ir = new ImportRegistrationImpl(irParent);
@@ -412,7 +412,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                     if (er.equals(eri)) {
                         eventProducer.notifyRemoval(eri);
                         it2.remove();
-                        if (value.size() == 0) {
+                        if (value.isEmpty()) {
                             it.remove();
                         }
                         return;
@@ -456,7 +456,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 LOG.error("An importRegistration was intended to be removed form internal management "
                     + "structure but couldn't be found in it!");
             }
-            if (imRegs == null || imRegs.size() == 0) {
+            if (imRegs == null || imRegs.isEmpty()) {
                 importedServices.remove(iri.getImportedEndpointAlways());
             }
 

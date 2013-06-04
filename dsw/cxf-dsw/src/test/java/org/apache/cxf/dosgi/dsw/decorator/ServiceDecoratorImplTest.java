@@ -150,7 +150,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         Map<String, Object> actual = testDecorate(serviceProps, r1, r2);
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("A", "B");
-        expected.put("C", new Integer(2));
+        expected.put("C", 2);
         assertEquals(expected, actual);
     }
 

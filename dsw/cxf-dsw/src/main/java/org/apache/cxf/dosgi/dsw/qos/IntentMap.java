@@ -37,7 +37,6 @@ public class IntentMap extends ConcurrentHashMap<String, Object> {
     }
     
     public IntentMap(Map<String, Object> defaultMap) {
-        super();
         this.defaultMap = defaultMap;
         putAll(defaultMap);
     }

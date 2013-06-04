@@ -56,11 +56,9 @@ public class GreetingPhrase {
     
     @Override
     public boolean equals(Object other) {
-        if (!GreetingPhrase.class.isAssignableFrom(other.getClass())) {
-            return false;
-        }
-        
-        return phrase.equals(((GreetingPhrase)other).phrase)
-            && name.equals(((GreetingPhrase)other).name);
+        return GreetingPhrase.class.isAssignableFrom(other.getClass())
+                && phrase.equals(((GreetingPhrase) other).phrase)
+                && name.equals(((GreetingPhrase) other).name);
+
     }
 }

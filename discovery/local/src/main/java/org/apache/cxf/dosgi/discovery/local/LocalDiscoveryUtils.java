@@ -390,7 +390,7 @@ public final class LocalDiscoveryUtils {
 
             String iface = p.getAttributeValue(PROPERTY_INTERFACE_ATTRIBUTE);
             if (key != null) {
-                props.put(iface == null || iface.length() == 0
+                props.put(iface == null || iface.isEmpty()
                           ? key
                           : key + INTERFACE_SEPARATOR + iface,
                           value);
@@ -437,9 +437,8 @@ public final class LocalDiscoveryUtils {
         if (value instanceof Collection<?>) {
             Collection<?> values = (Collection<?>) value;
             List<String> result = new ArrayList<String>(values.size());
-            for (Iterator<?> iter = values.iterator(); iter.hasNext();) {
-                Object v = iter.next();
-                if ((v != null) && (v instanceof String)) {
+            for (Object v : values) {
+                if (v instanceof String) {
                     result.add((String) v);
                 }
             }
@@ -458,7 +457,7 @@ public final class LocalDiscoveryUtils {
         rootEl.addContent(contentEl);
 
         for (Map.Entry<String, Object> entry : m.entrySet()) {
-            String key = entry.getKey().toString();
+            String key = entry.getKey();
             Object val = entry.getValue();
 
             Element propEl = new Element("property", ns);
@@ -491,7 +490,7 @@ public final class LocalDiscoveryUtils {
                     || val instanceof Float
                     || val instanceof Integer
                     || val instanceof Short) {
-                //various numbers..   maybe "val instanceof Number"?
+                // various numbers..   maybe "val instanceof Number"?
                 setValueType(propEl, val);
                 propEl.setAttribute("value", val.toString());
             } else {

@@ -74,13 +74,13 @@ public class EventProducerTest {
 
                 Assert.assertEquals("org/osgi/service/remoteserviceadmin/EXPORT_REGISTRATION", event.getTopic());
                 Assert.assertSame(bundle, event.getProperty("bundle"));
-                Assert.assertEquals(new Long(42), event.getProperty("bundle.id"));
+                Assert.assertEquals(42L, event.getProperty("bundle.id"));
                 Assert.assertEquals("test.bundle", event.getProperty("bundle.symbolicname"));
                 Assert.assertEquals(new Version(1, 2, 3, "test"), event.getProperty("bundle.version"));
                 Assert.assertNull(event.getProperty("cause"));
                 Assert.assertEquals(endpoint, event.getProperty("export.registration"));
 
-                Assert.assertEquals(new Long(Long.MAX_VALUE), event.getProperty("service.remote.id"));
+                Assert.assertEquals(Long.MAX_VALUE, event.getProperty("service.remote.id"));
                 Assert.assertEquals(uuid, event.getProperty("service.remote.uuid"));
                 Assert.assertEquals("foo://bar", event.getProperty("service.remote.uri"));
                 Assert.assertTrue(Arrays.equals(interfaces.toArray(new String[] {}),
@@ -144,7 +144,7 @@ public class EventProducerTest {
 
                 Assert.assertEquals("org/osgi/service/remoteserviceadmin/EXPORT_ERROR", event.getTopic());
                 Assert.assertSame(bundle, event.getProperty("bundle"));
-                Assert.assertEquals(new Long(42), event.getProperty("bundle.id"));
+                Assert.assertEquals(42L, event.getProperty("bundle.id"));
                 Assert.assertEquals("test.bundle", event.getProperty("bundle.symbolicname"));
                 Assert.assertEquals(new Version("0"), event.getProperty("bundle.version"));
                 Assert.assertSame(exportException, event.getProperty("cause"));

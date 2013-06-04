@@ -73,7 +73,7 @@ public class InterfaceRuleTest extends TestCase {
         Map<String, Object> m = new HashMap<String, Object>();
         ir.apply(sref, m);
         Map<String, Object> expected = new HashMap<String, Object>();
-        expected.put("x", new Integer(1));
+        expected.put("x", 1);
         expected.put("aaa.bbb", Boolean.TRUE);
         assertEquals(expected, m);
     }
@@ -112,7 +112,7 @@ public class InterfaceRuleTest extends TestCase {
         ir.addProperty("x", "1", Long.class.getName());        
         
         final Map<String, Object> serviceProps = new HashMap<String, Object>();
-        serviceProps.put("test.int", new Integer(42));
+        serviceProps.put("test.int", 42);
         serviceProps.put(Constants.OBJECTCLASS, new String [] {"org.apache.Foo"});
         ServiceReference sref = mockServiceReference(serviceProps);
 
@@ -121,7 +121,7 @@ public class InterfaceRuleTest extends TestCase {
         m.put("aaa.bbb", Boolean.TRUE);
         ir.apply(sref, m);
         Map<String, Object> expected = new HashMap<String, Object>();
-        expected.put("x", new Long(1));
+        expected.put("x", 1L);
         expected.put("aaa.bbb", Boolean.TRUE);
         assertEquals(expected, m);
     }
@@ -132,7 +132,7 @@ public class InterfaceRuleTest extends TestCase {
         ir.addProperty("x", "1", Long.class.getName());        
         
         final Map<String, Object> serviceProps = new HashMap<String, Object>();
-        serviceProps.put("test.int", new Integer(51));
+        serviceProps.put("test.int", 51);
         serviceProps.put(Constants.OBJECTCLASS, new String [] {"org.apache.Foo"});
         ServiceReference sref = mockServiceReference(serviceProps);
 

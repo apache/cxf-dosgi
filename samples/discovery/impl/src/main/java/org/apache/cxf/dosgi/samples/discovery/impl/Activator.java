@@ -48,7 +48,7 @@ public class Activator implements BundleActivator {
                 new DisplayServiceImpl(host + ":" + port), props);
     }
 
-    private static String getAddress(String host, int port) throws Exception {        
+    private static String getAddress(String host, int port) {
         return "http://" + host + ":" + port + "/display";
     }
 

@@ -218,7 +218,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
             LOG.debug("Got data for node: {}", node);
 
             List<Element> elements = LocalDiscoveryUtils.getElements(new ByteArrayInputStream(data));
-            if (elements.size() > 0) {
+            if (!elements.isEmpty()) {
                 return LocalDiscoveryUtils.getEndpointDescription(elements.get(0));
             }
             LOG.warn("No Discovery information found for node: {}", node);

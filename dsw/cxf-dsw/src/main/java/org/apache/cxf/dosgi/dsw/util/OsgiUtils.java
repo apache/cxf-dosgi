@@ -41,26 +41,23 @@ public final class OsgiUtils {
     private OsgiUtils() {
     }
 
-    // TODO : move these property helpers into PropertyUtils ?
+    // TODO : move these property helpers into PropertyUtils?
 
     @SuppressWarnings("rawtypes")
     public static boolean getBooleanProperty(Map sd, String name) {
-        Object value = sd.get(name);
-        return toBoolean(value);
+        return toBoolean(sd.get(name));
     }
 
     public static boolean toBoolean(Object value) {
-        return value instanceof Boolean && ((Boolean)value).booleanValue() || value instanceof String
-               && Boolean.parseBoolean((String)value);
+        return value instanceof Boolean && (Boolean) value
+            || value instanceof String && Boolean.parseBoolean((String)value);
     }
 
     @SuppressWarnings("unchecked")
     public static Collection<String> getMultiValueProperty(Object property) {
         if (property == null) {
             return null;
-        }
-
-        if (property instanceof Collection) {
+        } else if (property instanceof Collection) {
             return (Collection<String>)property;
         } else if (property instanceof String[]) {
             return Arrays.asList((String[])property);
@@ -70,42 +67,21 @@ public final class OsgiUtils {
     }
 
     public static String getProperty(EndpointDescription sd, String name) {
-        Object o = sd.getProperties().get(name);
-
-        if (o instanceof String) {
-            return (String)o;
-        }
-
-        return null;
-
+        return getProperty(sd.getProperties(), name);
     }
 
     @SuppressWarnings("rawtypes")
     public static String getProperty(Map dict, String name) {
         Object o = dict.get(name);
-
-        if (o instanceof String) {
-            return (String)o;
-        }
-        return null;
+        return o instanceof String ? (String) o : null;
     }
 
     public static String getFirstNonEmptyStringProperty(@SuppressWarnings("rawtypes") Map dict, String ... keys) {
         for (String key : keys) {
-            String value = getStringProperty(dict, key);
+            String value = getProperty(dict, key);
             if (value != null) {
                 return value;
             }
-        }
-        return null;
-    }
-
-    @SuppressWarnings("rawtypes")
-    private static String getStringProperty(Map dict, String name) {
-        Object o = dict.get(name);
-
-        if (o instanceof String) {
-            return (String)o;
         }
         return null;
     }

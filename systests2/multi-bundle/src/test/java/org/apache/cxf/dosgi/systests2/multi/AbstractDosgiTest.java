@@ -34,7 +34,7 @@ public class AbstractDosgiTest {
 
     protected ServiceReference waitService(BundleContext bc, Class<?> cls, String filter, int timeout)
         throws Exception {
-        ServiceReference[] refs = null;
+        ServiceReference[] refs;
         for (int i = 0; i < timeout; i++) {
             refs = bc.getServiceReferences(cls.getName(), filter);
             if (refs != null && refs.length > 0) {

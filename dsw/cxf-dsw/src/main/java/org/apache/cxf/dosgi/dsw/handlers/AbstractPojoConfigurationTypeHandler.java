@@ -36,6 +36,7 @@ import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.helpers.CastUtils;
@@ -115,21 +116,21 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         }
     }
 
-    protected void setWsdlProperties(ServerFactoryBean factory, BundleContext callingContext, Map<String, Object> sd,
-                                     boolean wsdlType) {
+    protected void setCommonWsdlProperties(AbstractWSDLBasedEndpointFactory factory, BundleContext context,
+                                           Map<String, Object> sd, boolean wsdlType) {
         String location = OsgiUtils.getProperty(sd, wsdlType ? Constants.WSDL_LOCATION : Constants.WS_WSDL_LOCATION);
         if (location != null) {
-            URL wsdlURL = callingContext.getBundle().getResource(location);
+            URL wsdlURL = context.getBundle().getResource(location);
             if (wsdlURL != null) {
                 factory.setWsdlURL(wsdlURL.toString());
             }
-            QName serviceName = getServiceQName(null, sd, wsdlType
-                ? Constants.WSDL_SERVICE_NAMESPACE : Constants.WS_WSDL_SERVICE_NAMESPACE, wsdlType
-                ? Constants.WSDL_SERVICE_NAME : Constants.WS_WSDL_SERVICE_NAME);
+            QName serviceName = getServiceQName(null, sd,
+                    wsdlType ? Constants.WSDL_SERVICE_NAMESPACE : Constants.WS_WSDL_SERVICE_NAMESPACE,
+                    wsdlType ? Constants.WSDL_SERVICE_NAME : Constants.WS_WSDL_SERVICE_NAME);
             if (serviceName != null) {
                 factory.setServiceName(serviceName);
-                QName portName = getPortQName(serviceName.getNamespaceURI(), sd, wsdlType
-                    ? Constants.WSDL_PORT_NAME : Constants.WS_WSDL_PORT_NAME);
+                QName portName = getPortQName(serviceName.getNamespaceURI(), sd,
+                        wsdlType ? Constants.WSDL_PORT_NAME : Constants.WS_WSDL_PORT_NAME);
                 if (portName != null) {
                     factory.setEndpointName(portName);
                 }
@@ -137,26 +138,14 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         }
     }
 
+    protected void setWsdlProperties(ServerFactoryBean factory, BundleContext callingContext, Map<String, Object> sd,
+                                     boolean wsdlType) {
+        setCommonWsdlProperties(factory, callingContext, sd, wsdlType);
+    }
+
     protected void setClientWsdlProperties(ClientFactoryBean factory, BundleContext dswContext, Map<String, Object> sd,
                                            boolean wsdlType) {
-        String location = OsgiUtils.getProperty(sd, wsdlType ? Constants.WSDL_LOCATION : Constants.WS_WSDL_LOCATION);
-        if (location != null) {
-            URL wsdlURL = dswContext.getBundle().getResource(location);
-            if (wsdlURL != null) {
-                factory.setWsdlURL(wsdlURL.toString());
-            }
-            QName serviceName = getServiceQName(null, sd, wsdlType
-                ? Constants.WSDL_SERVICE_NAMESPACE : Constants.WS_WSDL_SERVICE_NAMESPACE, wsdlType
-                ? Constants.WSDL_SERVICE_NAME : Constants.WS_WSDL_SERVICE_NAME);
-            if (serviceName != null) {
-                factory.setServiceName(serviceName);
-                QName portName = getPortQName(serviceName.getNamespaceURI(), sd, wsdlType
-                    ? Constants.WSDL_PORT_NAME : Constants.WS_WSDL_PORT_NAME);
-                if (portName != null) {
-                    factory.setEndpointName(portName);
-                }
-            }
-        }
+        setCommonWsdlProperties(factory, dswContext, sd, wsdlType);
     }
 
     protected static QName getServiceQName(Class<?> iClass, Map<String, Object> sd, String nsPropName,
@@ -191,7 +180,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
     }
 
     protected String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
-        String address = null;
+        String address;
         try {
             address = getClientAddress(sd, iClass);
         } catch (RuntimeException e) {
@@ -242,8 +231,8 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         boolean out = propName.contains("out.interceptors");
         boolean inFault = propName.contains("in.fault.interceptors");
         boolean outFault = propName.contains("out.fault.interceptors");
-        for (int i = 0; i < providers.size(); i++) {
-            Interceptor<?> interceptor = (Interceptor<?>)providers.get(i);
+        for (Object provider : providers) {
+            Interceptor<?> interceptor = (Interceptor<?>) provider;
             if (in) {
                 factory.getInInterceptors().add(interceptor);
             } else if (out) {
@@ -260,7 +249,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
                                     Map<String, Object> sd, String propName) {
 
         List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName);
-        if (providers.size() > 0) {
+        if (!providers.isEmpty()) {
             factory.getFeatures().addAll(CastUtils.cast(providers, AbstractFeature.class));
         }
     }

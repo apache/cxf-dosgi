@@ -121,7 +121,7 @@ public final class ClassUtils {
         for (String className : classNames) {
             try {
                 String realName = className.trim();
-                if (realName.length() > 0) {
+                if (!realName.isEmpty()) {
                     Class<?> pClass = callingContext.getBundle().loadClass(realName);
                     providers.add(pClass.newInstance());
                 }

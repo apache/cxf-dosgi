@@ -28,14 +28,12 @@ public class ExportResult {
     private final Exception exception;
 
     public ExportResult(Map<String, Object> endpointProps, Server server) {
-        super();
         this.endpointProps = endpointProps;
         this.server = server;
         this.exception = null;
     }
     
     public ExportResult(Map<String, Object> endpointProps, Exception ex) {
-        super();
         this.endpointProps = endpointProps;
         this.server = null;
         this.exception = ex;

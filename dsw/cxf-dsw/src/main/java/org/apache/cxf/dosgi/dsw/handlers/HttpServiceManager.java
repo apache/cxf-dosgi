@@ -115,8 +115,8 @@ public class HttpServiceManager {
      * This listens for service removal events and "un-exports" the service
      * from the HttpService.
      * 
-     * @param reference The service reference to track
-     * @param alias The HTTP servlet context alias
+     * @param sref the service reference to track
+     * @param alias the HTTP servlet context alias
      */
     private void registerUnexportHook(ServiceReference sref, String alias) {
         final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);

@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.discovery.zookeeper.server;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -35,7 +34,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.verify;
 
-
 public class ZookeeperStarterTest extends TestCase {
     public void testUpdateConfig() throws Exception {
         final File tempDir = new File("target");
@@ -48,7 +46,7 @@ public class ZookeeperStarterTest extends TestCase {
         ZookeeperStarter starter = new ZookeeperStarter(bc) {
 
             @Override
-            protected void startFromConfig(QuorumPeerConfig config) throws IOException, InterruptedException {
+            protected void startFromConfig(QuorumPeerConfig config) {
                 assertEquals(1234, config.getClientPortAddress().getPort());
                 assertTrue(config.getDataDir().contains(tempDir + File.separator + "zkdata"));
                 assertEquals(2000, config.getTickTime());

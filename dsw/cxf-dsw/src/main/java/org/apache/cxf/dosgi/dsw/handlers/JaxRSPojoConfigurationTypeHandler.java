@@ -21,8 +21,6 @@ package org.apache.cxf.dosgi.dsw.handlers;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.dosgi.dsw.Constants;
@@ -44,8 +42,6 @@ import org.slf4j.LoggerFactory;
 
 public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(JaxRSPojoConfigurationTypeHandler.class);
-
-    Set<ServiceReference> httpServiceReferences = new CopyOnWriteArraySet<ServiceReference>();
 
     public JaxRSPojoConfigurationTypeHandler(BundleContext dswBC,
                                              IntentManager intentManager, 
@@ -108,7 +104,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
             bean.setServiceClass(iClass);
         }
         List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd.getProperties());
-        if (providers != null && providers.size() > 0) {
+        if (providers != null && !providers.isEmpty()) {
             bean.setProviders(providers);
         }
         Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
@@ -184,7 +180,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         }
         factory.setAddress(address);
         List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd);
-        if (providers != null && providers.size() > 0) {
+        if (providers != null && !providers.isEmpty()) {
             factory.setProviders(providers);
         }
         addRsInterceptorsFeaturesProps(factory, callingContext, sd);

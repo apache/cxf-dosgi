@@ -112,7 +112,7 @@ public class Activator implements BundleActivator {
         }
 
         public void run() {
-            String line = null;
+            String line;
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
             while (!stop) {
@@ -137,7 +137,7 @@ public class Activator implements BundleActivator {
 
                     line = line.trim();
 
-                    if (line.length() == 0) {
+                    if (line.isEmpty()) {
                         continue;
                     }
 
@@ -150,7 +150,7 @@ public class Activator implements BundleActivator {
                                 BufferedReader reader = new BufferedReader(new FileReader(commands));
                                 String command = reader.readLine().trim();
                                 while (command != null) {
-                                    if (command.length() > 0) {
+                                    if (!command.isEmpty()) {
                                         System.out.println("\nexecuting: " + command);
                                         shell.executeCommand(command.trim(), System.out, System.err);
                                     }

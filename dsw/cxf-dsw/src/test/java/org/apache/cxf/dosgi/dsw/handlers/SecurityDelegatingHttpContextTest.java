@@ -225,7 +225,7 @@ class CommitResponseFilter implements Filter {
         throws java.io.IOException, javax.servlet.ServletException {
         called = true;
         response.getWriter().write("committing the response");
-    };
+    }
 }
 
 class DoNothingFilter implements Filter {
@@ -241,7 +241,7 @@ class DoNothingFilter implements Filter {
         throws java.io.IOException, javax.servlet.ServletException {
         called = true;
         chain.doFilter(request, response);
-    };
+    }
 }
 
 class AccessDeniedFilter implements Filter {
@@ -257,5 +257,5 @@ class AccessDeniedFilter implements Filter {
         throws java.io.IOException, javax.servlet.ServletException {
         called = true;
         ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
-    };
+    }
 }

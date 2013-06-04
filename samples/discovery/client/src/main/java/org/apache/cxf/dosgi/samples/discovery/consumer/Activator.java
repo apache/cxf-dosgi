@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.samples.discovery.consumer;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,8 +65,7 @@ public class Activator implements BundleActivator {
                 counter++;
                 String text = "some text " + counter;
                 System.out.println("Sending text to displays: " + text);
-                for (Iterator<Entry<DisplayService, String>> it = displays.entrySet().iterator(); it.hasNext();) {
-                    Entry<DisplayService, String> entry = it.next();
+                for (Entry<DisplayService, String> entry : displays.entrySet()) {
                     try {
                         entry.getKey().displayText(text);
                     } catch (Throwable th) {
