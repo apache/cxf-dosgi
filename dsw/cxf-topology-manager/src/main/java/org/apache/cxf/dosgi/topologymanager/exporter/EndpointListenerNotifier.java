@@ -147,7 +147,7 @@ public class EndpointListenerNotifier {
                     if (o instanceof String) {
                         filters.add(bctx.createFilter((String) o));
                     } else {
-                        LOG.warn("Component of a EndpointListener filter is not a string -> skipped !");
+                        LOG.warn("Component of a EndpointListener filter is not a string -> skipped!");
                     }
                 }
             }

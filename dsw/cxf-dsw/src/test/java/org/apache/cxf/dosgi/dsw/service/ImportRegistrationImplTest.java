@@ -90,7 +90,7 @@ public class ImportRegistrationImplTest {
             i2.setImportedServiceRegistration(sr);    
             assertTrue("An exception should be thrown here !", false);
         } catch (IllegalStateException e) {
-            // must be thrown here ...
+            // must be thrown here
         }
         
         i1.setImportedServiceRegistration(sr);

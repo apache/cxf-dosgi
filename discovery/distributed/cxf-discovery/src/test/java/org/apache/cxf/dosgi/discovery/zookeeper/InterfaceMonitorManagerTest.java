@@ -92,53 +92,53 @@ public class InterfaceMonitorManagerTest extends TestCase {
         
         // sref has no scope -> nothing should happen
         
-        assertEquals(0, eltc.getHandledEndpointlisteners().size());
+        assertEquals(0, eltc.getHandledEndpointListeners().size());
         assertEquals(0, eltc.getInterestingScopes().size());
         
         //p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, );
         
         eltc.addInterest(sref, "(objectClass=mine)", "mine"); 
         
-        assertEquals(1, eltc.getHandledEndpointlisteners().size());
-        assertEquals(1, eltc.getHandledEndpointlisteners().get(sref).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref).get(0));
+        assertEquals(1, eltc.getHandledEndpointListeners().size());
+        assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
+        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
         
         
         eltc.addInterest(sref, "(objectClass=mine)", "mine");
         
-        assertEquals(1, eltc.getHandledEndpointlisteners().size());
-        assertEquals(1, eltc.getHandledEndpointlisteners().get(sref).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref).get(0));
+        assertEquals(1, eltc.getHandledEndpointListeners().size());
+        assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
+        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
         
         eltc.addInterest(sref2, "(objectClass=mine)", "mine");
         
-        assertEquals(2, eltc.getHandledEndpointlisteners().size());
-        assertEquals(1, eltc.getHandledEndpointlisteners().get(sref).size());
-        assertEquals(1, eltc.getHandledEndpointlisteners().get(sref2).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref).get(0));
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref2).get(0));
+        assertEquals(2, eltc.getHandledEndpointListeners().size());
+        assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
+        assertEquals(1, eltc.getHandledEndpointListeners().get(sref2).size());
+        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
+        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref2).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
         
         
         eltc.removeInterest(sref);
         
-        assertEquals(1, eltc.getHandledEndpointlisteners().size());
-        assertEquals(1, eltc.getHandledEndpointlisteners().get(sref2).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref2).get(0));
+        assertEquals(1, eltc.getHandledEndpointListeners().size());
+        assertEquals(1, eltc.getHandledEndpointListeners().get(sref2).size());
+        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref2).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
         
         eltc.removeInterest(sref);
         
-        assertEquals(1, eltc.getHandledEndpointlisteners().size());
-        assertEquals(1, eltc.getHandledEndpointlisteners().get(sref2).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointlisteners().get(sref2).get(0));
+        assertEquals(1, eltc.getHandledEndpointListeners().size());
+        assertEquals(1, eltc.getHandledEndpointListeners().get(sref2).size());
+        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref2).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
         
         eltc.removeInterest(sref2);
         
-        assertEquals(0, eltc.getHandledEndpointlisteners().size());
+        assertEquals(0, eltc.getHandledEndpointListeners().size());
         assertEquals(0, eltc.getInterestingScopes().size());
         
         c.verify();

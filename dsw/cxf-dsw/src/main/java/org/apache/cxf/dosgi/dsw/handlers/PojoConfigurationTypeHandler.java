@@ -27,7 +27,7 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentUnsatifiedException;
+import org.apache.cxf.dosgi.dsw.qos.IntentUnsatisfiedException;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -53,7 +53,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     public Object createProxy(ServiceReference sref, BundleContext dswContext,
-            BundleContext callingContext, Class<?> iClass, EndpointDescription epd) throws IntentUnsatifiedException {
+            BundleContext callingContext, Class<?> iClass, EndpointDescription epd) throws IntentUnsatisfiedException {
         Map<String, Object> sd = epd.getProperties();
         String address = getClientAddress(sd, iClass);
         if (address == null) {
@@ -90,7 +90,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
                                      BundleContext callingContext,
                                      Map<String, Object> sd,
                                      Class<?> iClass,
-                                     Object serviceBean) throws IntentUnsatifiedException {
+                                     Object serviceBean) throws IntentUnsatisfiedException {
         try {
             String address = getPojoAddress(sd, iClass);
             String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
@@ -135,7 +135,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         }
 
         address = "http://localhost:" + port + "/" + iClass.getName().replace('.', '/');
-        LOG.info("Using a default address : " + address);
+        LOG.info("Using a default address: " + address);
         return address;
     }
 

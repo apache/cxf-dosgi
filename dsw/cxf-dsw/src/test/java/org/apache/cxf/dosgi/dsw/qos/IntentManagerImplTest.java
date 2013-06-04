@@ -102,7 +102,7 @@ public class IntentManagerImplTest extends Assert {
         try {
             intentManager.applyIntents(features, factory, props);
             Assert.fail("applyIntents() should have thrown an exception as there was an unsatisfiable intent");
-        } catch (IntentUnsatifiedException iue) {
+        } catch (IntentUnsatisfiedException iue) {
             assertEquals("B", iue.getIntent());
         }
     }

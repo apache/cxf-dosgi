@@ -113,7 +113,7 @@ public class EventProducerTest {
         EventProducer eventProducer = new EventProducer(bc);
 
         ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore);
-        eventProducer.publishNotifcation(ereg);
+        eventProducer.publishNotification(ereg);
     }
 
     @Test
@@ -178,6 +178,6 @@ public class EventProducerTest {
 
         ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore);
         ereg.setException(exportException);
-        eventProducer.publishNotifcation(Arrays.<ExportRegistration>asList(ereg));
+        eventProducer.publishNotification(Arrays.<ExportRegistration>asList(ereg));
     }
 }

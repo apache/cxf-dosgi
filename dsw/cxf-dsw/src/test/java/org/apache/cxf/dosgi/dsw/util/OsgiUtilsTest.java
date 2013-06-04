@@ -93,7 +93,7 @@ public class OsgiUtilsTest extends TestCase {
 
         c.verify();
         c.reset();
-        // version 1.2.3 ...
+        // version 1.2.3
 
         EasyMock.expect(bc.getServiceReference(EasyMock.eq(PackageAdmin.class.getName()))).andReturn(sref);
         EasyMock.expect(bc.getService(EasyMock.eq(sref))).andReturn(pa);
@@ -187,7 +187,7 @@ public class OsgiUtilsTest extends TestCase {
 
         EndpointDescription ep = new EndpointDescription(p);
 
-        assertNull(OsgiUtils.getProperty(ep, "unkownProp"));
+        assertNull(OsgiUtils.getProperty(ep, "unknownProp"));
         assertEquals(p.get(RemoteConstants.ENDPOINT_ID), OsgiUtils.getProperty(ep, RemoteConstants.ENDPOINT_ID));
         assertEquals(null, OsgiUtils.getProperty(ep, "notAString"));
     }

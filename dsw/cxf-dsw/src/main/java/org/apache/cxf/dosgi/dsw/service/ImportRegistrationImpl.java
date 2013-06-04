@@ -59,7 +59,7 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
      * Creates a clone of the given parent instance.
      */
     public ImportRegistrationImpl(ImportRegistrationImpl ir) {
-        // we always want a link to the parent ...
+        // we always want a link to the parent...
         parent = ir.getParent();
         exception = parent.getException();
         importedEndpoint = parent.getImportedEndpointDescription();
@@ -97,7 +97,7 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
             detached = true;
         }
 
-        LOG.debug("really closing ImportRegistartion now");
+        LOG.debug("really closing ImportRegistration now");
 
         if (clientServiceFactory != null) {
             clientServiceFactory.setCloseable(true);

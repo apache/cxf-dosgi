@@ -93,7 +93,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
     }
 
     /**
-     * only for the test case !
+     * Only for the test case!
      */
     protected List<PublishingEndpointListener> getListeners() {
         synchronized (listeners) {

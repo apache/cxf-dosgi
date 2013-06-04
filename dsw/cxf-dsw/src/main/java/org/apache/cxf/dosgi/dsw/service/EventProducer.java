@@ -41,13 +41,13 @@ public class EventProducer {
         eaHelper = new EventAdminHelper(bctx);
     }
 
-    protected void publishNotifcation(List<ExportRegistration> erl) {
+    protected void publishNotification(List<ExportRegistration> erl) {
         for (ExportRegistration exportRegistration : erl) {
-            publishNotifcation(exportRegistration);
+            publishNotification(exportRegistration);
         }
     }
 
-    protected void publishNotifcation(ExportRegistration er) {
+    protected void publishNotification(ExportRegistration er) {
         int type = er.getException() == null 
             ? RemoteServiceAdminEvent.EXPORT_REGISTRATION 
             : RemoteServiceAdminEvent.EXPORT_ERROR;

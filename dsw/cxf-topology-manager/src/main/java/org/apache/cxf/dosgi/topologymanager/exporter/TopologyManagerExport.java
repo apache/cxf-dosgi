@@ -160,8 +160,8 @@ public class TopologyManagerExport {
 
     private void exportServiceUsingRemoteServiceAdmin(final ServiceReference sref,
                                                       final RemoteServiceAdmin remoteServiceAdmin) {
-        // TODO: additional parameter Map ?
-        LOG.debug("exporting ...");
+        // TODO: additional parameter Map?
+        LOG.debug("exporting...");
         Collection<ExportRegistration> exportRegs = remoteServiceAdmin.exportService(sref, null);
         List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
         if (exportRegs.isEmpty()) {
@@ -198,7 +198,7 @@ public class TopologyManagerExport {
                 }
             }
         } catch (InvalidSyntaxException e) {
-            LOG.error("Error in filter {}. This should not occur !", DOSGI_SERVICES);
+            LOG.error("Error in filter {}. This should not occur!", DOSGI_SERVICES);
         }
     }
 

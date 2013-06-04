@@ -47,7 +47,7 @@ public class InterfaceMonitorManager {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitorManager.class);
     
     private final ZooKeeper zooKeeper;
-    private final Map<ServiceReference, List<String> /* scopes of the epl */> handledEndpointlisteners
+    private final Map<ServiceReference, List<String> /* scopes of the epl */> handledEndpointListeners
         = new HashMap<ServiceReference, List<String>>();
     private final Map<String /* scope */, Interest> interestingScopes = new HashMap<String, Interest>();
     private final BundleContext bctx;
@@ -78,10 +78,10 @@ public class InterfaceMonitorManager {
             interest.im.start();
         }
 
-        List<String> handledScopes = handledEndpointlisteners.get(sref);
+        List<String> handledScopes = handledEndpointListeners.get(sref);
         if (handledScopes == null) {
             handledScopes = new ArrayList<String>(1);
-            handledEndpointlisteners.put(sref, handledScopes);
+            handledEndpointListeners.put(sref, handledScopes);
         }
 
         if (!handledScopes.contains(scope)) {
@@ -90,17 +90,17 @@ public class InterfaceMonitorManager {
     }
     
     /**
-     * Only for test case !
-     * */
+     * Only for test case!
+     */
     protected synchronized Map<String, Interest> getInterestingScopes() {
         return interestingScopes;
     }
 
     /**
-     * Only for test case !
-     * */
-    protected synchronized Map<ServiceReference, List<String>> getHandledEndpointlisteners() {
-        return handledEndpointlisteners;
+     * Only for test case!
+     */
+    protected synchronized Map<ServiceReference, List<String>> getHandledEndpointListeners() {
+        return handledEndpointListeners;
     }
     
     private InterfaceMonitor createInterfaceMonitor(final String scope, String objClass, final Interest interest) {
@@ -118,7 +118,7 @@ public class InterfaceMonitorManager {
     }
 
     public synchronized void removeInterest(ServiceReference sref) {
-        List<String> handledScopes = handledEndpointlisteners.get(sref);
+        List<String> handledScopes = handledEndpointListeners.get(sref);
         if (handledScopes == null) {
             return;
         }
@@ -133,7 +133,7 @@ public class InterfaceMonitorManager {
                 }
             }
         }
-        handledEndpointlisteners.remove(sref);
+        handledEndpointListeners.remove(sref);
     }
     
     private void notifyListeners(EndpointDescription epd, String currentScope, boolean isAdded,
@@ -182,6 +182,6 @@ public class InterfaceMonitorManager {
             interest.im.close();
         }
         interestingScopes.clear();
-        handledEndpointlisteners.clear();
+        handledEndpointListeners.clear();
     }
 }

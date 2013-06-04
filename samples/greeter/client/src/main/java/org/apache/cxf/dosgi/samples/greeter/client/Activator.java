@@ -78,7 +78,7 @@ public class Activator implements BundleActivator {
                         System.out.println("  " + phrase.getPhrase());
                     }
                 } catch (GreeterException ex) {
-                    System.out.println("GreeterException : " + ex.toString());
+                    System.out.println("GreeterException: " + ex.toString());
                 }                
             }
         }

@@ -89,7 +89,7 @@ public class RemoteServiceAdminCoreTest {
         assertNotNull(exRefs);
         assertEquals(0, exRefs.size());
 
-        // must be empty ...
+        // must be empty
         assertEquals(rsaCore.getExportedServices().size(), 0);
 
         c.verify();
@@ -113,7 +113,7 @@ public class RemoteServiceAdminCoreTest {
         p.put(Constants.OBJECTCLASS, new String[] {
             "es.schaaf.my.class"
         });
-        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "unsupportetConfiguration");
+        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "unsupportedConfiguration");
         EndpointDescription endpoint = new EndpointDescription(p);
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
@@ -132,7 +132,7 @@ public class RemoteServiceAdminCoreTest {
 
         // must be null as the endpoint doesn't contain any usable configurations
         assertNull(rsaCore.importService(endpoint));
-        // must be empty ...
+        // must be empty
         assertEquals(0, rsaCore.getImportedEndpoints().size());
 
         p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE);
@@ -153,13 +153,13 @@ public class RemoteServiceAdminCoreTest {
         assertEquals(ireg.getImportReference().getImportedEndpoint(), ireg2.getImportReference()
             .getImportedEndpoint());
 
-        // remove the registration ....
+        // remove the registration
 
-        // first call shouldn't remove the import ...
+        // first call shouldn't remove the import
         ireg2.close();
         assertEquals(1, rsaCore.getImportedEndpoints().size());
 
-        // second call should really close and remove the import ...
+        // second call should really close and remove the import
         ireg.close();
         assertEquals(0, rsaCore.getImportedEndpoints().size());
 

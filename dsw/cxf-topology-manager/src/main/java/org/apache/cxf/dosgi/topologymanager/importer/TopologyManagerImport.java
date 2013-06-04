@@ -205,7 +205,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
                 } catch (Exception e) {
                     LOG.error(e.getMessage(), e);
                 }
-                // Notify EndpointListeners ? NO!
+                // Notify EndpointListeners? NO!
             }
 
         });
@@ -312,7 +312,6 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
      * does nothing for the moment.
      */
     public void removeImportReference(ImportReference anyObject) {
-        //LOG.severe("NOT IMPLEMENTED !!!");
     }
 
     public void remoteAdminEvent(RemoteServiceAdminEvent event) {

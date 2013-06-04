@@ -22,7 +22,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.qos.IntentUnsatifiedException;
+import org.apache.cxf.dosgi.dsw.qos.IntentUnsatisfiedException;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
@@ -40,7 +40,7 @@ public class ClientServiceFactory implements ServiceFactory {
     private EndpointDescription sd;
     private ConfigurationTypeHandler handler;
 
-    private ImportRegistrationImpl importRegistartion;
+    private ImportRegistrationImpl importRegistration;
 
     private boolean closeable;
     private int serviceCounter;
@@ -51,7 +51,7 @@ public class ClientServiceFactory implements ServiceFactory {
         this.iClass = iClass;
         this.sd = sd;
         this.handler = handler;
-        importRegistartion = ir;
+        importRegistration = ir;
     }
 
     public Object getService(final Bundle requestingBundle, final ServiceRegistration sreg) {
@@ -72,7 +72,7 @@ public class ClientServiceFactory implements ServiceFactory {
                 ++serviceCounter;
             }
             return proxy;
-        } catch (IntentUnsatifiedException iue) {
+        } catch (IntentUnsatisfiedException iue) {
             LOG.info("Did not create proxy for " + interfaceName + " because intent " + iue.getIntent()
                      + " could not be satisfied");
         } catch (Exception ex) {
@@ -89,7 +89,7 @@ public class ClientServiceFactory implements ServiceFactory {
         sb.append("Releasing a client object");
         Object objectClass = sreg.getReference().getProperty(org.osgi.framework.Constants.OBJECTCLASS);
         if (objectClass != null) {
-            sb.append(", interfaces : ");
+            sb.append(", interfaces: ");
             for (String s : (String[])objectClass) {
                 sb.append(" " + s);
             }
@@ -107,7 +107,7 @@ public class ClientServiceFactory implements ServiceFactory {
     }
 
     private void remove() {
-        importRegistartion.closeAll();
+        importRegistration.closeAll();
     }
 
     public void setCloseable(boolean closeable) {

@@ -44,8 +44,8 @@ public class ExportServiceTest {
 
     /**
      * This tests if the topology manager handles a service marked to be
-     * exported correctly by exporting it to an available RemoteServiceAdmin and
-     * by notifying an EndpointListener Afterwards
+     * exported correctly by exporting it to an available RemoteServiceAdmin
+     * and notifying an EndpointListener afterwards.
      * 
      * @throws Exception
      */

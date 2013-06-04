@@ -83,7 +83,7 @@ public class EndpointListenerImplTest extends Assert {
                     assertEquals("(c=d)", scope.get(0));
                     break;
                 default:
-                    assertTrue("This should not happen !", false);
+                    assertTrue("This should not happen!", false);
                 }
                 return null;
             }

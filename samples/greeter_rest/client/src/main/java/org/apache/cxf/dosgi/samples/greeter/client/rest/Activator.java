@@ -95,7 +95,7 @@ public class Activator implements BundleActivator {
                                 + " " + greeting.getName());
                     }
                 } catch (GreeterException ex) {
-                    System.out.println("GreeterException : " + ex.toString());
+                    System.out.println("GreeterException: " + ex.toString());
                 }
             }
         }
@@ -104,7 +104,7 @@ public class Activator implements BundleActivator {
     private void greeter2UI(final GreeterService2 greeter) {
         while (true) {
             System.out.println("*** Opening greeter2 client dialog ***");
-            String name = JOptionPane.showInputDialog("Greeter2 : Enter name");
+            String name = JOptionPane.showInputDialog("Greeter2: Enter name");
             if (name == null) {
                 break;
             } else {
@@ -118,7 +118,7 @@ public class Activator implements BundleActivator {
                                 + " " + greeting.getName());
                     }
                 } catch (GreeterException ex) {
-                    System.out.println("GreeterException : " + ex.toString());
+                    System.out.println("GreeterException: " + ex.toString());
                 }
             }
         }

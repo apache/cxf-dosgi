@@ -88,8 +88,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         List<String> interfaces = getInterfaces(serviceProperties);
 
         if (isCreatedByThisRSA(serviceReference)) {
-            LOG.debug("Skipping export of this service as we created it ourself as a proxy {}", interfaces);
-            // TODO: publish error event ? Not sure
+            LOG.debug("Skipping export of this service as we created it ourselves as a proxy {}", interfaces);
+            // TODO: publish error event? Not sure
             return Collections.emptyList();
         }
 
@@ -126,7 +126,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             synchronized (exportedServices) {
                 exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
             }
-            eventProducer.publishNotifcation(exportRegs);
+            eventProducer.publishNotification(exportRegs);
             return exportRegs;
         } finally {
             synchronized (exportedServices) {
@@ -154,7 +154,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
         for (String iface : interfaces) {
             LOG.info("creating server for interface " + iface);
-            // this is an extra sanity check, but do we really need it now ?
+            // this is an extra sanity check, but do we really need it now?
             Class<?> interfaceClass = ClassUtils.getInterfaceClass(serviceObject, iface);
             if (interfaceClass != null) {
                 ExportResult exportResult = handler.createServer(serviceReference, bctx, callingContext,
@@ -276,7 +276,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
         regs.addAll(copy);
 
-        eventProducer.publishNotifcation(copy);
+        eventProducer.publishNotification(copy);
         return copy;
     }
 
@@ -310,7 +310,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
     /**
-     * Importing form here ....
+     * Importing form here...
      */
     public ImportRegistration importService(EndpointDescription endpoint) {
 
@@ -343,7 +343,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             LOG.info("Matching Interfaces for import: " + matchingInterfaces);
 
             if (matchingInterfaces.size() == 1) {
-                LOG.info("Proxifying interface : " + matchingInterfaces.get(0));
+                LOG.info("Proxifying interface: " + matchingInterfaces.get(0));
 
                 ImportRegistrationImpl imReg = new ImportRegistrationImpl(endpoint, this);
 
@@ -365,7 +365,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                                             ConfigurationTypeHandler handler, BundleContext requestingContext) {
 
         try {
-            // MARC: relies on dynamic imports ?
+            // MARC: relies on dynamic imports?
             Class<?> iClass = bctx.getBundle().loadClass(interfaceName);
             if (iClass == null) {
                 throw new ClassNotFoundException("Cannot load interface class");
@@ -382,7 +382,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             }
 
             EndpointDescription ed = imReg.getImportedEndpointDescription();
-            /* TODO: add additional local params ... */
+            /* TODO: add additional local params... */
             Dictionary<String, Object> serviceProps = new Hashtable<String, Object>(ed.getProperties());
             serviceProps.put(RemoteConstants.SERVICE_IMPORTED, true);
             serviceProps.remove(RemoteConstants.SERVICE_EXPORTED_INTERFACES);
@@ -453,8 +453,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             if (imRegs != null && imRegs.contains(iri)) {
                 imRegs.remove(iri);
             } else {
-                LOG.error("An importRegistartion was intended to be removed form internal management "
-                    + "structure but couldn't be found in it !! ");
+                LOG.error("An importRegistration was intended to be removed form internal management "
+                    + "structure but couldn't be found in it!");
             }
             if (imRegs == null || imRegs.size() == 0) {
                 importedServices.remove(iri.getImportedEndpointAlways());

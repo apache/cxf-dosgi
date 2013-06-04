@@ -49,7 +49,7 @@ public class IntentManagerImpl implements IntentManager {
     }
     
     public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory,
-                                 Map<String, Object> props) throws IntentUnsatifiedException {
+                                 Map<String, Object> props) throws IntentUnsatisfiedException {
         Set<String> requestedIntents = IntentUtils.getRequestedIntents(props);
         Set<String> appliedIntents = new HashSet<String>();
         appliedIntents.addAll(reverseLookup(intentMap, PROVIDED_INTENT_VALUE));
@@ -68,7 +68,7 @@ public class IntentManagerImpl implements IntentManager {
     }
     
     private boolean processIntent(List<Feature> features, AbstractEndpointFactory factory,
-                                  String intentName, Object intent) throws IntentUnsatifiedException {
+                                  String intentName, Object intent) throws IntentUnsatisfiedException {
         if (intent instanceof String) {
             if (PROVIDED_INTENT_VALUE.equalsIgnoreCase((String) intent)) {
                 return false;
@@ -85,7 +85,7 @@ public class IntentManagerImpl implements IntentManager {
             return false;
         } else {
             LOG.info("No mapping for intent: " + intentName);
-            throw new IntentUnsatifiedException(intentName);
+            throw new IntentUnsatisfiedException(intentName);
         }
         return false;
     }

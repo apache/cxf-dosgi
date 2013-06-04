@@ -91,7 +91,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         Service service = createWebService(wsdlAddress, serviceQname);
         Object proxy = getProxy(portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass), 
                                 iClass);
-        //MARC: FIXME !!!! getDistributionProvider().addRemoteService(serviceReference);
+        //MARC: FIXME!!!! getDistributionProvider().addRemoteService(serviceReference);
         return proxy;
         
     }

@@ -76,7 +76,7 @@ public class EndpointListenerNotifierTest {
         EasyMock.expect(epd.getProperties()).andReturn(props).anyTimes();
         EasyMock.expect(epd2.getProperties()).andReturn(props2).anyTimes();
         
-        // must only be called for the first EndpointDestription ! 
+        // must only be called for the first EndpointDescription!
         epl.endpointRemoved(EasyMock.eq(epd), EasyMock.eq("(objectClass=myClass)"));
         EasyMock.expectLastCall().once();
         
@@ -101,7 +101,7 @@ public class EndpointListenerNotifierTest {
     }
 
     @Test
-    public void testNomalizeScopeForSingleString() {
+    public void testNormalizeScopeForSingleString() {
 
         try {
             ServiceReference sr = EasyMock.createMock(ServiceReference.class);
@@ -130,7 +130,7 @@ public class EndpointListenerNotifierTest {
     
     
     @Test
-    public void testNomalizeScopeForStringArray() {
+    public void testNormalizeScopeForStringArray() {
 
         try {
             
@@ -162,7 +162,7 @@ public class EndpointListenerNotifierTest {
     }
     
     @Test
-    public void testNomalizeScopeForCollection() {
+    public void testNormalizeScopeForCollection() {
 
         try {
             

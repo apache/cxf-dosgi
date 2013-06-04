@@ -79,7 +79,7 @@ public class ListenerHookImplTest {
         m.put("a", "b");
         
         assertTrue(filter + " filter must match as uuid is missing", f.match(m));      
-        m.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID , "MyUUID");
+        m.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, "MyUUID");
         assertFalse(filter + " filter must NOT match as uuid is the local one", f.match(m));
     }
 }

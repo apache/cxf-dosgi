@@ -153,7 +153,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         c.verify();
     }
 
-    public void testCreateServerWithAddressProprety() {
+    public void testCreateServerWithAddressProperty() {
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(dswContext);
 

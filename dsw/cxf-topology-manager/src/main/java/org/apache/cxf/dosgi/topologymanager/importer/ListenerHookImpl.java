@@ -84,7 +84,7 @@ public class ListenerHookImpl implements ListenerHook {
             }
 
             if (isClassExcluded(className)) {
-                LOG.debug("Skipping import request for excluded classs [{}]", className);
+                LOG.debug("Skipping import request for excluded class [{}]", className);
                 continue;
             }
             String exFilter = extendFilter(listenerInfo.getFilter(), bctx);
@@ -102,7 +102,7 @@ public class ListenerHookImpl implements ListenerHook {
             ListenerInfo listenerInfo = (ListenerInfo)li;
             LOG.debug("Filter {}", listenerInfo.getFilter());
 
-            // TODO: determine if service was handled ? 
+            // TODO: determine if service was handled?
             String exFilter = extendFilter(listenerInfo.getFilter(), bctx);
             serviceInterestListener.removeServiceInterest(exFilter);
 

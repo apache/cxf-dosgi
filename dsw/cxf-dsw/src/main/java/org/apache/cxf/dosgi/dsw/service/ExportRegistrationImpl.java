@@ -99,13 +99,13 @@ public class ExportRegistrationImpl implements ExportRegistration {
         --instanceCount;
         if (instanceCount <= 0) {
             // really close the ExReg
-            // TODO close it and remove from management structure .... !
+            // TODO close it and remove from management structure!
 
-            LOG.debug("really closing ExportRegistartion now! ");
+            LOG.debug("really closing ExportRegistration now!");
 
             synchronized (this) {
                 if (server != null) {
-                    // FIXME: is this done like this ?
+                    // FIXME: is this done like this?
                     server.stop();
                     server = null;
                 }
@@ -124,7 +124,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
         }
         EndpointDescription endpointDescription = getExportReference().getExportedEndpoint();
         ServiceReference serviceReference = getExportReference().getExportedService();
-        String r = "Endpoint Desctiption for ServiceReference " + serviceReference;
+        String r = "EndpointDescription for ServiceReference " + serviceReference;
         r += "\n";
 
         r += "*** EndpointDescription: **** \n";

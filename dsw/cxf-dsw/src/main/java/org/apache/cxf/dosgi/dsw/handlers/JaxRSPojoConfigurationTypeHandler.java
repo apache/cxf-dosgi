@@ -27,7 +27,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.cxf.Bus;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentUnsatifiedException;
+import org.apache.cxf.dosgi.dsw.qos.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -59,7 +59,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
     
     public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
                               BundleContext callingContext, Class<?> iClass,
-                              EndpointDescription sd) throws IntentUnsatifiedException {
+                              EndpointDescription sd) throws IntentUnsatisfiedException {
 
         String address = getPojoAddress(sd, iClass);
         if (address == null) {
@@ -119,7 +119,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
                                      BundleContext dswContext,
                                      BundleContext callingContext, 
                                      Map<String, Object> sd, Class<?> iClass,
-                                     Object serviceBean) throws IntentUnsatifiedException {
+                                     Object serviceBean) throws IntentUnsatisfiedException {
 
         String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
         String address;
@@ -204,7 +204,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         if (address == null) {
             address = httpServiceManager.getDefaultAddress(iClass);
             if (address != null) {
-                LOG.info("Using a default address : " + address);
+                LOG.info("Using a default address: " + address);
             }
         }
         return address;

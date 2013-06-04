@@ -266,7 +266,7 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
 //    }
 //    
 //    public void testGetInterfacesFromFilter() {
-//        testGetInterfacesFromFilter("ojectClass=org.apache_2.Some$FunnyClass", 
+//        testGetInterfacesFromFilter("objectClass=org.apache_2.Some$FunnyClass",
 //                "org.apache_2.Some$FunnyClass");
 //        testGetInterfacesFromFilter("(&(a=b)(objectClass = org.acme.Q)", 
 //                "org.acme.Q");

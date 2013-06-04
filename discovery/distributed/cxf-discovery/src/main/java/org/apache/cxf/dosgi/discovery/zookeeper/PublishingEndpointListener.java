@@ -65,7 +65,7 @@ public class PublishingEndpointListener implements EndpointListener {
                 return;
             }
             if (endpoints.contains(endpoint)) {
-                // TODO -> Should the published endpoint be updated here ?
+                // TODO -> Should the published endpoint be updated here?
                 return;
             }
 

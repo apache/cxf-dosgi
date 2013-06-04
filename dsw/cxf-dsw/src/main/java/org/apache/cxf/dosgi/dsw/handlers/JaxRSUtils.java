@@ -50,7 +50,7 @@ public final class JaxRSUtils {
     private static final Logger LOG = LoggerFactory.getLogger(JaxRSUtils.class);
 
     private JaxRSUtils() {
-        //never contructed
+        // never constructed
     }
 
     @SuppressWarnings("rawtypes")

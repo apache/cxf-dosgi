@@ -59,7 +59,7 @@ public final class Utils {
                     String s = (String)o;
                     ar.add(s);
                 } else {
-                    LOG.warn("stringPlus contained non string element in list ! Element was skipped");
+                    LOG.warn("stringPlus contained non string element in list! Element was skipped");
                 }
             }
             return ar.toArray(new String[ar.size()]);

@@ -27,7 +27,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 /**
- * Utility methods to get the local address even on a linux host
+ * Utility methods to get the local address even on a linux host.
  */
 public final class LocalHostUtil {
 
@@ -41,8 +41,7 @@ public final class LocalHostUtil {
      * address. If no other address can be found, the loopback will be returned.
      * 
      * @return InetAddress - the address of localhost
-     * @throws UnknownHostException
-     *             - if there is a problem determing the address
+     * @throws UnknownHostException if there is a problem determining the address
      */
     public static InetAddress getLocalHost() throws UnknownHostException {
         InetAddress localHost = InetAddress.getLocalHost();

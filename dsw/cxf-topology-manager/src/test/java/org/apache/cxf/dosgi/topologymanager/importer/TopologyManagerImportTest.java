@@ -83,7 +83,7 @@ public class TopologyManagerImportTest {
         TopologyManagerImport tm = new TopologyManagerImport(bc, rsaTracker);
 
         tm.start();
-        // no RSa available yet so no import ...  
+        // no RSA available yet so no import...
         tm.endpointAdded(epd, "myFilter");
         tm.triggerImportsForRemoteServiceAdmin(rsa);
         assertTrue("importService should have been called on RemoteServiceAdmin",

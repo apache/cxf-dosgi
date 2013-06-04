@@ -109,7 +109,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
             setDefaults(dict);
             QuorumPeerConfig config = parseConfig(dict);
             startFromConfig(config);
-            LOG.info("Applied configuration update :" + dict);
+            LOG.info("Applied configuration update: " + dict);
         } catch (Exception th) {
             LOG.error("Problem applying configuration update: " + dict, th);
         }
