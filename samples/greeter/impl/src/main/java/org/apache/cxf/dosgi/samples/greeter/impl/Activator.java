@@ -18,10 +18,8 @@
  */
 package org.apache.cxf.dosgi.samples.greeter.impl;
 
-
 import java.util.Dictionary;
 import java.util.Hashtable;
-
 
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.osgi.framework.BundleActivator;
@@ -29,6 +27,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 public class Activator implements BundleActivator {
+
     private ServiceRegistration registration;
 
     public void start(BundleContext bc) throws Exception {
@@ -37,8 +36,8 @@ public class Activator implements BundleActivator {
         props.put("service.exported.interfaces", "*");
         props.put("service.exported.configs", "org.apache.cxf.ws");
         props.put("org.apache.cxf.ws.address", "http://localhost:9090/greeter");
-        
-        registration = bc.registerService(GreeterService.class.getName(), 
+
+        registration = bc.registerService(GreeterService.class.getName(),
                                           new GreeterServiceImpl(), props);
     }
 

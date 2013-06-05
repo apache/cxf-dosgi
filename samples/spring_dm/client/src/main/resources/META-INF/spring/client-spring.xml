@@ -23,7 +23,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
   <osgi:reference id="dinnerServiceRef" interface="org.apache.cxf.dosgi.samples.springdm.DinnerService"/>
-  
+
   <bean class="org.apache.cxf.dosgi.samples.springdm.client.DinnerServiceConsumer"
         init-method="start">
     <property name="dinnerService" ref="dinnerServiceRef"/>

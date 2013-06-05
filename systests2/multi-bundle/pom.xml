@@ -62,14 +62,14 @@
             <version>${exam.version}</version>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
             <version>1.5.0</version>
             <scope>test</scope>
         </dependency>
- 
+
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
@@ -180,9 +180,9 @@
         <plugins>
             <!-- use pax exam maven plugin -->
 
-            <!-- Note: settings and dependencies for the final osgi runtime 
-                (TESTS) are just used in TestCases that annotated with this: @RunWith( MavenConfiguredJUnit4TestRunner.class 
-                ) All other testcases will use their own settings/provisioning inside @Configure 
+            <!-- Note: settings and dependencies for the final osgi runtime
+                (TESTS) are just used in TestCases that annotated with this: @RunWith( MavenConfiguredJUnit4TestRunner.class
+                ) All other testcases will use their own settings/provisioning inside @Configure
                 Methods. -->
             <plugin>
                 <groupId>org.ops4j.pax.exam</groupId>
@@ -208,7 +208,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <!-- <org.apache.cxf.dosgi.test.debug.port>5005</org.apache.cxf.dosgi.test.debug.port> 
+                        <!-- <org.apache.cxf.dosgi.test.debug.port>5005</org.apache.cxf.dosgi.test.debug.port>
                             <org.apache.cxf.dosgi.test.serviceWaitTimeout>180</org.apache.cxf.dosgi.test.serviceWaitTimeout> -->
                         <java.util.logging.config.file>${project.build.directory}/test-classes/logging.properties</java.util.logging.config.file>
                     </systemPropertyVariables>
@@ -217,4 +217,3 @@
         </plugins>
     </build>
 </project>
-

@@ -49,19 +49,15 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.LoggerFactory;
 
-
 public final class LocalDiscoveryUtils {
-    private static final org.slf4j.Logger LOG =
-        LoggerFactory.getLogger(LocalDiscoveryUtils.class);
+
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(LocalDiscoveryUtils.class);
 
     private static final String REMOTE_SERVICES_HEADER_NAME = "Remote-Service";
-    private static final String REMOTE_SERVICES_DIRECTORY =
-        "OSGI-INF/remote-service/";
-    private static final String REMOTE_SERVICES_NS =
-        "http://www.osgi.org/xmlns/sd/v1.0.0"; // this one was replaced by the RSA one in the spec
-    private static final String REMOTE_SERVICES_ADMIN_NS =
-        "http://www.osgi.org/xmlns/rsa/v1.0.0";
-
+    private static final String REMOTE_SERVICES_DIRECTORY = "OSGI-INF/remote-service/";
+    // this one was replaced by the RSA one in the spec
+    private static final String REMOTE_SERVICES_NS = "http://www.osgi.org/xmlns/sd/v1.0.0";
+    private static final String REMOTE_SERVICES_ADMIN_NS = "http://www.osgi.org/xmlns/rsa/v1.0.0";
 
     private static final String SERVICE_DESCRIPTION_ELEMENT = "service-description";
     private static final String ENDPOINT_DESCRIPTION_ELEMENT = "endpoint-description";
@@ -503,15 +499,15 @@ public final class LocalDiscoveryUtils {
         return new XMLOutputter(Format.getPrettyFormat()).outputString(d);
     }
 
-    private static Object [] normalizeArray(Object val) {
+    private static Object[] normalizeArray(Object val) {
         List<Object> l = new ArrayList<Object>();
         if (val instanceof int[]) {
-            int[] ia = (int []) val;
+            int[] ia = (int[]) val;
             for (int i : ia) {
                 l.add(i);
             }
         } else if (val instanceof long[]) {
-            long[] la = (long []) val;
+            long[] la = (long[]) val;
             for (long i : la) {
                 l.add(i);
             }
@@ -521,27 +517,27 @@ public final class LocalDiscoveryUtils {
                 l.add(f);
             }
         } else if (val instanceof byte[]) {
-            byte[] ba = (byte []) val;
+            byte[] ba = (byte[]) val;
             for (byte b : ba) {
                 l.add(b);
             }
         } else if (val instanceof boolean[]) {
-            boolean[] ba = (boolean []) val;
+            boolean[] ba = (boolean[]) val;
             for (boolean b : ba) {
                 l.add(b);
             }
         } else if (val instanceof short[]) {
-            short[] sa = (short []) val;
+            short[] sa = (short[]) val;
             for (short s : sa) {
                 l.add(s);
             }
         } else if (val instanceof char[]) {
-            char[] ca = (char []) val;
+            char[] ca = (char[]) val;
             for (char c : ca) {
                 l.add(c);
             }
         } else {
-            return (Object []) val;
+            return (Object[]) val;
         }
         return l.toArray();
     }
@@ -569,7 +565,6 @@ public final class LocalDiscoveryUtils {
 
     @SuppressWarnings("unchecked")
     public static List<Element> getElements(InputStream in) throws JDOMException, IOException {
-
         List<Element> elements = new ArrayList<Element>();
 
         Document d = new SAXBuilder().build(in);

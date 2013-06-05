@@ -44,9 +44,8 @@ import org.osgi.service.http.NamespaceException;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
-
 public class HttpServiceManagerTest extends TestCase {
-    
+
     public void testGetAbsoluteAddress() {
         IMocksControl c = EasyMock.createControl();
         BundleContext bundleContext = c.createMock(BundleContext.class);
@@ -55,14 +54,14 @@ public class HttpServiceManagerTest extends TestCase {
         String localIp = LocalHostUtil.getLocalIp();
 
         String address1 = manager.getAbsoluteAddress(bundleContext, null, "/myservice");
-        assertEquals("http://" + localIp  + ":8181/cxf/myservice", address1);
-        
+        assertEquals("http://" + localIp + ":8181/cxf/myservice", address1);
+
         String address2 = manager.getAbsoluteAddress(bundleContext, "/mycontext", "/myservice");
-        assertEquals("http://" + localIp  + ":8181/mycontext/myservice", address2);
+        assertEquals("http://" + localIp + ":8181/mycontext/myservice", address2);
 
         c.verify();
     }
-    
+
     public void testRegisterAndUnregisterServlet() throws Exception {
         IMocksControl c = EasyMock.createControl();
         BundleContext dswContext = c.createMock(BundleContext.class);
@@ -80,25 +79,23 @@ public class HttpServiceManagerTest extends TestCase {
         ServiceReference sr = c.createMock(ServiceReference.class);
         expect(sr.getProperty(EasyMock.eq("service.id"))).andReturn(12345L).atLeastOnce();
         c.replay();
-        
-        HttpServiceManager h = new HttpServiceManager(dswContext, null, null, null) {
 
+        HttpServiceManager h = new HttpServiceManager(dswContext, null, null, null) {
             @Override
             protected HttpService getHttpService() {
                 return httpService;
             }
-            
         };
         Bus bus = h.registerServletAndGetBus("/myService", dswContext, sr);
         Assert.assertNotNull(bus);
-        
+
         ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING, sr);
         captured.getValue().serviceChanged(event);
         c.verify();
-    } 
+    }
 
     static class DummyHttpService implements HttpService {
-        
+
         private ServletConfig config;
 
         public DummyHttpService(ServletConfig config) {
@@ -117,12 +114,10 @@ public class HttpServiceManagerTest extends TestCase {
         }
 
         public void unregister(String alias) {
-
         }
 
         public HttpContext createDefaultHttpContext() {
             return EasyMock.createNiceMock(HttpContext.class);
         }
-        
     }
 }

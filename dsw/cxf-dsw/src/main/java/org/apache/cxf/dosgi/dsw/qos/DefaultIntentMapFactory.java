@@ -28,6 +28,7 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.feature.LoggingFeature;
 
 public class DefaultIntentMapFactory {
+
     public Map<String, Object> create() {
         Map<String, Object> intentMap = new HashMap<String, Object>();
         intentMap.put("logging", getLoggingFeature());
@@ -48,5 +49,4 @@ public class DefaultIntentMapFactory {
         soapBindingConfig.setVersion(soapVersion);
         return soapBindingConfig;
     }
-
 }

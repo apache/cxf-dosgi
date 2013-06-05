@@ -41,16 +41,17 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LocalDiscovery implements BundleListener {   
+public class LocalDiscovery implements BundleListener {
+
     private static final Logger LOG = LoggerFactory.getLogger(LocalDiscovery.class);
-    
+
     // this is effectively a set which allows for multiple service descriptions with the
-    // same interface name but different properties and takes care of itself with respect to concurrency 
-    ConcurrentHashMap<EndpointDescription, Bundle> endpointDescriptions = 
+    // same interface name but different properties and takes care of itself with respect to concurrency
+    ConcurrentHashMap<EndpointDescription, Bundle> endpointDescriptions =
         new ConcurrentHashMap<EndpointDescription, Bundle>();
-    Map<EndpointListener, Collection<String>> listenerToFilters = 
+    Map<EndpointListener, Collection<String>> listenerToFilters =
         new HashMap<EndpointListener, Collection<String>>();
-    Map<String, Collection<EndpointListener>> filterToListeners = 
+    Map<String, Collection<EndpointListener>> filterToListeners =
         new HashMap<String, Collection<EndpointListener>>();
     final BundleContext bundleContext;
 
@@ -58,7 +59,7 @@ public class LocalDiscovery implements BundleListener {
 
     public LocalDiscovery(BundleContext bc) {
         bundleContext = bc;
-        
+
         listenerTracker = new ServiceTracker(bundleContext, EndpointListener.class.getName(), null) {
 
             @Override
@@ -72,7 +73,7 @@ public class LocalDiscovery implements BundleListener {
             public void modifiedService(ServiceReference reference, Object service) {
                 super.modifiedService(reference, service);
                 clearTracker(service);
-                
+
                 // This may cause duplicate registrations of remote services,
                 // but that's fine and should be filtered out on another level.
                 // See Remove Service Admin spec section 122.6.3
@@ -84,20 +85,19 @@ public class LocalDiscovery implements BundleListener {
                 super.removedService(reference, service);
                 clearTracker(service);
             }
-            
         };
         listenerTracker.open();
-        
+
         bundleContext.addBundleListener(this);
         processExistingBundles();
     }
 
     private void processExistingBundles() {
-        Bundle [] bundles = bundleContext.getBundles();
+        Bundle[] bundles = bundleContext.getBundles();
         if (bundles == null) {
             return;
         }
-        
+
         for (Bundle b : bundles) {
             if (b.getState() == Bundle.ACTIVE) {
                 findDeclaredRemoteServices(b);
@@ -117,7 +117,7 @@ public class LocalDiscovery implements BundleListener {
         if (svc instanceof EndpointListener) {
             EndpointListener listener = (EndpointListener) svc;
             removeListener(listener);
-            // If the tracker was removed or the scope was changed this doesn't require 
+            // If the tracker was removed or the scope was changed this doesn't require
             // additional callbacks on the tracker. Its the responsibility of the tracker
             // itself to clean up any orphans. See Remote Service Admin spec 122.6.3
         }
@@ -125,12 +125,12 @@ public class LocalDiscovery implements BundleListener {
 
     private Collection<String> addListener(ServiceReference reference,
             EndpointListener listener) {
-        List<String> filters = 
+        List<String> filters =
             LocalDiscoveryUtils.getStringPlusProperty(reference, EndpointListener.ENDPOINT_LISTENER_SCOPE);
         if (filters.isEmpty()) {
             return filters;
         }
-        
+
         listenerToFilters.put(listener, filters);
         for (String filter : filters) {
             Collection<EndpointListener> listeners = filterToListeners.get(filter);
@@ -142,22 +142,22 @@ public class LocalDiscovery implements BundleListener {
                 filterToListeners.put(filter, list);
             }
         }
-        
+
         return filters;
     }
-    
+
     private void removeListener(EndpointListener listener) {
         Collection<String> filters = listenerToFilters.remove(listener);
         if (filters == null) {
             return;
         }
-        
+
         for (String filter : filters) {
             Collection<EndpointListener> listeners = filterToListeners.get(filter);
             if (listeners != null) {
                 listeners.remove(listener);
             }
-        }        
+        }
     }
 
     public void shutDown() {
@@ -218,37 +218,37 @@ public class LocalDiscovery implements BundleListener {
         if (!filterMatches(toMatch, ed)) {
             return;
         }
-        
+
         if (added) {
             listener.endpointAdded(ed, toMatch);
         } else {
             listener.endpointRemoved(ed, toMatch);
         }
     }
-    
+
     private void triggerCallbacks(Collection<String> filters, EndpointListener listener) {
         for (String filter : filters) {
             for (EndpointDescription ed : endpointDescriptions.keySet()) {
                 triggerCallbacks(listener, filter, ed, true);
             }
         }
-    }    
+    }
 
     private boolean filterMatches(String match, EndpointDescription ed) {
         Filter filter = createFilter(match);
         return filter != null && filter.match(new Hashtable<String, Object>(ed.getProperties()));
-    } 
-    
-    private Filter createFilter(String filterValue) {        
+    }
+
+    private Filter createFilter(String filterValue) {
         if (filterValue == null) {
             return null;
         }
-        
+
         try {
-            return bundleContext.createFilter(filterValue); 
+            return bundleContext.createFilter(filterValue);
         } catch (Exception ex) {
-            LOG.error("Problem creating a Filter from " + filterValue, ex); 
+            LOG.error("Problem creating a Filter from " + filterValue, ex);
         }
         return null;
-    }    
+    }
 }

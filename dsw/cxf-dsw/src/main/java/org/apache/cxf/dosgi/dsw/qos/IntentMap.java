@@ -25,22 +25,23 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Maps intent names to intent objects
  * An intent object can be a Feature, a BindingConfiguration or a String
- * 
- * Also supports a default intent map. Custom intents can override the defaults 
+ *
+ * Also supports a default intent map. Custom intents can override the defaults
  */
 public class IntentMap extends ConcurrentHashMap<String, Object> {
+
     private static final long serialVersionUID = 2606460607920520767L;
     private Map<String, Object> defaultMap;
-    
+
     public IntentMap() {
         this(new HashMap<String, Object>());
     }
-    
+
     public IntentMap(Map<String, Object> defaultMap) {
         this.defaultMap = defaultMap;
         putAll(defaultMap);
     }
-    
+
     @Override
     public Object put(String key, Object value) {
         Object result = super.put(key, value);
@@ -58,5 +59,4 @@ public class IntentMap extends ConcurrentHashMap<String, Object> {
         }
         return old;
     }
-    
 }

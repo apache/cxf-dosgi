@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.dsw.handlers.jaxws;
 
 public class MyJaxWsEchoServiceImpl implements MyJaxWsEchoService {
+
     @Override
     public String echo(String message) {
         return message;

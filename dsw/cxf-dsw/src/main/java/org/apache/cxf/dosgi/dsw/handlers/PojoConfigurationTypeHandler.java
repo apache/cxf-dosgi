@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
+
     private static final Logger LOG = LoggerFactory.getLogger(PojoConfigurationTypeHandler.class);
 
     public PojoConfigurationTypeHandler(BundleContext dswBC,
@@ -166,5 +167,4 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             || Constants.WS_FRONTEND_JAXWS.equals(frontEnd))
             && !Constants.WS_FRONTEND_SIMPLE.equals(frontEnd);
     }
-
 }

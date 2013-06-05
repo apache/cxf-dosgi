@@ -18,20 +18,21 @@
  */
 package org.apache.cxf.dosgi.samples.springdm;
 
-public class Restaurant {    
+public class Restaurant {
+
     private String name;
     private String address;
     private int rating;
 
     public Restaurant() {
     }
-    
+
     public Restaurant(String name, String address, int rating) {
         this.name = name;
         this.address = address;
         this.rating = rating;
     }
-    
+
     public String getAddress() {
         return address;
     }
@@ -56,4 +57,3 @@ public class Restaurant {
         this.rating = rating;
     }
 }
-

@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class ClassUtils {
+
     private static final Logger LOG = LoggerFactory.getLogger(ClassUtils.class);
 
     private ClassUtils() {
@@ -63,13 +64,13 @@ public final class ClassUtils {
 
     /**
      * <pre>
-     * 
-     * The following method tries to deal specifically with classes that might have been proxied 
+     *
+     * The following method tries to deal specifically with classes that might have been proxied
      * eg. CGLIB proxies of which there might be a chain of proxies as different osgi frameworks
      * might be proxying the original service class that has been registered and then proxying the proxy.
-     * 
+     *
      * </pre>
-     * 
+     *
      * @param serviceClass
      * @param interfaceName
      * @return
@@ -96,7 +97,6 @@ public final class ClassUtils {
 
     @SuppressWarnings("rawtypes")
     public static List<Object> loadProviderClasses(BundleContext callingContext, Map sd, String propName) {
-
         Object serviceProviders = sd.get(propName);
         if (serviceProviders != null) {
             if (serviceProviders.getClass().isArray()) {

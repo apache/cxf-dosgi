@@ -32,7 +32,7 @@
   </parent>
 
   <dependencies>
-    <dependency> 
+    <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.framework</artifactId>
       <version>${felix.version}</version>
@@ -42,13 +42,13 @@
           <artifactId>org.osgi.foundation</artifactId>
         </exclusion>
       </exclusions>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>org.apache.cxf.dosgi.samples</groupId>
       <artifactId>cxf-dosgi-ri-samples-discovery-interface</artifactId>
       <version>${project.version}</version>
     </dependency>
-  </dependencies> 
+  </dependencies>
 
   <build>
     <plugins>
@@ -64,11 +64,11 @@
             <Import-Package>
               org.apache.cxf.dosgi.samples.discovery,
               org.osgi.framework
-            </Import-Package> 
-            <Private-Package>org.apache.cxf.dosgi.samples.discovery.impl</Private-Package> 
+            </Import-Package>
+            <Private-Package>org.apache.cxf.dosgi.samples.discovery.impl</Private-Package>
           </instructions>
         </configuration>
-      </plugin> 
+      </plugin>
     </plugins>
-  </build>    
+  </build>
 </project>

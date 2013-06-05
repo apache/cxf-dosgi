@@ -37,6 +37,5 @@
       <module>local</module>
       <module>distributed</module>
     </modules>
-    
 
 </project>

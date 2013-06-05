@@ -25,12 +25,11 @@ public class CxfPublishHookTest extends Assert {
 
     @Test
     public void testDUMMY() throws Exception {
-        
     }
 
     //
     // private IMocksControl control;
-    //    
+    //
     // @Before
     // public void setUp() {
     // control = EasyMock.createNiceControl();
@@ -58,12 +57,12 @@ public class CxfPublishHookTest extends Assert {
     // "http://localhost:9002/hello"};
     // doTestPublishHook("multi-services.xml", serviceNames, addresses);
     // }
-    //    
+    //
     // @SuppressWarnings("unchecked")
     // private void doTestPublishHook(String remoteServices,
     // String[] serviceNames,
     // String[] addresses) throws Exception {
-    //        
+    //
     // Bundle bundle = control.createMock(Bundle.class);
     // bundle.findEntries(EasyMock.eq("OSGI-INF/remote-service"),
     // EasyMock.eq("*.xml"), EasyMock.anyBoolean());
@@ -79,7 +78,7 @@ public class CxfPublishHookTest extends Assert {
     // BundleContext requestingContext = control.createMock(BundleContext.class);
     // bundle.getBundleContext();
     // EasyMock.expectLastCall().andReturn(requestingContext).anyTimes();
-    //       
+    //
     // TestService serviceObject = new TestServiceImpl();
     // Dictionary serviceProps = new Hashtable();
     //
@@ -90,7 +89,7 @@ public class CxfPublishHookTest extends Assert {
     // EasyMock.expectLastCall().andReturn(serviceNames).anyTimes();
     // sref.getPropertyKeys();
     // EasyMock.expectLastCall().andReturn(new String[]{}).anyTimes();
-    //        
+    //
     // BundleTestContext dswContext = new BundleTestContext(bundle);
     //
     // ServiceRegistration[] serviceRegistrations =
@@ -104,7 +103,7 @@ public class CxfPublishHookTest extends Assert {
     // dswContext.addServiceReference(serviceNames[i], sref);
     // }
     // dswContext.registerService(serviceNames, serviceObject, serviceProps);
-    //        
+    //
     // Server server = control.createMock(Server.class);
     //
     // String publicationClass = ServicePublication.class.getName();
@@ -117,7 +116,7 @@ public class CxfPublishHookTest extends Assert {
     // control.createMock(ServiceReference.class);
     // dswContext.addServiceReference(publicationClass, publicationReference);
     // control.replay();
-    //     
+    //
     // TestPublishHook hook = new TestPublishHook(dswContext,
     // serviceObject,
     // server);
@@ -170,7 +169,7 @@ public class CxfPublishHookTest extends Assert {
     //
     // control.verify();
     // }
-    //    
+    //
     // @SuppressWarnings("unchecked")
     // @Test
     // public void testPublishMultipleTimes() {
@@ -201,11 +200,11 @@ public class CxfPublishHookTest extends Assert {
     // sref.getBundle();
     // EasyMock.expectLastCall().andReturn(bundle).anyTimes();
     // sref.getProperty(Constants.OBJECTCLASS);
-    // String [] serviceNames = {TestService.class.getName()};
+    // String[] serviceNames = {TestService.class.getName()};
     // EasyMock.expectLastCall().andReturn(serviceNames).anyTimes();
     // sref.getPropertyKeys();
     // EasyMock.expectLastCall().andReturn(new String[]{}).anyTimes();
-    //              
+    //
     // BundleTestContext dswContext = new BundleTestContext(bundle);
     // ServiceRegistration[] serviceRegistrations =
     // new ServiceRegistration[serviceNames.length];
@@ -217,7 +216,7 @@ public class CxfPublishHookTest extends Assert {
     // dswContext.addServiceReference(serviceNames[i], sref);
     // }
     // dswContext.registerService(serviceNames, serviceObject, serviceProps);
-    //        
+    //
     // final Server server = control.createMock(Server.class);
     // control.replay();
     //
@@ -235,23 +234,23 @@ public class CxfPublishHookTest extends Assert {
     // assertEquals("Precondition failed", 0, hook.getEndpoints().get(sref).size());
     // hook.publishEndpoint(sref);
     // assertEquals(0, hook.getEndpoints().get(sref).size());
-    //        
+    //
     // control.verify();
     // }
     //
     // private static class TestPublishHook extends CxfPublishHook {
-    //        
+    //
     // private boolean called;
     // private TestService serviceObject;
     // private Server server;
-    //        
+    //
     // public TestPublishHook(BundleContext bc, TestService serviceObject,
     // Server s) {
     // super(bc, null);
     // this.serviceObject = serviceObject;
     // this.server = s;
     // }
-    //        
+    //
     // @Override
     // protected ConfigurationTypeHandler getHandler(ServiceEndpointDescription sd,
     // Map<String, Object> props) {
@@ -278,14 +277,14 @@ public class CxfPublishHookTest extends Assert {
     // }
     // return server;
     // }
-    //                
+    //
     // };
     // }
-    //        
+    //
     // public void setCalled() {
     // called = true;
     // }
-    //        
+    //
     // public void verify() {
     // Assert.assertTrue(called);
     // }
@@ -293,8 +292,8 @@ public class CxfPublishHookTest extends Assert {
     //
     // public interface AdditionalInterface {
     // }
-    //    
+    //
     // private static class TestServiceImpl implements TestService, AdditionalInterface {
-    //        
+    //
     // }
 }

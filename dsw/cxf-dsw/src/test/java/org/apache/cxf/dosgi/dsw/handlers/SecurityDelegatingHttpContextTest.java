@@ -38,8 +38,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 
-
 public class SecurityDelegatingHttpContextTest extends TestCase {
+
     protected HttpContext defaultHttpContext;
     protected SecurityDelegatingHttpContext httpContext;
     protected CommitResponseFilter commitFilter;
@@ -213,6 +213,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
 }
 
 class CommitResponseFilter implements Filter {
+
     boolean called;
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -229,6 +230,7 @@ class CommitResponseFilter implements Filter {
 }
 
 class DoNothingFilter implements Filter {
+
     boolean called;
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -245,6 +247,7 @@ class DoNothingFilter implements Filter {
 }
 
 class AccessDeniedFilter implements Filter {
+
     boolean called;
 
     public void init(FilterConfig filterConfig) throws ServletException {

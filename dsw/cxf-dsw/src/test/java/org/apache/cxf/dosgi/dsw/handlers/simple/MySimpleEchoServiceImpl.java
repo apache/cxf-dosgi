@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.dsw.handlers.simple;
 
 public class MySimpleEchoServiceImpl implements MySimpleEchoService {
+
     @Override
     public String echo(String message) {
         return message;

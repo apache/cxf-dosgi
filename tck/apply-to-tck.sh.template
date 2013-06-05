@@ -1,6 +1,6 @@
 #This script pretends the current build to be the same as the version in the R5 TCK repo.
 #This puts the wrong version numbers on the files copied to the repo, so it could be improved
-#but it keeps changes to a minimum. 
+#but it keeps changes to a minimum.
 #
 #Run this script before executing the CT tests to get the CT tests to run with the current CXF DOSGi build
 

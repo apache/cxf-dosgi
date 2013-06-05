@@ -33,21 +33,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IntentManagerImpl implements IntentManager {
+
     static final Logger LOG = LoggerFactory.getLogger(IntentManagerImpl.class);
     private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
 
     private final IntentMap intentMap;
     private long maxIntentWaitTime;
-    
+
     public IntentManagerImpl(IntentMap intentMap) {
         this(intentMap, 0);
     }
-    
+
     public IntentManagerImpl(IntentMap intentMap, int maxIntentWaitTime) {
         this.intentMap = intentMap;
         this.maxIntentWaitTime = maxIntentWaitTime;
     }
-    
+
     public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory,
                                  Map<String, Object> props) throws IntentUnsatisfiedException {
         Set<String> requestedIntents = IntentUtils.getRequestedIntents(props);
@@ -66,7 +67,7 @@ public class IntentManagerImpl implements IntentManager {
         appliedIntents.addAll(addSynonymIntents(appliedIntents, intentMap));
         return appliedIntents.toArray(new String[appliedIntents.size()]);
     }
-    
+
     private boolean processIntent(List<Feature> features, AbstractEndpointFactory factory,
                                   String intentName, Object intent) throws IntentUnsatisfiedException {
         if (intent instanceof String) {
@@ -120,7 +121,7 @@ public class IntentManagerImpl implements IntentManager {
         }
         return intentsFound;
     }
-    
+
     public void assertAllIntentsSupported(Map<String, Object> serviceProperties) {
         long endTime = System.currentTimeMillis() + maxIntentWaitTime;
         Set<String> requiredIntents = IntentUtils.getRequestedIntents(serviceProperties);
@@ -144,12 +145,10 @@ public class IntentManagerImpl implements IntentManager {
                 }
             }
         } while (!unsupportedIntents.isEmpty() && System.currentTimeMillis() < endTime);
-        
+
         if (!unsupportedIntents.isEmpty()) {
             throw new RuntimeException("service cannot be exported because the following "
-                                       + "intents are not supported by this RSA: "
-                                       + unsupportedIntents);
+                                       + "intents are not supported by this RSA: " + unsupportedIntents);
         }
     }
-
 }

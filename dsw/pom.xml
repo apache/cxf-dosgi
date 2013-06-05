@@ -41,5 +41,5 @@
     <modules>
       <module>cxf-dsw</module>
       <module>cxf-topology-manager</module>
-    </modules> 
+    </modules>
 </project>

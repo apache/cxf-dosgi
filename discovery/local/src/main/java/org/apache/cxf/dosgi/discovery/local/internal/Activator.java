@@ -28,7 +28,7 @@ public class Activator implements BundleActivator {
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
 
     LocalDiscovery localDiscovery;
-    
+
     public synchronized void start(BundleContext context) {
         localDiscovery = new LocalDiscovery(context);
         LOG.info("Local D-OSGi service discovery started");

@@ -34,7 +34,7 @@
     <properties>
         <topDirectoryLocation>../../..</topDirectoryLocation>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -52,33 +52,33 @@
             <exclusions>
                 <exclusion>
                    <groupId>com.sun.jdmk</groupId>
-                   <artifactId>jmxtools</artifactId> 
+                   <artifactId>jmxtools</artifactId>
                 </exclusion>
                 <exclusion>
                    <groupId>com.sun.jmx</groupId>
-                   <artifactId>jmxri</artifactId> 
+                   <artifactId>jmxri</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <!--  We need the newer log4j as the one from zookeeper has some ugly dependencies -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>  
+        </dependency>
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
             <scope>test</scope>
-        </dependency> 
-    </dependencies> 
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -96,7 +96,7 @@
                         <Export-Package />
                     </instructions>
                 </configuration>
-            </plugin> 
+            </plugin>
         </plugins>
-    </build>    
+    </build>
 </project>

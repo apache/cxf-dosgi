@@ -36,13 +36,13 @@
         <bundle.import.package>javax.ws.rs,javax.xml.bind.annotation,*</bundle.import.package>
         <bundle.export.package>org.apache.cxf.dosgi.samples.greeter.rest</bundle.export.package>
     </properties>
-    
+
     <dependencies>
         <dependency>
            <groupId>junit</groupId>
            <artifactId>junit</artifactId>
            <scope>test</scope>
-        </dependency>  
+        </dependency>
         <dependency>
            <groupId>org.easymock</groupId>
            <artifactId>easymockclassextension</artifactId>
@@ -58,7 +58,7 @@
           <artifactId>org.apache.servicemix.specs.jaxb-api-2.1</artifactId>
           <version>${servicemix.specs.version}</version>
         </dependency>
-    </dependencies> 
+    </dependencies>
 
     <build>
       <plugins>
@@ -71,11 +71,11 @@
                         <Bundle-Description>This bundle contains the implementation of the CXF Distributed OSGi Greeter Rest Demo Interfaces</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>${bundle.import.package}</Import-Package>
-                        <Export-Package>${bundle.export.package}</Export-Package> 
+                        <Export-Package>${bundle.export.package}</Export-Package>
                     </instructions>
                 </configuration>
-            </plugin> 
+            </plugin>
          </plugins>
-    </build>    
+    </build>
 
 </project>

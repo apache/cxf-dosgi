@@ -33,6 +33,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {
+
     private ServiceTracker tracker;
     private Map<DisplayService, String> displays = new ConcurrentHashMap<DisplayService, String>();
     private ScheduledExecutorService scheduler;
@@ -40,6 +41,7 @@ public class Activator implements BundleActivator {
 
     public void start(BundleContext bc) throws Exception {
         tracker = new ServiceTracker(bc, DisplayService.class.getName(), null) {
+
             public Object addingService(ServiceReference reference) {
                 Object svc = super.addingService(reference);
                 if (svc instanceof DisplayService) {
@@ -54,10 +56,10 @@ public class Activator implements BundleActivator {
                 String value = displays.remove(service);
                 System.out.println("Removed display: " + value);
                 super.removedService(reference, service);
-            }            
-        };        
+            }
+        };
         tracker.open();
-        
+
         scheduler = Executors.newScheduledThreadPool(1);
         Runnable printer = new Runnable() {
             int counter;
@@ -72,7 +74,7 @@ public class Activator implements BundleActivator {
                         System.out.println("Could not send message to display: " + entry.getValue());
                     }
                 }
-            }            
+            }
         };
         handle = scheduler.scheduleAtFixedRate(printer, 5, 5, TimeUnit.SECONDS);
     }

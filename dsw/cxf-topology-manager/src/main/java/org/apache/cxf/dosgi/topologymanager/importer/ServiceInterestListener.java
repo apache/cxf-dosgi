@@ -23,5 +23,4 @@ public interface ServiceInterestListener {
     void addServiceInterest(String filter);
 
     void removeServiceInterest(String filter);
-
 }

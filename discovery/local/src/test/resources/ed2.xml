@@ -20,7 +20,7 @@
         <value>some.other.Service</value>
       </array>
     </property>
-    
+
     <property name="someXML" value-type="String">
       <!-- Literal XML to be parsed into the String -->
       <xml>
@@ -46,7 +46,7 @@
     <property name="Short2" value-type="Short" value="-99"/>
     <property name="char" value-type="char">@</property>
     <property name="Character2" value-type="Character" value="X"/>
-    
+
     <property name="bool-list" value-type="boolean">
       <list>
         <value>true</value>
@@ -80,7 +80,7 @@
 
     <property name="other1">
         Hello
-      <other:t1/>        
+      <other:t1/>
       <!-- the above tag is a custom extension -->
     </property>
     <property name="other2">
@@ -89,11 +89,11 @@
           <!-- A value specified as literal XML -->
           <xml>
             <other:t2/>
-          </xml>        
+          </xml>
         </value>
       </list>
       <!-- This is a custom extension -->
-      <other:t1/>                    
-    </property>    
+      <other:t1/>
+    </property>
   </endpoint-description>
 </endpoint-descriptions>

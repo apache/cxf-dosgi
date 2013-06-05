@@ -44,17 +44,15 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 public class EndpointListenerImplTest extends TestCase {
 
     public void testEndpointRemovalAdding() throws KeeperException, InterruptedException {
-
         IMocksControl c = EasyMock.createNiceControl();
 
         BundleContext ctx = c.createMock(BundleContext.class);
         ZooKeeper zk = c.createMock(ZooKeeper.class);
 
         String path = "/osgi/service_registry/myClass/google.de#80##test";
-        EasyMock.expect(
-                        zk.create(EasyMock.eq(path),
-                                  (byte[])EasyMock.anyObject(), EasyMock.eq(Ids.OPEN_ACL_UNSAFE), EasyMock
-                                      .eq(CreateMode.EPHEMERAL))).andReturn("").once();
+        EasyMock.expect(zk.create(EasyMock.eq(path),
+                (byte[])EasyMock.anyObject(), EasyMock.eq(Ids.OPEN_ACL_UNSAFE),
+                EasyMock.eq(CreateMode.EPHEMERAL))).andReturn("").once();
 
         zk.delete(EasyMock.eq("/osgi/service_registry/myClass/google.de#80##test"), EasyMock.eq(-1));
         EasyMock.expectLastCall().once();
@@ -73,13 +71,12 @@ public class EndpointListenerImplTest extends TestCase {
         EndpointDescription ed = new EndpointDescription(props);
 
         eli.endpointAdded(ed, null);
-        eli.endpointAdded(ed, null);  // should do nothing
+        eli.endpointAdded(ed, null); // should do nothing
 
         eli.endpointRemoved(ed, null);
         eli.endpointRemoved(ed, null); // should do nothing
 
         c.verify();
-
     }
 
     public void testDiscoveryPlugin() throws Exception {
@@ -110,8 +107,8 @@ public class EndpointListenerImplTest extends TestCase {
                 EasyMock.eq("(objectClass=org.apache.cxf.dosgi.discovery.zookeeper.DiscoveryPlugin)"));
         EasyMock.expect(ctx.getService(sr1)).andReturn(plugin1).anyTimes();
         EasyMock.expect(ctx.getService(sr2)).andReturn(plugin2).anyTimes();
-        EasyMock.expect(ctx.getServiceReferences(DiscoveryPlugin.class.getName(), null)).andReturn(
-                new ServiceReference[] {sr1, sr2}).anyTimes();
+        EasyMock.expect(ctx.getServiceReferences(DiscoveryPlugin.class.getName(), null))
+                .andReturn(new ServiceReference[]{sr1, sr2}).anyTimes();
         EasyMock.replay(ctx);
 
         Map<String, Object> props = new HashMap<String, Object>();
@@ -144,7 +141,6 @@ public class EndpointListenerImplTest extends TestCase {
         EasyMock.verify(zk);
     }
 
-
     @SuppressWarnings("unchecked")
     private List<EndpointDescription> getEndpointsList(PublishingEndpointListener eli) throws Exception {
         Field field = eli.getClass().getDeclaredField("endpoints");
@@ -153,17 +149,15 @@ public class EndpointListenerImplTest extends TestCase {
     }
 
     public void testClose() throws KeeperException, InterruptedException {
-
         IMocksControl c = EasyMock.createNiceControl();
 
         BundleContext ctx = c.createMock(BundleContext.class);
         ZooKeeper zk = c.createMock(ZooKeeper.class);
 
         String path = "/osgi/service_registry/myClass/google.de#80##test";
-        EasyMock.expect(
-                        zk.create(EasyMock.eq(path),
-                                  (byte[])EasyMock.anyObject(), EasyMock.eq(Ids.OPEN_ACL_UNSAFE), EasyMock
-                                      .eq(CreateMode.EPHEMERAL))).andReturn("").once();
+        EasyMock.expect(zk.create(EasyMock.eq(path),
+                (byte[])EasyMock.anyObject(), EasyMock.eq(Ids.OPEN_ACL_UNSAFE),
+                EasyMock.eq(CreateMode.EPHEMERAL))).andReturn("").once();
 
         zk.delete(EasyMock.eq("/osgi/service_registry/myClass/google.de#80##test"), EasyMock.eq(-1));
         EasyMock.expectLastCall().once();
@@ -186,13 +180,10 @@ public class EndpointListenerImplTest extends TestCase {
         eli.close(); // should result in zk.delete(...)
 
         c.verify();
-
     }
-
 
     public void testGetKey() throws Exception {
         assertEquals("somehost#9090##org#example#TestEndpoint",
             PublishingEndpointListener.getKey("http://somehost:9090/org/example/TestEndpoint"));
     }
-
 }

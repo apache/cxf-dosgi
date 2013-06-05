@@ -32,18 +32,18 @@
   </parent>
 
   <dependencies>
-    <dependency> 
+    <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.framework</artifactId>
       <version>${felix.version}</version>
       <scope>provided</scope>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>org.apache.cxf.dosgi.samples</groupId>
       <artifactId>cxf-dosgi-ri-samples-ds-interface</artifactId>
       <version>${project.version}</version>
     </dependency>
-  </dependencies> 
+  </dependencies>
 
   <build>
     <plugins>
@@ -56,12 +56,12 @@
             <Bundle-Description>This bundle contains the client-side implementation of the Distributed OSGi with Declarative Services sample.</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Activator>org.apache.cxf.dosgi.samples.ds.consumer.Activator</Bundle-Activator>
-            <Import-Package>*</Import-Package> 
-            <Private-Package>org.apache.cxf.dosgi.samples.ds.consumer</Private-Package> 
+            <Import-Package>*</Import-Package>
+            <Private-Package>org.apache.cxf.dosgi.samples.ds.consumer</Private-Package>
             <Service-Component>OSGI-INF/component.xml</Service-Component>
           </instructions>
         </configuration>
-      </plugin> 
+      </plugin>
     </plugins>
-  </build>    
+  </build>
 </project>

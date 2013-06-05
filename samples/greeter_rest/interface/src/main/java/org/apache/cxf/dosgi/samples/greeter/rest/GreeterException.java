@@ -19,25 +19,25 @@
 package org.apache.cxf.dosgi.samples.greeter.rest;
 
 public class GreeterException extends Exception {
-    
+
     private static final long serialVersionUID = 1L;
     private String name;
-    
+
     public GreeterException() {
     }
-    
+
     public GreeterException(String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String theName) {
         name = theName;
     }
-    
+
     @Override
     public String toString() {
         return "GreeterService can not greet " + name;

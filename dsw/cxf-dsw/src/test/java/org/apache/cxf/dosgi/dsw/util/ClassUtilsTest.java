@@ -34,7 +34,7 @@ public class ClassUtilsTest extends TestCase {
         assertEquals(List.class, ClassUtils.getInterfaceClass(new ArrayList<String>(), "java.util.List"));
         assertEquals(Collection.class, ClassUtils.getInterfaceClass(new ArrayList<String>(), "java.util.Collection"));
     }
-    
+
     public void testGetInterfaceClassFromSubclass() {
         assertEquals(Map.class, ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.Map"));
         assertNull(ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.UnknownType"));

@@ -32,7 +32,7 @@
   </parent>
 
   <dependencies>
-    <dependency> 
+    <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.framework</artifactId>
       <version>${felix.version}</version>
@@ -42,13 +42,13 @@
           <artifactId>org.osgi.foundation</artifactId>
         </exclusion>
       </exclusions>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>org.apache.cxf.dosgi.samples</groupId>
       <artifactId>cxf-dosgi-ri-samples-discovery-interface</artifactId>
       <version>${project.version}</version>
     </dependency>
-  </dependencies> 
+  </dependencies>
 
   <build>
     <plugins>
@@ -62,14 +62,14 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Activator>org.apache.cxf.dosgi.samples.discovery.consumer.Activator</Bundle-Activator>
             <Import-Package>
-              org.apache.cxf.dosgi.samples.discovery, 
-              org.osgi.framework, 
+              org.apache.cxf.dosgi.samples.discovery,
+              org.osgi.framework,
               org.osgi.util.tracker
-            </Import-Package> 
-            <Private-Package>org.apache.cxf.dosgi.samples.discovery.consumer</Private-Package> 
+            </Import-Package>
+            <Private-Package>org.apache.cxf.dosgi.samples.discovery.consumer</Private-Package>
           </instructions>
         </configuration>
-      </plugin> 
+      </plugin>
     </plugins>
-  </build>    
+  </build>
 </project>

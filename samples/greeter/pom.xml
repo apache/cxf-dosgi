@@ -30,13 +30,13 @@
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-parent</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <relativePath>../../parent/pom.xml</relativePath> 
+      <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
-    <modules>    
+    <modules>
       <module>interface</module>
       <module>impl</module>
       <module>client</module>
-    </modules> 
+    </modules>
 
 </project>

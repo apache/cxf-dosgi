@@ -36,6 +36,7 @@ import org.osgi.framework.ServiceReference;
 import static org.easymock.EasyMock.expect;
 
 public class IntentTrackerTest {
+
     private static final String MY_INTENT_NAME = "myIntent";
 
     @Test
@@ -48,7 +49,7 @@ public class IntentTrackerTest {
         final Capture<ServiceListener> capturedListener = new Capture<ServiceListener>();
         bc.addServiceListener(EasyMock.capture(capturedListener), EasyMock.<String>anyObject());
         EasyMock.expectLastCall().atLeastOnce();
-        expect(bc.getServiceReferences(EasyMock.<String>anyObject(), 
+        expect(bc.getServiceReferences(EasyMock.<String>anyObject(),
                                        EasyMock.<String>anyObject())).andReturn(new ServiceReference[]{});
         IntentMap intentMap = new IntentMap();
 
@@ -63,19 +64,18 @@ public class IntentTrackerTest {
 
         IntentTracker tracker = new IntentTracker(bc, intentMap);
         tracker.open();
-        
+
         Assert.assertFalse("IntentMap should not contain " + MY_INTENT_NAME, intentMap.containsKey(MY_INTENT_NAME));
         ServiceListener listener = capturedListener.getValue();
-        
+
         // Simulate adding custom intent service
         ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, reference);
         listener.serviceChanged(event);
-        
+
         // our custom intent should now be available
         Assert.assertTrue("IntentMap should contain " + MY_INTENT_NAME, intentMap.containsKey(MY_INTENT_NAME));
         Assert.assertEquals(testIntent, intentMap.get(MY_INTENT_NAME));
-        
+
         c.verify();
-        
     }
 }

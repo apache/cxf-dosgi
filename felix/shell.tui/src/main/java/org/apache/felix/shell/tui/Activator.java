@@ -33,6 +33,7 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
 public class Activator implements BundleActivator {
+
     private static final String RUN_CMD = "run ";
 
     private BundleContext context;
@@ -56,7 +57,6 @@ public class Activator implements BundleActivator {
                         initializeService();
                     } else if (event.getType() == ServiceEvent.UNREGISTERING
                         && event.getServiceReference().equals(shellRef)) {
-                        
                         // Unget the service if it is unregistering.
                         context.ungetService(shellRef);
                         shellRef = null;
@@ -69,8 +69,7 @@ public class Activator implements BundleActivator {
         };
         try {
             context.addServiceListener(sl,
-                                         "(objectClass="
-                                             + org.apache.felix.shell.ShellService.class.getName() + ")");
+                    "(objectClass=" + org.apache.felix.shell.ShellService.class.getName() + ")");
         } catch (InvalidSyntaxException ex) {
             System.err.println("ShellTui: Cannot add service listener.");
             System.err.println("ShellTui: " + ex);
@@ -105,6 +104,7 @@ public class Activator implements BundleActivator {
     }
 
     private class ShellTuiRunnable implements Runnable {
+
         private boolean stop;
 
         public void stop() {
@@ -163,7 +163,6 @@ public class Activator implements BundleActivator {
                         } else {
                             shell.executeCommand(line, System.out, System.err);
                         }
-
                     } catch (Exception ex) {
                         System.err.println("ShellTui: " + ex);
                         ex.printStackTrace();

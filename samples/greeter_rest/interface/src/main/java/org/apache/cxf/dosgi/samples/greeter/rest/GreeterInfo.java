@@ -24,15 +24,14 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class GreeterInfo {
+
     private List<GreetingPhrase> greetings = new ArrayList<GreetingPhrase>();
-    
+
     public void setGreetings(List<GreetingPhrase> list) {
         greetings = list;
     }
-    
+
     public List<GreetingPhrase> getGreetings() {
         return greetings;
     }
-    
-    
 }

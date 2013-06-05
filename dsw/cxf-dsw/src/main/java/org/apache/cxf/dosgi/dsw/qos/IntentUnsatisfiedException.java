@@ -19,15 +19,16 @@
 package org.apache.cxf.dosgi.dsw.qos;
 
 public class IntentUnsatisfiedException extends RuntimeException {
+
     private static final long serialVersionUID = 1L;
-    
+
     private String intent;
-    
+
     public IntentUnsatisfiedException(String theIntent) {
         super(theIntent);
         intent = theIntent;
     }
-    
+
     public String getIntent() {
         return intent;
     }

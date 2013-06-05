@@ -35,6 +35,7 @@ import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
 public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
+
     private BundleContext bctx;
     private RemoteServiceAdminCore rsaCore;
 
@@ -48,7 +49,6 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List /* ExportRegistration */exportService(final ServiceReference ref, final Map properties)
         throws IllegalArgumentException, UnsupportedOperationException {
-
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             EndpointPermission epp = new EndpointPermission("*", EndpointPermission.EXPORT);
@@ -60,7 +60,6 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
                 if (closed) {
                     return Collections.emptyList();
                 }
-
                 return rsaCore.exportService(ref, properties);
             }
         });
@@ -68,7 +67,6 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Collection getExportedServices() {
-
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
         if (sm != null) {
@@ -83,7 +81,6 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Collection getImportedEndpoints() {
-
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
         if (sm != null) {
@@ -97,9 +94,7 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
     }
 
     public ImportRegistration importService(EndpointDescription endpoint) {
-
         final EndpointDescription epd = endpoint;
-
         SecurityManager sm = System.getSecurityManager();
         EndpointPermission epp = new EndpointPermission(epd, OsgiUtils.getUUID(bctx),
                                                         EndpointPermission.IMPORT);
@@ -109,11 +104,9 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
         return AccessController.doPrivileged(new PrivilegedAction<ImportRegistration>() {
             public ImportRegistration run() {
-
                 if (closed) {
                     return null;
                 }
-
                 return rsaCore.importService(epd);
             }
         });
@@ -121,7 +114,6 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
     public void close() {
         closed = true;
-
         rsaCore.removeExportRegistrations(bctx.getBundle());
     }
 }

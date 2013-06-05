@@ -19,5 +19,5 @@
 package org.apache.cxf.dosgi.systests2.common.test2;
 
 public interface Test2Service {
-    String getRemoteStackTrace();    
+    String getRemoteStackTrace();
 }

@@ -40,8 +40,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class GreeterDialog extends JDialog {
+
     private static final long serialVersionUID = 1L;
-    
+
     JTextField name1field;
     JTextField name2field;
     JTextField ageTextField;
@@ -50,16 +51,16 @@ public class GreeterDialog extends JDialog {
 
     public GreeterDialog() {
         super((Frame) null, "Invoke Remote Greeter Service", true);
-        
+
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));     
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         setContentPane(panel);
 
         final JRadioButton rb1 = new JRadioButton("invoke: Map<GreetingPhrase, String> greetMe(String name);");
         rb1.setSelected(true);
-        rb1.setAlignmentX(Component.LEFT_ALIGNMENT);        
+        rb1.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(rb1);
-        
+
         final JPanel simplePanel = createFirstOptionPanel();
         rb1.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -68,60 +69,58 @@ public class GreeterDialog extends JDialog {
         });
         panel.add(simplePanel);
         panel.add(new JLabel(" ")); // add a spacer
-        
-        final JRadioButton rb2 
-            = new JRadioButton("invoke: GreetingPhrase [] greetMe(GreeterData data) throws GreeterException;");
+
+        final JRadioButton rb2
+            = new JRadioButton("invoke: GreetingPhrase[] greetMe(GreeterData data) throws GreeterException;");
         rb2.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(rb2);
-        
 
         final JPanel complexPanel = createSecondOptionPanel();
 
-        rb2.addChangeListener(new ChangeListener() {            
+        rb2.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 enablePanel(complexPanel, rb2.isSelected());
             }
-        });            
-        
+        });
+
         panel.add(complexPanel);
         enablePanel(complexPanel, false);
-        
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));        
+
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttons.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         JButton b1 = new JButton("Invoke");
         buttons.add(b1);
-        
-        b1.addActionListener(new ActionListener() {            
+
+        b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (rb1.isSelected()) {
                     selection = name1field.getText();
                 } else {
                     selection = new GreeterDataImpl(name2field.getText(),
-                                                    new Integer(ageTextField.getText()), 
+                                                    new Integer(ageTextField.getText()),
                                                     throwExCB.isSelected());
-                }                
-                
+                }
+
                 setVisible(false);
             }
         });
-        
+
         panel.add(buttons);
-        
+
         ButtonGroup bg = new ButtonGroup();
         bg.add(rb1);
         bg.add(rb2);
-        
+
         pack();
         setLocationRelativeTo(null); // centers frame on screen
     }
-    
+
     private JPanel createFirstOptionPanel() {
         final JPanel simplePanel = new JPanel(new GridBagLayout());
         simplePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         GridBagConstraints c1 = new GridBagConstraints();
-        
-        
+
         JLabel lb1 = new JLabel("Name: ");
         c1.weightx = 0.0;
         c1.gridx = 0;
@@ -129,7 +128,7 @@ public class GreeterDialog extends JDialog {
         c1.insets = new Insets(0, 25, 0, 0);
         c1.anchor = GridBagConstraints.LINE_START;
         simplePanel.add(lb1, c1);
-        
+
         name1field = new JTextField(20);
         c1.weightx = 0.2;
         c1.gridx = 1;
@@ -143,7 +142,7 @@ public class GreeterDialog extends JDialog {
         final JPanel complexPanel = new JPanel(new GridBagLayout());
         complexPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         GridBagConstraints c2 = new GridBagConstraints();
-       
+
         JLabel lb2 = new JLabel("Name: ");
         c2.weightx = 0.0;
         c2.gridx = 0;
@@ -151,15 +150,15 @@ public class GreeterDialog extends JDialog {
         c2.insets = new Insets(0, 25, 0, 0);
         c2.anchor = GridBagConstraints.LINE_START;
         complexPanel.add(lb2, c2);
-        
+
         name2field = new JTextField(20);
         c2.weightx = 0.2;
         c2.gridx = 1;
         c2.gridy = 0;
         c2.insets = new Insets(0, 10, 0, 0);
         c2.anchor = GridBagConstraints.LINE_START;
-        complexPanel.add(name2field, c2);        
-                
+        complexPanel.add(name2field, c2);
+
         JLabel lb3 = new JLabel("Age: ");
         c2.weightx = 0.0;
         c2.gridx = 0;
@@ -167,7 +166,7 @@ public class GreeterDialog extends JDialog {
         c2.insets = new Insets(0, 25, 0, 0);
         c2.anchor = GridBagConstraints.LINE_START;
         complexPanel.add(lb3, c2);
-        
+
         ageTextField = new JTextField(7);
         c2.weightx = 0.2;
         c2.gridx = 1;
@@ -175,7 +174,7 @@ public class GreeterDialog extends JDialog {
         c2.insets = new Insets(0, 10, 0, 0);
         c2.anchor = GridBagConstraints.LINE_START;
         complexPanel.add(ageTextField, c2);
-        
+
         throwExCB = new JCheckBox("Throw Exception");
         c2.weightx = 0.0;
         c2.gridx = 0;
@@ -185,12 +184,12 @@ public class GreeterDialog extends JDialog {
         c2.anchor = GridBagConstraints.LINE_START;
         complexPanel.add(throwExCB, c2);
         return complexPanel;
-    }    
-    
+    }
+
     public Object getSelection() {
         return selection;
     }
-    
+
     private static void enablePanel(JPanel panel, boolean b) {
         for (Component c : panel.getComponents()) {
             c.setEnabled(b);

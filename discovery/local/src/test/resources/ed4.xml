@@ -41,4 +41,3 @@
     <property name="service.imported.configs" value="org.apache.cxf.ws"/>
   </endpoint-description>
 </endpoint-descriptions>
-  

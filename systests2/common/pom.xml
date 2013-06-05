@@ -74,7 +74,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>provided</scope>
-        </dependency> 
+        </dependency>
     </dependencies>
 
     <build>
@@ -99,8 +99,7 @@
                         <Export-Package>*</Export-Package>
                     </instructions>
                 </configuration>
-            </plugin> 
+            </plugin>
         </plugins>
     </build>
 </project>
-

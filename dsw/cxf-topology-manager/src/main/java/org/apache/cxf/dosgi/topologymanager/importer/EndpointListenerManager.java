@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class EndpointListenerManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerManager.class);
-    
+
     private final BundleContext bctx;
     private volatile ServiceRegistration serviceRegistration;
     private final List<String> filters = new ArrayList<String>();
@@ -50,7 +50,7 @@ public class EndpointListenerManager {
         serviceRegistration = bctx.registerService(EndpointListener.class.getName(), endpointListener,
                                                    getRegistrationProperties());
     }
-    
+
     public void stop() {
         if (serviceRegistration != null) {
             serviceRegistration.unregister();
@@ -95,5 +95,4 @@ public class EndpointListenerManager {
             serviceRegistration.setProperties(getRegistrationProperties());
         }
     }
-
 }

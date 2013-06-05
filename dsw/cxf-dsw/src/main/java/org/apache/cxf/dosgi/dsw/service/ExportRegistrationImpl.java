@@ -73,7 +73,6 @@ public class ExportRegistrationImpl implements ExportRegistration {
         ++instanceCount;
     }
 
-
     public synchronized void close() {
         if (closed) {
             return;
@@ -134,8 +133,8 @@ public class ExportRegistrationImpl implements ExportRegistration {
             Set<Map.Entry<String, Object>> props = endpointDescription.getProperties().entrySet();
             for (Map.Entry<String, Object> entry : props) {
                 Object value = entry.getValue();
-                r += entry.getKey() + "  => "
-                    + (value instanceof Object[] ? Arrays.toString((Object []) value) : value) + "\n";
+                r += entry.getKey() + " => "
+                    + (value instanceof Object[] ? Arrays.toString((Object[]) value) : value) + "\n";
             }
         }
         return r;
@@ -162,7 +161,6 @@ public class ExportRegistrationImpl implements ExportRegistration {
      * is exported by this exportRegistration
      * */
     public void startServiceTracker(BundleContext bctx) {
-
         // only the parent should do this
         if (parent != this) {
             parent.startServiceTracker(bctx);

@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * resource.
  */
 public class SampleSecurityFilter implements Filter {
+
     private static final Logger LOG = LoggerFactory.getLogger(SampleSecurityFilter.class);
 
     public void destroy() {

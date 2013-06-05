@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConfigTypeHandlerFactory {
+
     protected static final String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
     private static final Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
 
@@ -79,9 +80,7 @@ public class ConfigTypeHandlerFactory {
         if (configurationTypes.contains(Constants.WS_CONFIG_TYPE)
             || configurationTypes.contains(Constants.WS_CONFIG_TYPE_OLD)
             || configurationTypes.contains(Constants.RS_CONFIG_TYPE)) {
-
             boolean jaxrs = isJaxrsRequested(configurationTypes, serviceProperties);
-
             return jaxrs ? jaxRsPojoConfigurationTypeHandler : pojoConfigurationTypeHandler;
         } else if (configurationTypes.contains(Constants.WSDL_CONFIG_TYPE)) {
             return wsdlConfigurationTypeHandler;
@@ -89,14 +88,13 @@ public class ConfigTypeHandlerFactory {
         throw new RuntimeException("None of the configuration types in " + configurationTypes + " is supported.");
     }
 
-    private boolean isJaxrsRequested(Collection<String> types,  Map<String, Object> serviceProperties) {
-
+    private boolean isJaxrsRequested(Collection<String> types, Map<String, Object> serviceProperties) {
         if (types == null) {
             return false;
         }
 
         if (types.contains(Constants.RS_CONFIG_TYPE)) {
-            Collection<String> intentsProperty 
+            Collection<String> intentsProperty
                 = OsgiUtils.getMultiValueProperty(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
             boolean hasHttpIntent = false;
             boolean hasSoapIntent = false;
@@ -159,10 +157,8 @@ public class ConfigTypeHandlerFactory {
 
         if (usableConfigurationTypes.isEmpty()) {
             throw new RuntimeException("The supplied endpoint has no compatible configuration type. "
-                                       + "Supported types are: "
-                                       + supportedConfigurationTypes
-                                       + "    Types needed by the endpoint: "
-                                       + remoteConfigurationTypes);
+                    + "Supported types are: " + supportedConfigurationTypes
+                    + "    Types needed by the endpoint: " + remoteConfigurationTypes);
         }
         return usableConfigurationTypes;
     }
@@ -170,5 +166,4 @@ public class ConfigTypeHandlerFactory {
     public List<String> getSupportedConfigurationTypes() {
         return supportedConfigurationTypes;
     }
-
 }

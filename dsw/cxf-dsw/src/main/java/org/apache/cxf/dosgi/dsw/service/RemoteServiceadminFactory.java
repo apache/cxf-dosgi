@@ -53,5 +53,4 @@ public class RemoteServiceadminFactory implements ServiceFactory {
             rsaServiceInstances.remove(rsai);
         }
     }
-
 }

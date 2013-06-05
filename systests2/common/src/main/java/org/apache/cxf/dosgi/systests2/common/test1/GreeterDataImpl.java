@@ -36,5 +36,4 @@ public class GreeterDataImpl implements GreeterData {
         // TODO Auto-generated method stub
         return false;
     }
-
 }

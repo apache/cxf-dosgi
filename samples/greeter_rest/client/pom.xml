@@ -33,17 +33,17 @@
     </parent>
 
     <properties>
-        <bundle.import.package>javax.ws.rs.*,*</bundle.import.package>                
+        <bundle.import.package>javax.ws.rs.*,*</bundle.import.package>
         <bundle.private.package>org.apache.cxf.dosgi.samples.greeter.client.rest</bundle.private.package>
     </properties>
-    
+
     <dependencies>
-        <dependency> 
+        <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
             <artifactId>cxf-dosgi-ri-samples-greeter-rest-interface</artifactId>
             <version>${project.version}</version>
-        </dependency> 
-        <dependency> 
+        </dependency>
+        <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
             <version>${felix.version}</version>
@@ -53,8 +53,8 @@
                     <artifactId>org.osgi.foundation</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency> 
-    </dependencies> 
+        </dependency>
+    </dependencies>
 
     <build>
       <plugins>
@@ -68,12 +68,12 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.apache.cxf.dosgi.samples.greeter.client.rest.Activator</Bundle-Activator>
                         <Import-Package>${bundle.import.package}</Import-Package>
-                        <Private-Package>${bundle.private.package}</Private-Package> 
+                        <Private-Package>${bundle.private.package}</Private-Package>
                         <DynamicImport-Package>org.apache.cxf.dosgi.dsw.qos,org.apache.cxf</DynamicImport-Package>
                     </instructions>
                 </configuration>
-            </plugin> 
+            </plugin>
          </plugins>
-    </build>    
+    </build>
 
 </project>

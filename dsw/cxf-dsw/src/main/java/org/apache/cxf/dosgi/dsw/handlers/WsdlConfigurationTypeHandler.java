@@ -40,30 +40,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
+
     private static final Logger LOG = LoggerFactory.getLogger(WsdlConfigurationTypeHandler.class);
-    
+
     public WsdlConfigurationTypeHandler(BundleContext dswBC,
                                         IntentManager intentManager,
                                         HttpServiceManager httpServiceManager) {
         super(dswBC, intentManager, httpServiceManager);
     }
-    
+
     public String[] getSupportedTypes() {
         return new String[] {Constants.WSDL_CONFIG_TYPE};
     }
-    
+
     public Object createProxy(ServiceReference serviceReference,
                               BundleContext dswContext,
                               BundleContext callingContext,
-                              Class<?> iClass, 
+                              Class<?> iClass,
                               EndpointDescription sd) {
-        
         String wsdlAddressProp = getWsdlAddress(sd, iClass);
         if (wsdlAddressProp == null) {
             LOG.warn("WSDL address is unavailable");
             return null;
         }
-        
+
         URL wsdlAddress;
         try {
             wsdlAddress = new URL(wsdlAddressProp);
@@ -71,14 +71,13 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             LOG.warn("WSDL address is malformed");
             return null;
         }
-        
+
         LOG.info("Creating a " + sd.getInterfaces().toArray()[0] + " client, wsdl address is "
                  + OsgiUtils.getProperty(sd, Constants.WSDL_CONFIG_PREFIX));
-        
+
         String serviceNs = OsgiUtils.getProperty(sd, Constants.WSDL_SERVICE_NAMESPACE);
         if (serviceNs == null) {
-            serviceNs = PackageUtils.getNamespace(
-                            PackageUtils.getPackageName(iClass));
+            serviceNs = PackageUtils.getNamespace(PackageUtils.getPackageName(iClass));
         }
         String serviceName = OsgiUtils.getProperty(sd, Constants.WSDL_SERVICE_NAME);
         if (serviceName == null) {
@@ -89,11 +88,10 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
                                              Constants.WSDL_SERVICE_NAME);
         QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd.getProperties(), Constants.WSDL_PORT_NAME);
         Service service = createWebService(wsdlAddress, serviceQname);
-        Object proxy = getProxy(portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass), 
+        Object proxy = getProxy(portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass),
                                 iClass);
         // MARC: FIXME!!!! getDistributionProvider().addRemoteService(serviceReference);
         return proxy;
-        
     }
 
     // Isolated so that it can be overridden for test purposes.
@@ -104,10 +102,9 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     public ExportResult createServer(ServiceReference sref,
                                BundleContext dswContext,
                                BundleContext callingContext,
-                               Map<String, Object> sd, 
-                               Class<?> iClass, 
+                               Map<String, Object> sd,
+                               Class<?> iClass,
                                Object serviceBean) {
-        
         String location = OsgiUtils.getProperty(sd, Constants.WSDL_LOCATION);
         if (location == null) {
             throw new RuntimeException("WSDL location property is unavailable");
@@ -116,7 +113,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         if (wsdlURL == null) {
             throw new RuntimeException("WSDL resource at " + location + " is unavailable");
         }
-        
+
         String address = getServerAddress(sd, iClass);
         String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
         if (address == null && contextRoot == null) {
@@ -137,28 +134,26 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         factory.setServiceBean(serviceBean);
 
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
-        
+
         setWsdlProperties(factory, callingContext, sd, true);
-        
+
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
 
         // The properties for the EndpointDescription
         Map<String, Object> endpointProps = createEndpointProps(sd, iClass,
-                                                                new String[]{Constants.WS_CONFIG_TYPE}, 
+                                                                new String[]{Constants.WS_CONFIG_TYPE},
                                                                 address, intents);
-
         return createServerFromFactory(factory, endpointProps);
     }
-    
+
     private String getWsdlAddress(EndpointDescription sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, Constants.WSDL_CONFIG_PREFIX);
         if (address == null) {
             address = httpServiceManager.getDefaultAddress(iClass);
             if (address != null) {
-                address += "?wsdl";    
+                address += "?wsdl";
             }
         }
         return address;
     }
-
 }

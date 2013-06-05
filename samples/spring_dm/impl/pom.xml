@@ -38,7 +38,7 @@
       <artifactId>cxf-dosgi-ri-samples-spring-dm-interface</artifactId>
       <version>${project.version}</version>
     </dependency>
-  </dependencies> 
+  </dependencies>
 
   <build>
     <plugins>
@@ -50,11 +50,11 @@
             <Bundle-Name>CXF Distributed OSGi Spring-DM Sample Implementation Bundle</Bundle-Name>
             <Bundle-Description>This bundle contains the server-side implementation of the Distributed OSGi with Spring-DM sample.</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>org.apache.cxf.dosgi.samples.springdm</Import-Package> 
-            <Private-Package>org.apache.cxf.dosgi.samples.springdm.impl</Private-Package> 
+            <Import-Package>org.apache.cxf.dosgi.samples.springdm</Import-Package>
+            <Private-Package>org.apache.cxf.dosgi.samples.springdm.impl</Private-Package>
           </instructions>
         </configuration>
-      </plugin> 
+      </plugin>
     </plugins>
-  </build>    
+  </build>
 </project>

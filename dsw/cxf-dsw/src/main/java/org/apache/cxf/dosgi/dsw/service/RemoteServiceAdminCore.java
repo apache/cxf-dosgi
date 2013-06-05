@@ -78,7 +78,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<ExportRegistration> exportService(ServiceReference serviceReference, Map additionalProperties)
         throws IllegalArgumentException, UnsupportedOperationException {
-
         Map<String, Object> serviceProperties = getProperties(serviceReference);
         if (additionalProperties != null) {
             OsgiUtils.overlayProperties(serviceProperties, additionalProperties);
@@ -280,7 +279,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         return copy;
     }
 
-
     private boolean isCreatedByThisRSA(ServiceReference sref) {
         return (sref.getBundle() != null) && sref.getBundle().equals(bctx.getBundle());
     }
@@ -313,7 +311,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
      * Importing form here...
      */
     public ImportRegistration importService(EndpointDescription endpoint) {
-
         LOG.debug("importService() Endpoint: {}", endpoint.getProperties());
 
         synchronized (importedServices) {
@@ -363,7 +360,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
                                             ConfigurationTypeHandler handler, BundleContext requestingContext) {
-
         try {
             // MARC: relies on dynamic imports?
             Class<?> iClass = bctx.getBundle().loadClass(interfaceName);
@@ -376,7 +372,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             if (actualClass != iClass) {
                 LOG.info("Class " + interfaceName + " loaded by DSW's bundle context is not "
                              + "equal to the one loaded by the requesting bundle context, "
-                             + "DSW will use the requesting bundle context to register " + "a proxy service");
+                             + "DSW will use the requesting bundle context to register a proxy service");
                 iClass = actualClass;
                 actualContext = requestingContext;
             }

@@ -203,13 +203,13 @@
 
 
 The Apache CXF Distributed OSGi DSW Reference Implementation
-includes a number of components and libraries with separate 
-copyright notices and license terms. Your use of those components are 
-subject to the terms and conditions of the following licenses. 
+includes a number of components and libraries with separate
+copyright notices and license terms. Your use of those components are
+subject to the terms and conditions of the following licenses.
 
 
 AOP alliance (http://aopalliance.sourceforge.net) aopalliance:aopalliance:jar:1.0
-    License: Public Domain 
+    License: Public Domain
 
 Unnamed - asm:asm:jar:2.2.3 (http://asm.objectweb.org/asm/asm) asm:asm:jar:2.2.3:compile
     License: BSD  (http://asm.objectweb.org/license.html)

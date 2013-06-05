@@ -29,18 +29,19 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 public class ServiceInvocationHandlerTest extends TestCase {
+
     private static final Map<String, Method> OBJECT_METHODS = new HashMap<String, Method>(); {
         for (Method m : Object.class.getMethods()) {
             OBJECT_METHODS.put(m.getName(), m);
         }
     }
-    
+
     public void testInvoke() throws Throwable {
         ServiceInvocationHandler sih = new ServiceInvocationHandler("hello", String.class);
-        Method m = String.class.getMethod("length", new Class [] {});
-        assertEquals(5, sih.invoke(null, m, new Object [] {}));
+        Method m = String.class.getMethod("length", new Class[] {});
+        assertEquals(5, sih.invoke(null, m, new Object[] {}));
     }
-    
+
     public void testInvokeObjectMethod() throws Throwable {
         final List<String> called = new ArrayList<String>();
         ServiceInvocationHandler sih = new ServiceInvocationHandler("hi", String.class) {
@@ -57,18 +58,18 @@ public class ServiceInvocationHandlerTest extends TestCase {
             public String toString() {
                 called.add("toString");
                 return "somestring";
-            }            
+            }
         };
 
         Object proxy = Proxy.newProxyInstance(
-                getClass().getClassLoader(), new Class [] {Runnable.class}, sih);                
-        
-        assertEquals(true, 
-                sih.invoke(null, OBJECT_METHODS.get("equals"), new Object [] {proxy}));
-        assertEquals(System.identityHashCode(sih), 
-                sih.invoke(null, OBJECT_METHODS.get("hashCode"), new Object [] {}));
-        assertEquals("somestring", 
-                sih.invoke(null, OBJECT_METHODS.get("toString"), new Object [] {}));
-        assertEquals(Arrays.asList("equals", "hashCode", "toString"), called);        
+                getClass().getClassLoader(), new Class[] {Runnable.class}, sih);
+
+        assertEquals(true,
+                sih.invoke(null, OBJECT_METHODS.get("equals"), new Object[] {proxy}));
+        assertEquals(System.identityHashCode(sih),
+                sih.invoke(null, OBJECT_METHODS.get("hashCode"), new Object[] {}));
+        assertEquals("somestring",
+                sih.invoke(null, OBJECT_METHODS.get("toString"), new Object[] {}));
+        assertEquals(Arrays.asList("equals", "hashCode", "toString"), called);
     }
 }

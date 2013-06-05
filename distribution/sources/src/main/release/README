@@ -8,12 +8,12 @@ Compendium Specification, and OSGi Remote Service Admin Specification
 version 1.0, Chapter 122 in the OSGi Enterprise Specification[1].
 
 
-This release is provided for your convenience in three different 
+This release is provided for your convenience in three different
 distribution formats:
 
 1. Multi-bundle distro: cxf-dosgi-ri-multibundle-distribution-1.3.{tar.gaz|zip}
 
-Contains the dOSGi implementation and all 3rd party dependencies as 
+Contains the dOSGi implementation and all 3rd party dependencies as
 separate bundles within an archive. The current distribution is an
 instance of this type.
 
@@ -21,7 +21,7 @@ instance of this type.
 2. Single-bundle distro: cxf-dosgi-ri-singlebundle-distribution-1.3.jar
 
 Contains the dOSGi implementation and all 3rd party dependencies wrapped
-in a single OSGi bundle so as to allow direct installation in your favourite 
+in a single OSGi bundle so as to allow direct installation in your favourite
 OSGi container in one fell swoop.
 
 3. Source distro: cxf-dosgi-ri-source-distribution-1.3.{tar.gz|zip}
@@ -37,9 +37,9 @@ The best starting point for using dOSGi is the Getting Started Guide[2].
 
 Also note the very detailed walk-through of the greeter demo[3].
 
-If you need more help, or want to provide any feedback, please feel free 
+If you need more help, or want to provide any feedback, please feel free
 to drop us a note on the CXF dev or users list[4].
- 
+
 If you trip over any problems with dOSGi, don't hesitate to submit an issue
 to the CXF Distributed OSGI JIRA[5].
 

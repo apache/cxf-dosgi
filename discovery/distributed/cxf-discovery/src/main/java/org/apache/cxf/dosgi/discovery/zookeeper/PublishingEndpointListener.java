@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * Listens for local Endpoints and publishes them to Zookeeper
  */
 public class PublishingEndpointListener implements EndpointListener {
+
     private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListener.class);
 
     private final ZooKeeper zookeeper;
@@ -76,7 +77,6 @@ public class PublishingEndpointListener implements EndpointListener {
                 LOG.error("Exception while processing the addition of an endpoint.", ex);
             }
         }
-
     }
 
     private void addEndpoint(EndpointDescription endpoint) throws URISyntaxException, KeeperException,
@@ -122,7 +122,6 @@ public class PublishingEndpointListener implements EndpointListener {
                 LOG.error("Exception while processing the removal of an endpoint", ex);
             }
         }
-
     }
 
     private void removeEndpoint(EndpointDescription endpoint) throws UnknownHostException, URISyntaxException {
@@ -143,7 +142,6 @@ public class PublishingEndpointListener implements EndpointListener {
 
     private static void ensurePath(String path, ZooKeeper zk) throws KeeperException, InterruptedException {
         StringBuilder current = new StringBuilder();
-
         String[] parts = Util.removeEmpty(path.split("/"));
         for (String part : parts) {
             current.append('/');

@@ -21,13 +21,14 @@ package org.apache.cxf.dosgi.samples.discovery.impl;
 import org.apache.cxf.dosgi.samples.discovery.DisplayService;
 
 public class DisplayServiceImpl implements DisplayService {
+
     private final String id;
-    
+
     public DisplayServiceImpl(String id) {
         this.id = id;
         System.out.println("Created DisplayService [" + id + "]");
     }
-    
+
     public boolean displayText(String text) {
         System.out.println("DisplayService [" + id + "]: " + text);
         return true;
@@ -35,5 +36,5 @@ public class DisplayServiceImpl implements DisplayService {
 
     public String getID() {
         return id;
-    }    
+    }
 }

@@ -27,6 +27,7 @@ import org.osgi.framework.Constants;
 import org.osgi.service.cm.ManagedService;
 
 public class Activator implements BundleActivator {
+
     private ZooKeeperDiscovery zkd;
 
     public synchronized void start(BundleContext bc) throws Exception {
@@ -39,5 +40,4 @@ public class Activator implements BundleActivator {
     public synchronized void stop(BundleContext bc) throws Exception {
         zkd.stop();
     }
-
 }

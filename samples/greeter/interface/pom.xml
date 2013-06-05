@@ -37,19 +37,19 @@
         <bundle.import.package>*</bundle.import.package>
         <bundle.export.package>org.apache.cxf.dosgi.samples.greeter</bundle.export.package>
     </properties>
-    
+
     <dependencies>
         <dependency>
            <groupId>junit</groupId>
            <artifactId>junit</artifactId>
            <scope>test</scope>
-        </dependency>  
+        </dependency>
         <dependency>
            <groupId>org.easymock</groupId>
            <artifactId>easymockclassextension</artifactId>
            <scope>test</scope>
          </dependency>
-    </dependencies> 
+    </dependencies>
 
     <build>
       <plugins>
@@ -62,11 +62,11 @@
                         <Bundle-Description>This bundle contains the implementation of the CXF Distributed OSGi Greeter Demo Interfaces</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>${bundle.import.package}</Import-Package>
-                        <Export-Package>${bundle.export.package}</Export-Package> 
+                        <Export-Package>${bundle.export.package}</Export-Package>
                     </instructions>
                 </configuration>
-            </plugin> 
+            </plugin>
          </plugins>
-    </build>    
+    </build>
 
 </project>

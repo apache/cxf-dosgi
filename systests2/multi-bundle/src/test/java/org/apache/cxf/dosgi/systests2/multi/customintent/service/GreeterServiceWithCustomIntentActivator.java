@@ -39,5 +39,4 @@ public class GreeterServiceWithCustomIntentActivator implements BundleActivator 
 
     public void stop(BundleContext context) throws Exception {
     }
-    
 }

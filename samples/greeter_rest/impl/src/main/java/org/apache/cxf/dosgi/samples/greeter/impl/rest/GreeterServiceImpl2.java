@@ -30,5 +30,4 @@ public class GreeterServiceImpl2 implements GreeterService2 {
         System.out.println("Delegating from GreeterServiceImpl2 to GreeterServiceImpl");
         return greeter.greetMe(name);
     }
-
 }

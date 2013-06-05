@@ -25,12 +25,13 @@ import org.apache.cxf.dosgi.samples.springdm.DinnerService;
 import org.apache.cxf.dosgi.samples.springdm.Restaurant;
 
 public class DinnerServiceImpl implements DinnerService {
+
     List<Restaurant> restaurants = Arrays.asList(
         new Restaurant("Jojo's", "1 food way", 3),
         new Restaurant("Boohaa's", "95 forage ave", 1),
         new Restaurant("MicMac", "Plastic Plaza", 1)
     );
-    
+
     public List<Restaurant> findRestaurants(String query) {
         System.out.println("Hey! Someone's using the Dinner Service! Query: " + query);
         return restaurants;

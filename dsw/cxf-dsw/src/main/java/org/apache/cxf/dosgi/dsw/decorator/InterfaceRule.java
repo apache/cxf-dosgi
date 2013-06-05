@@ -31,13 +31,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InterfaceRule implements Rule {
+
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceRule.class);
-    
+
     private final Bundle bundle;
     private final Pattern matchPattern;
     private final Map<String, String> propMatches = new HashMap<String, String>();
     private final Map<String, Object> addProps = new HashMap<String, Object>();
-    
+
     public InterfaceRule(Bundle b, String im) {
         bundle = b;
         matchPattern = Pattern.compile(im);
@@ -49,26 +50,26 @@ public class InterfaceRule implements Rule {
 
     public synchronized void addProperty(String name, String value, String type) {
         Object obj = value;
-        
+
         if (!String.class.getName().equals(type)) {
             try {
                 Class<?> cls = getClass().getClassLoader().loadClass(type);
-                Constructor<?> ctor = cls.getConstructor(new Class [] {String.class});
+                Constructor<?> ctor = cls.getConstructor(new Class[] {String.class});
                 obj = ctor.newInstance(value);
             } catch (Throwable th) {
-                LOG.warn("Could not handle property '" + name 
+                LOG.warn("Could not handle property '" + name
                          + "' with value '" + value + "' of type: " + type, th);
                 return;
             }
         }
-        
+
         addProps.put(name, obj);
     }
 
     public synchronized void apply(ServiceReference sref, Map<String, Object> target) {
-        String [] objectClass = (String[]) sref.getProperty(Constants.OBJECTCLASS);
+        String[] objectClass = (String[]) sref.getProperty(Constants.OBJECTCLASS);
         boolean matches = false;
-        for (String cls : objectClass) {            
+        for (String cls : objectClass) {
             Matcher m = matchPattern.matcher(cls);
             if (m.matches()) {
                 for (Map.Entry<String, String> pm : propMatches.entrySet()) {
@@ -87,12 +88,12 @@ public class InterfaceRule implements Rule {
         if (!matches) {
             return;
         }
-        
+
         LOG.info("Adding the following properties to " + sref + ": " + addProps);
         target.putAll(addProps);
     }
 
     public Bundle getBundle() {
         return bundle;
-    }    
+    }
 }

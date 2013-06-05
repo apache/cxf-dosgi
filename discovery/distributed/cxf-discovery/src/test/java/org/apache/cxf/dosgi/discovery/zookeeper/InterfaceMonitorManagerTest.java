@@ -34,49 +34,47 @@ import org.osgi.framework.ServiceReference;
 import static org.junit.Assert.assertEquals;
 
 public class InterfaceMonitorManagerTest {
-    
+
     @Test
     public void testEndpointListenerTrackerCustomizer() {
-        
         IMocksControl c = EasyMock.createNiceControl();
-        
+
         BundleContext ctx = c.createMock(BundleContext.class);
         ZooKeeper zk = c.createMock(ZooKeeper.class);
-        
+
         ServiceReference sref = c.createMock(ServiceReference.class);
         ServiceReference sref2 = c.createMock(ServiceReference.class);
-        
+
         final Map<String, ?> p = new HashMap<String, Object>();
-        
+
         EasyMock.expect(sref.getPropertyKeys()).andAnswer(new IAnswer<String[]>() {
             public String[] answer() throws Throwable {
                 return p.keySet().toArray(new String[p.size()]);
             }
         }).anyTimes();
-        
+
         EasyMock.expect(sref.getProperty((String)EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
             public Object answer() throws Throwable {
                 String key = (String)(EasyMock.getCurrentArguments()[0]);
                 return p.get(key);
             }
         }).anyTimes();
-        
+
         EasyMock.expect(sref2.getPropertyKeys()).andAnswer(new IAnswer<String[]>() {
             public String[] answer() throws Throwable {
                 return p.keySet().toArray(new String[p.size()]);
             }
         }).anyTimes();
-        
+
         EasyMock.expect(sref2.getProperty((String)EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
             public Object answer() throws Throwable {
                 String key = (String)(EasyMock.getCurrentArguments()[0]);
                 return p.get(key);
             }
         }).anyTimes();
-        
-        
+
         final List<IMocksControl> controls = new ArrayList<IMocksControl>();
-        
+
         InterfaceMonitorManager eltc = new InterfaceMonitorManager(ctx, zk) {
             protected InterfaceMonitor createInterfaceMonitor(String scope, String objClass, Interest interest) {
                 IMocksControl lc = EasyMock.createNiceControl();
@@ -90,64 +88,61 @@ public class InterfaceMonitorManagerTest {
                 return im;
             }
         };
-        
+
         c.replay();
-        
+
         // sref has no scope -> nothing should happen
-        
+
         assertEquals(0, eltc.getHandledEndpointListeners().size());
         assertEquals(0, eltc.getInterestingScopes().size());
-        
+
         //p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, );
-        
-        eltc.addInterest(sref, "(objectClass=mine)", "mine"); 
-        
-        assertEquals(1, eltc.getHandledEndpointListeners().size());
-        assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
-        assertEquals(1, eltc.getInterestingScopes().size());
-        
-        
+
         eltc.addInterest(sref, "(objectClass=mine)", "mine");
-        
+
         assertEquals(1, eltc.getHandledEndpointListeners().size());
         assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
         assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
-        
+
+        eltc.addInterest(sref, "(objectClass=mine)", "mine");
+
+        assertEquals(1, eltc.getHandledEndpointListeners().size());
+        assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
+        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
+        assertEquals(1, eltc.getInterestingScopes().size());
+
         eltc.addInterest(sref2, "(objectClass=mine)", "mine");
-        
+
         assertEquals(2, eltc.getHandledEndpointListeners().size());
         assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
         assertEquals(1, eltc.getHandledEndpointListeners().get(sref2).size());
         assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
         assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref2).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
-        
-        
+
         eltc.removeInterest(sref);
-        
+
         assertEquals(1, eltc.getHandledEndpointListeners().size());
         assertEquals(1, eltc.getHandledEndpointListeners().get(sref2).size());
         assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref2).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
-        
+
         eltc.removeInterest(sref);
-        
+
         assertEquals(1, eltc.getHandledEndpointListeners().size());
         assertEquals(1, eltc.getHandledEndpointListeners().get(sref2).size());
         assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref2).get(0));
         assertEquals(1, eltc.getInterestingScopes().size());
-        
+
         eltc.removeInterest(sref2);
-        
+
         assertEquals(0, eltc.getHandledEndpointListeners().size());
         assertEquals(0, eltc.getInterestingScopes().size());
-        
+
         c.verify();
         for (IMocksControl control : controls) {
             control.verify();
         }
     }
-    
 }

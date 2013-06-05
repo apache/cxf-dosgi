@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/")
 public class SecureRestEndpoint {
-  
+
     @GET
     @Path("hello")
     @Produces(MediaType.TEXT_PLAIN)

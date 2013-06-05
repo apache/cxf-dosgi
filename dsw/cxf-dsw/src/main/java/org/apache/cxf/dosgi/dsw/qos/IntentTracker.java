@@ -26,13 +26,14 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class IntentTracker extends ServiceTracker {
+
     private final IntentMap intentMap;
 
     public IntentTracker(BundleContext context, IntentMap intentMap) {
         super(context, getFilter(context), null);
         this.intentMap = intentMap;
     }
-    
+
     static Filter getFilter(BundleContext context) {
         try {
             return context.createFilter("(" + Constants.INTENT_NAME_PROP + "=*)");

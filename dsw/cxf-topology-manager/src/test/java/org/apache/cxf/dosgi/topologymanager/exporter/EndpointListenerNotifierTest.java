@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.topologymanager.exporter;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,7 +42,6 @@ public class EndpointListenerNotifierTest {
 
     @Test
     public void testNotifyListenersOfRemovalIfAppropriate() throws InvalidSyntaxException {
-
         IMocksControl c = EasyMock.createNiceControl();
 
         BundleContext bc = c.createMock(BundleContext.class);
@@ -51,18 +49,17 @@ public class EndpointListenerNotifierTest {
         EndpointListener epl = EasyMock.createMock(EndpointListener.class);
         EndpointDescription epd = c.createMock(EndpointDescription.class);
         EndpointDescription epd2 = c.createMock(EndpointDescription.class);
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         String[] oc = new String[1];
         oc[0] = "myClass";
         props.put("objectClass", oc);
-        
+
         Map<String, Object> props2 = new HashMap<String, Object>();
         oc = new String[1];
         oc[0] = "notMyClass";
         props2.put("objectClass", oc);
-        
-        
+
         EasyMock.expect(bc.getService(EasyMock.eq(sref))).andReturn(epl).anyTimes();
         EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andAnswer(new IAnswer<Filter>() {
             public Filter answer() throws Throwable {
@@ -72,22 +69,19 @@ public class EndpointListenerNotifierTest {
         EasyMock.expect(sref.getProperty(EasyMock.eq(EndpointListener.ENDPOINT_LISTENER_SCOPE)))
             .andReturn("(objectClass=myClass)").anyTimes();
 
-        
         EasyMock.expect(epd.getProperties()).andReturn(props).anyTimes();
         EasyMock.expect(epd2.getProperties()).andReturn(props2).anyTimes();
-        
+
         // must only be called for the first EndpointDescription!
         epl.endpointRemoved(EasyMock.eq(epd), EasyMock.eq("(objectClass=myClass)"));
         EasyMock.expectLastCall().once();
-        
+
         EndpointRepository exportRepository = EasyMock.createMock(EndpointRepository.class);
-        
+
         c.replay();
         EasyMock.replay(epl);
-        
-        
-        EndpointListenerNotifier tm = new EndpointListenerNotifier(bc, exportRepository);
 
+        EndpointListenerNotifier tm = new EndpointListenerNotifier(bc, exportRepository);
 
         List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
         endpoints.add(epd);
@@ -97,19 +91,17 @@ public class EndpointListenerNotifierTest {
 
         c.verify();
         EasyMock.verify(epl);
-
     }
 
     @Test
     public void testNormalizeScopeForSingleString() {
-
         try {
             ServiceReference sr = EasyMock.createMock(ServiceReference.class);
             EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
                 .andReturn("Filterstring");
 
             Filter f = EasyMock.createNiceMock(Filter.class);
-            
+
             BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
             EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f);
 
@@ -127,22 +119,18 @@ public class EndpointListenerNotifierTest {
             e.printStackTrace();
         }
     }
-    
-    
+
     @Test
     public void testNormalizeScopeForStringArray() {
-
         try {
-            
             String[] filterStrings = {"f1", "f2", "f3"};
-            
+
             ServiceReference sr = EasyMock.createMock(ServiceReference.class);
             EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
                 .andReturn(filterStrings);
 
             Filter f = EasyMock.createNiceMock(Filter.class);
-            
-            
+
             BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
             EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f).times(filterStrings.length);
 
@@ -160,25 +148,21 @@ public class EndpointListenerNotifierTest {
             e.printStackTrace();
         }
     }
-    
+
     @Test
     public void testNormalizeScopeForCollection() {
-
         try {
-            
-            
             Collection<String> collection = new ArrayList<String>();
             collection.add("f1");
             collection.add("f2");
             collection.add("f3");
-            
+
             ServiceReference sr = EasyMock.createMock(ServiceReference.class);
             EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
                 .andReturn(collection);
 
             Filter f = EasyMock.createNiceMock(Filter.class);
-            
-            
+
             BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
             EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f).times(collection.size());
 

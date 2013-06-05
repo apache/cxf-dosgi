@@ -64,7 +64,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <!--  We need the newer log4j as the one from zookeeper has some ugly dependencies -->
         <dependency>
             <groupId>log4j</groupId>

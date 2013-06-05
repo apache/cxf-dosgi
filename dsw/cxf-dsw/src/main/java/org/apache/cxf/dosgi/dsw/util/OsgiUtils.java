@@ -87,15 +87,14 @@ public final class OsgiUtils {
     }
 
     /**
-     * Tries to retrieve the version of iClass via the PackageAdmin
+     * Tries to retrieve the version of iClass via the PackageAdmin.
      *
-     * @param iClass - The interface for which the version should be found
-     * @param bc - any valid BundleContext
+     * @param iClass tThe interface for which the version should be found
+     * @param bc any valid BundleContext
      * @return the version of the interface or "0.0.0" if no version information could be found or an error
      *         occurred during the retrieval
      */
     public static String getVersion(Class<?> iClass, BundleContext bc) {
-
         ServiceReference paRef = bc.getServiceReference(PackageAdmin.class.getName());
         if (paRef != null) {
             PackageAdmin pa = (PackageAdmin)bc.getService(paRef);

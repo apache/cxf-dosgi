@@ -46,7 +46,7 @@ public class ExportServiceTest {
      * This tests if the topology manager handles a service marked to be
      * exported correctly by exporting it to an available RemoteServiceAdmin
      * and notifying an EndpointListener afterwards.
-     * 
+     *
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
@@ -81,7 +81,6 @@ public class ExportServiceTest {
         c.replay();
 
         TopologyManagerExport topManager = new TopologyManagerExport(bctx, rsaTracker, mockEpListenerNotifier) {
-
             /**
              * To avoid async call
              */
@@ -89,11 +88,9 @@ public class ExportServiceTest {
             protected void triggerExport(ServiceReference sref) {
                 doExportService(sref);
             }
-
         };
         topManager.start();
         c.verify();
-
     }
 
     private void simulateUserServicePublished(BundleContext bctx, final ServiceReference sref) {
@@ -142,5 +139,4 @@ public class ExportServiceTest {
         EasyMock.expect(srefBundle.getSymbolicName()).andReturn("serviceBundleName").atLeastOnce();
         return sref;
     }
-
 }

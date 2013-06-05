@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * Tracks EndpointListeners and allows to notify them of endpoints.
  */
 public class EndpointListenerNotifier {
+
     private static final String ENDPOINT_LISTENER_FILTER =
         "(&(" + Constants.OBJECTCLASS + "=" + EndpointListener.class.getName() + ")"
         + "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*))";
@@ -71,11 +72,9 @@ public class EndpointListenerNotifier {
                 notifyListener(true, epListenerRef, endpointRepository.getAllEndpoints());
                 super.modifiedService(epListenerRef, service);
             }
-
         };
-
     }
-    
+
     public void start() {
         stEndpointListeners.open();
     }
@@ -128,7 +127,7 @@ public class EndpointListenerNotifier {
             }
         }
     }
-    
+
     static List<Filter> getFiltersFromEndpointListenerScope(ServiceReference sref, BundleContext bctx) {
         List<Filter> filters = new ArrayList<Filter>();
         try {
@@ -156,7 +155,7 @@ public class EndpointListenerNotifier {
         }
         return filters;
     }
-    
+
     private List<Filter> getMatchingFilters(List<Filter> filters,
             EndpointDescription endpoint) {
         List<Filter> matchingFilters = new ArrayList<Filter>();
@@ -172,12 +171,12 @@ public class EndpointListenerNotifier {
         }
         return matchingFilters;
     }
-   
+
     /**
      * Retrieves an endpoint's properties as a Dictionary.
-     * 
+     *
      * @param ep an endpoint description
-     * @return endpoint properties (will never return null) 
+     * @return endpoint properties (will never return null)
      */
     private Dictionary<String, Object> getEndpointProperties(EndpointDescription ep) {
         if (ep == null || ep.getProperties() == null) {

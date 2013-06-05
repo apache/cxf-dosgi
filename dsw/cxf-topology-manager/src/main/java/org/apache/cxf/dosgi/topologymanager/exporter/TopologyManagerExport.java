@@ -43,14 +43,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages exported endpoints of DOSGi services and notifies EndpointListeners of changes.
- * 
+ *
  * <li> Tracks local RemoteServiceAdmin instances by using a ServiceTracker
  * <li> Uses a ServiceListener to track local OSGi services
  * <li> When a service is published that is supported by DOSGi the
  *      known RemoteServiceAdmins are instructed to export the service and
  *      the EndpointListeners are notified
  * <li> When a service is unpublished the EndpointListeners are notified.
- *      The endpoints are not closed as the ExportRegistration takes care of this  
+ *      The endpoints are not closed as the ExportRegistration takes care of this
  */
 public class TopologyManagerExport {
 
@@ -80,6 +80,7 @@ public class TopologyManagerExport {
         bctx = ctx;
         this.remoteServiceAdminTracker = rsaTracker;
         this.remoteServiceAdminTracker.addListener(new RemoteServiceAdminLifeCycleListener() {
+
             public void added(RemoteServiceAdmin rsa) {
                 for (ServiceReference serviceRef : endpointRepo.getServicesToBeExportedFor(rsa)) {
                     triggerExport(serviceRef);
@@ -92,6 +93,7 @@ public class TopologyManagerExport {
             }
         });
         serviceListener = new ServiceListener() {
+
             public void serviceChanged(ServiceEvent event) {
                 ServiceReference sref = event.getServiceReference();
                 if (event.getType() == ServiceEvent.REGISTERED) {
@@ -107,7 +109,7 @@ public class TopologyManagerExport {
             }
         };
     }
-    
+
     /**
      * checks if a Service is intended to be exported
      */
@@ -126,7 +128,7 @@ public class TopologyManagerExport {
         bctx.removeServiceListener(serviceListener);
         epListenerNotifier.stop();
     }
-    
+
     protected void triggerExport(final ServiceReference sref) {
         execService.execute(new Runnable() {
             public void run() {
@@ -139,15 +141,13 @@ public class TopologyManagerExport {
         endpointRepo.addService(sref);
         List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getList();
         if (rsaList.isEmpty()) {
-            LOG.error(
-                    "No RemoteServiceAdmin available! Unable to export service from bundle {}, interfaces: {}",
+            LOG.error("No RemoteServiceAdmin available! Unable to export service from bundle {}, interfaces: {}",
                     sref.getBundle().getSymbolicName(),
                     sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS));
         }
 
         for (final RemoteServiceAdmin remoteServiceAdmin : rsaList) {
-            LOG.info("TopologyManager: handling remoteServiceAdmin "
-                    + remoteServiceAdmin);
+            LOG.info("TopologyManager: handling remoteServiceAdmin " + remoteServiceAdmin);
 
             if (endpointRepo.isAlreadyExportedForRsa(sref, remoteServiceAdmin)) {
                 // already handled by this remoteServiceAdmin
@@ -185,9 +185,9 @@ public class TopologyManagerExport {
      */
     private EndpointDescription getExportedEndpoint(ExportRegistration exReg) {
         ExportReference ref = (exReg == null) ? null : exReg.getExportReference();
-        return (ref == null) ? null : ref.getExportedEndpoint(); 
+        return (ref == null) ? null : ref.getExportedEndpoint();
     }
-    
+
     private void exportExistingServices() {
         try {
             // cast to String is necessary for compiling against OSGi core version >= 4.3
@@ -201,5 +201,4 @@ public class TopologyManagerExport {
             LOG.error("Error in filter {}. This should not occur!", DOSGI_SERVICES);
         }
     }
-
 }

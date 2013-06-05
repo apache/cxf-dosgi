@@ -29,14 +29,13 @@
         <version>1.5-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
-    
 
     <properties>
         <topDirectoryLocation>..</topDirectoryLocation>
     </properties>
 
     <modules>
-        <module>shell.tui</module>        
+        <module>shell.tui</module>
         <module>profiles</module>
     </modules>
 

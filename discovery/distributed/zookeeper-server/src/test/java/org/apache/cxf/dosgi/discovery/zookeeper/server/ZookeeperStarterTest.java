@@ -35,6 +35,7 @@ import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.verify;
 
 public class ZookeeperStarterTest extends TestCase {
+
     public void testUpdateConfig() throws Exception {
         final File tempDir = new File("target");
         IMocksControl control = EasyMock.createControl();
@@ -42,9 +43,8 @@ public class ZookeeperStarterTest extends TestCase {
         expect(bc.getDataFile("")).andReturn(tempDir);
         final MyZooKeeperServerMain mockServer = control.createMock(MyZooKeeperServerMain.class);
         control.replay();
-        
-        ZookeeperStarter starter = new ZookeeperStarter(bc) {
 
+        ZookeeperStarter starter = new ZookeeperStarter(bc) {
             @Override
             protected void startFromConfig(QuorumPeerConfig config) {
                 assertEquals(1234, config.getClientPortAddress().getPort());
@@ -54,7 +54,6 @@ public class ZookeeperStarterTest extends TestCase {
                 assertEquals(5, config.getSyncLimit());
                 this.main = mockServer;
             }
-
         };
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put("clientPort", "1234");
@@ -63,21 +62,20 @@ public class ZookeeperStarterTest extends TestCase {
 
         control.verify();
     }
-    
+
     public void testRemoveConfiguration() throws Exception {
         BundleContext bc = EasyMock.createMock(BundleContext.class);
         MyZooKeeperServerMain zkServer = EasyMock.createMock(MyZooKeeperServerMain.class);
         zkServer.shutdown();
         EasyMock.expectLastCall();
-        
+
         replay(zkServer);
 
         ZookeeperStarter starter = new ZookeeperStarter(bc);
         starter.main = zkServer;
         starter.updated(null);
-        
+
         verify(zkServer);
         assertNull("main should be null", starter.main);
     }
-
 }

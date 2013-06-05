@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.samples.greeter.impl2.rest;
 
-
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -28,14 +27,16 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 public class Activator implements BundleActivator {
+
     private ServiceRegistration registration;
+
     public void start(BundleContext bc) throws Exception {
         Dictionary<String, Object> props = getProperties("/rest");
-        registration = bc.registerService(GreeterService.class.getName(), 
+        registration = bc.registerService(GreeterService.class.getName(),
                                           new GreeterServiceImpl2(), props);
     }
 
-    private Dictionary<String, Object> getProperties(String address) { 
+    private Dictionary<String, Object> getProperties(String address) {
         Dictionary<String, Object> props = new Hashtable<String, Object>();
 
         props.put("service.exported.interfaces", "*");
@@ -45,7 +46,7 @@ public class Activator implements BundleActivator {
         props.put("org.apache.cxf.rs.address", "/service");
         return props;
     }
-    
+
     public void stop(BundleContext bc) throws Exception {
         registration.unregister();
     }

@@ -39,8 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ServiceDecoratorImpl implements ServiceDecorator {
+
     private static final Logger LOG = LoggerFactory.getLogger(ServiceDecoratorImpl.class);
-    
+
     final List<Rule> decorations = new CopyOnWriteArrayList<Rule>();
     private final BundleContext bundleContext;
     private final BundleListenerImpl bundleListener;
@@ -50,7 +51,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         bundleListener = new BundleListenerImpl();
         bc.addBundleListener(bundleListener);
     }
-    
+
     public void shutdown() {
         bundleContext.removeBundleListener(bundleListener);
     }
@@ -60,7 +61,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
             matcher.apply(sref, target);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     void addDecorations(Bundle bundle) {
         Namespace ns = Namespace.getNamespace("http://cxf.apache.org/xmlns/service-decoration/1.0.0");
@@ -71,7 +72,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
                     m.addPropMatch(propMatch.getAttributeValue("name"), propMatch.getAttributeValue("value"));
                 }
                 for (Element addProp : (List<Element>) match.getChildren("add-property", ns)) {
-                    m.addProperty(addProp.getAttributeValue("name"), 
+                    m.addProperty(addProp.getAttributeValue("name"),
                                   addProp.getAttributeValue("value"),
                                   addProp.getAttributeValue("type", String.class.getName()));
                 }
@@ -86,7 +87,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         if (entries == null) {
             return Collections.emptyList();
         }
-        
+
         List<Element> elements = new ArrayList<Element>();
         while (entries.hasMoreElements()) {
             URL resourceURL = (URL) entries.nextElement();
@@ -100,7 +101,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         }
         return elements;
     }
-    
+
     void removeDecorations(Bundle bundle) {
         for (Rule r : decorations) {
             if (bundle.equals(r.getBundle())) {
@@ -120,6 +121,6 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
                 break;
             default:
             }
-        }        
+        }
     }
 }

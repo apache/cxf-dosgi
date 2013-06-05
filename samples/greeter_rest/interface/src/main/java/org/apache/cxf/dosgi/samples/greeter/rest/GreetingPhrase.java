@@ -22,12 +22,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class GreetingPhrase {
+
     private String phrase;
     private String name;
-    
+
     public GreetingPhrase() {
     }
-    
+
     public GreetingPhrase(String phrase, String name) {
         this.phrase = phrase;
         this.name = name;
@@ -36,29 +37,28 @@ public class GreetingPhrase {
     public void setPhrase(String thePhrase) {
         this.phrase = thePhrase;
     }
-    
+
     public String getPhrase() {
         return phrase;
     }
-    
+
     public void setName(String theName) {
         this.name = theName;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     @Override
     public int hashCode() {
         return phrase.hashCode() + 37 * name.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object other) {
         return GreetingPhrase.class.isAssignableFrom(other.getClass())
                 && phrase.equals(((GreetingPhrase) other).phrase)
                 && name.equals(((GreetingPhrase) other).name);
-
     }
 }

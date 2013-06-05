@@ -21,28 +21,28 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import junit.framework.TestCase;
 
 public class InterfaceDataMonitorListenerImplTest extends TestCase {
-    
+
     public void testDUMMY() {
         assertTrue(true);
     }
-    
+
 //    public void testChange() throws Exception {
 //        final List<DiscoveredServiceNotification> dsnCallbacks = new ArrayList<DiscoveredServiceNotification>();
 //        DiscoveredServiceTracker dst = new DiscoveredServiceTracker() {
 //            public void serviceChanged(DiscoveredServiceNotification dsn) {
 //                dsnCallbacks.add(dsn);
-//            }            
+//            }
 //        };
-//        
+//
 //        //----------------------------------------------------------------
 //        // Test DiscoveredServiceNotification.AVAILABLE
 //        //----------------------------------------------------------------
 //        Properties initial = new Properties();
-//        initial.put("a", "b");     
+//        initial.put("a", "b");
 //        initial.put(ServicePublication.ENDPOINT_LOCATION, "http://somehost:12345/some/context");
 //        ByteArrayOutputStream propBytes = new ByteArrayOutputStream();
 //        initial.store(propBytes, "");
-//        
+//
 //        ZooKeeper zk = EasyMock.createMock(ZooKeeper.class);
 //        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
 //            .andReturn(Arrays.asList("x#y#z"));
@@ -51,7 +51,7 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        EasyMock.replay(zk);
 //
 //        InterfaceDataMonitorListenerImpl dml = new InterfaceDataMonitorListenerImpl(zk, String.class.getName(), dst);
-//        
+//
 //        assertEquals("Precondition failed", 0, dsnCallbacks.size());
 //        dml.change();
 //        assertEquals(1, dsnCallbacks.size());
@@ -60,16 +60,16 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        assertEquals(DiscoveredServiceNotification.AVAILABLE, dsn.getType());
 //        assertEquals(0, dsn.getFilters().size());
 //        ServiceEndpointDescription sed = dsn.getServiceEndpointDescription();
-//        assertEquals(Collections.singleton(String.class.getName()), sed.getProvidedInterfaces());    
-//        
+//        assertEquals(Collections.singleton(String.class.getName()), sed.getProvidedInterfaces());
+//
 //        Properties expected = new Properties();
 //        expected.load(new ByteArrayInputStream(propBytes.toByteArray()));
 //        expected.put("service.exported.configs", "org.apache.cxf.ws");
 //        expected.put("org.apache.cxf.ws.address", "http://somehost:12345/some/context");
-//        
+//
 //        assertEquals(expected, sed.getProperties());
 //        EasyMock.verify(zk);
-//        
+//
 //        // Again with the same data
 //        EasyMock.reset(zk);
 //        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
@@ -82,7 +82,7 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        assertEquals("Precondition failed", 0, dsnCallbacks.size());
 //        dml.change();
 //        assertEquals(0, dsnCallbacks.size());
-//        
+//
 //        EasyMock.verify(zk);
 //        //----------------------------------------------------------------
 //        // Test DiscoveredServiceNotification.MODIFIED
@@ -93,7 +93,7 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        modified.put("service.exported.configs", "org.apache.cxf.rs");
 //        ByteArrayOutputStream modBytes = new ByteArrayOutputStream();
 //        modified.store(modBytes, "");
-//        
+//
 //        EasyMock.reset(zk);
 //        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
 //            .andReturn(Arrays.asList("x#y#z"));
@@ -110,9 +110,9 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        assertEquals(DiscoveredServiceNotification.MODIFIED, dsn2.getType());
 //        assertEquals(0, dsn2.getFilters().size());
 //        ServiceEndpointDescription sed2 = dsn2.getServiceEndpointDescription();
-//        assertEquals(Collections.singleton(String.class.getName()), sed2.getProvidedInterfaces());        
+//        assertEquals(Collections.singleton(String.class.getName()), sed2.getProvidedInterfaces());
 //        assertEquals(modified, sed2.getProperties());
-//        
+//
 //        EasyMock.verify(zk);
 //
 //        //----------------------------------------------------------------
@@ -125,7 +125,7 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        modified2.put("org.apache.cxf.ws.address", "http://somewhereelse/123");
 //        ByteArrayOutputStream modBytes2 = new ByteArrayOutputStream();
 //        modified2.store(modBytes2, "");
-//        
+//
 //        EasyMock.reset(zk);
 //        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
 //            .andReturn(Arrays.asList("x#y#z"));
@@ -142,9 +142,9 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        assertEquals(DiscoveredServiceNotification.MODIFIED, dsn3.getType());
 //        assertEquals(0, dsn3.getFilters().size());
 //        ServiceEndpointDescription sed3 = dsn3.getServiceEndpointDescription();
-//        assertEquals(Collections.singleton(String.class.getName()), sed3.getProvidedInterfaces());        
+//        assertEquals(Collections.singleton(String.class.getName()), sed3.getProvidedInterfaces());
 //        assertEquals(modified2, sed3.getProperties());
-//        
+//
 //        EasyMock.verify(zk);
 //        //----------------------------------------------------------------
 //        // Test DiscoveredServiceNotification.UNAVAILABLE
@@ -163,11 +163,11 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        assertEquals(DiscoveredServiceNotification.UNAVAILABLE, dsn4.getType());
 //        assertEquals(0, dsn4.getFilters().size());
 //        ServiceEndpointDescription sed4 = dsn4.getServiceEndpointDescription();
-//        assertEquals(Collections.singleton(String.class.getName()), sed4.getProvidedInterfaces());        
+//        assertEquals(Collections.singleton(String.class.getName()), sed4.getProvidedInterfaces());
 //        assertEquals(modified2, sed4.getProperties());
-//        
+//
 //        EasyMock.verify(zk);
-//        
+//
 //        // Try the same again...
 //        EasyMock.reset(zk);
 //        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))

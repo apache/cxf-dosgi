@@ -24,7 +24,7 @@
     <version>1.5-SNAPSHOT</version>
 
     <packaging>pom</packaging>
-    <name>Distributed OSGI Reference Implementation</name>  
+    <name>Distributed OSGI Reference Implementation</name>
 
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/dosgi/trunk</connection>
@@ -85,7 +85,7 @@
             <archive>http://mail-archives.apache.org/mod_mbox/cxf-issues</archive>
         </mailingList>
     </mailingLists>
-    
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -93,12 +93,12 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <organization>
         <name>The Apache Software Foundation</name>
         <url>http://www.apache.org/</url>
     </organization>
-    
+
     <modules>
         <module>parent</module>
         <module>felix</module>

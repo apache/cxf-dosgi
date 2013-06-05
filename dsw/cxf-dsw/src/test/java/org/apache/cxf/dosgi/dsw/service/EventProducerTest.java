@@ -40,6 +40,7 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 
 public class EventProducerTest {
+
     @Test
     public void testPublishNotification() throws Exception {
         RemoteServiceAdminCore remoteServiceAdminCore = EasyMock.createNiceMock(RemoteServiceAdminCore.class);
@@ -106,8 +107,8 @@ public class EventProducerTest {
 
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bc.getBundle()).andReturn(bundle).anyTimes();
-        EasyMock.expect(bc.getAllServiceReferences(EventAdmin.class.getName(), null)).
-            andReturn(new ServiceReference[] {eaSref}).anyTimes();
+        EasyMock.expect(bc.getAllServiceReferences(EventAdmin.class.getName(), null))
+            .andReturn(new ServiceReference[] {eaSref}).anyTimes();
         EasyMock.expect(bc.getService(eaSref)).andReturn(ea).anyTimes();
         EasyMock.replay(bc);
         EventProducer eventProducer = new EventProducer(bc);
@@ -149,7 +150,7 @@ public class EventProducerTest {
                 Assert.assertEquals(new Version("0"), event.getProperty("bundle.version"));
                 Assert.assertSame(exportException, event.getProperty("cause"));
                 Assert.assertEquals(endpoint, event.getProperty("export.registration"));
-                Assert.assertTrue(Arrays.equals(new String[] {"org.foo.Bar"}, 
+                Assert.assertTrue(Arrays.equals(new String[] {"org.foo.Bar"},
                                                 (String[]) event.getProperty("objectClass")));
 
                 RemoteServiceAdminEvent rsae = (RemoteServiceAdminEvent) event.getProperty("event");
@@ -170,8 +171,8 @@ public class EventProducerTest {
 
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bc.getBundle()).andReturn(bundle).anyTimes();
-        EasyMock.expect(bc.getAllServiceReferences(EventAdmin.class.getName(), null)).
-            andReturn(new ServiceReference[] {eaSref}).anyTimes();
+        EasyMock.expect(bc.getAllServiceReferences(EventAdmin.class.getName(), null))
+            .andReturn(new ServiceReference[] {eaSref}).anyTimes();
         EasyMock.expect(bc.getService(eaSref)).andReturn(ea).anyTimes();
         EasyMock.replay(bc);
         EventProducer eventProducer = new EventProducer(bc);

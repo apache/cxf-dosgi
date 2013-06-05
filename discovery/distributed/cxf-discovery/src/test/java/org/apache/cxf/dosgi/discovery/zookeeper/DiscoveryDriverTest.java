@@ -21,15 +21,15 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import junit.framework.TestCase;
 
 public class DiscoveryDriverTest extends TestCase {
-    
+
     public void testDUMMY() {
         assertTrue(true);
     }
-    
+
 //    public void testDiscoveryDriver() throws Exception {
 //        BundleContext bc = getDefaultBundleContext();
 //        Dictionary<String, String> props = getDefaultProps();
-//        
+//
 //        final StringBuilder sb = new StringBuilder();
 //        DiscoveryDriver dd = new DiscoveryDriver(bc, props) {
 //            @Override
@@ -38,17 +38,17 @@ public class DiscoveryDriverTest extends TestCase {
 //                ZooKeeper zk = EasyMock.createMock(ZooKeeper.class);
 //                EasyMock.replay(zk);
 //                return zk;
-//            }           
+//            }
 //        };
 //        EasyMock.verify(bc);
 //        assertEquals("somehost:1910", sb.toString());
-//        
+//
 //        EasyMock.verify(dd.zooKeeper);
 //        EasyMock.reset(dd.zooKeeper);
 //        dd.zooKeeper.close();
 //        EasyMock.expectLastCall();
 //        EasyMock.replay(dd.zooKeeper);
-//        
+//
 //        ServiceTracker st1 = EasyMock.createMock(ServiceTracker.class);
 //        st1.close();
 //        EasyMock.expectLastCall();
@@ -57,35 +57,35 @@ public class DiscoveryDriverTest extends TestCase {
 //        st2.close();
 //        EasyMock.expectLastCall();
 //        EasyMock.replay(st2);
-//        
+//
 //        dd.lookupTracker = st1;
 //        dd.publicationTracker = st2;
-//        
-//        dd.destroy();        
+//
+//        dd.destroy();
 //    }
 //
 //    private void expectServiceTrackerCalls(BundleContext bc, String objectClass)
 //            throws InvalidSyntaxException {
 //        Filter filter = EasyMock.createNiceMock(Filter.class);
 //        EasyMock.replay(filter);
-//        
+//
 //        EasyMock.expect(bc.createFilter("(objectClass=" + objectClass + ")"))
 //            .andReturn(filter).anyTimes();
-//        bc.addServiceListener((ServiceListener) EasyMock.anyObject(), 
+//        bc.addServiceListener((ServiceListener) EasyMock.anyObject(),
 //            EasyMock.eq("(objectClass=" + objectClass + ")"));
 //        EasyMock.expectLastCall().anyTimes();
 //        EasyMock.expect(bc.getServiceReferences(objectClass, null))
 //            .andReturn(new ServiceReference [0]).anyTimes();
 //    }
-//    
+//
 //    public void testProcessEvent() throws Exception {
 //        DiscoveryDriver db = new DiscoveryDriver(getDefaultBundleContext(), getDefaultProps()) {
 //            @Override
 //            ZooKeeper createZooKeeper() throws IOException {
 //                return null;
-//            }            
+//            }
 //        };
-//        
+//
 //        FindInZooKeeperCustomizer fc = new FindInZooKeeperCustomizer(null, null);
 //        List<InterfaceMonitor> l1 = new ArrayList<InterfaceMonitor>();
 //        InterfaceMonitor dm1a = EasyMock.createMock(InterfaceMonitor.class);
@@ -98,7 +98,7 @@ public class DiscoveryDriverTest extends TestCase {
 //        EasyMock.replay(dm1b);
 //        l1.add(dm1a);
 //        l1.add(dm1b);
-//        
+//
 //        List<InterfaceMonitor> l2 = new ArrayList<InterfaceMonitor>();
 //        InterfaceMonitor dm2 = EasyMock.createMock(InterfaceMonitor.class);
 //        dm2.process();
@@ -108,10 +108,10 @@ public class DiscoveryDriverTest extends TestCase {
 //
 //        fc.watchers.put(EasyMock.createMock(DiscoveredServiceTracker.class), l1);
 //        fc.watchers.put(EasyMock.createMock(DiscoveredServiceTracker.class), l2);
-//        
+//
 //        db.finderCustomizer = fc;
 //        db.process(null);
-//        
+//
 //        EasyMock.verify(dm1a);
 //        EasyMock.verify(dm1b);
 //        EasyMock.verify(dm2);
@@ -132,5 +132,4 @@ public class DiscoveryDriverTest extends TestCase {
 //        props.put("zookeeper.timeout", "1500");
 //        return props;
 //    }
-
 }

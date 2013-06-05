@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
-
 import java.util.Collections;
 
 import junit.framework.TestCase;
@@ -39,7 +38,6 @@ import static org.easymock.EasyMock.expect;
 public class InterfaceMonitorTest extends TestCase {
 
     public void testInterfaceMonitor() throws KeeperException, InterruptedException {
-
         IMocksControl c = EasyMock.createControl();
 
         ZooKeeper zk = c.createMock(ZooKeeper.class);

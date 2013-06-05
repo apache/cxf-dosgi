@@ -26,13 +26,14 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public interface ConfigurationTypeHandler {
+
     String[] getSupportedTypes();
-    
+
     ExportResult createServer(ServiceReference serviceReference,
                         BundleContext dswContext,
-                        BundleContext callingContext, 
-                        Map<String, Object> sd, 
-                        Class<?> iClass, 
+                        BundleContext callingContext,
+                        Map<String, Object> sd,
+                        Class<?> iClass,
                         Object serviceBean);
 
     Object createProxy(ServiceReference serviceReference,

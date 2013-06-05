@@ -49,6 +49,7 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class LocalDiscoveryUtilsTest extends TestCase {
+
     private static final String LF = "\n";
 
     public void testNoRemoteServicesXMLFiles() {
@@ -152,10 +153,10 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         assertEquals('@', props.get("char"));
         assertEquals('X', props.get("Character2"));
 
-        int [] intArray = (int []) props.get("int-array");
+        int[] intArray = (int[]) props.get("int-array");
         assertTrue(Arrays.equals(new int[] {1, 2}, intArray));
 
-        Integer [] integerArray = (Integer []) props.get("Integer-array");
+        Integer[] integerArray = (Integer[]) props.get("Integer-array");
         assertTrue(Arrays.equals(new Integer[] {2, 1}, integerArray));
 
         assertEquals(Arrays.asList(true, false), props.get("bool-list"));
@@ -222,7 +223,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         Map<String, Object> m = new LinkedHashMap<String, Object>();
         m.put("service.imported.configs", "org.apache.cxf.ws");
         m.put("endpoint.id", "foo:bar");
-        m.put("objectClass", new String [] {"com.acme.HelloService", "some.other.Service"});
+        m.put("objectClass", new String[] {"com.acme.HelloService", "some.other.Service"});
         m.put("SomeObject", new Object());
         m.put("long", 9223372036854775807L);
         m.put("Long2", -1L);
@@ -255,9 +256,9 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         int[] intArray = new int[] {1, 2};
         m.put("int-array", intArray);
 
-        String xml = "<xml>" + LF 
-            + "<t1 xmlns=\"http://www.acme.org/xmlns/other/v1.0.0\">" + LF 
-            +     "<foo type='bar'>haha</foo>" + LF
+        String xml = "<xml>" + LF
+            + "<t1 xmlns=\"http://www.acme.org/xmlns/other/v1.0.0\">" + LF
+            + "<foo type='bar'>haha</foo>" + LF
             + "</t1>" + LF
             + "</xml>";
         m.put("someXML", xml);
@@ -273,7 +274,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         String s2 = stripComment(s);
         String s3 = stripProlog(s2);
         Document d = new SAXBuilder().build(new ByteArrayInputStream(s3.getBytes()));
-        XMLOutputter outputter  = new XMLOutputter(Format.getPrettyFormat());
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         return outputter.outputString(d);
     }
 
@@ -304,7 +305,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         }
     }
 
-    public static byte [] drainStream(InputStream is) throws IOException {
+    public static byte[] drainStream(InputStream is) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             drainStream(is, baos);
@@ -313,5 +314,4 @@ public class LocalDiscoveryUtilsTest extends TestCase {
             is.close();
         }
     }
-
 }

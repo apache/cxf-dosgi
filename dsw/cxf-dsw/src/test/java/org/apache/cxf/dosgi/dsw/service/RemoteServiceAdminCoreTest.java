@@ -57,7 +57,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-
 public class RemoteServiceAdminCoreTest {
 
     @Test
@@ -75,7 +74,7 @@ public class RemoteServiceAdminCoreTest {
         EasyMock.expect(sref.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(sref.getPropertyKeys())
             .andReturn(new String[]{"objectClass", "service.exported.interfaces"}).anyTimes();
-        EasyMock.expect(sref.getProperty("objectClass")).andReturn(new String [] {"a.b.C"}).anyTimes();
+        EasyMock.expect(sref.getProperty("objectClass")).andReturn(new String[] {"a.b.C"}).anyTimes();
         EasyMock.expect(sref.getProperty("service.exported.interfaces")).andReturn("*").anyTimes();
 
         ConfigTypeHandlerFactory configTypeHandlerFactory = c.createMock(ConfigTypeHandlerFactory.class);
@@ -97,7 +96,6 @@ public class RemoteServiceAdminCoreTest {
 
     @Test
     public void testImport() {
-
         IMocksControl c = EasyMock.createNiceControl();
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
@@ -125,7 +123,6 @@ public class RemoteServiceAdminCoreTest {
             protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
                                                     ConfigurationTypeHandler handler,
                                                     BundleContext requestingContext) {
-
             }
         };
         c.replay();
@@ -172,9 +169,9 @@ public class RemoteServiceAdminCoreTest {
         EasyMock.expect(bc.getProperty(Constants.FRAMEWORK_VERSION)).andReturn(null).anyTimes();
         bc.addServiceListener(EasyMock.<ServiceListener>anyObject(), EasyMock.<String>anyObject());
         EasyMock.expectLastCall().anyTimes();
-        EasyMock.expect(bc.getServiceReferences(EasyMock.<String>anyObject(), 
+        EasyMock.expect(bc.getServiceReferences(EasyMock.<String>anyObject(),
                                                 EasyMock.<String>anyObject())).andReturn(null).anyTimes();
-        EasyMock.expect(bc.getAllServiceReferences(EasyMock.<String>anyObject(), 
+        EasyMock.expect(bc.getAllServiceReferences(EasyMock.<String>anyObject(),
                                                    EasyMock.<String>anyObject())).andReturn(null).anyTimes();
 
         Bundle b = createDummyRsaBundle(bc);
@@ -203,7 +200,7 @@ public class RemoteServiceAdminCoreTest {
         ConfigurationTypeHandler handler = EasyMock.createNiceMock(ConfigurationTypeHandler.class);
         EasyMock.expect(handler.createServer(sref,
                                              bc,
-                                             sref.getBundle().getBundleContext(), 
+                                             sref.getBundle().getBundleContext(),
                                              sProps, Runnable.class, svcObject)).andReturn(er).once();
         EasyMock.replay(handler);
 
@@ -223,9 +220,9 @@ public class RemoteServiceAdminCoreTest {
         Map<String, Object> edProps = ed.getProperties();
         assertEquals("http://something", edProps.get("endpoint.id"));
         assertNotNull(edProps.get("service.imported"));
-        assertTrue(Arrays.equals(new String [] {"java.lang.Runnable"}, 
+        assertTrue(Arrays.equals(new String[] {"java.lang.Runnable"},
                                  (Object[]) edProps.get("objectClass")));
-        assertTrue(Arrays.equals(new String[] {"org.apache.cxf.ws"}, 
+        assertTrue(Arrays.equals(new String[] {"org.apache.cxf.ws"},
                                  (Object[]) edProps.get("service.imported.configs")));
 
         // Ask to export the same service again, this should not go through the whole process again but simply return
@@ -300,7 +297,7 @@ public class RemoteServiceAdminCoreTest {
         ExportResult er = new ExportResult(eProps, new TestException());
 
         ConfigurationTypeHandler handler = EasyMock.createNiceMock(ConfigurationTypeHandler.class);
-        EasyMock.expect(handler.createServer(sref, bc, sref.getBundle().getBundleContext(), 
+        EasyMock.expect(handler.createServer(sref, bc, sref.getBundle().getBundleContext(),
                                              sProps, Runnable.class, svcObject)).andReturn(er);
         EasyMock.replay(handler);
 
@@ -342,7 +339,7 @@ public class RemoteServiceAdminCoreTest {
 
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         EasyMock.expect(sref.getBundle()).andReturn(b).anyTimes();
-        EasyMock.expect(sref.getPropertyKeys()).andReturn(sProps.keySet().toArray(new String [] {})).anyTimes();
+        EasyMock.expect(sref.getPropertyKeys()).andReturn(sProps.keySet().toArray(new String[] {})).anyTimes();
         EasyMock.expect(sref.getProperty((String) EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
             @Override
             public Object answer() throws Throwable {

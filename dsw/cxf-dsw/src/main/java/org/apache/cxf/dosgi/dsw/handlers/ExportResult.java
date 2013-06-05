@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.cxf.endpoint.Server;
 
 public class ExportResult {
+
     private final Map<String, Object> endpointProps;
     private final Server server;
     private final Exception exception;
@@ -32,7 +33,7 @@ public class ExportResult {
         this.server = server;
         this.exception = null;
     }
-    
+
     public ExportResult(Map<String, Object> endpointProps, Exception ex) {
         this.endpointProps = endpointProps;
         this.server = null;
@@ -50,6 +51,4 @@ public class ExportResult {
     public Exception getException() {
         return exception;
     }
-    
-    
 }

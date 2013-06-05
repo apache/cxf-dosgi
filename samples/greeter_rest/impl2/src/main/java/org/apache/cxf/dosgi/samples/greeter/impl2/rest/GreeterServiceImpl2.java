@@ -32,7 +32,7 @@ public class GreeterServiceImpl2 implements GreeterService {
 
     public GreeterInfo greetMe(String name) throws GreeterException {
         System.out.println("Invoking from GreeterServiceImpl2: greetMe(" + name + ")");
-        
+
         if (name.equals(STRANGER_NAME)) {
             throw new GreeterException(name);
         }
@@ -46,5 +46,4 @@ public class GreeterServiceImpl2 implements GreeterService {
         info.setGreetings(list);
         return info;
     }
-
 }

@@ -21,5 +21,4 @@ package org.apache.cxf.dosgi.samples.greeter.rest;
 public interface GreeterService2 {
 
     GreeterInfo greetMe(String name) throws GreeterException;
-
 }

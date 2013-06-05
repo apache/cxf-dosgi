@@ -27,6 +27,7 @@ import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
 
 public final class EmptyGreeterService implements GreeterService {
+
     /**
      * Return an empty array. Our custom intent should add a GreetingPhrase
      */

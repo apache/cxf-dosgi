@@ -38,21 +38,22 @@ import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 
 public final class MultiBundleTools {
+
     private MultiBundleTools() {
     }
-    
+
     private static int getDistroBundles(Map<Integer, String> bundles, boolean discovery) throws Exception {
-        File root = getRootDirectory();        
+        File root = getRootDirectory();
         File mdRoot = new File(root, "distribution/multi-bundle");
         String pomVersion = getPomVersion(mdRoot);
-        
+
         return getDistroBundles(mdRoot, pomVersion, bundles, discovery);
     }
-    
-    private static int getDistroBundles(File mdRoot, 
-                                        String pomVersion, 
+
+    private static int getDistroBundles(File mdRoot,
+                                        String pomVersion,
                                         Map<Integer,
-                                        String> bundles, 
+                                        String> bundles,
                                         boolean discovery) throws Exception {
         File distroDir = new File(mdRoot, "target/cxf-dosgi-ri-multibundle-distribution-" + pomVersion + "-dir");
         Properties p = new Properties();
@@ -61,7 +62,7 @@ public final class MultiBundleTools {
         if (discovery) {
             p.load(new FileInputStream(new File(confDir, "felix.discovery.config.properties.append")));
         }
-        
+
         int startLevel = Integer.parseInt(p.getProperty("org.osgi.framework.startlevel.beginning"));
         for (int i = 0; i <= startLevel; i++) {
             String val = p.getProperty("felix.auto.start." + i);
@@ -84,7 +85,7 @@ public final class MultiBundleTools {
         String resourceName = "/" + MultiBundleTools.class.getName().replace('.', '/') + ".class";
         URL curURL = MultiBundleTools.class.getResource(resourceName);
         File curFile = new File(curURL.getFile());
-        String curString = curFile.getAbsolutePath(); 
+        String curString = curFile.getAbsolutePath();
         File curBase = new File(curString.substring(0, curString.length() - resourceName.length()));
         return curBase.getParentFile().getParentFile().getParentFile().getParentFile();
     }
@@ -128,7 +129,7 @@ public final class MultiBundleTools {
     public static Option getDistroWithDiscovery() throws Exception {
         return CoreOptions.composite(getDistroBundleOptions(true));
     }
-    
+
     public static Option getDistro() throws Exception {
         return CoreOptions.composite(getDistroBundleOptions(false));
     }

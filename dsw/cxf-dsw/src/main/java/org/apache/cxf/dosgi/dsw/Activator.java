@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 // registered as spring bean -> start / stop called accordingly
 public class Activator implements ManagedService, BundleActivator {
+
     private static final int DEFAULT_INTENT_TIMEOUT = 30000;
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
@@ -85,14 +86,14 @@ public class Activator implements ManagedService, BundleActivator {
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         String[] supportedIntents = intentMap.keySet().toArray(new String[] {});
         props.put("remote.intents.supported", supportedIntents);
-        props.put("remote.configs.supported", 
+        props.put("remote.configs.supported",
                   obtainSupportedConfigTypes(configTypeHandlerFactory.getSupportedConfigurationTypes()));
         LOG.info("Registering RemoteServiceAdminFactory...");
         rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc), null);
     }
 
-    // The CT sometimes uses the first element returned to register a service, but 
+    // The CT sometimes uses the first element returned to register a service, but
     // does not provide any additional configuration.
     // Return the configuration type that works without additional configuration as the first in the list.
     private String[] obtainSupportedConfigTypes(List<String> types) {

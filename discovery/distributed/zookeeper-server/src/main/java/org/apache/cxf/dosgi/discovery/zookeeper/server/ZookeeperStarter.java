@@ -37,6 +37,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 
 public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
+
     private static final Logger LOG = Logger.getLogger(ZookeeperStarter.class); //NOPMD - using log4j here
 
     protected ZookeeperServer main;
@@ -74,7 +75,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
 
     /**
      * Remove empty values to avoid NumberFormatExceptions
-     * 
+     *
      * @param dict
      */
     private void removeEmptyValues(Dictionary<String, Object> dict) {
@@ -145,13 +146,14 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
         });
         zkMainThread.start();
     }
-    
+
     interface ZookeeperServer {
         void startup() throws IOException;
         void shutdown();
     }
 
     static class MyQuorumPeerMain extends QuorumPeerMain implements ZookeeperServer {
+
         private QuorumPeerConfig config;
 
         public MyQuorumPeerMain(QuorumPeerConfig config) {
@@ -170,12 +172,13 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
     }
 
     static class MyZooKeeperServerMain extends ZooKeeperServerMain implements ZookeeperServer {
+
         private QuorumPeerConfig config;
 
         public MyZooKeeperServerMain(QuorumPeerConfig config) {
             this.config = config;
         }
-        
+
         public void startup() throws IOException {
             ServerConfig serverConfig = new ServerConfig();
             serverConfig.readFrom(config);
@@ -190,5 +193,4 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
             }
         }
     }
-
 }

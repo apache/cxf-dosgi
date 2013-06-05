@@ -30,8 +30,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-
 public class IntentUtilsTest {
+
     @Test
     public void testMergeArrays() {
         Assert.assertNull(IntentUtils.mergeArrays(null, null));

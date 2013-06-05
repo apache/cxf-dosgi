@@ -25,30 +25,28 @@ public class CxfFindListenerHookTest extends Assert {
 
     @Test
     public void testDUMMY() throws Exception {
-        
     }
-    
+
 //    private IMocksControl control;
-//    
+//
 //    @Before
 //    public void setUp() {
 //        control = EasyMock.createNiceControl();
 //    }
-    
+
     /* Todo this test doesn't apply at the moment since the ListenerHook doesn't
      * have a serviceReferencesRequested() API (yet).
     @Test
     public void testSyncListenerHook() throws Exception {
-        
         Bundle bundle = control.createMock(Bundle.class);
-        bundle.findEntries(EasyMock.eq("OSGI-INF/remote-service"), 
+        bundle.findEntries(EasyMock.eq("OSGI-INF/remote-service"),
             EasyMock.eq("*.xml"), EasyMock.anyBoolean());
         EasyMock.expectLastCall().andReturn(Collections.enumeration(
             Arrays.asList(getClass().getResource("/OSGI-INF/remote-service/remote-services.xml"))));
         Dictionary<String, String> bundleHeaders = new Hashtable<String, String>();
-        bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_NAME, 
+        bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_NAME,
                           "Test Bundle");
-        bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_VERSION, 
+        bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_VERSION,
                           "1.0.0");
         bundle.getHeaders();
         EasyMock.expectLastCall().andReturn(bundleHeaders).anyTimes();
@@ -57,25 +55,25 @@ public class CxfFindListenerHookTest extends Assert {
         final BundleContext requestingContext = control.createMock(BundleContext.class);
         requestingContext.getBundle();
         EasyMock.expectLastCall().andReturn(bundle).anyTimes();
-        
+
         BundleTestContext dswContext = new BundleTestContext(bundle);
-        dswContext.addServiceReference(TestService.class.getName(), 
+        dswContext.addServiceReference(TestService.class.getName(),
                                        control.createMock(ServiceReference.class));
         control.replay();
-     
+
         CxfListenerHook hook = new CxfListenerHook(dswContext, null);
-        
+
         // TODO : if the next call ends up being executed in a thread of its own then
         // update the test accordingly, use Futures for ex
-        
-        hook.serviceReferencesRequested(requestingContext, 
+
+        hook.serviceReferencesRequested(requestingContext,
                                        TestService.class.getName(), null, true);
-        
+
         List<ServiceReference> registeredRefs = dswContext.getRegisteredReferences();
         assertNotNull(registeredRefs);
-        assertEquals(1, registeredRefs.size());        
+        assertEquals(1, registeredRefs.size());
     } */
-    
+
 //    @Test
 //    public void testTrackerPropertiesOnlyClassInFilterWithMatchingInterface() throws Exception {
 //        String filter = "(objectClass=" + TestService.class.getName() + ")";
@@ -88,7 +86,7 @@ public class CxfFindListenerHookTest extends Assert {
 //
 //    @Test
 //    public void testTrackerPropertiesGenericFilterWithMatchingInterface() throws Exception {
-//        String filter = "(&(objectClass=" + TestService.class.getName() 
+//        String filter = "(&(objectClass=" + TestService.class.getName()
 //                        + ")(colour=blue))";
 //        doTestTrackerPropertiesSet(filter,
 //                                   "osgi.remote.discovery.interest.filters",
@@ -109,7 +107,7 @@ public class CxfFindListenerHookTest extends Assert {
 //
 //    @Test
 //    public void testTrackerPropertiesGenericFilterWithMatchingFilter() throws Exception {
-//        String filter = "(&(objectClass=" + TestService.class.getName() 
+//        String filter = "(&(objectClass=" + TestService.class.getName()
 //                        + ")(colour=blue))";
 //        doTestTrackerPropertiesSet(filter,
 //                                   "osgi.remote.discovery.interest.filters",
@@ -130,7 +128,7 @@ public class CxfFindListenerHookTest extends Assert {
 //
 //    @Test
 //    public void testTrackerPropertiesGenericFilterWithMatchingBoth() throws Exception {
-//        String filter = "(&(objectClass=" + TestService.class.getName() 
+//        String filter = "(&(objectClass=" + TestService.class.getName()
 //                        + ")(colour=blue))";
 //        doTestTrackerPropertiesSet(filter,
 //                                   "osgi.remote.discovery.interest.filters",
@@ -145,36 +143,30 @@ public class CxfFindListenerHookTest extends Assert {
 //                                            Collection matchingInterfaces,
 //                                            Collection matchingFilters) throws Exception {
 //        Bundle bundle = control.createMock(Bundle.class);
-//        Dictionary<String, String> bundleHeaders = 
-//            new Hashtable<String, String>();
-//        bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_NAME, 
+//        Dictionary<String, String> bundleHeaders = new Hashtable<String, String>();
+//        bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_NAME,
 //                          "Test Bundle");
-//        bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_VERSION, 
+//        bundleHeaders.put(org.osgi.framework.Constants.BUNDLE_VERSION,
 //                          "1.0.0");
 //        bundle.getHeaders();
 //        EasyMock.expectLastCall().andReturn(bundleHeaders).times(2);
 //        final String serviceClass = TestService.class.getName();
 //        bundle.loadClass(serviceClass);
 //        EasyMock.expectLastCall().andReturn(TestService.class).times(2);
-//        final BundleContext requestingContext = 
-//            control.createMock(BundleContext.class);
-//        
+//        final BundleContext requestingContext = control.createMock(BundleContext.class);
+//
 //        BundleTestContext dswContext = new BundleTestContext(bundle);
-//        ServiceRegistration serviceRegistration =
-//            control.createMock(ServiceRegistration.class);
+//        ServiceRegistration serviceRegistration = control.createMock(ServiceRegistration.class);
 //        dswContext.addServiceRegistration(serviceClass, serviceRegistration);
 //        serviceRegistration.unregister();
 //        EasyMock.expectLastCall().times(1);
-//        ServiceReference serviceReference = 
-//            control.createMock(ServiceReference.class);
+//        ServiceReference serviceReference = control.createMock(ServiceReference.class);
 //        dswContext.addServiceReference(serviceClass, serviceReference);
 //
 //        final String trackerClass = DiscoveredServiceTracker.class.getName();
-//        ServiceRegistration trackerRegistration =
-//            control.createMock(ServiceRegistration.class);
+//        ServiceRegistration trackerRegistration = control.createMock(ServiceRegistration.class);
 //        dswContext.addServiceRegistration(trackerClass, trackerRegistration);
-//        ServiceReference trackerReference = 
-//            control.createMock(ServiceReference.class);
+//        ServiceReference trackerReference = control.createMock(ServiceReference.class);
 //        dswContext.addServiceReference(trackerClass, trackerReference);
 //
 //        List property = asList(propValue);
@@ -191,10 +183,10 @@ public class CxfFindListenerHookTest extends Assert {
 //                f.match(EasyMock.isA(Dictionary.class));
 //                EasyMock.expectLastCall().andReturn(true);
 //            }
-//        } 
+//        }
 //
 //        control.replay();
-//     
+//
 //        CxfFindListenerHook hook = new CxfFindListenerHook(dswContext, null);
 //
 //        ListenerHook.ListenerInfo info = new ListenerHook.ListenerInfo() {
@@ -208,7 +200,7 @@ public class CxfFindListenerHookTest extends Assert {
 //
 //            public boolean isRemoved() {
 //                return false;
-//            }            
+//            }
 //        };
 //        hook.added(Collections.singleton(info));
 //
@@ -221,7 +213,7 @@ public class CxfFindListenerHookTest extends Assert {
 //        notifyAvailable(tracker, matchingInterfaces, matchingFilters, "1234");
 //        notifyAvailable(tracker, matchingInterfaces, matchingFilters, "5678");
 //        notifyAvailable(tracker, matchingInterfaces, matchingFilters, "1234");
-//        
+//
 //        notifyUnAvailable(tracker, "1234");
 //        notifyUnAvailable(tracker, "5678");
 //
@@ -229,15 +221,13 @@ public class CxfFindListenerHookTest extends Assert {
 //
 //        control.verify();
 //
-//        Map<String, ServiceReference> registeredRefs = 
-//            dswContext.getRegisteredReferences();
+//        Map<String, ServiceReference> registeredRefs = dswContext.getRegisteredReferences();
 //        assertNotNull(registeredRefs);
 //        assertEquals(2, registeredRefs.size());
 //        assertNotNull(registeredRefs.get(serviceClass));
 //        assertSame(serviceReference, registeredRefs.get(serviceClass));
 //
-//        Map<String, ServiceRegistration> registeredRegs = 
-//            dswContext.getRegisteredRegistrations();
+//        Map<String, ServiceRegistration> registeredRegs = dswContext.getRegisteredRegistrations();
 //        assertNotNull(registeredRegs);
 //        assertEquals(2, registeredRegs.size());
 //        assertNotNull(registeredRegs.get(trackerClass));
@@ -246,14 +236,14 @@ public class CxfFindListenerHookTest extends Assert {
 //        List<Object> registeredServices = dswContext.getRegisteredServices();
 //        assertNotNull(registeredServices);
 //        assertEquals(2, registeredServices.size());
-//    } 
+//    }
 //
 //    @Test
 //    public void testConstructorAndGetters() {
 //        BundleContext bc = control.createMock(BundleContext.class);
 //        CxfRemoteServiceAdmin dp = control.createMock(CxfRemoteServiceAdmin.class);
 //        control.replay();
-//        
+//
 //        CxfFindListenerHook clh = new CxfFindListenerHook(bc, dp);
 //        assertSame(bc, clh.getContext());
 //        assertSame(dp, clh.getDistributionProvider());
@@ -262,27 +252,27 @@ public class CxfFindListenerHookTest extends Assert {
 //    @Test
 //    public void testFindHook() {
 //        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-//        
-//        final List<String> lookupCalls = new ArrayList<String>();        
+//
+//        final List<String> lookupCalls = new ArrayList<String>();
 //        CxfFindListenerHook fh = new CxfFindListenerHook(bc, null) {
 //            @Override
 //            protected synchronized void lookupDiscoveryService(
 //                    String interfaceName, String filterValue) {
 //                lookupCalls.add(interfaceName);
 //                lookupCalls.add(filterValue);
-//            }            
+//            }
 //        };
-//        
+//
 //        String clazz = "my.app.Class";
 //        String filter = "&(A=B)(C=D)";
 //        fh.find(null, clazz, filter, true, null);
-//        
+//
 //        assertEquals(Arrays.asList(clazz, filter), lookupCalls);
 //    }
-//    
+//
 //    private void notifyAvailable(DiscoveredServiceTracker tracker,
 //                                 Collection interfaces,
-//                                 Collection filters, 
+//                                 Collection filters,
 //                                 String endpointId) {
 //        Map<String, Object> props = new Hashtable<String, Object>();
 //        props.put("osgi.remote.interfaces", "*");
@@ -290,11 +280,11 @@ public class CxfFindListenerHookTest extends Assert {
 //        tracker.serviceChanged(new Notification(AVAILABLE,
 //                                                TestService.class.getName(),
 //                                                interfaces,
-//                                                filters, 
+//                                                filters,
 //                                                props));
 //    }
 //
-//    private void notifyUnAvailable(DiscoveredServiceTracker tracker, 
+//    private void notifyUnAvailable(DiscoveredServiceTracker tracker,
 //                                   String endpointId) {
 //        Map<String, Object> props = new Hashtable<String, Object>();
 //        props.put("osgi.remote.endpoint.id", endpointId);
@@ -321,14 +311,13 @@ public class CxfFindListenerHookTest extends Assert {
 //        private Collection interfaces;
 //        private Collection filters;
 //
-//        Notification(int type, 
+//        Notification(int type,
 //                     String interfaceName,
 //                     Collection interfaces,
-//                     Collection filters, 
+//                     Collection filters,
 //                     Map<String, Object> props) {
 //            this.type = type;
-//            this.sed = 
-//                new ServiceEndpointDescriptionImpl(interfaceName, props);
+//            this.sed = new ServiceEndpointDescriptionImpl(interfaceName, props);
 //            this.interfaces = interfaces;
 //            this.filters = filters;
 //        }
@@ -342,12 +331,11 @@ public class CxfFindListenerHookTest extends Assert {
 //        }
 //
 //        public Collection getInterfaces() {
-//            return interfaces; 
+//            return interfaces;
 //        }
 //
 //        public Collection getFilters() {
-//            return filters; 
+//            return filters;
 //        }
 //    }
-
 }

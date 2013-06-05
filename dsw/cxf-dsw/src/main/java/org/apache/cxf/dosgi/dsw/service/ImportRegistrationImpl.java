@@ -201,5 +201,4 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
     public EndpointDescription getImportedEndpointAlways() {
         return importedEndpoint;
     }
-
 }

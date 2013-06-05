@@ -38,55 +38,47 @@ public class EndpointListenerFactoryTest extends TestCase {
         BundleContext ctx = c.createMock(BundleContext.class);
         ZooKeeper zk = c.createMock(ZooKeeper.class);
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
-        
+
         PublishingEndpointListenerFactory eplf = new PublishingEndpointListenerFactory(zk, ctx);
 
-        EasyMock.expect(
-                        ctx.registerService(EasyMock.eq(EndpointListener.class.getName()), EasyMock.eq(eplf),
+        EasyMock.expect(ctx.registerService(EasyMock.eq(EndpointListener.class.getName()), EasyMock.eq(eplf),
                                             (Dictionary<String, String>)EasyMock.anyObject())).andReturn(sreg).once();
-        
-        EasyMock.expect(ctx.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("myUUID")
-            .anyTimes();
-        
+
+        EasyMock.expect(ctx.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("myUUID").anyTimes();
+
         c.replay();
         eplf.start();
         c.verify();
-        
+
         c.reset();
         sreg.unregister();
         EasyMock.expectLastCall().once();
         c.replay();
         eplf.stop();
         c.verify();
-        
-        
     }
 
     public void testServiceFactory() {
         IMocksControl c = EasyMock.createNiceControl();
-        
+
         BundleContext ctx = c.createMock(BundleContext.class);
         ZooKeeper zk = c.createMock(ZooKeeper.class);
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
-        
+
         PublishingEndpointListenerFactory eplf = new PublishingEndpointListenerFactory(zk, ctx);
 
-        EasyMock.expect(
-                        ctx.registerService(EasyMock.eq(EndpointListener.class.getName()), EasyMock.eq(eplf),
+        EasyMock.expect(ctx.registerService(EasyMock.eq(EndpointListener.class.getName()), EasyMock.eq(eplf),
                                 (Dictionary<String, String>)EasyMock.anyObject())).andReturn(sreg).once();
 
-        
-        EasyMock.expect(ctx.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("myUUID")
-            .anyTimes();
+        EasyMock.expect(ctx.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("myUUID").anyTimes();
 
         PublishingEndpointListener eli = c.createMock(PublishingEndpointListener.class);
         eli.close();
         EasyMock.expectLastCall().once();
-        
+
         c.replay();
         eplf.start();
-        
-        
+
         Object service = eplf.getService(null, null);
         assertNotNull(service);
         assertTrue(service instanceof EndpointListener);
@@ -94,18 +86,17 @@ public class EndpointListenerFactoryTest extends TestCase {
         List<PublishingEndpointListener> listeners = eplf.getListeners();
         assertEquals(1, listeners.size());
         assertEquals(service, listeners.get(0));
-        
+
         eplf.ungetService(null, null, service);
         listeners = eplf.getListeners();
         assertEquals(0, listeners.size());
-        
-        eplf.ungetService(null, null, eli); // no call to close 
+
+        eplf.ungetService(null, null, eli); // no call to close
         listeners.add(eli);
         eplf.ungetService(null, null, eli); // call to close
         listeners = eplf.getListeners();
         assertEquals(0, listeners.size());
-        
+
         c.verify();
     }
-    
 }

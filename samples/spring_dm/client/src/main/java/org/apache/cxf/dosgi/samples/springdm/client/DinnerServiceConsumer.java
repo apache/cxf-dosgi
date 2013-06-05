@@ -22,12 +22,13 @@ import org.apache.cxf.dosgi.samples.springdm.DinnerService;
 import org.apache.cxf.dosgi.samples.springdm.Restaurant;
 
 public class DinnerServiceConsumer {
+
     DinnerService dinnerService;
-    
+
     public void setDinnerService(DinnerService ds) {
         dinnerService = ds;
     }
-    
+
     public void start() {
         System.out.println("Found the following restaurants:");
         for (Restaurant r : dinnerService.findRestaurants("nice and not too expensive!")) {

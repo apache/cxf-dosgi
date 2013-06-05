@@ -29,7 +29,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class Activator implements BundleActivator {    
+public class Activator implements BundleActivator {
+
     private ServiceTracker tracker;
 
     public void start(final BundleContext bc) {
@@ -44,7 +45,6 @@ public class Activator implements BundleActivator {
             }
         };
         tracker.open();
-        
     }
 
     protected void useService(final GreeterService greeter) {
@@ -66,20 +66,20 @@ public class Activator implements BundleActivator {
 
                 System.out.println("greetMe(\"" + gd + "\") returns:");
                 for (Map.Entry<GreetingPhrase, String> greeting : result.entrySet()) {
-                    System.out.println("  " + greeting.getKey().getPhrase() 
+                    System.out.println("  " + greeting.getKey().getPhrase()
                             + " " + greeting.getValue());
                 }
             } else if (gd instanceof GreeterData) {
                 System.out.println("*** Invoking greeter ***");
                 try {
-                    GreetingPhrase [] result = greeter.greetMe((GreeterData) gd);
+                    GreetingPhrase[] result = greeter.greetMe((GreeterData) gd);
                     System.out.println("greetMe(\"" + gd + "\") returns:");
                     for (GreetingPhrase phrase : result) {
                         System.out.println("  " + phrase.getPhrase());
                     }
                 } catch (GreeterException ex) {
                     System.out.println("GreeterException: " + ex.toString());
-                }                
+                }
             }
         }
     }

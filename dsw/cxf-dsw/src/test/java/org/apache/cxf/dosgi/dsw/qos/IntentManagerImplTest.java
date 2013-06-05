@@ -36,68 +36,67 @@ import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Test;
 
-
 public class IntentManagerImplTest extends Assert {
-    
+
     @Test
     public void testIntents() throws Exception {
         Map<String, Object> intents = new HashMap<String, Object>();
         intents.put("A", new TestFeature("A"));
         intents.put("SOAP", new TestFeature("SOAP"));
         final IntentMap intentMap = new IntentMap(intents);
-        
+
         IMocksControl control = EasyMock.createNiceControl();
         List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
         IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "A");
 
         List<String> effectiveIntents = Arrays.asList(intentManager.applyIntents(features, factory, props));
         assertEquals(Arrays.asList("A", "SOAP"), effectiveIntents);
-    }    
-    
+    }
+
     @Test
     public void testMultiIntents() {
         final IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         intentMap.put("confidentiality.message", new TestFeature("confidentiality.message"));
         intentMap.put("transactionality", new TestFeature("transactionality"));
-        
+
         IMocksControl control = EasyMock.createNiceControl();
         List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
         IntentManager intentManager = new IntentManagerImpl(intentMap);
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "transactionality confidentiality.message");
 
         List<String> effectiveIntents = Arrays.asList(intentManager.applyIntents(features, factory, props));
-        assertTrue(effectiveIntents.contains("transactionality"));        
-        assertTrue(effectiveIntents.contains("confidentiality.message"));        
+        assertTrue(effectiveIntents.contains("transactionality"));
+        assertTrue(effectiveIntents.contains("confidentiality.message"));
     }
-    
+
     @Test
     public void testFailedIntent() {
         Map<String, Object> intents = new HashMap<String, Object>();
         intents.put("A", new TestFeature("A"));
         final IntentMap intentMap = new IntentMap(intents);
-                
+
         IMocksControl control = EasyMock.createNiceControl();
         List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
-        
+
         IntentManager intentManager = new IntentManagerImpl(intentMap);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "A B");
-        //        ServiceEndpointDescription sd = 
-        //            new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
+        // ServiceEndpointDescription sd =
+        //         new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
 
         try {
             intentManager.applyIntents(features, factory, props);
@@ -106,7 +105,7 @@ public class IntentManagerImplTest extends Assert {
             assertEquals("B", iue.getIntent());
         }
     }
- 
+
     @Test
     public void testInferIntents() {
         Map<String, Object> intents = new HashMap<String, Object>();
@@ -117,28 +116,28 @@ public class IntentManagerImplTest extends Assert {
         intents.put("A_alt", feat1);
         intents.put("B", new TestFeature("B"));
         final IntentMap intentMap = new IntentMap(intents);
-        
+
         IMocksControl control = EasyMock.createNiceControl();
         List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
         IntentManager intentManager = new IntentManagerImpl(intentMap);
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "A");
-        //        ServiceEndpointDescription sd = 
-        //            new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
-        
+        // ServiceEndpointDescription sd =
+        //         new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
+
         List<String> effectiveIntents = Arrays.asList(intentManager.applyIntents(features, factory, props));
         assertEquals(4, effectiveIntents.size());
         assertTrue(effectiveIntents.contains("Prov"));
         assertTrue(effectiveIntents.contains("A"));
         assertTrue(effectiveIntents.contains("A_alt"));
     }
-    
+
     @Test
-    public void testDefaultBindingIntent() {        
+    public void testDefaultBindingIntent() {
         IMocksControl control = EasyMock.createNiceControl();
 
         Map<String, Object> intents = new HashMap<String, Object>();
@@ -157,11 +156,10 @@ public class IntentManagerImplTest extends Assert {
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "A");
-        //        ServiceEndpointDescription sd = 
-        //            new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
-        
-        List<String> effectiveIntents = 
-            Arrays.asList(intentManager.applyIntents(features, factory, props));
+        // ServiceEndpointDescription sd =
+        //         new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
+
+        List<String> effectiveIntents = Arrays.asList(intentManager.applyIntents(features, factory, props));
         assertEquals(3, effectiveIntents.size());
         assertTrue(effectiveIntents.contains("A"));
         assertTrue(effectiveIntents.contains("SOAP"));
@@ -189,19 +187,18 @@ public class IntentManagerImplTest extends Assert {
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "A SOAP.1_2");
-        //        ServiceEndpointDescription sd = 
-        //            new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
-        
-        List<String> effectiveIntents = 
-            Arrays.asList(intentManager.applyIntents(features, factory, props));
+        // ServiceEndpointDescription sd =
+        //         new ServiceEndpointDescriptionImpl(Arrays.asList(String.class.getName()), props);
+
+        List<String> effectiveIntents = Arrays.asList(intentManager.applyIntents(features, factory, props));
         assertEquals(2, effectiveIntents.size());
         assertTrue(effectiveIntents.contains("A"));
-        assertTrue(effectiveIntents.contains("SOAP.1_2"));        
+        assertTrue(effectiveIntents.contains("SOAP.1_2"));
     }
 
     public void testInheritMasterIntentMapDefault() {
         List<String> features = runTestInheritMasterIntentMap("A B");
-        
+
         assertEquals(2, features.size());
         assertTrue(features.contains("appFeatureA"));
         assertTrue(features.contains("masterFeatureB"));
@@ -209,7 +206,7 @@ public class IntentManagerImplTest extends Assert {
 
     public void testInheritMasterIntentMap() {
         List<String> features = runTestInheritMasterIntentMap("A B");
-        
+
         assertEquals(2, features.size());
         assertTrue(features.contains("appFeatureA"));
         assertTrue(features.contains("masterFeatureB"));
@@ -229,7 +226,7 @@ public class IntentManagerImplTest extends Assert {
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", requestedIntents);
-        
+
         IntentManagerImpl intentManager = new IntentManagerImpl(intentMap);
         intentManager.applyIntents(features, factory, props);
 
@@ -239,7 +236,7 @@ public class IntentManagerImplTest extends Assert {
         }
         return featureNames;
     }
-    
+
     @Test
     public void testProvidedIntents() {
         Map<String, Object> masterIntents = new HashMap<String, Object>();
@@ -252,22 +249,23 @@ public class IntentManagerImplTest extends Assert {
         List<Feature> features = new ArrayList<Feature>();
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "B A");
-        
+
         IntentManager intentManager = new IntentManagerImpl(intentMap);
-        
+
         Set<String> effectiveIntents = new HashSet<String>(Arrays.asList(intentManager.applyIntents(features,
-                                                                                                    factory, 
+                                                                                                    factory,
                                                                                                     props)));
-        Set<String> expectedIntents = new HashSet<String>(Arrays.asList(new String [] {"A", "B", "SOAP"}));
+        Set<String> expectedIntents = new HashSet<String>(Arrays.asList(new String[] {"A", "B", "SOAP"}));
         assertEquals(expectedIntents, effectiveIntents);
     }
-    
+
     private static final class TestFeature extends AbstractFeature {
+
         private final String name;
-        
+
         private TestFeature(String n) {
             name = n;
         }

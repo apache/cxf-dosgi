@@ -23,6 +23,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class ClientActivator implements BundleActivator {
+
     private ServiceTracker tracker;
 
     public void start(final BundleContext bc) throws Exception {

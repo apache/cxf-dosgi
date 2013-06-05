@@ -33,6 +33,7 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 @RunWith(JUnit4TestRunner.class)
 public class TestExportRestService extends AbstractDosgiTest {
+
     @Inject
     BundleContext bundleContext;
 
@@ -50,10 +51,9 @@ public class TestExportRestService extends AbstractDosgiTest {
                 frameworkStartLevel(100)
         };
     }
-    
+
     @Test
     public void testEndpointAvailable() throws Exception {
         waitPort(8080);
     }
-
 }

@@ -32,17 +32,18 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
 public class ActivatorTest extends TestCase {
+
     private BundleContext getMockBundleContext(IMocksControl control) {
         Bundle b = control.createMock(Bundle.class);
         Dictionary<String, String> ht = new Hashtable<String, String>();
-        EasyMock.expect(b.getHeaders()).andReturn(ht).anyTimes();        
+        EasyMock.expect(b.getHeaders()).andReturn(ht).anyTimes();
         BundleContext bc = control.createMock(BundleContext.class);
 
         EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
         return bc;
     }
-    
+
     public void testCreateAndShutdownRemoteServiceAdminService() throws Exception {
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext bc = getMockBundleContext(control);
@@ -53,11 +54,10 @@ public class ActivatorTest extends TestCase {
         EasyMock.expect(bc.registerService(EasyMock.eq(RemoteServiceAdmin.class.getName()),
                                            EasyMock.anyObject(), (Dictionary<String, String>)EasyMock.anyObject()))
                                            .andReturn(sr).atLeastOnce();
-        
+
         control.replay();
         Activator a = new Activator();
         a.start(bc);
         control.verify();
     }
-    
 }

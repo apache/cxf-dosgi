@@ -38,16 +38,12 @@ public class JaxRSUtilsTest extends TestCase {
     private void addRequiredProps(Map<String, Object> props) {
         props.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myGreatConfiguration");
-        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[] {
-            "my.class"
-        });
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[] {"my.class"});
     }
 
     public void testNoGlobalProviders() {
         Map<String, Object> props = new HashMap<String, Object>();
-
         addRequiredProps(props);
-
         props.put(Constants.RS_PROVIDER_GLOBAL_PROP_KEY, "false");
 
         assertEquals(0, JaxRSUtils.getProviders(null, null, props).size());
@@ -80,7 +76,6 @@ public class JaxRSUtilsTest extends TestCase {
     }
 
     public void testServiceProviderProperty() throws Exception {
-
         BundleContext bc = EasyMock.createMock(BundleContext.class);
         Bundle bundle = EasyMock.createMock(Bundle.class);
         bc.getBundle();
@@ -106,7 +101,6 @@ public class JaxRSUtilsTest extends TestCase {
     }
 
     public void testServiceProviderStrings() throws Exception {
-
         BundleContext bc = EasyMock.createMock(BundleContext.class);
         Bundle bundle = EasyMock.createMock(Bundle.class);
         bc.getBundle();
@@ -137,9 +131,7 @@ public class JaxRSUtilsTest extends TestCase {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         bc.getServiceReferences((String)null, JaxRSUtils.PROVIDERS_FILTER);
-        EasyMock.expectLastCall().andReturn(new ServiceReference[] {
-            sref
-        });
+        EasyMock.expectLastCall().andReturn(new ServiceReference[] {sref});
         sref.getProperty(Constants.RS_PROVIDER_EXPECTED_PROP_KEY);
         EasyMock.expectLastCall().andReturn(false);
         bc.getService(sref);
@@ -159,9 +151,7 @@ public class JaxRSUtilsTest extends TestCase {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         bc.getServiceReferences((String)null, JaxRSUtils.PROVIDERS_FILTER);
-        EasyMock.expectLastCall().andReturn(new ServiceReference[] {
-            sref
-        });
+        EasyMock.expectLastCall().andReturn(new ServiceReference[] {sref});
         sref.getProperty(Constants.RS_PROVIDER_PROP_KEY);
         EasyMock.expectLastCall().andReturn(false);
         bc.getService(sref);
@@ -181,9 +171,7 @@ public class JaxRSUtilsTest extends TestCase {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         bc.getServiceReferences((String)null, JaxRSUtils.PROVIDERS_FILTER);
-        EasyMock.expectLastCall().andReturn(new ServiceReference[] {
-            sref
-        });
+        EasyMock.expectLastCall().andReturn(new ServiceReference[] {sref});
         sref.getProperty(Constants.RS_PROVIDER_PROP_KEY);
         EasyMock.expectLastCall().andReturn(true);
         bc.getService(sref);
@@ -198,5 +186,4 @@ public class JaxRSUtilsTest extends TestCase {
         assertEquals(1, providers.size());
         assertSame(p, providers.get(0));
     }
-
 }

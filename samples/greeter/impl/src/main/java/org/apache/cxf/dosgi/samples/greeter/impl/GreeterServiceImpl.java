@@ -27,36 +27,35 @@ import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
 
 public class GreeterServiceImpl implements GreeterService {
+
     public Map<GreetingPhrase, String> greetMe(String name) {
         System.out.println("Invoking: greetMe(" + name + ")");
-        
-        Map<GreetingPhrase, String> greetings = 
-            new HashMap<GreetingPhrase, String>();
-        
+
+        Map<GreetingPhrase, String> greetings = new HashMap<GreetingPhrase, String>();
+
         greetings.put(new GreetingPhrase("Hello"), name);
         greetings.put(new GreetingPhrase("Hoi"), name);
         greetings.put(new GreetingPhrase("Hola"), name);
         greetings.put(new GreetingPhrase("Bonjour"), name);
-        
-        
+
         return greetings;
     }
 
-    public GreetingPhrase [] greetMe(GreeterData gd) throws GreeterException {
+    public GreetingPhrase[] greetMe(GreeterData gd) throws GreeterException {
         if (gd.isException()) {
             System.out.println("Throwing custom exception from: greetMe(" + gd.getName() + ")");
             throw new GreeterException(gd.getName());
         }
-        
+
         String details = gd.getName() + "(" + gd.getAge() + ")";
         System.out.println("Invoking: greetMe(" + details + ")");
-        
-        GreetingPhrase [] greetings = new GreetingPhrase [] {
+
+        GreetingPhrase[] greetings = new GreetingPhrase[] {
             new GreetingPhrase("Howdy " + details),
             new GreetingPhrase("Hallo " + details),
             new GreetingPhrase("Ni hao " + details)
         };
-        
+
         return greetings;
     }
 }

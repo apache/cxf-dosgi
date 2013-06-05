@@ -30,7 +30,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class Activator implements BundleActivator {    
+public class Activator implements BundleActivator {
+
     private ServiceTracker tracker;
     private ServiceTracker tracker2;
 
@@ -46,7 +47,7 @@ public class Activator implements BundleActivator {
             }
         };
         tracker.open();
-        
+
         tracker2 = new ServiceTracker(bc, GreeterService2.class.getName(), null) {
             @Override
             public Object addingService(ServiceReference reference) {
@@ -68,7 +69,7 @@ public class Activator implements BundleActivator {
         });
         t.start();
     }
-    
+
     protected void useGreeterService2(final GreeterService2 greeter) {
         Thread t = new Thread(new Runnable() {
             public void run() {
@@ -88,10 +89,10 @@ public class Activator implements BundleActivator {
                 System.out.println("*** Invoking greeter ***");
                 try {
                     GreeterInfo info = greeter.greetMe(name);
-    
+
                     System.out.println("greetMe(\"" + name + "\") returns:");
                     for (GreetingPhrase greeting: info.getGreetings()) {
-                        System.out.println("  " + greeting.getPhrase() 
+                        System.out.println("  " + greeting.getPhrase()
                                 + " " + greeting.getName());
                     }
                 } catch (GreeterException ex) {
@@ -100,7 +101,7 @@ public class Activator implements BundleActivator {
             }
         }
     }
-    
+
     private void greeter2UI(final GreeterService2 greeter) {
         while (true) {
             System.out.println("*** Opening greeter2 client dialog ***");
@@ -111,10 +112,10 @@ public class Activator implements BundleActivator {
                 System.out.println("*** Invoking greeter2 ***");
                 try {
                     GreeterInfo info = greeter.greetMe(name);
-    
+
                     System.out.println("greetMe(\"" + name + "\") returns:");
                     for (GreetingPhrase greeting: info.getGreetings()) {
-                        System.out.println("  " + greeting.getPhrase() 
+                        System.out.println("  " + greeting.getPhrase()
                                 + " " + greeting.getName());
                     }
                 } catch (GreeterException ex) {

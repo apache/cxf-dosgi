@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.dosgi.dsw;
 
-
 public final class TestUtils {
+
 //    private TestUtils() {
 //    }
 //
@@ -28,7 +28,7 @@ public final class TestUtils {
 //        for (String iName : interfaceNames) {
 //            iList.add(iName);
 //        }
-//        
+//
 //        ServiceEndpointDescription sd = EasyMock.createNiceMock(ServiceEndpointDescription.class);
 //        sd.getProvidedInterfaces();
 //        EasyMock.expectLastCall().andReturn(iList);

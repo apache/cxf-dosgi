@@ -72,15 +72,15 @@
 	  <groupId>org.osgi</groupId>
 	  <artifactId>org.osgi.enterprise</artifactId>
     </dependency>
-    <dependency>  
-        <groupId>org.slf4j</groupId>  
-        <artifactId>slf4j-api</artifactId>  
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>  
-        <groupId>org.slf4j</groupId>  
-        <artifactId>slf4j-jcl</artifactId>  
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-jcl</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>com.springsource.org.jdom</artifactId>
@@ -184,62 +184,62 @@
     <dependency>
       <groupId>org.apache.ws.xmlschema</groupId>
       <artifactId>xmlschema-core</artifactId>
-      <version>${xmlschema.bundle.version}</version> 
+      <version>${xmlschema.bundle.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId> 
-      <artifactId>org.apache.servicemix.bundles.xmlresolver</artifactId> 
-      <version>${xmlresolver.bundle.version}</version> 
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.xmlresolver</artifactId>
+      <version>${xmlresolver.bundle.version}</version>
     </dependency>
     <dependency>
-       <groupId>org.apache.neethi</groupId> 
-       <artifactId>neethi</artifactId> 
-       <version>${neethi.bundle.version}</version> 
+       <groupId>org.apache.neethi</groupId>
+       <artifactId>neethi</artifactId>
+       <version>${neethi.bundle.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId> 
-      <artifactId>org.apache.servicemix.bundles.wsdl4j</artifactId> 
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.wsdl4j</artifactId>
       <version>${wsdl4j.bundle.version}</version>
     </dependency>
     <dependency>
-       <groupId>org.apache.servicemix.bundles</groupId> 
-       <artifactId>org.apache.servicemix.bundles.xmlsec</artifactId> 
+       <groupId>org.apache.servicemix.bundles</groupId>
+       <artifactId>org.apache.servicemix.bundles.xmlsec</artifactId>
        <version>${xmlsec.bundle.version}</version>
-    </dependency>  
+    </dependency>
     <dependency>
-       <groupId>org.apache.servicemix.bundles</groupId> 
-       <artifactId>org.apache.servicemix.bundles.jaxb-impl</artifactId> 
-       <version>${jaxbimpl.bundle.version}</version> 
-    </dependency> 
-
-    <dependency>
-       <groupId>org.apache.servicemix.bundles</groupId> 
-       <artifactId>org.apache.servicemix.bundles.asm</artifactId> 
-       <version>${asm.bundle.version}</version> 
+       <groupId>org.apache.servicemix.bundles</groupId>
+       <artifactId>org.apache.servicemix.bundles.jaxb-impl</artifactId>
+       <version>${jaxbimpl.bundle.version}</version>
     </dependency>
 
     <dependency>
-       <groupId>org.codehaus.woodstox</groupId> 
-       <artifactId>stax2-api</artifactId> 
-       <version>3.1.1</version> 
+       <groupId>org.apache.servicemix.bundles</groupId>
+       <artifactId>org.apache.servicemix.bundles.asm</artifactId>
+       <version>${asm.bundle.version}</version>
+    </dependency>
+
+    <dependency>
+       <groupId>org.codehaus.woodstox</groupId>
+       <artifactId>stax2-api</artifactId>
+       <version>3.1.1</version>
     </dependency>
     <dependency>
-       <groupId>org.codehaus.woodstox</groupId> 
-       <artifactId>woodstox-core-asl</artifactId> 
-       <version>${woodstox.bundle.version}</version> 
+       <groupId>org.codehaus.woodstox</groupId>
+       <artifactId>woodstox-core-asl</artifactId>
+       <version>${woodstox.bundle.version}</version>
     </dependency>
     <dependency>
-       <groupId>org.apache.servicemix.bundles</groupId> 
-       <artifactId>org.apache.servicemix.bundles.commons-pool</artifactId> 
-       <version>${commons.pool.bundle.version}</version> 
+       <groupId>org.apache.servicemix.bundles</groupId>
+       <artifactId>org.apache.servicemix.bundles.commons-pool</artifactId>
+       <version>${commons.pool.bundle.version}</version>
     </dependency>
     <dependency>
-       <groupId>org.apache.servicemix.bundles</groupId> 
+       <groupId>org.apache.servicemix.bundles</groupId>
        <artifactId>org.apache.servicemix.bundles.joda-time</artifactId>
        <version>1.5.2_4</version>
     </dependency>
     <dependency>
-       <groupId>org.apache.servicemix.bundles</groupId> 
+       <groupId>org.apache.servicemix.bundles</groupId>
        <artifactId>org.apache.servicemix.bundles.opensaml</artifactId>
        <version>2.4.1_1</version>
     </dependency>
@@ -269,16 +269,16 @@
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.configadmin</artifactId>
       <version>1.2.8</version>
-    </dependency>      
+    </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.fileinstall</artifactId>
       <version>3.1.10</version>
-    </dependency>      
+    </dependency>
 
-    <dependency> 
-      <groupId>org.apache.log4j</groupId> 
-      <artifactId>com.springsource.org.apache.log4j</artifactId> 
+    <dependency>
+      <groupId>org.apache.log4j</groupId>
+      <artifactId>com.springsource.org.apache.log4j</artifactId>
       <version>${log4j.version}</version>
     </dependency>
     <dependency>
@@ -288,15 +288,15 @@
             <exclusions>
                 <exclusion>
                    <groupId>com.sun.jdmk</groupId>
-                   <artifactId>jmxtools</artifactId> 
+                   <artifactId>jmxtools</artifactId>
                 </exclusion>
                 <exclusion>
                    <groupId>com.sun.jmx</groupId>
-                   <artifactId>jmxri</artifactId> 
+                   <artifactId>jmxri</artifactId>
                 </exclusion>
                 <exclusion>
                    <groupId>log4j</groupId>
-                   <artifactId>log4j</artifactId> 
+                   <artifactId>log4j</artifactId>
                 </exclusion>
             </exclusions>
     </dependency>
@@ -315,9 +315,8 @@
         <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-server-config</artifactId>
         <version>${project.version}</version>
     </dependency>
-    
-  </dependencies>        
-  
+
+  </dependencies>
 
   <build>
     <resources>
@@ -347,7 +346,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Since the assembly plugin has no way to output to an .esa file extension use the antrun 
+      <!-- Since the assembly plugin has no way to output to an .esa file extension use the antrun
            plugin to copy the file to one with the proper extension -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -365,7 +364,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>     
+      </plugin>
       <!-- Attach the .esa file to the project so that it ends up in the repo -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

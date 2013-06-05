@@ -33,6 +33,7 @@ import org.osgi.util.tracker.ServiceTracker;
  * when RemoteServiceAdmin services are added or removed
  */
 public class RemoteServiceAdminTracker extends ServiceTracker {
+
     private List<RemoteServiceAdminLifeCycleListener> listeners;
 
     public RemoteServiceAdminTracker(BundleContext bc) {
@@ -71,5 +72,4 @@ public class RemoteServiceAdminTracker extends ServiceTracker {
         }
         return list;
     }
-
 }

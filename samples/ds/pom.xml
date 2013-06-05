@@ -31,11 +31,11 @@
       <version>1.5-SNAPSHOT</version>
       <relativePath>../../parent/pom.xml</relativePath>
     </parent>
-    
-    <modules>    
+
+    <modules>
       <module>interface</module>
       <module>impl</module>
       <module>client</module>
-    </modules> 
+    </modules>
 
 </project>

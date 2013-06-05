@@ -37,12 +37,10 @@
       <scope>runtime</scope>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <excludes>
-        <!-- Exclude the current artifact as it doesn't contribute anything other than the 
+        <!-- Exclude the current artifact as it doesn't contribute anything other than the
              logic to build the subsystem. -->
         <exclude>org.apache.cxf.dosgi:cxf-dosgi-ri-subsystem-distribution</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
 </assembly>
-
-

@@ -48,11 +48,10 @@ import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
-
 @RunWith(JUnit4TestRunner.class)
 public class TestDiscoveryExport extends AbstractDosgiTest {
 
-    private static final String GREETER_ZOOKEEPER_NODE 
+    private static final String GREETER_ZOOKEEPER_NODE
         = "/osgi/service_registry/org/apache/cxf/dosgi/samples/greeter/GreeterService/localhost#9090##greeter";
 
     @Inject
@@ -70,8 +69,8 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
                     .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
                 mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                     .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf.dosgi.samples").
-                    artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf.dosgi.samples")
+                    .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf.dosgi.systests")
                     .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
                 frameworkStartLevel(100)
@@ -90,7 +89,7 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
     private void assertNodeExists(ZooKeeper zk, String zNode, int timeout) {
         long endTime = System.currentTimeMillis() + timeout;
         Stat stat = null;
-        while (stat == null  && System.currentTimeMillis() < endTime) {
+        while (stat == null && System.currentTimeMillis() < endTime) {
             try {
                 stat = zk.exists(zNode, null);
                 Thread.sleep(200);
@@ -123,10 +122,10 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
 
     protected void configureZookeeper(ConfigurationAdmin ca, int zkPort) throws IOException {
         System.out.println("*** Port for Zookeeper Server: " + zkPort);
-        updateZkServerConfig(zkPort, ca);                            
+        updateZkServerConfig(zkPort, ca);
         updateZkClientConfig(zkPort, ca);
     }
-    
+
     protected void updateZkClientConfig(final int zkPort, ConfigurationAdmin cadmin) throws IOException {
         Dictionary<String, Object> cliProps = new Hashtable<String, Object>();
         cliProps.put("zookeeper.host", "127.0.0.1");
@@ -139,5 +138,4 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
         svrProps.put("clientPort", zkPort);
         cadmin.getConfiguration("org.apache.cxf.dosgi.discovery.zookeeper.server", null).update(svrProps);
     }
-    
 }

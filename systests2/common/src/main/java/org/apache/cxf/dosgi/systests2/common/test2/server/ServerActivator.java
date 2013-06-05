@@ -27,22 +27,23 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-public class ServerActivator implements BundleActivator {    
+public class ServerActivator implements BundleActivator {
+
     private ServiceRegistration reg;
 
     public void start(BundleContext bc) throws Exception {
         Test2Service svc = new Test2ServiceImpl();
-                
+
         // Dynamically assign a free port
         int freePort = new ServerSocket(0).getLocalPort();
         String url = "http://localhost:" + freePort + "/test2";
         System.out.println("*** Server using URL: " + url);
-        
+
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put("service.exported.interfaces", "*");
         props.put("service.exported.configs", "org.apache.cxf.ws");
         props.put("endpoint.id", url);
-        
+
         reg = bc.registerService(Test2Service.class.getName(), svc, props);
     }
 

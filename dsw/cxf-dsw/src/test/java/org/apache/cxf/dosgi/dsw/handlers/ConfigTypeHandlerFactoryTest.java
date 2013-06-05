@@ -33,7 +33,6 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 import static org.junit.Assert.assertTrue;
 
-
 public class ConfigTypeHandlerFactoryTest {
 
     @Test

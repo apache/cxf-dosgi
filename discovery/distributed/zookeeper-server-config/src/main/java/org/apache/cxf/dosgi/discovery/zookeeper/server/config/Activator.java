@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Activator implements BundleActivator {
+
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
     private static final String ZOOKEEPER_PORT = "org.apache.cxf.dosgi.discovery.zookeeper.port";
     private static final String PID = "org.apache.cxf.dosgi.discovery.zookeeper.server";
@@ -48,7 +49,7 @@ public class Activator implements BundleActivator {
                 LOG.info("Global zookeeper port: {}", port);
             }
         }
-        
+
         st = new ServiceTracker(context, ConfigurationAdmin.class.getName(), null) {
             @Override
             public Object addingService(ServiceReference reference) {
@@ -67,12 +68,12 @@ public class Activator implements BundleActivator {
                     }
                 }
                 return svc;
-            }            
+            }
         };
         st.open();
-        
+
         // The following section is done synchronously otherwise it doesn't happen in time for the CT
-        ServiceReference[] refs = context.getServiceReferences(ManagedService.class.getName(), 
+        ServiceReference[] refs = context.getServiceReferences(ManagedService.class.getName(),
                 "(service.pid=org.apache.cxf.dosgi.discovery.zookeeper)");
         if (refs == null || refs.length == 0) {
             throw new RuntimeException("This bundle must be started after the bundle with the Zookeeper "
@@ -93,7 +94,7 @@ public class Activator implements BundleActivator {
         }
         LOG.debug("Passed the zookeeper.host property to the Zookeeper Client managed service.");
     }
-    
+
     private String getFreePort() {
         try {
             ServerSocket ss = new ServerSocket(0);
@@ -104,8 +105,8 @@ public class Activator implements BundleActivator {
             LOG.error("Failed to find a free port!", e);
             return null;
         }
-    }    
-    
+    }
+
     public void stop(BundleContext context) throws Exception {
         st.close();
     }

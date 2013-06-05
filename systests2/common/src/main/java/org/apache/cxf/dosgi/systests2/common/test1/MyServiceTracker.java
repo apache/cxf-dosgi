@@ -30,6 +30,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class MyServiceTracker extends ServiceTracker {
+
     private static StringBuffer invocationResult = new StringBuffer();
 
     public MyServiceTracker(BundleContext context) {
@@ -44,7 +45,7 @@ public class MyServiceTracker extends ServiceTracker {
         }
         return svc;
     }
-    
+
     public static String getResult() {
         return invocationResult.toString();
     }
@@ -61,7 +62,7 @@ public class MyServiceTracker extends ServiceTracker {
                 svc.greetMe(new GreeterDataImpl());
             } catch (GreeterException ex) {
                 invocationResult.append(";exception");
-            } 
+            }
             Dictionary<String, Object> props = new Hashtable<String, Object>();
             props.put("result", invocationResult.toString());
             props.put("testResult", "test1");

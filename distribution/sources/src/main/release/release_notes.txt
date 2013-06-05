@@ -42,11 +42,11 @@ Many dependencies have been updated, including the update to CXF 2.5.1. See also
 Additionally, a number of bugs has been fixed including:
 
 DOSGI-108   service.exported.interfaces doesn't support comma-seperated String value
-DOSGI-107   Support for a 'wsdl' configuration type 	
-DOSGI-105   Update greeter_rest demo to use OSGI HttpService 	 
+DOSGI-107   Support for a 'wsdl' configuration type
+DOSGI-105   Update greeter_rest demo to use OSGI HttpService
 DOSGI-103   Improve multi-bundle distro configuration for Felix
 DOSGI-102   DOSGI RI can not map invocation exceptions to custom exceptions on the client side
-DOSGI-97    Automatically unregister HTTP servlets/resources if exported service goes down 	
+DOSGI-97    Automatically unregister HTTP servlets/resources if exported service goes down
 DOSGI-94    Enhancement to deal with registered services that might have been proxied
 DOSGI-91    DOSGI RS Proxies ignore ResponseExceptionMapper providers
 DOSGI-85    Unable to export services started after Topology manager
@@ -54,7 +54,7 @@ DOSGI-82    Populate custom servicename, portname and targetnamespace for jax-ws
 DOSGI-79    RemoteServiceAdmin.getImportedEndpoints() returns collection of incorrect type
 DOSGI-77    NullPointerException from Distributed OSGI when bundle with wanted properties is started.
 DOSGI-76    EndpointListener.endpointRemoved
-DOSGI-75    CXF Distributed OSGi isn't using org.apache.cxf.common.logging.LogUtils 
+DOSGI-75    CXF Distributed OSGi isn't using org.apache.cxf.common.logging.LogUtils
 
 
 Apache CXF Distributed OSGi 1.2 Release Notes
@@ -119,7 +119,7 @@ Additionally, a number of bugs has been fixed including:
              version
 [DOSGI-61] - The Zookeeper Discovery only supports primitive types as service
              properties
-[DOSGI-62] - The DSW creates endpoints with localhost URLs 
+[DOSGI-62] - The DSW creates endpoints with localhost URLs
 [DOSGI-66] - The DSW only loads the intent map when certain spring bundles
              are loaded and started upfront
 [DOSGI-67] - Enable filters on DOSGi endpoints
@@ -157,7 +157,7 @@ New features in this release include:
 [CXF-2435] - Distributed OSGi having a problem with a custom type method
              argument
 [CXF-2288] - Bundle cannot be restarted
-[CXF-2385] - Discovery doesn't fully translate 'localhost' into a proper 
+[CXF-2385] - Discovery doesn't fully translate 'localhost' into a proper
              machine name
 [CXF-2200] - Consuming more than 1 service using Spring-DM doesn't work
 

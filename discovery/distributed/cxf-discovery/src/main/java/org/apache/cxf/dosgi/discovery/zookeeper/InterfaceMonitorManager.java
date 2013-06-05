@@ -44,8 +44,9 @@ import org.slf4j.LoggerFactory;
  * These events are then forwarded to all interested EndpointListeners
  */
 public class InterfaceMonitorManager {
+
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitorManager.class);
-    
+
     private final ZooKeeper zooKeeper;
     private final Map<ServiceReference, List<String> /* scopes of the epl */> handledEndpointListeners
         = new HashMap<ServiceReference, List<String>>();
@@ -56,7 +57,7 @@ public class InterfaceMonitorManager {
         List<ServiceReference> relatedServiceListeners = new CopyOnWriteArrayList<ServiceReference>();
         InterfaceMonitor im;
     }
-    
+
     public InterfaceMonitorManager(BundleContext bctx, ZooKeeper zooKeeper) {
         this.bctx = bctx;
         this.zooKeeper = zooKeeper;
@@ -88,7 +89,7 @@ public class InterfaceMonitorManager {
             handledScopes.add(scope);
         }
     }
-    
+
     /**
      * Only for test case!
      */
@@ -102,14 +103,15 @@ public class InterfaceMonitorManager {
     protected synchronized Map<ServiceReference, List<String>> getHandledEndpointListeners() {
         return handledEndpointListeners;
     }
-    
+
     private InterfaceMonitor createInterfaceMonitor(final String scope, String objClass, final Interest interest) {
         // holding this object's lock in the callbacks can lead to a deadlock with InterfaceMonitor
         EndpointListener epListener = new EndpointListener() {
+
             public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
                 notifyListeners(endpoint, scope, false, interest.relatedServiceListeners);
             }
-            
+
             public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
                 notifyListeners(endpoint, scope, true, interest.relatedServiceListeners);
             }
@@ -135,7 +137,7 @@ public class InterfaceMonitorManager {
         }
         handledEndpointListeners.remove(sref);
     }
-    
+
     private void notifyListeners(EndpointDescription epd, String currentScope, boolean isAdded,
             List<ServiceReference> relatedServiceListeners) {
         for (ServiceReference sref : relatedServiceListeners) {
@@ -165,7 +167,7 @@ public class InterfaceMonitorManager {
             }
         }
     }
-    
+
     private static boolean matches(String scope, EndpointDescription epd) {
         try {
             Filter f = FrameworkUtil.createFilter(scope);

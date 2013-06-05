@@ -31,20 +31,21 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 public class Activator implements BundleActivator {
+
     private ServiceRegistration reg;
 
-    public void start(BundleContext bc) throws Exception {        
+    public void start(BundleContext bc) throws Exception {
         Dictionary<String, Object> props = new Hashtable<String, Object>();
-        
+
         String host = getHostName();
         int port = getPort();
-        
+
         props.put("service.exported.interfaces", "*");
         props.put("service.exported.configs", "org.apache.cxf.ws");
         props.put("org.apache.cxf.ws.address", getAddress(host, port)); // old obsolete value
         props.put("endpoint.id", getAddress(host, port));
 
-        reg = bc.registerService(DisplayService.class.getName(), 
+        reg = bc.registerService(DisplayService.class.getName(),
                 new DisplayServiceImpl(host + ":" + port), props);
     }
 
@@ -67,5 +68,4 @@ public class Activator implements BundleActivator {
     public void stop(BundleContext bc) throws Exception {
         reg.unregister();
     }
-
 }

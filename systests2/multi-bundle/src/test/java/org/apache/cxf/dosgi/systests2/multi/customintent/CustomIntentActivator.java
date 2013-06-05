@@ -34,5 +34,4 @@ public class CustomIntentActivator implements BundleActivator {
 
     public void stop(BundleContext context) throws Exception {
     }
-
 }

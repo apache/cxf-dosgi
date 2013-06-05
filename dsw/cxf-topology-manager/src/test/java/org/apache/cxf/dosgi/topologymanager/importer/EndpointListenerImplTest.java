@@ -29,35 +29,29 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 
-
-
 public class EndpointListenerImplTest extends Assert {
-   
+
     int testCase;
 
     @SuppressWarnings("rawtypes")
     @Test
     public void testScopeChange() {
-        
-        
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         TopologyManagerImport tm = EasyMock.createNiceMock(TopologyManagerImport.class);
         ServiceRegistration sr = EasyMock.createNiceMock(ServiceRegistration.class);
-        
+
         // expect Listener registration
         EasyMock.expect(bc.registerService((String)EasyMock.anyObject(),
-                                           EasyMock.anyObject(), 
+                                           EasyMock.anyObject(),
                                            (Dictionary)EasyMock.anyObject())).andReturn(sr).atLeastOnce();
-        
-        
+
         sr.setProperties((Dictionary)EasyMock.anyObject());
-        
-        
+
         // expect property changes based on later calls
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-            
+
             public Object answer() throws Throwable {
-                Object[] args =  EasyMock.getCurrentArguments();
+                Object[] args = EasyMock.getCurrentArguments();
                 Dictionary props = (Dictionary)args[0];
                 @SuppressWarnings("unchecked")
                 List<String> scope = (List<String>)props.get(EndpointListener.ENDPOINT_LISTENER_SCOPE);
@@ -88,34 +82,31 @@ public class EndpointListenerImplTest extends Assert {
                 return null;
             }
         }).atLeastOnce();
-        
-        
+
         EasyMock.replay(bc);
         EasyMock.replay(tm);
         EasyMock.replay(sr);
-        
+
         EndpointListenerManager endpointListener = new EndpointListenerManager(bc, tm);
-                
+
         endpointListener.start();
 
-        
         testCase = 1;
-        endpointListener.extendScope("(a=b)");        
+        endpointListener.extendScope("(a=b)");
         testCase = 2;
         endpointListener.reduceScope("(a=b)");
-        
+
         testCase = 3;
         endpointListener.extendScope("(a=b)");
         testCase = 4;
         endpointListener.extendScope("(c=d)");
-        testCase = 5;       
+        testCase = 5;
         endpointListener.reduceScope("(a=b)");
-                
+
         endpointListener.stop();
-        
+
         EasyMock.verify(bc);
         EasyMock.verify(tm);
         EasyMock.verify(sr);
     }
-    
 }

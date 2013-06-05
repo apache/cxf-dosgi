@@ -32,6 +32,7 @@ import org.osgi.framework.ServiceRegistration;
  * endpoint.
  */
 public class Activator implements BundleActivator {
+
     private ServiceRegistration restRegistration;
     private ServiceRegistration filterRegistration;
 

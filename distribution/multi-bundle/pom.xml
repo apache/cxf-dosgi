@@ -232,7 +232,7 @@
             <groupId>org.apache.aries.blueprint</groupId>
             <artifactId>org.apache.aries.blueprint.api</artifactId>
             <version>1.0.0</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
             <artifactId>org.apache.aries.blueprint.core</artifactId>
@@ -243,7 +243,6 @@
             <artifactId>org.apache.aries.blueprint.cm</artifactId>
             <version>1.0.1</version>
         </dependency>
-        
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -314,7 +313,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-bundle-compatible</artifactId>
             <version>${cxf.version}</version>
-            <!-- <exclusions> <exclusion> <groupId>org.apache.cxf</groupId> 
+            <!-- <exclusions> <exclusion> <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-transports-jms</artifactId> </exclusion> </exclusions> -->
         </dependency>
 
@@ -385,8 +384,7 @@
             <version>${project.version}</version>
         </dependency>
 
-    </dependencies>        
-  
+    </dependencies>
 
   <build>
     <resources>
@@ -473,7 +471,6 @@
           </execution>
         </executions>
       </plugin>
-      
 
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -486,39 +483,39 @@
                   <pathelement location="." />
                 </path>
                 <pathconvert targetos="unix" property="current.dir" refid="current.dir.path" />
-                
+
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/distribution_configs/felix.config.properties.append" style="src/main/xsl/felix_distro_config.xslt">
                     <param name="Version" expression="${dosgi.version}" />
                     <param name="Offset" expression="50" />
                 </xslt>
-                
+
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/felix.config.properties.append" style="src/main/xsl/felix_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/" />
                       <param name="Offset" expression="50" />
                 </xslt>
-                
+
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/distribution_configs/equinox.config.ini.append" style="src/main/xsl/equinox_distro_config.xslt">
                     <param name="Version" expression="${dosgi.version}" />
                 </xslt>
-                
+
                 <xslt processor="trax" in="target/classes/distro_bundles.xml" out="target/equinox.config.ini.append" style="src/main/xsl/equinox_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/" />
                 </xslt>
-                
+
                 <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/distribution_configs/felix.discovery.config.properties.append" style="src/main/xsl/felix_distro_config.xslt">
                     <param name="Version" expression="${dosgi.version}" />
                     <param name="Offset" expression="120" />
                 </xslt>
-                
+
                 <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/felix.discovery.config.properties.append" style="src/main/xsl/felix_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/" />
                       <param name="Offset" expression="120" />
                 </xslt>
-                
+
                 <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/distribution_configs/equinox.discovery.config.ini.append" style="src/main/xsl/equinox_distro_config.xslt">
                     <param name="Version" expression="${dosgi.version}" />
                 </xslt>
-                
+
                 <xslt processor="trax" in="target/classes/distro_discovery_bundles.xml" out="target/equinox.discovery.config.ini.append" style="src/main/xsl/equinox_buildsystem_config.xslt">
                       <param name="TargetDir" expression="${current.dir}/target/" />
                 </xslt>
@@ -529,7 +526,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin> 
+      </plugin>
     </plugins>
   </build>
 </project>

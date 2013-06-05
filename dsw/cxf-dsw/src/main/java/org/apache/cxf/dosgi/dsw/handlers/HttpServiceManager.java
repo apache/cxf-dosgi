@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HttpServiceManager {
+
     private static final Logger LOG = LoggerFactory.getLogger(HttpServiceManager.class);
     private ServiceTracker tracker;
     private BundleContext bundleContext;
@@ -52,25 +53,25 @@ public class HttpServiceManager {
     private String cxfServletAlias;
 
     public HttpServiceManager(BundleContext bundleContext, String httpBase, String cxfServletAlias) {
-        this(bundleContext, httpBase, cxfServletAlias, 
+        this(bundleContext, httpBase, cxfServletAlias,
              new ServiceTracker(bundleContext, HttpService.class.getName(), null));
         this.tracker.open();
     }
 
     // Only for tests
-    public HttpServiceManager(BundleContext bundleContext, 
-                              String httpBase, String cxfServletAlias, 
+    public HttpServiceManager(BundleContext bundleContext,
+                              String httpBase, String cxfServletAlias,
                               ServiceTracker tracker) {
         this.bundleContext = bundleContext;
         this.tracker = tracker;
         this.httpBase = getWithDefault(httpBase, "http://" + LocalHostUtil.getLocalIp() + ":8181");
         this.cxfServletAlias = getWithDefault(cxfServletAlias, "/cxf");
     }
-    
+
     private String getWithDefault(String value, String defaultValue) {
         return value == null ? defaultValue : value;
     }
-    
+
     public Bus registerServletAndGetBus(String contextRoot, BundleContext callingContext,
             ServiceReference sref) {
         Bus bus = BusFactory.newInstance().createBus();
@@ -79,10 +80,10 @@ public class HttpServiceManager {
         cxf.setBus(bus);
         try {
             HttpService httpService = getHttpService();
-            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), 
+            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(),
                                        getHttpContext(callingContext, httpService));
             registerUnexportHook(sref, contextRoot);
-            
+
             LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
         } catch (Exception e) {
             throw new ServiceException("CXF DOSGi: problem registering CXF HTTP Servlet", e);
@@ -99,7 +100,7 @@ public class HttpServiceManager {
     }
 
     public String getServletContextRoot(Map<?, ?> sd, Class<?> iClass) {
-        return OsgiUtils.getFirstNonEmptyStringProperty(sd, 
+        return OsgiUtils.getFirstNonEmptyStringProperty(sd,
                 Constants.WS_HTTP_SERVICE_CONTEXT,
                 Constants.WS_HTTP_SERVICE_CONTEXT_OLD,
                 Constants.WSDL_HTTP_SERVICE_CONTEXT,
@@ -110,26 +111,26 @@ public class HttpServiceManager {
         HttpContext httpContext = httpService.createDefaultHttpContext();
         return new SecurityDelegatingHttpContext(bc, httpContext);
     }
-    
+
     /**
      * This listens for service removal events and "un-exports" the service
      * from the HttpService.
-     * 
+     *
      * @param sref the service reference to track
      * @param alias the HTTP servlet context alias
      */
     private void registerUnexportHook(ServiceReference sref, String alias) {
         final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
         LOG.debug("Registering service listener for service with ID {}", sid);
-     
+
         String previous = exportedAliases.put(sid, alias);
         if (previous != null) {
             LOG.warn("Overwriting service export for service with ID {}", sid);
         }
-        
+
         try {
             Filter f = bundleContext.createFilter("(" + org.osgi.framework.Constants.SERVICE_ID + "=" + sid + ")");
-            
+
             if (f != null) {
                 bundleContext.addServiceListener(new UnregisterListener(), f.toString());
             } else {
@@ -139,7 +140,7 @@ public class HttpServiceManager {
             LOG.warn("Service listener could not be started. The service will not be automatically unexported.", e);
         }
     }
-    
+
     protected String getDefaultAddress(Class<?> type) {
         return "/" + type.getName().replace('.', '/');
     }
@@ -148,17 +149,17 @@ public class HttpServiceManager {
         if (relativeEndpointAddress.startsWith("http")) {
             return relativeEndpointAddress;
         }
-        String effContextRoot = contextRoot == null ? cxfServletAlias : contextRoot; 
+        String effContextRoot = contextRoot == null ? cxfServletAlias : contextRoot;
         return this.httpBase + effContextRoot + relativeEndpointAddress;
     }
-    
+
     public void close() {
         tracker.close();
     }
-    
-    private final class UnregisterListener implements ServiceListener {
-        public void serviceChanged(ServiceEvent event) {
 
+    private final class UnregisterListener implements ServiceListener {
+
+        public void serviceChanged(ServiceEvent event) {
             if (!(event.getType() == ServiceEvent.UNREGISTERING)) {
                 return;
             }
@@ -166,8 +167,7 @@ public class HttpServiceManager {
             final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
             final String alias = exportedAliases.remove(sid);
             if (alias == null) {
-                LOG.error(
-                        "Unable to unexport HTTP servlet for service class ''{0}'',"
+                LOG.error("Unable to unexport HTTP servlet for service class ''{0}'',"
                         + " service-id {1}: no servlet alias found",
                         new Object[] {sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid});
                 return;
@@ -177,7 +177,7 @@ public class HttpServiceManager {
                 HttpService http = getHttpService();
                 http.unregister(alias);
             } catch (Exception e) {
-                LOG.warn("An exception occurred while unregistering service for HTTP servlet alias '" 
+                LOG.warn("An exception occurred while unregistering service for HTTP servlet alias '"
                         + alias + "'", e);
             }
         }

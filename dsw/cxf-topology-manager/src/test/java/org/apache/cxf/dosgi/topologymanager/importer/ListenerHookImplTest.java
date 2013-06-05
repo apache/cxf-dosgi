@@ -34,9 +34,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-
 public class ListenerHookImplTest {
-    
+
     @Test
     public void testGetNewUUID() {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
@@ -44,9 +43,9 @@ public class ListenerHookImplTest {
         EasyMock.replay(bc);
         String uuid = ListenerHookImpl.getUUID(bc);
         assertNotNull(uuid);
-        
+
         assertEquals(System.getProperty("org.osgi.framework.uuid"), uuid);
-        
+
         EasyMock.verify(bc);
     }
 
@@ -56,29 +55,28 @@ public class ListenerHookImplTest {
         EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("MyUUID").atLeastOnce();
         EasyMock.replay(bc);
         String uuid = ListenerHookImpl.getUUID(bc);
-        
+
         assertEquals("MyUUID", uuid);
-        
+
         EasyMock.verify(bc);
     }
 
     @Test
     public void testUUIDFilterExtension() throws InvalidSyntaxException {
         String filter = "(a=b)";
-        
-        
+
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("MyUUID").atLeastOnce();
         EasyMock.replay(bc);
-        
+
         filter = ListenerHookImpl.extendFilter(filter, bc);
-        
+
         Filter f = FrameworkUtil.createFilter(filter);
-        
+
         Dictionary<String, String> m = new Hashtable<String, String>();
         m.put("a", "b");
-        
-        assertTrue(filter + " filter must match as uuid is missing", f.match(m));      
+
+        assertTrue(filter + " filter must match as uuid is missing", f.match(m));
         m.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, "MyUUID");
         assertFalse(filter + " filter must NOT match as uuid is the local one", f.match(m));
     }

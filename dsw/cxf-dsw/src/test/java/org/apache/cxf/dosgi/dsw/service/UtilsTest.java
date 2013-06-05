@@ -32,7 +32,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-
 public class UtilsTest {
 
     @Test
@@ -45,7 +44,6 @@ public class UtilsTest {
 
     @Test
     public void testNormalizeStringPlus() {
-
         String s1 = "s1";
         String s2 = "s2";
         String s3 = "s3";
@@ -66,12 +64,10 @@ public class UtilsTest {
         }, Utils.normalizeStringPlus(s1));
         assertArrayEquals(sa, Utils.normalizeStringPlus(sa));
         assertArrayEquals(sa, Utils.normalizeStringPlus(sl));
-
     }
 
     @Test
     public void testOverlayProperties() {
-
         Map<String, Object> original = new HashMap<String, Object>();
 
         original.put("MyProp", "my value");
@@ -167,7 +163,5 @@ public class UtilsTest {
             }
         }
         assertEquals("newValue", copy.get("MyProp"));
-
     }
-
 }

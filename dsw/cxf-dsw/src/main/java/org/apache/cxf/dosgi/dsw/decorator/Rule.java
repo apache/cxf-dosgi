@@ -24,14 +24,17 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 
 public interface Rule {
-    /** When the ServiceReference passed in matches the rule's condition,
+
+    /**
+     * When the ServiceReference passed in matches the rule's condition,
      * set the additional properties in the target.
      * @param sref The Service Reference to be checked.
      * @param target Any additional properties are to be set in this map.
      */
     void apply(ServiceReference sref, Map<String, Object> target);
-    
-    /** Returns the bundle that provided this rule.
+
+    /**
+     * Returns the bundle that provided this rule.
      * @return The Bundle where the Rule was defined.
      */
     Bundle getBundle();

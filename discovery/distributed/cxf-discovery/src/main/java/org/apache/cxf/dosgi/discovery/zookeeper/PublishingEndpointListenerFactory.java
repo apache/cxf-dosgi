@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * Creates local EndpointListeners that publish to Zookeeper.
  */
 public class PublishingEndpointListenerFactory implements ServiceFactory {
+
     public static final String DISCOVERY_ZOOKEEPER_ID = "org.apache.cxf.dosgi.discovery.zookeeper";
     private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListenerFactory.class);
 
@@ -71,7 +72,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
 
     public synchronized void start() {
         Dictionary<String, String> props = new Hashtable<String, String>();
-        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, 
+        props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE,
                   "(&(" + Constants.OBJECTCLASS + "=*)(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID
                   + "=" + Util.getUUID(bctx) + "))");
         props.put(DISCOVERY_ZOOKEEPER_ID, "true");
@@ -100,5 +101,4 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
             return listeners;
         }
     }
-    
 }

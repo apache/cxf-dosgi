@@ -33,6 +33,7 @@ import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public final class IntentUtils {
+
     private IntentUtils() {
         // never constructed
     }
@@ -64,7 +65,7 @@ public final class IntentUtils {
 
     public static Set<String> getRequestedIntents(Map<?, ?> sd) {
         Collection<String> intents = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
-        Collection<String> intents2 
+        Collection<String> intents2
             = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
         @SuppressWarnings("deprecation")
         Collection<String> oldIntents = OsgiUtils.getMultiValueProperty(sd.get(Constants.EXPORTED_INTENTS_OLD));

@@ -69,7 +69,7 @@
                  <exclude>**/*.java</exclude>
              </excludes>
           </configuration>
-      </plugin> 
+      </plugin>
 
       <plugin>
         <groupId>org.apache.felix</groupId>

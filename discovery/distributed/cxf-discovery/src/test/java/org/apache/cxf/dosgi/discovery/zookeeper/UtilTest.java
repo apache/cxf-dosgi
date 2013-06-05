@@ -30,9 +30,9 @@ import org.osgi.service.remoteserviceadmin.EndpointListener;
 public class UtilTest extends TestCase {
 
     public void testGetZooKeeperPath() {
-        assertEquals(Util.PATH_PREFIX + '/' + "org/example/Test", 
+        assertEquals(Util.PATH_PREFIX + '/' + "org/example/Test",
             Util.getZooKeeperPath("org.example.Test"));
-        
+
         // used for the recursive discovery
         assertEquals(Util.PATH_PREFIX, Util.getZooKeeperPath(null));
         assertEquals(Util.PATH_PREFIX, Util.getZooKeeperPath(""));
@@ -43,11 +43,11 @@ public class UtilTest extends TestCase {
         String[] out = Util.getStringPlusProperty("MyString");
         assertEquals(1, out.length);
         assertEquals("MyString", out[0]);
-        
+
         out = Util.getStringPlusProperty(new String[]{"MyString"});
         assertEquals(1, out.length);
         assertEquals("MyString", out[0]);
-        
+
         out = Util.getStringPlusProperty(Arrays.asList("MyString"));
         assertEquals(1, out.length);
         assertEquals("MyString", out[0]);
@@ -89,23 +89,22 @@ public class UtilTest extends TestCase {
         assertEquals("hi", out[0]);
         assertEquals("bye", out[1]);
     }
-    
+
     public void testGetScopes() {
         IMocksControl c = EasyMock.createNiceControl();
-        
+
         String[] scopes = new String[]{"myScope=test", ""};
-        
+
         ServiceReference sref = c.createMock(ServiceReference.class);
         EasyMock.expect(sref.getProperty(EasyMock.eq(EndpointListener.ENDPOINT_LISTENER_SCOPE)))
             .andReturn(scopes).anyTimes();
-        
+
         c.replay();
-        
+
         String[] ret = Util.getScopes(sref);
-        
+
         c.verify();
         assertEquals(1, ret.length);
         assertEquals(scopes[0], ret[0]);
-        
     }
 }

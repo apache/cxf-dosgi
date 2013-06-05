@@ -37,7 +37,7 @@
       <artifactId>cxf-dosgi-ri-samples-ds-interface</artifactId>
       <version>${project.version}</version>
     </dependency>
-  </dependencies> 
+  </dependencies>
 
   <build>
     <plugins>
@@ -49,12 +49,12 @@
             <Bundle-Name>${project.name}</Bundle-Name>
             <Bundle-Description>This bundle contains the server-side implementation of the Distributed OSGi with Declarative Services sample.</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>org.apache.cxf.dosgi.samples.ds</Import-Package> 
-            <Private-Package>org.apache.cxf.dosgi.samples.ds.impl</Private-Package> 
+            <Import-Package>org.apache.cxf.dosgi.samples.ds</Import-Package>
+            <Private-Package>org.apache.cxf.dosgi.samples.ds.impl</Private-Package>
             <Service-Component>OSGI-INF/component.xml</Service-Component>
           </instructions>
         </configuration>
-      </plugin> 
+      </plugin>
     </plugins>
-  </build>    
+  </build>
 </project>

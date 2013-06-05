@@ -33,19 +33,18 @@ import java.util.Map;
 import org.osgi.framework.ServiceException;
 
 public class ServiceInvocationHandler implements InvocationHandler {
-    private static final String REMOTE_EXCEPTION_TYPE = "REMOTE";
-    private static final Collection<Method> OBJECT_METHODS = 
-        Arrays.asList(Object.class.getMethods());
 
-    private Map<Method, List<Class<?>>> exceptionsMap
-        = new HashMap<Method, List<Class<?>>>();
+    private static final String REMOTE_EXCEPTION_TYPE = "REMOTE";
+    private static final Collection<Method> OBJECT_METHODS = Arrays.asList(Object.class.getMethods());
+
+    private Map<Method, List<Class<?>>> exceptionsMap = new HashMap<Method, List<Class<?>>>();
     private Object serviceObject;
-    
+
     public ServiceInvocationHandler(Object serviceObject, Class<?> iType) {
         this.serviceObject = serviceObject;
         introspectType(iType);
     }
-    
+
     public Object invoke(Object proxy, final Method m, Object[] params) throws Throwable {
         if (OBJECT_METHODS.contains(m)) {
             if (m.getName().equals("equals")) {
@@ -55,14 +54,14 @@ public class ServiceInvocationHandler implements InvocationHandler {
         }
 
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-        try {            
+        try {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             final Object[] paramsFinal = params;
             return AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws Exception {
                     return m.invoke(serviceObject, paramsFinal);
                 }
-            }); 
+            });
         } catch (Throwable ex) {
             Throwable theCause = ex.getCause() == null ? ex : ex.getCause();
             Throwable theCauseCause = theCause.getCause() == null ? theCause : theCause.getCause();
@@ -76,9 +75,8 @@ public class ServiceInvocationHandler implements InvocationHandler {
                         throw theCauseCause;
                     }
                 }
-                
             }
-                        
+
             throw new ServiceException(REMOTE_EXCEPTION_TYPE, theCause);
         } finally {
             Thread.currentThread().setContextClassLoader(oldCl);

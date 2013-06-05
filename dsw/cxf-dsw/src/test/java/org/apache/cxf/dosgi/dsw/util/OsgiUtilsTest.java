@@ -40,6 +40,7 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class OsgiUtilsTest extends TestCase {
+
     public void testMultiValuePropertyAsString() {
         assertEquals(Collections.singleton("hi"),
             OsgiUtils.getMultiValueProperty("hi"));
@@ -47,7 +48,7 @@ public class OsgiUtilsTest extends TestCase {
 
     public void testMultiValuePropertyAsArray() {
         assertEquals(Arrays.asList("a", "b"),
-                OsgiUtils.getMultiValueProperty(new String [] {"a", "b"}));
+                OsgiUtils.getMultiValueProperty(new String[] {"a", "b"}));
     }
 
     public void testMultiValuePropertyAsCollection() {
@@ -173,12 +174,9 @@ public class OsgiUtilsTest extends TestCase {
         public boolean isRemovalPending() {
             return false;
         }
-
     }
 
-
     public void testGetProperty() {
-
         Map<String, Object> p = new HashMap<String, Object>();
         p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
         p.put("notAString", new Object());

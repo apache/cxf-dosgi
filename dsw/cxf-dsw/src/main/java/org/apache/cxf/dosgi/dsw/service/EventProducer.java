@@ -48,8 +48,8 @@ public class EventProducer {
     }
 
     protected void publishNotification(ExportRegistration er) {
-        int type = er.getException() == null 
-            ? RemoteServiceAdminEvent.EXPORT_REGISTRATION 
+        int type = er.getException() == null
+            ? RemoteServiceAdminEvent.EXPORT_REGISTRATION
             : RemoteServiceAdminEvent.EXPORT_ERROR;
         RemoteServiceAdminEvent rsae = new RemoteServiceAdminEvent(type, bctx.getBundle(), er.getExportReference(),
                 er.getException());
@@ -76,7 +76,6 @@ public class EventProducer {
                     }
                 }
             }
-
         } catch (InvalidSyntaxException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -105,7 +104,6 @@ public class EventProducer {
         eaHelper.notifyEventAdmin(rsae);
     }
 
-
     public void notifyRemoval(ImportRegistration eri) {
         RemoteServiceAdminEvent rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION,
                 bctx.getBundle(), eri.getImportReference(), eri.getException());
@@ -113,5 +111,4 @@ public class EventProducer {
         notifyListeners(rsae);
         eaHelper.notifyEventAdmin(rsae);
     }
-
 }

@@ -19,5 +19,4 @@
 package org.apache.cxf.dosgi.dsw.hooks;
 
 public interface TestService {
-
 }

@@ -29,6 +29,7 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 public final class AddGreetingPhraseInterceptor extends AbstractPhaseInterceptor<Message> {
+
     AddGreetingPhraseInterceptor(String phase) {
         super(phase);
     }

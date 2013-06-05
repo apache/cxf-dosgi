@@ -21,20 +21,21 @@ package org.apache.cxf.dosgi.dsw.service;
 import junit.framework.TestCase;
 
 public class DistributionProviderImplTest extends TestCase {
+
     public void testDUMMY() {
         assertTrue(true);
     }
-    
+
 //    public void testExposedServices() {
 //        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
 //        EasyMock.replay(bc);
 //        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(bc);
-//        
+//
 //        assertEquals(0, dp.getExposedServices().size());
 //        assertEquals(0, dp.getRemoteServices().size());
 //        ServiceReference sr = new TestServiceReference();
 //        ServiceReference sr2 = new TestServiceReference();
-//        
+//
 //        dp.addExposedService(sr, null);
 //        assertEquals(1, dp.getExposedServices().size());
 //        assertEquals(0, dp.getRemoteServices().size());
@@ -46,20 +47,20 @@ public class DistributionProviderImplTest extends TestCase {
 //        assertSame(sr, dp.getExposedServices().iterator().next());
 //
 //        dp.addExposedService(sr2, null);
-//        assertEquals(2, dp.getExposedServices().size());        
+//        assertEquals(2, dp.getExposedServices().size());
 //        assertEquals(0, dp.getRemoteServices().size());
-//    }   
-//    
+//    }
+//
 //    public void testRemoteServices() {
 //        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
 //        EasyMock.replay(bc);
 //        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(bc);
-//        
+//
 //        assertEquals(0, dp.getExposedServices().size());
-//        assertEquals(0, dp.getRemoteServices().size());        
+//        assertEquals(0, dp.getRemoteServices().size());
 //        ServiceReference sr = new TestServiceReference();
 //        ServiceReference sr2 = new TestServiceReference();
-//        
+//
 //        dp.addRemoteService(sr);
 //        assertEquals(0, dp.getExposedServices().size());
 //        assertEquals(1, dp.getRemoteServices().size());
@@ -71,20 +72,20 @@ public class DistributionProviderImplTest extends TestCase {
 //        assertSame(sr, dp.getRemoteServices().iterator().next());
 //
 //        dp.addRemoteService(sr2);
-//        assertEquals(0, dp.getExposedServices().size());        
+//        assertEquals(0, dp.getExposedServices().size());
 //        assertEquals(2, dp.getRemoteServices().size());
 //    }
-//    
+//
 //    public void testPublicationProperties() {
 //        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
 //        EasyMock.replay(bc);
-//        
+//
 //        RemoteServiceAdminCore dp = new RemoteServiceAdminCore(bc);
 //        ServiceReference sr = new TestServiceReference();
 //        ServiceReference sr2 = new TestServiceReference();
-//        
+//
 //        assertNull(dp.getExposedProperties(sr));
-//        
+//
 //        dp.addExposedService(sr, null);
 //        Map<String, String> pp = new HashMap<String, String>();
 //        pp.put("a", "b");
@@ -93,8 +94,9 @@ public class DistributionProviderImplTest extends TestCase {
 //        assertEquals(0, dp.getExposedProperties(sr).size());
 //        assertEquals(pp, dp.getExposedProperties(sr2));
 //    }
-//    
+//
 //    private static class TestServiceReference implements ServiceReference {
+
 //        public Bundle getBundle() {
 //            return null;
 //        }
@@ -113,8 +115,8 @@ public class DistributionProviderImplTest extends TestCase {
 //
 //        public boolean isAssignableTo(Bundle arg0, String arg1) {
 //            return false;
-//        }        
-//        
+//        }
+//
 //        public int compareTo(Object o) {
 //            return 0;
 //        }

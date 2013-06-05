@@ -21,16 +21,17 @@ package org.apache.cxf.dosgi.samples.greeter.client;
 import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 
 public class GreeterDataImpl implements GreeterData {
+
     private final String name;
     private final int age;
     private final boolean exception;
-        
+
     public GreeterDataImpl(String n, int a, boolean b) {
         name = n;
         age = a;
         exception = b;
     }
-    
+
     public String getName() {
         return name;
     }

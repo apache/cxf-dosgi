@@ -43,10 +43,10 @@
             <Bundle-Description>This bundle contains the interfaces of the Distributed OSGi with Declarative Services sample.</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package />
-            <Export-Package>org.apache.cxf.dosgi.samples.ds</Export-Package> 
+            <Export-Package>org.apache.cxf.dosgi.samples.ds</Export-Package>
           </instructions>
         </configuration>
-      </plugin> 
+      </plugin>
     </plugins>
-  </build>    
+  </build>
 </project>

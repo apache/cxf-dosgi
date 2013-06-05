@@ -24,12 +24,13 @@ import java.io.StringWriter;
 import org.apache.cxf.dosgi.systests2.common.test2.Test2Service;
 
 public class Test2ServiceImpl implements Test2Service {
+
     public String getRemoteStackTrace() {
         Throwable th = new Throwable("Throwable created on the server");
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         th.printStackTrace(pw);
-        
+
         return sw.toString();
     }
 }

@@ -48,9 +48,9 @@ import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
-
 @RunWith(JUnit4TestRunner.class)
 public class TestCustomIntent extends AbstractDosgiTest {
+
     @Inject
     BundleContext bundleContext;
 
@@ -82,8 +82,8 @@ public class TestCustomIntent extends AbstractDosgiTest {
                 mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                     .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf.dosgi.systests")
-                    .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(), 
-                streamBundle(getCustomIntentBundle()).noStart(), 
+                    .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
+                streamBundle(getCustomIntentBundle()).noStart(),
                 provision(getServiceBundle()),
                 frameworkStartLevel(100) };
     }
@@ -107,5 +107,4 @@ public class TestCustomIntent extends AbstractDosgiTest {
             Thread.currentThread().setContextClassLoader(cl);
         }
     }
-
 }

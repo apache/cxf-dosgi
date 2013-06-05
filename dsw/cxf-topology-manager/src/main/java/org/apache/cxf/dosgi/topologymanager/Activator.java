@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Activator implements BundleActivator {
+
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
 
     private TopologyManagerExport topManager;
@@ -51,5 +52,4 @@ public class Activator implements BundleActivator {
         topManagerImport.stop();
         rsaTracker.close();
     }
-
 }

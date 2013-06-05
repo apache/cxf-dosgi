@@ -36,34 +36,34 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class ClientServiceFactoryTest extends TestCase {
-    
+
     public void testGetService() {
         Object myTestProxyObject = new Object();
-        
+
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext dswContext = control.createMock(BundleContext.class);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
         map.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myGreatConfiguration");
         map.put(Constants.OBJECTCLASS, new String[]{"my.class"});
-        
+
         EndpointDescription ed = new EndpointDescription(map);
         ConfigurationTypeHandler handler = control.createMock(ConfigurationTypeHandler.class);
 
         ImportRegistrationImpl iri = new ImportRegistrationImpl(ed, null);
-        
+
         BundleContext requestingContext = control.createMock(BundleContext.class);
         Bundle requestingBundle = control.createMock(Bundle.class);
         EasyMock.expect(requestingBundle.getBundleContext()).andReturn(requestingContext);
-        
+
         ServiceReference sr = control.createMock(ServiceReference.class);
         ServiceRegistration sreg = control.createMock(ServiceRegistration.class);
         EasyMock.expect(sreg.getReference()).andReturn(sr);
-        
+
         handler.createProxy(sr, dswContext, requestingContext, String.class, ed);
-        EasyMock.expectLastCall().andReturn(myTestProxyObject);        
-        control.replay();       
-        
+        EasyMock.expectLastCall().andReturn(myTestProxyObject);
+        control.replay();
+
         ClientServiceFactory csf = new ClientServiceFactory(dswContext, String.class, ed, handler, iri);
         assertSame(myTestProxyObject, csf.getService(requestingBundle, sreg));
     }

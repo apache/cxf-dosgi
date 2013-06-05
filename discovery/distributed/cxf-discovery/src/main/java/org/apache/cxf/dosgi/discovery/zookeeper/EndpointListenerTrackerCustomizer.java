@@ -27,10 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tracks interest in EndpointListeners. Delegates to InterfaceMonitorManager to manage 
+ * Tracks interest in EndpointListeners. Delegates to InterfaceMonitorManager to manage
  * interest in the scopes of each EndpointListener.
  */
 public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomizer {
+
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerTrackerCustomizer.class);
     private static final Pattern OBJECTCLASS_PATTERN = Pattern.compile(".*\\(objectClass=([^)]+)\\).*");
 

@@ -101,5 +101,4 @@ public class AbstractDosgiTest {
             socket.close();
         }
     }
-
 }

@@ -45,9 +45,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Listens for remote endpoints using the EndpointListener interface and the EndpointListenerManager.
- * Listens for local service interests using the ListenerHookImpl that calls back through the 
- * ServiceInterestListener interface. 
- * Manages local creation and destruction of service imports using the available RemoteServiceAdmin services. 
+ * Listens for local service interests using the ListenerHookImpl that calls back through the
+ * ServiceInterestListener interface.
+ * Manages local creation and destruction of service imports using the available RemoteServiceAdmin services.
  */
 public class TopologyManagerImport implements EndpointListener, RemoteServiceAdminListener, ServiceInterestListener {
 
@@ -61,8 +61,8 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
 
     /**
      * If set to false only one service is imported for each import interest even it multiple services are
-     * available. If set to true, all available services are imported. 
-     * 
+     * available. If set to true, all available services are imported.
+     *
      * TODO: Make this available as a configuration option
      */
     private boolean importAllAvailable = true;
@@ -78,19 +78,20 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     /**
      * List of Endpoints by matched filter that were reported by the EndpointListener and can be imported
      */
-    private final Map<String /* filter */, List<EndpointDescription>> importPossibilities 
+    private final Map<String /* filter */, List<EndpointDescription>> importPossibilities
         = new HashMap<String, List<EndpointDescription>>();
-    
+
     /**
      * List of already imported Endpoints by their matched filter
      */
-    private final Map<String /* filter */, List<ImportRegistration>> importedServices 
+    private final Map<String /* filter */, List<ImportRegistration>> importedServices
         = new HashMap<String, List<ImportRegistration>>();
 
     public TopologyManagerImport(BundleContext bc, RemoteServiceAdminTracker rsaTracker) {
         bctx = bc;
         remoteServiceAdminTracker = rsaTracker;
         remoteServiceAdminTracker.addListener(new RemoteServiceAdminLifeCycleListener() {
+
             public void added(RemoteServiceAdmin rsa) {
                 triggerImportsForRemoteServiceAdmin(rsa);
             }
@@ -114,7 +115,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
         execService.shutdown();
         // this is called from Activator.stop(), which implicitly unregisters our registered services
     }
-    
+
     /* (non-Javadoc)
      * @see org.apache.cxf.dosgi.topologymanager.ServiceInterestListener#addServiceInterest(java.lang.String)
      */
@@ -207,11 +208,9 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
                 }
                 // Notify EndpointListeners? NO!
             }
-
         });
-
     }
-    
+
     private void unexportNotAvailableServices(String filter) {
         synchronized (importedServices) {
             List<ImportRegistration> importRegistrations = importedServices.get(filter);
@@ -235,7 +234,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
             }
         }
     }
-    
+
     private boolean isImportPossibilityAvailable(EndpointDescription ep, String filter) {
         synchronized (importPossibilities) {
             List<EndpointDescription> ips = importPossibilities.get(filter);
@@ -290,8 +289,8 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     }
 
     /**
-     * Tries to import the service with each rsa until one import is successful 
-     * 
+     * Tries to import the service with each rsa until one import is successful
+     *
      * @param ep endpoint to import
      * @return import registration of the first successful import
      */
@@ -319,5 +318,4 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
             removeImportReference(event.getImportReference());
         }
     }
-
 }

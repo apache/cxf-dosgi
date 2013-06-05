@@ -30,11 +30,11 @@
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-parent</artifactId>
     <version>1.5-SNAPSHOT</version>
-    <relativePath>../../parent/pom.xml</relativePath> 
+    <relativePath>../../parent/pom.xml</relativePath>
   </parent>
 
   <dependencies>
-      <dependency> 
+      <dependency>
           <groupId>org.apache.felix</groupId>
           <artifactId>org.apache.felix.framework</artifactId>
           <version>${felix.version}</version>
@@ -44,7 +44,7 @@
                   <artifactId>org.osgi.foundation</artifactId>
               </exclusion>
           </exclusions>
-      </dependency> 
+      </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
         <artifactId>geronimo-servlet_${servlet.version}_spec</artifactId>
@@ -59,7 +59,7 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
       </dependency>
-  </dependencies> 
+  </dependencies>
 
   <build>
     <plugins>
@@ -75,8 +75,8 @@
             <Bundle-Activator>org.apache.cxf.dosgi.samples.security.Activator</Bundle-Activator>
           </instructions>
         </configuration>
-      </plugin> 
+      </plugin>
     </plugins>
-  </build>    
+  </build>
 
 </project>

@@ -24,6 +24,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.phase.Phase;
 
 public final class CustomFeature extends AbstractFeature {
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         provider.getOutInterceptors().add(0, new AddGreetingPhraseInterceptor(Phase.USER_LOGICAL));

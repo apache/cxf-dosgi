@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class SecurityDelegatingHttpContext implements HttpContext {
+
     public static final String FILTER_PROP = "org.apache.cxf.httpservice.filter";
     public static final String FILTER_REQUIRED_PROP = "org.apache.cxf.httpservice.requirefilter";
     private static final Logger LOG = LoggerFactory.getLogger(SecurityDelegatingHttpContext.class);
@@ -109,6 +110,7 @@ public class SecurityDelegatingHttpContext implements HttpContext {
  * A {@link FilterChain} composed of {@link Filter}s with the
  */
 class Chain implements FilterChain {
+
     private static final Logger LOG = LoggerFactory.getLogger(Chain.class);
 
     int current;

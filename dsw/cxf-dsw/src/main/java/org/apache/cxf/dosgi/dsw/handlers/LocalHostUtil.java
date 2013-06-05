@@ -39,8 +39,8 @@ public final class LocalHostUtil {
      * Returns an InetAddress representing the address of the localhost. Every
      * attempt is made to find an address for this host that is not the loopback
      * address. If no other address can be found, the loopback will be returned.
-     * 
-     * @return InetAddress - the address of localhost
+     *
+     * @return InetAddress the address of localhost
      * @throws UnknownHostException if there is a problem determining the address
      */
     public static InetAddress getLocalHost() throws UnknownHostException {
@@ -60,10 +60,9 @@ public final class LocalHostUtil {
     /**
      * Utility method that delegates to the methods of NetworkInterface to
      * determine addresses for this machine.
-     * 
-     * @return InetAddress[] - all addresses found from the NetworkInterfaces
-     * @throws UnknownHostException
-     *             - if there is a problem determining addresses
+     *
+     * @return all addresses found from the NetworkInterfaces
+     * @throws UnknownHostException if there is a problem determining addresses
      */
     private static InetAddress[] getAllLocalUsingNetworkInterface() throws UnknownHostException {
         try {
@@ -90,5 +89,4 @@ public final class LocalHostUtil {
         }
         return localIP;
     }
-
 }

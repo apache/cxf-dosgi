@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
  * notification to other EndpointListeners with a matching scope).
  */
 public class InterfaceMonitor implements Watcher, StatCallback {
+
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitor.class);
 
     private final String znode;

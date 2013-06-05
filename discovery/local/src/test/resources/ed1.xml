@@ -30,13 +30,13 @@
     <property name="osgi.remote.requires.intents">
       <list>
         <value>confidentiality</value>
-      </list>    
+      </list>
     </property>
     <property name="testKey" value="testValue"/>
     <property name="endpoint.id">http://somewhere:12345</property>
     <property name="service.imported.configs" value="org.apache.cxf.ws"/>
   </endpoint-description>
-  
+
   <endpoint-description>
     <property name="objectClass">
       <array>
@@ -70,4 +70,3 @@
     <property name="service.imported.configs" value="org.apache.cxf.ws"/>
   </endpoint-description>
 </endpoint-descriptions>
-  

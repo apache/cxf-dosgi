@@ -44,7 +44,6 @@ public class EventAdminHelper {
 
     @SuppressWarnings("rawtypes")
     private Event createEvent(Properties props, String type) {
-
         String topic = "org/osgi/service/remoteserviceadmin/" + type;
         props.put("bundle", bctx.getBundle());
         props.put("bundle.id", bctx.getBundle().getBundleId());
@@ -64,12 +63,10 @@ public class EventAdminHelper {
     }
 
     public void notifyEventAdmin(RemoteServiceAdminEvent rsae) {
-
         String topic = remoteServiceAdminEventTypeToString(rsae.getType());
 
         Properties props = new Properties();
         setIfNotNull(props, "cause", rsae.getException());
-
 
         EndpointDescription epd = null;
         if (rsae.getImportReference() != null) {
@@ -110,7 +107,7 @@ public class EventAdminHelper {
         }
 
         if (refs != null) {
-            LOG.debug("Publishing event to {} EventAdmins;  Topic:[{}]", refs.length, topic);
+            LOG.debug("Publishing event to {} EventAdmins; Topic:[{}]", refs.length, topic);
             for (ServiceReference serviceReference : refs) {
                 EventAdmin eventAdmin = (EventAdmin) bctx.getService(serviceReference);
                 try {
@@ -156,5 +153,4 @@ public class EventAdminHelper {
         }
         return retval;
     }
-
 }

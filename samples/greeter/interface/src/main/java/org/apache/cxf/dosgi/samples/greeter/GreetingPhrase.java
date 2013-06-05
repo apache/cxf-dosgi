@@ -19,11 +19,12 @@
 package org.apache.cxf.dosgi.samples.greeter;
 
 public class GreetingPhrase {
+
     private String phrase;
-    
+
     public GreetingPhrase() {
     }
-    
+
     public GreetingPhrase(String phrase) {
         this.phrase = phrase;
     }
@@ -31,20 +32,19 @@ public class GreetingPhrase {
     public void setPhrase(String thePhrase) {
         this.phrase = thePhrase;
     }
-    
+
     public String getPhrase() {
         return phrase;
     }
-    
+
     @Override
     public int hashCode() {
         return phrase.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object other) {
         return GreetingPhrase.class.isAssignableFrom(other.getClass())
                 && phrase.equals(((GreetingPhrase) other).phrase);
-
     }
 }

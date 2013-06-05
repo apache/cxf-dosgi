@@ -28,5 +28,4 @@ public interface GreeterService {
     @GET
     @Path("greeting/{name}")
     GreeterInfo greetMe(@PathParam("name") String name) throws GreeterException;
-
 }

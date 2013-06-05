@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * in services
  */
 public class ListenerHookImpl implements ListenerHook {
+
     private static final Logger LOG = LoggerFactory.getLogger(ListenerHookImpl.class);
 
     private static final String CLASS_NAME_EXPRESSION = ".*\\(" + Constants.OBJECTCLASS
@@ -89,9 +90,7 @@ public class ListenerHookImpl implements ListenerHook {
             }
             String exFilter = extendFilter(listenerInfo.getFilter(), bctx);
             serviceInterestListener.addServiceInterest(exFilter);
-
         }
-
     }
 
     @SuppressWarnings("rawtypes")
@@ -105,9 +104,7 @@ public class ListenerHookImpl implements ListenerHook {
             // TODO: determine if service was handled?
             String exFilter = extendFilter(listenerInfo.getFilter(), bctx);
             serviceInterestListener.removeServiceInterest(exFilter);
-
         }
-
     }
 
     private static String getClassNameFromFilter(String filter) {
@@ -143,9 +140,8 @@ public class ListenerHookImpl implements ListenerHook {
             return uuid;
         }
     }
-    
+
     static String extendFilter(String filter, BundleContext bctx) {
         return "(&" + filter + "(!(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID + "=" + getUUID(bctx) + ")))";
     }
-
 }

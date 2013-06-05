@@ -76,15 +76,13 @@ public class ClientServiceFactory implements ServiceFactory {
             LOG.info("Did not create proxy for " + interfaceName + " because intent " + iue.getIntent()
                      + " could not be satisfied");
         } catch (Exception ex) {
-            LOG.warn("Problem creating a remote proxy for " + interfaceName
-                                   + " from CXF FindHook: ", ex);
+            LOG.warn("Problem creating a remote proxy for " + interfaceName + " from CXF FindHook: ", ex);
         }
 
         return null;
     }
 
     public void ungetService(Bundle requestingBundle, ServiceRegistration sreg, Object serviceObject) {
-
         StringBuilder sb = new StringBuilder();
         sb.append("Releasing a client object");
         Object objectClass = sreg.getReference().getProperty(org.osgi.framework.Constants.OBJECTCLASS);

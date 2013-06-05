@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.dsw;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public final class Constants {
+
     // Constants from RFC 119, they should ultimately be picked up from an OSGi class.
     @Deprecated
     public static final String EXPORTED_INTERFACES = RemoteConstants.SERVICE_EXPORTED_INTERFACES;
@@ -30,23 +31,23 @@ public final class Constants {
     @Deprecated
     public static final String EXPORTED_CONFIGS = RemoteConstants.SERVICE_EXPORTED_CONFIGS;
     @Deprecated
-    public static final String EXPORTED_CONFIGS_OLD = "osgi.remote.configuration.type"; // for BW comp.
-    
+    public static final String EXPORTED_CONFIGS_OLD = "osgi.remote.configuration.type"; // for BW compatibility
+
     @Deprecated
     public static final String EXPORTED_INTENTS = RemoteConstants.SERVICE_EXPORTED_INTENTS;
     @Deprecated
     public static final String EXPORTED_INTENTS_EXTRA = RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA;
     @Deprecated
     public static final String EXPORTED_INTENTS_OLD = "osgi.remote.requires.intents";
-    
+
     @Deprecated
     public static final String IMPORTED = RemoteConstants.SERVICE_IMPORTED;
     @Deprecated
     public static final String IMPORTD_CONFIGS = RemoteConstants.SERVICE_IMPORTED_CONFIGS;
-    
+
     @Deprecated
     public static final String INTENTS = RemoteConstants.SERVICE_INTENTS;
-        
+
     // WSDL
     public static final String WSDL_CONFIG_TYPE = "wsdl";
     public static final String WSDL_CONFIG_PREFIX = "osgi.remote.configuration" + "." + WSDL_CONFIG_TYPE;
@@ -57,7 +58,7 @@ public final class Constants {
     public static final String WSDL_HTTP_SERVICE_CONTEXT = WSDL_CONFIG_PREFIX + ".httpservice.context";
     // Provider prefix
     public static final String PROVIDER_PREFIX = "org.apache.cxf";
-    
+
     // WS
     public static final String WS_CONFIG_TYPE = PROVIDER_PREFIX + ".ws";
     public static final String WS_ADDRESS_PROPERTY = WS_CONFIG_TYPE + ".address";
@@ -79,10 +80,10 @@ public final class Constants {
     public static final String WS_DATA_BINDING_JAXB = "jaxb";
     public static final String WS_DATA_BINDING_AEGIS = "aegis";
 
-    public static final String WS_WSDL_SERVICE_NAMESPACE =  WS_CONFIG_TYPE + ".service.ns";
-    public static final String WS_WSDL_SERVICE_NAME =  WS_CONFIG_TYPE + ".service.name";
-    public static final String WS_WSDL_PORT_NAME =  WS_CONFIG_TYPE + ".port.name";
-    public static final String WS_WSDL_LOCATION =  WS_CONFIG_TYPE + ".wsdl.location";
+    public static final String WS_WSDL_SERVICE_NAMESPACE = WS_CONFIG_TYPE + ".service.ns";
+    public static final String WS_WSDL_SERVICE_NAME = WS_CONFIG_TYPE + ".service.name";
+    public static final String WS_WSDL_PORT_NAME = WS_CONFIG_TYPE + ".port.name";
+    public static final String WS_WSDL_LOCATION = WS_CONFIG_TYPE + ".wsdl.location";
     // Rest
     public static final String RS_CONFIG_TYPE = PROVIDER_PREFIX + ".rs";
     public static final String RS_ADDRESS_PROPERTY = RS_CONFIG_TYPE + ".address";
@@ -102,11 +103,11 @@ public final class Constants {
     public static final String WS_CONFIG_TYPE_OLD = "pojo";
     public static final String WS_CONFIG_OLD_PREFIX = "osgi.remote.configuration." + WS_CONFIG_TYPE_OLD;
     public static final String WS_ADDRESS_PROPERTY_OLD = WS_CONFIG_OLD_PREFIX + ".address";
-    public static final String WS_HTTP_SERVICE_CONTEXT_OLD = WS_CONFIG_OLD_PREFIX + ".httpservice.context"; 
+    public static final String WS_HTTP_SERVICE_CONTEXT_OLD = WS_CONFIG_OLD_PREFIX + ".httpservice.context";
 
     // Common Configuration Properties
     public static final String CHECK_BUNDLE = "check.bundle";
-    
+
     // The following constants are not evaluated anymore
     @Deprecated
     public static final String DEFAULT_PORT_CONFIG = "default.port";
@@ -118,26 +119,26 @@ public final class Constants {
     public static final String DEFAULT_HOST_VALUE = "localhost";
     @Deprecated
     public static final String USE_MASTER_MAP = "use.master.map";
-    
+
     // DSW Identification - TODO do we really need this one?
     public static final String DSW_CLIENT_ID = PROVIDER_PREFIX + ".remote.dsw.client";
 
     public static final String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
-    
+
     /**
      * Prefix to create an absolute URL from a relative URL.
-     * See HttpServiceManager.getAbsoluteAddress 
-     * 
+     * See HttpServiceManager.getAbsoluteAddress
+     *
      * Defaults to: http://<host name>:8181
      */
     public static final String HTTP_BASE = "httpBase";
-    
+
     /**
      * Name of the cxf servlet alias
      */
     public static final String CXF_SERVLET_ALIAS = "cxfServletAlias";
     public static final String DEFAULT_CXF_SERVLET_ALIAS = "/cxf";
-    
+
     private Constants() {
         // never constructed
     }

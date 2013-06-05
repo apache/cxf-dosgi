@@ -31,10 +31,9 @@ public final class Utils {
     private Utils() {
         // never constructed
     }
-    
+
     @SuppressWarnings("rawtypes")
     public static String[] normalizeStringPlus(Object object) {
-
         if (object instanceof String) {
             String s = (String)object;
             String[] values = s.split(",");
@@ -67,6 +66,4 @@ public final class Utils {
 
         return null;
     }
-
-    
 }

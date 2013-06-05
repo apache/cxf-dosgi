@@ -23,6 +23,7 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 
 public class ExportReferenceImpl implements ExportReference {
+
     private ServiceReference serviceReference;
     private EndpointDescription endpointDescription;
 
@@ -65,7 +66,7 @@ public class ExportReferenceImpl implements ExportReference {
             return false;
         }
         ExportReferenceImpl other = (ExportReferenceImpl) obj;
-        if (endpointDescription == null) { 
+        if (endpointDescription == null) {
             if (other.endpointDescription != null) {
                 return false;
             }

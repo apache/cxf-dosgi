@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPojoConfigurationTypeHandler implements ConfigurationTypeHandler {
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPojoConfigurationTypeHandler.class);
     protected BundleContext bundleContext;
     protected IntentManager intentManager;
@@ -98,7 +99,6 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         props.put(RemoteConstants.SERVICE_INTENTS, allIntents);
         props.put(RemoteConstants.ENDPOINT_ID, address);
         return props;
-
     }
 
     private void copyEndpointProperties(Map<String, Object> sd, Map<String, Object> endpointProps) {
@@ -110,7 +110,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
                     endpointProps.put(skey, entry.getValue());
                 }
             } catch (ClassCastException e) {
-                LOG.warn("ServiceProperties Map contained non String key. Skipped  " + entry + "   "
+                LOG.warn("ServiceProperties Map contained non String key. Skipped " + entry + "   "
                          + e.getLocalizedMessage());
             }
         }
@@ -225,7 +225,6 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
 
     private static void addInterceptors(AbstractEndpointFactory factory, BundleContext callingContext,
                                         Map<String, Object> sd, String propName) {
-
         List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName);
         boolean in = propName.contains("in.interceptors");
         boolean out = propName.contains("out.interceptors");
@@ -247,7 +246,6 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
 
     private static void addFeatures(AbstractEndpointFactory factory, BundleContext callingContext,
                                     Map<String, Object> sd, String propName) {
-
         List<Object> providers = ClassUtils.loadProviderClasses(callingContext, sd, propName);
         if (!providers.isEmpty()) {
             factory.getFeatures().addAll(CastUtils.cast(providers, AbstractFeature.class));

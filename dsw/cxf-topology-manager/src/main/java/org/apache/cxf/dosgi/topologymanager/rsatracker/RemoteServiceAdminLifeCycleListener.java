@@ -24,6 +24,7 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
  * Callback interface to be notified of RemoteServiceAdmin services that are added or removed
  */
 public interface RemoteServiceAdminLifeCycleListener {
+
     void added(RemoteServiceAdmin rsa);
     void removed(RemoteServiceAdmin rsa);
 }

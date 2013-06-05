@@ -26,6 +26,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
 public class Activator implements BundleActivator {
+
     ZookeeperStarter zkStarter;
 
     public void start(BundleContext context) throws Exception {
@@ -34,7 +35,7 @@ public class Activator implements BundleActivator {
         props.put(Constants.SERVICE_PID, "org.apache.cxf.dosgi.discovery.zookeeper.server");
         context.registerService(org.osgi.service.cm.ManagedService.class.getName(), zkStarter, props);
     }
-    
+
     public void stop(BundleContext context) throws Exception {
         if (zkStarter != null) {
             zkStarter.shutdown();
