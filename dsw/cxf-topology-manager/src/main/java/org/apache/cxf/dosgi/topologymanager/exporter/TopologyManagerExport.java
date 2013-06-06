@@ -26,8 +26,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminLifeCycleListener;
-import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
@@ -61,33 +61,34 @@ public class TopologyManagerExport {
     private final BundleContext bctx;
     private final EndpointListenerNotifier epListenerNotifier;
     private final ExecutorService execService;
-    private final RemoteServiceAdminTracker remoteServiceAdminTracker;
+    private final SimpleServiceTracker<RemoteServiceAdmin> remoteServiceAdminTracker;
     private final ServiceListener serviceListener;
     private final EndpointRepository endpointRepo;
 
-    public TopologyManagerExport(BundleContext ctx, RemoteServiceAdminTracker rsaTracker) {
+    public TopologyManagerExport(BundleContext ctx, SimpleServiceTracker<RemoteServiceAdmin> rsaTracker) {
         this(ctx, rsaTracker, null);
     }
-    public TopologyManagerExport(BundleContext ctx, RemoteServiceAdminTracker rsaTracker,
+
+    public TopologyManagerExport(BundleContext ctx, SimpleServiceTracker<RemoteServiceAdmin> rsaTracker,
                                  EndpointListenerNotifier notif) {
         endpointRepo = new EndpointRepository();
-        if (notif == null) {
-            epListenerNotifier = new EndpointListenerNotifier(ctx, endpointRepo);
-        } else {
-            epListenerNotifier = notif;
-        }
+        epListenerNotifier = notif == null ? new EndpointListenerNotifier(ctx, endpointRepo) : notif;
         execService = new ThreadPoolExecutor(5, 10, 50, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         bctx = ctx;
         this.remoteServiceAdminTracker = rsaTracker;
-        this.remoteServiceAdminTracker.addListener(new RemoteServiceAdminLifeCycleListener() {
+        this.remoteServiceAdminTracker.addListener(new SimpleServiceTrackerListener<RemoteServiceAdmin>() {
 
             public void added(RemoteServiceAdmin rsa) {
+                LOG.debug("RemoteServiceAdmin added: {}, total {}",
+                        rsa, remoteServiceAdminTracker.getAllServices().size());
                 for (ServiceReference serviceRef : endpointRepo.getServicesToBeExportedFor(rsa)) {
                     triggerExport(serviceRef);
                 }
             }
 
             public void removed(RemoteServiceAdmin rsa) {
+                LOG.debug("RemoteServiceAdmin removed: {}, total {}", rsa,
+                        remoteServiceAdminTracker.getAllServices().size());
                 List<EndpointDescription> endpoints = endpointRepo.removeRemoteServiceAdmin(rsa);
                 epListenerNotifier.notifyListeners(false, endpoints);
             }
@@ -138,8 +139,9 @@ public class TopologyManagerExport {
     }
 
     protected void doExportService(final ServiceReference sref) {
-        endpointRepo.addService(sref);
-        List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getList();
+        LOG.debug("Exporting service");
+        endpointRepo.addService(sref); // mark for future export even if there are currently no RSAs
+        List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getAllServices();
         if (rsaList.isEmpty()) {
             LOG.error("No RemoteServiceAdmin available! Unable to export service from bundle {}, interfaces: {}",
                     sref.getBundle().getSymbolicName(),

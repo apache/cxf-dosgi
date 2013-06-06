@@ -16,15 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.topologymanager.rsatracker;
-
-import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
+package org.apache.cxf.dosgi.topologymanager.util;
 
 /**
- * Callback interface to be notified of RemoteServiceAdmin services that are added or removed
+ * Callback interface for notifications of services that are
+ * added to or removed from tracking by a {@link SimpleServiceTracker}.
+ *
+ * @param <T> the service interface type
  */
-public interface RemoteServiceAdminLifeCycleListener {
+public interface SimpleServiceTrackerListener<T> {
 
-    void added(RemoteServiceAdmin rsa);
-    void removed(RemoteServiceAdmin rsa);
+    /**
+     * Called when a new service is added to the tracked services.
+     *
+     * @param service the newly added service
+     */
+    void added(T service);
+
+    /**
+     * Called when a service is removed from the tracked services.
+     *
+     * @param service the removed service
+     */
+    void removed(T service);
 }

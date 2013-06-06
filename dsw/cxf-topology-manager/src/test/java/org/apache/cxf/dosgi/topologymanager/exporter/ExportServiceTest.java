@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminLifeCycleListener;
-import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
 import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -66,7 +66,7 @@ public class ExportServiceTest {
             .expect(bctx.getServiceReferences(EasyMock.<String> anyObject(), EasyMock.<String> anyObject()))
             .andReturn(null).atLeastOnce();
 
-        RemoteServiceAdminTracker rsaTracker = createSingleRsaTracker(c, rsa);
+        SimpleServiceTracker<RemoteServiceAdmin> rsaTracker = createSingleRsaTracker(c, rsa);
 
         EndpointDescription endpoint = createEndpoint(c);
         ExportRegistration exportRegistration = createExportRegistration(c, endpoint);
@@ -81,9 +81,7 @@ public class ExportServiceTest {
         c.replay();
 
         TopologyManagerExport topManager = new TopologyManagerExport(bctx, rsaTracker, mockEpListenerNotifier) {
-            /**
-             * To avoid async call
-             */
+            // override to perform export from the same thread rather than asynchronously
             @Override
             protected void triggerExport(ServiceReference sref) {
                 doExportService(sref);
@@ -106,11 +104,11 @@ public class ExportServiceTest {
         }).once();
     }
 
-    private RemoteServiceAdminTracker createSingleRsaTracker(IMocksControl c, RemoteServiceAdmin rsa) {
-        RemoteServiceAdminTracker rsaTracker = c.createMock(RemoteServiceAdminTracker.class);
-        rsaTracker.addListener(EasyMock.<RemoteServiceAdminLifeCycleListener> anyObject());
+    private SimpleServiceTracker<RemoteServiceAdmin> createSingleRsaTracker(IMocksControl c, RemoteServiceAdmin rsa) {
+        SimpleServiceTracker<RemoteServiceAdmin> rsaTracker = c.createMock(SimpleServiceTracker.class);
+        rsaTracker.addListener(EasyMock.<SimpleServiceTrackerListener> anyObject());
         EasyMock.expectLastCall().once();
-        EasyMock.expect(rsaTracker.getList()).andReturn(Collections.singletonList(rsa));
+        EasyMock.expect(rsaTracker.getAllServices()).andReturn(Collections.singletonList(rsa));
         return rsaTracker;
     }
 

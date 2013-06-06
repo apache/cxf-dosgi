@@ -20,9 +20,10 @@ package org.apache.cxf.dosgi.topologymanager;
 
 import org.apache.cxf.dosgi.topologymanager.exporter.TopologyManagerExport;
 import org.apache.cxf.dosgi.topologymanager.importer.TopologyManagerImport;
-import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,26 +31,25 @@ public class Activator implements BundleActivator {
 
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
 
-    private TopologyManagerExport topManager;
-    private TopologyManagerImport topManagerImport;
-
-    private RemoteServiceAdminTracker rsaTracker;
+    private TopologyManagerExport topologyManagerExport;
+    private TopologyManagerImport topologyManagerImport;
+    private SimpleServiceTracker<RemoteServiceAdmin> rsaTracker;
 
     public void start(BundleContext bc) throws Exception {
         LOG.debug("TopologyManager: start()");
-        rsaTracker = new RemoteServiceAdminTracker(bc);
-        topManager = new TopologyManagerExport(bc, rsaTracker);
-        topManagerImport = new TopologyManagerImport(bc, rsaTracker);
+        rsaTracker = new SimpleServiceTracker<RemoteServiceAdmin>(bc, RemoteServiceAdmin.class);
+        topologyManagerExport = new TopologyManagerExport(bc, rsaTracker);
+        topologyManagerImport = new TopologyManagerImport(bc, rsaTracker);
 
         rsaTracker.open();
-        topManager.start();
-        topManagerImport.start();
+        topologyManagerExport.start();
+        topologyManagerImport.start();
     }
 
     public void stop(BundleContext bc) throws Exception {
         LOG.debug("TopologyManager: stop()");
-        topManager.stop();
-        topManagerImport.stop();
+        topologyManagerExport.stop();
+        topologyManagerImport.stop();
         rsaTracker.close();
     }
 }

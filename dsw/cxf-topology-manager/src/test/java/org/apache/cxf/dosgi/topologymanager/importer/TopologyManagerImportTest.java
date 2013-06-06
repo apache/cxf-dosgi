@@ -23,8 +23,8 @@ import java.util.Dictionary;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminLifeCycleListener;
-import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.easymock.classextension.EasyMock;
@@ -50,7 +50,7 @@ public class TopologyManagerImportTest {
         final Semaphore sema = new Semaphore(0);
 
         BundleContext bc = c.createMock(BundleContext.class);
-        RemoteServiceAdminTracker rsaTracker = c.createMock(RemoteServiceAdminTracker.class);
+        SimpleServiceTracker<RemoteServiceAdmin> rsaTracker = c.createMock(SimpleServiceTracker.class);
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
         sreg.unregister();
         EasyMock.expectLastCall().once();
@@ -64,8 +64,8 @@ public class TopologyManagerImportTest {
         EasyMock.expect(ireg.getException()).andReturn(null).anyTimes();
         ImportReference iref = c.createMock(ImportReference.class);
 
-        rsaTracker.addListener(EasyMock.<RemoteServiceAdminLifeCycleListener>anyObject());
-        EasyMock.expect(rsaTracker.getList()).andReturn(Arrays.asList(rsa)).anyTimes();
+        rsaTracker.addListener(EasyMock.<SimpleServiceTrackerListener>anyObject());
+        EasyMock.expect(rsaTracker.getAllServices()).andReturn(Arrays.asList(rsa)).anyTimes();
 
         EasyMock.expect(rsa.importService(EasyMock.eq(epd))).andAnswer(new IAnswer<ImportRegistration>() {
             public ImportRegistration answer() throws Throwable {

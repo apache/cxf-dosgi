@@ -29,8 +29,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminLifeCycleListener;
-import org.apache.cxf.dosgi.topologymanager.rsatracker.RemoteServiceAdminTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -56,7 +56,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
 
     private final EndpointListenerManager endpointListenerManager;
     private final BundleContext bctx;
-    private final RemoteServiceAdminTracker remoteServiceAdminTracker;
+    private final SimpleServiceTracker<RemoteServiceAdmin> remoteServiceAdminTracker;
     private final ListenerHookImpl listenerHook;
 
     /**
@@ -87,10 +87,10 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     private final Map<String /* filter */, List<ImportRegistration>> importedServices
         = new HashMap<String, List<ImportRegistration>>();
 
-    public TopologyManagerImport(BundleContext bc, RemoteServiceAdminTracker rsaTracker) {
+    public TopologyManagerImport(BundleContext bc, SimpleServiceTracker<RemoteServiceAdmin> rsaTracker) {
         bctx = bc;
         remoteServiceAdminTracker = rsaTracker;
-        remoteServiceAdminTracker.addListener(new RemoteServiceAdminLifeCycleListener() {
+        remoteServiceAdminTracker.addListener(new SimpleServiceTrackerListener<RemoteServiceAdmin>() {
 
             public void added(RemoteServiceAdmin rsa) {
                 triggerImportsForRemoteServiceAdmin(rsa);
@@ -187,7 +187,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     }
 
     public void triggerImportsForRemoteServiceAdmin(RemoteServiceAdmin rsa) {
-        LOG.debug("New RSA detected trying to import services with it");
+        LOG.debug("New RemoteServiceAdmin {} detected, trying to import services with it", rsa);
         synchronized (importPossibilities) {
             for (String filter : importPossibilities.keySet()) {
                 triggerImport(filter);
@@ -295,7 +295,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
      * @return import registration of the first successful import
      */
     private ImportRegistration importService(EndpointDescription ep) {
-        for (RemoteServiceAdmin rsa : remoteServiceAdminTracker.getList()) {
+        for (RemoteServiceAdmin rsa : remoteServiceAdminTracker.getAllServices()) {
             ImportRegistration ir = rsa.importService(ep);
             if (ir != null && ir.getException() == null) {
                 LOG.debug("Service import was successful {}", ir);
