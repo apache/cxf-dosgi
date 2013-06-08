@@ -52,8 +52,8 @@ import org.slf4j.LoggerFactory;
 // registered as spring bean -> start / stop called accordingly
 public class Activator implements ManagedService, BundleActivator {
 
-    private static final int DEFAULT_INTENT_TIMEOUT = 30000;
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
+    private static final int DEFAULT_INTENT_TIMEOUT = 30000;
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
     private ServiceRegistration rsaFactoryReg;
     private ServiceRegistration decoratorReg;

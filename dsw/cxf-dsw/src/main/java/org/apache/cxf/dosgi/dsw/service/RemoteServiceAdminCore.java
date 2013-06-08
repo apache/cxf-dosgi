@@ -64,14 +64,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     // Is stored in exportedServices while the export is in progress as a marker
     private final List<ExportRegistration> exportInProgress = Collections.emptyList();
 
-    private BundleContext bctx;
-    private EventProducer eventProducer;
-
-    private ConfigTypeHandlerFactory configTypeHandlerFactory;
+    private final BundleContext bctx;
+    private final EventProducer eventProducer;
+    private final ConfigTypeHandlerFactory configTypeHandlerFactory;
 
     public RemoteServiceAdminCore(BundleContext bc, ConfigTypeHandlerFactory configTypeHandlerFactory) {
-        bctx = bc;
-        eventProducer = new EventProducer(bctx);
+        this.bctx = bc;
+        this.eventProducer = new EventProducer(bctx);
         this.configTypeHandlerFactory = configTypeHandlerFactory;
     }
 
@@ -245,11 +244,9 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         Map<String, Object> converted = new HashMap<String, Object>(properties.size());
         for (Map.Entry<String, Object> entry : properties.entrySet()) {
             Object val = entry.getValue();
+            // convert arrays into lists so that they can be compared via equals()
             if (val instanceof Object[]) {
-                Object[] arr = (Object[])val;
-                List<Object> list = new ArrayList<Object>(arr.length);
-                Collections.addAll(list, arr);
-                val = list;
+                val = Arrays.asList((Object[])val);
             }
             converted.put(entry.getKey(), val);
         }
@@ -320,7 +317,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 ImportRegistrationImpl irParent = imRegs.iterator().next();
                 ImportRegistrationImpl ir = new ImportRegistrationImpl(irParent);
                 imRegs.add(ir);
-                eventProducer.publishNotifcation(ir);
+                eventProducer.publishNotification(ir);
                 return ir;
             }
 
@@ -350,7 +347,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                     importedServices.put(endpoint, imRegs);
                 }
                 imRegs.add(imReg);
-                eventProducer.publishNotifcation(imReg);
+                eventProducer.publishNotification(imReg);
                 return imReg;
             } else {
                 return null;
@@ -418,7 +415,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         }
     }
 
-    // Remove all export registrations associated with the given bundle
+    // remove all export registrations associated with the given bundle
     protected void removeExportRegistrations(Bundle exportingBundle) {
         List<ExportRegistration> bundleExports = getExportsForBundle(exportingBundle);
         for (ExportRegistration export : bundleExports) {
@@ -449,7 +446,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             if (imRegs != null && imRegs.contains(iri)) {
                 imRegs.remove(iri);
             } else {
-                LOG.error("An importRegistration was intended to be removed form internal management "
+                LOG.error("An importRegistration was intended to be removed from internal management "
                     + "structure but couldn't be found in it!");
             }
             if (imRegs == null || imRegs.isEmpty()) {

@@ -61,8 +61,8 @@ public class ExportRegistrationImpl implements ExportRegistration {
         rsaCore = parent.getRsaCore();
         parent.instanceAdded();
     }
-    public ExportRegistrationImpl(ServiceReference sref,
-                                  EndpointDescription endpoint,
+
+    public ExportRegistrationImpl(ServiceReference sref, EndpointDescription endpoint,
                                   RemoteServiceAdminCore remoteServiceAdminCore) {
         exportReference = new ExportReferenceImpl(sref, endpoint);
         parent = this;
@@ -112,10 +112,6 @@ public class ExportRegistrationImpl implements ExportRegistration {
         }
     }
 
-    public Throwable getException() {
-        return closed ? null : exception;
-    }
-
     @Override
     public String toString() {
         if (exportReference == null) {
@@ -140,12 +136,12 @@ public class ExportRegistrationImpl implements ExportRegistration {
         return r;
     }
 
-    public void setServer(Server server) {
-        this.server = server;
+    public Throwable getException() {
+        return closed ? null : exception;
     }
 
-    public Server getServer() {
-        return server;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public void setException(Throwable ex) {
@@ -154,6 +150,10 @@ public class ExportRegistrationImpl implements ExportRegistration {
 
     public ExportReference getExportReference() {
         return exportReference;
+    }
+
+    public RemoteServiceAdminCore getRsaCore() {
+        return rsaCore;
     }
 
     /**
@@ -201,11 +201,4 @@ public class ExportRegistrationImpl implements ExportRegistration {
         serviceTracker.open();
     }
 
-    public void setRsaCore(RemoteServiceAdminCore rsaCore) {
-        this.rsaCore = rsaCore;
-    }
-
-    public RemoteServiceAdminCore getRsaCore() {
-        return rsaCore;
-    }
 }

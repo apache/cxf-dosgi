@@ -38,7 +38,7 @@ public class IntentManagerImpl implements IntentManager {
     private static final String PROVIDED_INTENT_VALUE = "PROVIDED";
 
     private final IntentMap intentMap;
-    private long maxIntentWaitTime;
+    private final long maxIntentWaitTime;
 
     public IntentManagerImpl(IntentMap intentMap) {
         this(intentMap, 0);

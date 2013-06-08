@@ -36,8 +36,8 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
 public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
-    private BundleContext bctx;
-    private RemoteServiceAdminCore rsaCore;
+    private final BundleContext bctx;
+    private final RemoteServiceAdminCore rsaCore;
 
     private boolean closed;
 
@@ -57,10 +57,7 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
         return AccessController.doPrivileged(new PrivilegedAction<List>() {
             public List<ExportRegistration> run() {
-                if (closed) {
-                    return Collections.emptyList();
-                }
-                return rsaCore.exportService(ref, properties);
+                return closed ? Collections.<ExportRegistration>emptyList() : rsaCore.exportService(ref, properties);
             }
         });
     }
@@ -73,10 +70,7 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
             sm.checkPermission(epp);
         }
 
-        if (closed) {
-            return null;
-        }
-        return rsaCore.getExportedServices();
+        return closed ? null : rsaCore.getExportedServices();
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -87,27 +81,20 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
             sm.checkPermission(epp);
         }
 
-        if (closed) {
-            return null;
-        }
-        return rsaCore.getImportedEndpoints();
+        return closed ? null : rsaCore.getImportedEndpoints();
     }
 
     public ImportRegistration importService(EndpointDescription endpoint) {
         final EndpointDescription epd = endpoint;
         SecurityManager sm = System.getSecurityManager();
-        EndpointPermission epp = new EndpointPermission(epd, OsgiUtils.getUUID(bctx),
-                                                        EndpointPermission.IMPORT);
+        EndpointPermission epp = new EndpointPermission(epd, OsgiUtils.getUUID(bctx), EndpointPermission.IMPORT);
         if (sm != null) {
             sm.checkPermission(epp);
         }
 
         return AccessController.doPrivileged(new PrivilegedAction<ImportRegistration>() {
             public ImportRegistration run() {
-                if (closed) {
-                    return null;
-                }
-                return rsaCore.importService(epd);
+                return closed ? null : rsaCore.importService(epd);
             }
         });
     }

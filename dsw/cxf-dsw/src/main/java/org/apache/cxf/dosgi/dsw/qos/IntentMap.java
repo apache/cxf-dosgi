@@ -47,8 +47,8 @@ public class IntentMap extends ConcurrentHashMap<String, Object> {
         Object result = super.put(key, value);
         synchronized (this) {
             notifyAll();
-            return result;
         }
+        return result;
     }
 
     @Override

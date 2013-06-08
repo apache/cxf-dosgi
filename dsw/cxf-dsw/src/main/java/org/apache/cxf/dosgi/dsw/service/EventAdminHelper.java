@@ -50,13 +50,7 @@ public class EventAdminHelper {
         props.put("bundle.symbolicname", bctx.getBundle().getSymbolicName());
 
         String version = (String)bctx.getBundle().getHeaders().get("Bundle-Version");
-
-        Version v;
-        if (version != null) {
-            v = new Version(version);
-        } else {
-            v = Version.emptyVersion;
-        }
+        Version v = version != null ? new Version(version) : Version.emptyVersion;
         setIfNotNull(props, "bundle.version", v);
 
         return new Event(topic, (Dictionary)props);
@@ -92,7 +86,7 @@ public class EventAdminHelper {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void setIfNotNull(Dictionary props, String key, Object o) {
+    private static void setIfNotNull(Dictionary props, String key, Object o) {
         if (o != null) {
             props.put(key, o);
         }
@@ -121,7 +115,7 @@ public class EventAdminHelper {
         }
     }
 
-    static String remoteServiceAdminEventTypeToString(int type) {
+    private static String remoteServiceAdminEventTypeToString(int type) {
         String retval;
         switch (type) {
         case RemoteServiceAdminEvent.EXPORT_ERROR:

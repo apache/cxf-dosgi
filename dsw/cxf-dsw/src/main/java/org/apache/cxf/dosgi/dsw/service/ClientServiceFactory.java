@@ -51,7 +51,7 @@ public class ClientServiceFactory implements ServiceFactory {
         this.iClass = iClass;
         this.sd = sd;
         this.handler = handler;
-        importRegistration = ir;
+        this.importRegistration = ir;
     }
 
     public Object getService(final Bundle requestingBundle, final ServiceRegistration sreg) {
@@ -83,12 +83,12 @@ public class ClientServiceFactory implements ServiceFactory {
     }
 
     public void ungetService(Bundle requestingBundle, ServiceRegistration sreg, Object serviceObject) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(64);
         sb.append("Releasing a client object");
-        Object objectClass = sreg.getReference().getProperty(org.osgi.framework.Constants.OBJECTCLASS);
+        String[] objectClass = (String[])sreg.getReference().getProperty(org.osgi.framework.Constants.OBJECTCLASS);
         if (objectClass != null) {
             sb.append(", interfaces: ");
-            for (String s : (String[])objectClass) {
+            for (String s : objectClass) {
                 sb.append(' ').append(s);
             }
         }
@@ -97,23 +97,21 @@ public class ClientServiceFactory implements ServiceFactory {
         synchronized (this) {
             --serviceCounter;
             LOG.debug("Services still provided by this ServiceFactory: {}", serviceCounter);
-
-            if (serviceCounter <= 0 && closeable) {
-                remove();
-            }
+            closeIfUnused();
         }
     }
 
-    private void remove() {
-        importRegistration.closeAll();
+    // called only in synchronized block
+    private void closeIfUnused() {
+        if (serviceCounter <= 0 && closeable) {
+            importRegistration.closeAll();
+        }
     }
 
     public void setCloseable(boolean closeable) {
         synchronized (this) {
             this.closeable = closeable;
-            if (serviceCounter <= 0 && closeable) {
-                remove();
-            }
+            closeIfUnused();
         }
     }
 }

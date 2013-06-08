@@ -130,7 +130,6 @@ public class HttpServiceManager {
 
         try {
             Filter f = bundleContext.createFilter("(" + org.osgi.framework.Constants.SERVICE_ID + "=" + sid + ")");
-
             if (f != null) {
                 bundleContext.addServiceListener(new UnregisterListener(), f.toString());
             } else {
@@ -167,9 +166,9 @@ public class HttpServiceManager {
             final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
             final String alias = exportedAliases.remove(sid);
             if (alias == null) {
-                LOG.error("Unable to unexport HTTP servlet for service class ''{0}'',"
-                        + " service-id {1}: no servlet alias found",
-                        new Object[] {sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid});
+                LOG.error("Unable to unexport HTTP servlet for service class '{}',"
+                        + " service-id {}: no servlet alias found",
+                        sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid);
                 return;
             }
             LOG.debug("Unexporting HTTP servlet for alias '{}'", alias);
@@ -177,8 +176,7 @@ public class HttpServiceManager {
                 HttpService http = getHttpService();
                 http.unregister(alias);
             } catch (Exception e) {
-                LOG.warn("An exception occurred while unregistering service for HTTP servlet alias '"
-                        + alias + "'", e);
+                LOG.warn("An exception occurred while unregistering service for HTTP servlet alias '{}'", alias, e);
             }
         }
     }

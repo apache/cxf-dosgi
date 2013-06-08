@@ -33,8 +33,7 @@ public class ExportReferenceImpl implements ExportReference {
     }
 
     public ExportReferenceImpl(ExportReference exportReference) {
-        this.serviceReference = exportReference.getExportedService();
-        this.endpointDescription = exportReference.getExportedEndpoint();
+        this(exportReference.getExportedService(), exportReference.getExportedEndpoint());
     }
 
     public EndpointDescription getExportedEndpoint() {
@@ -49,8 +48,8 @@ public class ExportReferenceImpl implements ExportReference {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((endpointDescription == null) ? 0 : endpointDescription.hashCode());
-        result = prime * result + ((serviceReference == null) ? 0 : serviceReference.hashCode());
+        result = prime * result + (endpointDescription == null ? 0 : endpointDescription.hashCode());
+        result = prime * result + (serviceReference == null ? 0 : serviceReference.hashCode());
         return result;
     }
 
@@ -59,28 +58,15 @@ public class ExportReferenceImpl implements ExportReference {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
         ExportReferenceImpl other = (ExportReferenceImpl) obj;
-        if (endpointDescription == null) {
-            if (other.endpointDescription != null) {
-                return false;
-            }
-        } else if (!endpointDescription.equals(other.endpointDescription)) {
-            return false;
-        }
-        if (serviceReference == null) {
-            if (other.serviceReference != null) {
-                return false;
-            }
-        } else if (!serviceReference.equals(other.serviceReference)) {
-            return false;
-        }
-        return true;
+        boolean ed = endpointDescription == null ? other.endpointDescription == null
+                : endpointDescription.equals(other.endpointDescription);
+        boolean sr = serviceReference == null ? other.serviceReference == null
+                : serviceReference.equals(other.serviceReference);
+        return ed && sr;
     }
 
     synchronized void close() {

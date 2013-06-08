@@ -78,9 +78,10 @@ public class RemoteServiceAdminCoreTest {
         EasyMock.expect(sref.getProperty("service.exported.interfaces")).andReturn("*").anyTimes();
 
         ConfigTypeHandlerFactory configTypeHandlerFactory = c.createMock(ConfigTypeHandlerFactory.class);
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
 
         c.replay();
+
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
 
         // must return an empty List as sref if from the same bundle
         List<ExportRegistration> exRefs = rsaCore.exportService(sref, null);
@@ -118,6 +119,9 @@ public class RemoteServiceAdminCoreTest {
         HttpServiceManager httpServiceManager = c.createMock(HttpServiceManager.class);
         ConfigTypeHandlerFactory configTypeHandlerFactory
             = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
+
+        c.replay();
+
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory) {
             @Override
             protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
@@ -125,7 +129,6 @@ public class RemoteServiceAdminCoreTest {
                                                     BundleContext requestingContext) {
             }
         };
-        c.replay();
 
         // must be null as the endpoint doesn't contain any usable configurations
         assertNull(rsaCore.importService(endpoint));

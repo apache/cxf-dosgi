@@ -18,9 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
@@ -30,9 +27,8 @@ import org.slf4j.LoggerFactory;
 public class RemoteServiceadminFactory implements ServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteServiceadminFactory.class);
-    private List<RemoteServiceAdminInstance> rsaServiceInstances = new ArrayList<RemoteServiceAdminInstance>();
 
-    private RemoteServiceAdminCore rsaCore;
+    private final RemoteServiceAdminCore rsaCore;
 
     public RemoteServiceadminFactory(RemoteServiceAdminCore rsaCore) {
         this.rsaCore = rsaCore;
@@ -40,17 +36,13 @@ public class RemoteServiceadminFactory implements ServiceFactory {
 
     public Object getService(Bundle b, ServiceRegistration sr) {
         LOG.debug("new RemoteServiceAdmin ServiceInstance created for Bundle {}", b.getSymbolicName());
-        RemoteServiceAdminInstance rsai = new RemoteServiceAdminInstance(b.getBundleContext(), rsaCore);
-        rsaServiceInstances.add(rsai);
-        return rsai;
+        return new RemoteServiceAdminInstance(b.getBundleContext(), rsaCore);
     }
 
     public void ungetService(Bundle b, ServiceRegistration sr, Object serviceObject) {
         LOG.debug("RemoteServiceAdmin ServiceInstance removed for Bundle {}", b.getSymbolicName());
         if (serviceObject instanceof RemoteServiceAdminInstance) {
-            RemoteServiceAdminInstance rsai = (RemoteServiceAdminInstance)serviceObject;
-            rsai.close();
-            rsaServiceInstances.remove(rsai);
+            ((RemoteServiceAdminInstance)serviceObject).close();
         }
     }
 }

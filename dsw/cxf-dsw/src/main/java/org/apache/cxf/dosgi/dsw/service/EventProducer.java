@@ -33,8 +33,8 @@ import org.slf4j.LoggerFactory;
 public class EventProducer {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventProducer.class);
-    private BundleContext bctx;
-    private EventAdminHelper eaHelper;
+    private final BundleContext bctx;
+    private final EventAdminHelper eaHelper;
 
     public EventProducer(BundleContext bc) {
         bctx = bc;
@@ -51,17 +51,37 @@ public class EventProducer {
         int type = er.getException() == null
             ? RemoteServiceAdminEvent.EXPORT_REGISTRATION
             : RemoteServiceAdminEvent.EXPORT_ERROR;
-        RemoteServiceAdminEvent rsae = new RemoteServiceAdminEvent(type, bctx.getBundle(), er.getExportReference(),
-                er.getException());
+        notify(type, null, er);
+    }
 
-        notifyListeners(rsae);
-        eaHelper.notifyEventAdmin(rsae);
+    protected void publishNotification(ImportRegistration ir) {
+        int type = ir.getException() == null
+            ? RemoteServiceAdminEvent.IMPORT_REGISTRATION
+            : RemoteServiceAdminEvent.IMPORT_ERROR;
+        notify(type, ir, null);
+    }
+
+    public void notifyRemoval(ExportRegistration er) {
+        notify(RemoteServiceAdminEvent.EXPORT_UNREGISTRATION, null, er);
+    }
+
+    public void notifyRemoval(ImportRegistration ir) {
+        notify(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION, ir, null);
+    }
+
+    // only one of ir or er must be set, and the other must be null
+    private void notify(int type, ImportRegistration ir, ExportRegistration er) {
+        RemoteServiceAdminEvent event = ir != null
+            ? new RemoteServiceAdminEvent(type, bctx.getBundle(), ir.getImportReference(), ir.getException())
+            : new RemoteServiceAdminEvent(type, bctx.getBundle(), er.getExportReference(), er.getException());
+        notifyListeners(event);
+        eaHelper.notifyEventAdmin(event);
     }
 
     private void notifyListeners(RemoteServiceAdminEvent rsae) {
         try {
-            ServiceReference[] listenerRefs = bctx.getServiceReferences(RemoteServiceAdminListener.class
-                .getName(), null);
+            ServiceReference[] listenerRefs = bctx.getServiceReferences(
+                    RemoteServiceAdminListener.class.getName(), null);
             if (listenerRefs != null) {
                 for (ServiceReference sref : listenerRefs) {
                     RemoteServiceAdminListener rsal = (RemoteServiceAdminListener)bctx.getService(sref);
@@ -79,36 +99,5 @@ public class EventProducer {
         } catch (InvalidSyntaxException e) {
             LOG.error(e.getMessage(), e);
         }
-    }
-
-    protected void publishNotifcation(ImportRegistration ir) {
-        RemoteServiceAdminEvent rsae;
-        if (ir.getException() != null) {
-            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_ERROR, bctx.getBundle(),
-                                               ir.getImportReference(), ir.getException());
-        } else {
-            rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_REGISTRATION, bctx.getBundle(),
-                                               ir.getImportReference(), ir.getException());
-        }
-
-        notifyListeners(rsae);
-        eaHelper.notifyEventAdmin(rsae);
-    }
-
-    public void notifyRemoval(ExportRegistration eri) {
-        RemoteServiceAdminEvent rsae;
-        rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.EXPORT_UNREGISTRATION, bctx.getBundle(),
-                                           eri.getExportReference(), eri.getException());
-
-        notifyListeners(rsae);
-        eaHelper.notifyEventAdmin(rsae);
-    }
-
-    public void notifyRemoval(ImportRegistration eri) {
-        RemoteServiceAdminEvent rsae = new RemoteServiceAdminEvent(RemoteServiceAdminEvent.IMPORT_UNREGISTRATION,
-                bctx.getBundle(), eri.getImportReference(), eri.getException());
-
-        notifyListeners(rsae);
-        eaHelper.notifyEventAdmin(rsae);
     }
 }

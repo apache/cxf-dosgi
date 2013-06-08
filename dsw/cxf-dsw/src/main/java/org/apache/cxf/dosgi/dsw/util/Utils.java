@@ -50,6 +50,7 @@ public final class Utils {
         if (object instanceof String[]) {
             return (String[])object;
         }
+        
         if (object instanceof Collection) {
             Collection col = (Collection)object;
             List<String> ar = new ArrayList<String>(col.size());

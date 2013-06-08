@@ -114,7 +114,7 @@ class Chain implements FilterChain {
     private static final Logger LOG = LoggerFactory.getLogger(Chain.class);
 
     int current;
-    Filter[] filters;
+    final Filter[] filters;
 
     Chain(Filter[] filters) {
         this.filters = filters;

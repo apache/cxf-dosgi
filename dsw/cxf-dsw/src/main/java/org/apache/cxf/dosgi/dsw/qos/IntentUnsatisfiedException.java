@@ -22,11 +22,11 @@ public class IntentUnsatisfiedException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private String intent;
+    private final String intent;
 
-    public IntentUnsatisfiedException(String theIntent) {
-        super(theIntent);
-        intent = theIntent;
+    public IntentUnsatisfiedException(String intent) {
+        super(intent);
+        this.intent = intent;
     }
 
     public String getIntent() {

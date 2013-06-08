@@ -74,10 +74,7 @@ public class InterfaceRule implements Rule {
             if (m.matches()) {
                 for (Map.Entry<String, String> pm : propMatches.entrySet()) {
                     Object value = sref.getProperty(pm.getKey());
-                    if (value == null) {
-                        return;
-                    }
-                    if (!Pattern.matches(pm.getValue(), value.toString())) {
+                    if (value == null || !Pattern.matches(pm.getValue(), value.toString())) {
                         return;
                     }
                 }
