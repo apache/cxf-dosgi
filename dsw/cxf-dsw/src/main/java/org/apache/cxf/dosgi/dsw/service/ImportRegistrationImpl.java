@@ -103,7 +103,12 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
             clientServiceFactory.setCloseable(true);
         }
         if (importedService != null) {
-            importedService.unregister();
+            try {
+                importedService.unregister();
+            } catch (IllegalStateException ise) {
+                LOG.debug("imported service is already unregistered");
+            }
+            importedService = null;
         }
     }
 

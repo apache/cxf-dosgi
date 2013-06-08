@@ -423,6 +423,19 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         }
     }
 
+    // remove all import registrations associated with the given bundle
+    protected void removeImportRegistrations() {
+        Collection<ImportRegistrationImpl> copy = new ArrayList<ImportRegistrationImpl>();
+        synchronized (importedServices) {
+            for (Collection<ImportRegistrationImpl> irs : importedServices.values()) {
+                copy.addAll(irs);
+            }
+        }
+        for (ImportRegistrationImpl ir : copy) {
+            removeImportRegistration(ir);
+        }
+    }
+
     private List<ExportRegistration> getExportsForBundle(Bundle exportingBundle) {
         synchronized (exportedServices) {
             List<ExportRegistration> bundleRegs = new ArrayList<ExportRegistration>();

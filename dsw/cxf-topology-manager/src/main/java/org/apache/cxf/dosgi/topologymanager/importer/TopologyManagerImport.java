@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.topologymanager.importer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -97,6 +98,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
             }
 
             public void removed(RemoteServiceAdmin rsa) {
+                // the RSA's imports will be closed by its shutdown, so nothing to do here
             }
         });
         endpointListenerManager = new EndpointListenerManager(bctx, this);
@@ -305,12 +307,22 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
         return null;
     }
 
-    /**
-     * This method is called once a RemoteServiceAdminEvent for an removed import reference is received.
-     * However the current implementation has no special support for multiple topology managers, therefore this method
-     * does nothing for the moment.
-     */
-    public void removeImportReference(ImportReference anyObject) {
+    public void removeImportReference(ImportReference importReference) {
+        synchronized (importedServices) {
+            for (Iterator<List<ImportRegistration>> it1 = importedServices.values().iterator(); it1.hasNext();) {
+                Collection<ImportRegistration> irs = it1.next();
+                for (Iterator<ImportRegistration> it2 = irs.iterator(); it2.hasNext();) {
+                    ImportRegistration ir = it2.next();
+                    if (ir.getImportReference().equals(importReference)) {
+                        ir.close();
+                        it2.remove();
+                    }
+                }
+                if (irs.isEmpty()) {
+                    it1.remove();
+                }
+            }
+        }
     }
 
     public void remoteAdminEvent(RemoteServiceAdminEvent event) {

@@ -71,11 +71,15 @@ public class EventProducer {
 
     // only one of ir or er must be set, and the other must be null
     private void notify(int type, ImportRegistration ir, ExportRegistration er) {
-        RemoteServiceAdminEvent event = ir != null
-            ? new RemoteServiceAdminEvent(type, bctx.getBundle(), ir.getImportReference(), ir.getException())
-            : new RemoteServiceAdminEvent(type, bctx.getBundle(), er.getExportReference(), er.getException());
-        notifyListeners(event);
-        eaHelper.notifyEventAdmin(event);
+        try {
+            RemoteServiceAdminEvent event = ir != null
+                ? new RemoteServiceAdminEvent(type, bctx.getBundle(), ir.getImportReference(), ir.getException())
+                : new RemoteServiceAdminEvent(type, bctx.getBundle(), er.getExportReference(), er.getException());
+            notifyListeners(event);
+            eaHelper.notifyEventAdmin(event);
+        } catch (IllegalStateException ise) {
+            LOG.debug("can't send notifications since bundle context is no longer valid");
+        }
     }
 
     private void notifyListeners(RemoteServiceAdminEvent rsae) {
