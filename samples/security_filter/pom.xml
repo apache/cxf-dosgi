@@ -69,7 +69,7 @@
         <configuration>
           <instructions>
             <Bundle-Name>${project.name}</Bundle-Name>
-            <Bundle-Description>This bundle contains an example Distributed OSGi endpoint that passes requests through a security filter.</Bundle-Description>
+            <Bundle-Description>An example Distributed OSGi endpoint that passes requests through a security filter</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Private-Package>org.apache.cxf.dosgi.samples.security</Private-Package>
             <Bundle-Activator>org.apache.cxf.dosgi.samples.security.Activator</Bundle-Activator>

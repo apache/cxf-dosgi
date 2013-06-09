@@ -115,11 +115,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Name>CXF dOSGi Remote Service Admin
-                            Implementation</Bundle-Name>
-                        <Bundle-Description>This bundle contains the
-                            implementation required by the CXF
-                            Distributed Software Bundle</Bundle-Description>
+                        <Bundle-Name>CXF dOSGi Remote Service Admin Implementation</Bundle-Name>
+                        <Bundle-Description>The CXF Remote Service Admin as described in the OSGi Remote Service Admin specification</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
                         <Import-Package>${bundle.import.package}</Import-Package>

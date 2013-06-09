@@ -83,9 +83,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Name>CXF Local Discovery Service Bundle</Bundle-Name>
-                        <Bundle-Description>This bundle contains the
-                            implementation required by the CXF Local
-                            Discovery Service Bundle</Bundle-Description>
+                        <Bundle-Description>The CXF Local Discovery Service Implementation</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.apache.cxf.dosgi.discovery.local.internal.Activator</Bundle-Activator>
                         <Import-Package>

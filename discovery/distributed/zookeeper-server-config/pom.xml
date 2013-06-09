@@ -69,7 +69,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Name>ZooKeeper server configuration bundle</Bundle-Name>
-                        <Bundle-Description>This bundle can configure the ZooKeeper server in an OSGi Framework</Bundle-Description>
+                        <Bundle-Description>Configures the ZooKeeper server in an OSGi Framework</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.apache.cxf.dosgi.discovery.zookeeper.server.config.Activator</Bundle-Activator>
                         <Import-Package>*</Import-Package>

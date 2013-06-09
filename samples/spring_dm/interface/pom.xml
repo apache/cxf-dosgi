@@ -40,7 +40,7 @@
         <configuration>
           <instructions>
             <Bundle-Name>CXF Distributed OSGi Spring-DM Sample Interface Bundle</Bundle-Name>
-            <Bundle-Description>This bundle contains the interfaces of the Distributed OSGi with Spring-DM sample.</Bundle-Description>
+            <Bundle-Description>The interfaces of the Distributed OSGi with Spring-DM sample</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package />
             <Export-Package>org.apache.cxf.dosgi.samples.springdm</Export-Package>

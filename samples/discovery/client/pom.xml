@@ -58,7 +58,7 @@
         <configuration>
           <instructions>
             <Bundle-Name>${project.name}</Bundle-Name>
-            <Bundle-Description>This bundle contains the client-side implementation of the Distributed OSGi Discovery sample.</Bundle-Description>
+            <Bundle-Description>The client-side implementation of the Distributed OSGi Discovery sample</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Activator>org.apache.cxf.dosgi.samples.discovery.consumer.Activator</Bundle-Activator>
             <Import-Package>

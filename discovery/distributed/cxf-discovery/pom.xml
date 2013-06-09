@@ -103,11 +103,8 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Name>CXF Zookeeper-based Discovery
-                            Service Bundle</Bundle-Name>
-                        <Bundle-Description>This bundle contains an
-                            implementation of the Distributed OSGi
-                            Discovery Service using Zookeeper</Bundle-Description>
+                        <Bundle-Name>CXF ZooKeeper-based Discovery Service Bundle</Bundle-Name>
+                        <Bundle-Description>An implementation of the Distributed OSGi Discovery Service using ZooKeeper</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
                         <Bundle-Activator>org.apache.cxf.dosgi.discovery.zookeeper.Activator</Bundle-Activator>

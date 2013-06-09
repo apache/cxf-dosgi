@@ -40,7 +40,7 @@
         <configuration>
           <instructions>
             <Bundle-Name>${project.name}</Bundle-Name>
-            <Bundle-Description>This bundle contains the interfaces of the Distributed OSGi Discovery sample.</Bundle-Description>
+            <Bundle-Description>The interfaces of the Distributed OSGi Discovery sample</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package />
             <Export-Package>org.apache.cxf.dosgi.samples.discovery</Export-Package>

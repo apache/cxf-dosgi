@@ -59,7 +59,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Name>CXF Distributed OSGi Greeter Demo Interface Bundle</Bundle-Name>
-                        <Bundle-Description>This bundle contains the implementation of the CXF Distributed OSGi Greeter Demo Interfaces</Bundle-Description>
+                        <Bundle-Description>The interfaces of the CXF Distributed OSGi Greeter demo</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>${bundle.import.package}</Import-Package>
                         <Export-Package>${bundle.export.package}</Export-Package>

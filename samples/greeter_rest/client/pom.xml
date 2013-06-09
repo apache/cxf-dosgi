@@ -63,8 +63,8 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Name>CXF Distributed OSGi Greeter Rest Demo Client Bundle</Bundle-Name>
-                        <Bundle-Description>This bundle contains the implementation the Distributed OSGi Greeter Rest Demo Client</Bundle-Description>
+                        <Bundle-Name>CXF Distributed OSGi Greeter REST Demo Client Bundle</Bundle-Name>
+                        <Bundle-Description>The client-side implementation of the Distributed OSGi Greeter REST demo</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.apache.cxf.dosgi.samples.greeter.client.rest.Activator</Bundle-Activator>
                         <Import-Package>${bundle.import.package}</Import-Package>

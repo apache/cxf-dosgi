@@ -48,7 +48,7 @@
         <configuration>
           <instructions>
             <Bundle-Name>CXF Distributed OSGi Spring-DM Sample Client Bundle</Bundle-Name>
-            <Bundle-Description>This bundle contains the client-side implementation of the Distributed OSGi with Spring-DM sample.</Bundle-Description>
+            <Bundle-Description>The client-side implementation of the Distributed OSGi with Spring-DM sample</Bundle-Description>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>org.apache.cxf.dosgi.samples.springdm</Import-Package>
             <Private-Package>org.apache.cxf.dosgi.samples.springdm.client</Private-Package>
