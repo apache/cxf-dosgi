@@ -78,7 +78,7 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
 //        InterfaceMonitor dm = dmList.iterator().next();
 //        assertNotNull(dm.listener);
 //        assertSame(zk, dm.zookeeper);
-//        assertEquals(Util.getZooKeeperPath(String.class.getName()), dm.znode);
+//        assertEquals(Utils.getZooKeeperPath(String.class.getName()), dm.znode);
 //
 //        assertEquals("Precondition failed", 1, fc.watchers.size());
 //        fc.addingService(sr2);
@@ -95,8 +95,8 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
 //            actual.add(im.znode);
 //        }
 //        Set<String> expected = new HashSet<String>(Arrays.asList(
-//                Util.getZooKeeperPath(Integer.class.getName()),
-//                Util.getZooKeeperPath(Comparable.class.getName())));
+//                Utils.getZooKeeperPath(Integer.class.getName()),
+//                Utils.getZooKeeperPath(Comparable.class.getName())));
 //        assertEquals(expected, actual);
 //
 //        EasyMock.verify(zk);
@@ -124,7 +124,7 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
 //        assertEquals(dmList2, fc.watchers.get(dst2));
 //        List<InterfaceMonitor> dmList3 = fc.watchers.get(dst);
 //        assertEquals(1, dmList3.size());
-//        assertEquals(Util.getZooKeeperPath(List.class.getName()), dmList3.iterator().next().znode);
+//        assertEquals(Utils.getZooKeeperPath(List.class.getName()), dmList3.iterator().next().znode);
 //
 //        EasyMock.verify(zk);
 //
@@ -199,7 +199,7 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
 //        InterfaceMonitor dm = dmList.iterator().next();
 //        assertNotNull(dm.listener);
 //        assertSame(zk, dm.zookeeper);
-//        assertEquals(Util.getZooKeeperPath(String.class.getName()), dm.znode);
+//        assertEquals(Utils.getZooKeeperPath(String.class.getName()), dm.znode);
 //
 //        assertEquals("Precondition failed", 1, fc.watchers.size());
 //        fc.addingService(sr2);
@@ -215,8 +215,8 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
 //            actual.add(im.znode);
 //        }
 //        Set<String> expected = new HashSet<String>(Arrays.asList(
-//                Util.getZooKeeperPath(Integer.class.getName()),
-//                Util.getZooKeeperPath(Comparable.class.getName())));
+//                Utils.getZooKeeperPath(Integer.class.getName()),
+//                Utils.getZooKeeperPath(Comparable.class.getName())));
 //        assertEquals(expected, actual);
 //
 //        EasyMock.verify(zk);
@@ -245,7 +245,7 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
 //        assertEquals(dmList2, fc.watchers.get(dst2));
 //        List<InterfaceMonitor> dmList3 = fc.watchers.get(dst);
 //        assertEquals(1, dmList3.size());
-//        assertEquals(Util.getZooKeeperPath(List.class.getName()), dmList3.iterator().next().znode);
+//        assertEquals(Utils.getZooKeeperPath(List.class.getName()), dmList3.iterator().next().znode);
 //
 //        EasyMock.verify(zk);
 //
@@ -287,7 +287,7 @@ public class FindInZooKeeperCustomizerTest extends TestCase {
 //    }
 //
 //    private void zkExpectExists(ZooKeeper zk, String className) {
-//        zk.exists(EasyMock.eq(Util.getZooKeeperPath(className)),
+//        zk.exists(EasyMock.eq(Utils.getZooKeeperPath(className)),
 //                (Watcher) EasyMock.anyObject(),
 //                (StatCallback) EasyMock.anyObject(), EasyMock.isNull());
 //        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {

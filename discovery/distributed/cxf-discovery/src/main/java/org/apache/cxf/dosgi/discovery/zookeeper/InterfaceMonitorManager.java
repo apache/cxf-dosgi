@@ -19,18 +19,14 @@
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.cxf.dosgi.discovery.local.util.Utils;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
@@ -148,7 +144,7 @@ public class InterfaceMonitorManager {
                 }
                 EndpointListener epl = (EndpointListener) service;
                 LOG.debug("matching {} against {}", epd, currentScope);
-                if (matches(currentScope, epd)) {
+                if (Utils.matchFilter(bctx, currentScope, epd)) {
                     LOG.debug("Matched {} against {}", epd, currentScope);
                     if (isAdded) {
                         LOG.info("calling EndpointListener.endpointAdded: " + epl + " from bundle "
@@ -165,17 +161,6 @@ public class InterfaceMonitorManager {
                     bctx.ungetService(sref);
                 }
             }
-        }
-    }
-
-    private static boolean matches(String scope, EndpointDescription epd) {
-        try {
-            Filter f = FrameworkUtil.createFilter(scope);
-            Dictionary<String, Object> dict = new Hashtable<String, Object>(epd.getProperties());
-            return f.match(dict);
-        } catch (InvalidSyntaxException e) {
-            LOG.error("Scope [" + scope + "] resulted in an invalid filter!", e);
-            return false;
         }
     }
 

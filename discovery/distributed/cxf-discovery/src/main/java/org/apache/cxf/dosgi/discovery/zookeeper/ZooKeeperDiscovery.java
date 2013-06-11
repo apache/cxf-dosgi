@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import java.io.IOException;
 import java.util.Dictionary;
 
+import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
@@ -98,23 +99,16 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
 
     @SuppressWarnings("rawtypes")
     private synchronized void createZooKeeper(Dictionary props) {
-        String zkHost = getProp(props, "zookeeper.host", "localhost");
-        String zkPort = getProp(props, "zookeeper.port", "2181");
-        int zkTimeout = Integer.parseInt(getProp(props, "zookeeper.timeout", "3000"));
+        String host = Utils.getProp(props, "zookeeper.host", "localhost");
+        String port = Utils.getProp(props, "zookeeper.port", "2181");
+        int timeout = Utils.getProp(props, "zookeeper.timeout", 3000);
+        LOG.debug("ZooKeeper configuration: connecting to {}:{} with timeout {}",
+                new Object[]{host, port, timeout});
         try {
-            zooKeeper = new ZooKeeper(zkHost + ":" + zkPort, zkTimeout, this);
+            zooKeeper = new ZooKeeper(host + ":" + port, timeout, this);
         } catch (IOException e) {
             LOG.error("Failed to start the Zookeeper Discovery component.", e);
         }
-    }
-
-    @SuppressWarnings("rawtypes")
-    private static String getProp(Dictionary props, String key, String def) {
-        Object val = props.get(key);
-        String rv = val == null ? def : val.toString();
-
-        LOG.debug("Reading Config Admin property: {} value returned: {}", key, rv);
-        return rv;
     }
 
     /* Callback for ZooKeeper */

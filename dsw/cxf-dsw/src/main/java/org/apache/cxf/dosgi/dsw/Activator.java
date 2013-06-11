@@ -20,8 +20,6 @@ package org.apache.cxf.dosgi.dsw;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +37,7 @@ import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.qos.IntentTracker;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
+import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -151,20 +150,8 @@ public class Activator implements ManagedService, BundleActivator {
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
             }
-            init(getMapFromDictionary(config));
+            init(Utils.toMap(config));
         }
     }
 
-    private Map<String, Object> getMapFromDictionary(Dictionary<String, Object> config) {
-        Map<String, Object> configMap = new HashMap<String, Object>();
-        if (config == null) {
-            return configMap;
-        }
-        Enumeration<String> keys = config.keys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            configMap.put(key, config.get(key));
-        }
-        return configMap;
-    }
 }

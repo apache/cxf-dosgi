@@ -30,6 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.cxf.dosgi.topologymanager.util.ReferenceCounter;
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
 import org.osgi.framework.BundleContext;

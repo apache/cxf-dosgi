@@ -44,9 +44,9 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        initial.store(propBytes, "");
 //
 //        ZooKeeper zk = EasyMock.createMock(ZooKeeper.class);
-//        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
+//        EasyMock.expect(zk.getChildren(Utils.getZooKeeperPath(String.class.getName()), false))
 //            .andReturn(Arrays.asList("x#y#z"));
-//        EasyMock.expect(zk.getData(Util.getZooKeeperPath(String.class.getName()) + "/x#y#z", false, null))
+//        EasyMock.expect(zk.getData(Utils.getZooKeeperPath(String.class.getName()) + "/x#y#z", false, null))
 //            .andReturn(propBytes.toByteArray());
 //        EasyMock.replay(zk);
 //
@@ -72,9 +72,9 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //
 //        // Again with the same data
 //        EasyMock.reset(zk);
-//        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
+//        EasyMock.expect(zk.getChildren(Utils.getZooKeeperPath(String.class.getName()), false))
 //            .andReturn(Arrays.asList("x#y#z"));
-//        EasyMock.expect(zk.getData(Util.getZooKeeperPath(String.class.getName()) + "/x#y#z", false, null))
+//        EasyMock.expect(zk.getData(Utils.getZooKeeperPath(String.class.getName()) + "/x#y#z", false, null))
 //            .andReturn(propBytes.toByteArray());
 //        EasyMock.replay(zk);
 //
@@ -95,9 +95,9 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        modified.store(modBytes, "");
 //
 //        EasyMock.reset(zk);
-//        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
+//        EasyMock.expect(zk.getChildren(Utils.getZooKeeperPath(String.class.getName()), false))
 //            .andReturn(Arrays.asList("x#y#z"));
-//        EasyMock.expect(zk.getData(Util.getZooKeeperPath(String.class.getName()) + "/x#y#z", false, null))
+//        EasyMock.expect(zk.getData(Utils.getZooKeeperPath(String.class.getName()) + "/x#y#z", false, null))
 //            .andReturn(modBytes.toByteArray());
 //        EasyMock.replay(zk);
 //
@@ -127,9 +127,9 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        modified2.store(modBytes2, "");
 //
 //        EasyMock.reset(zk);
-//        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
+//        EasyMock.expect(zk.getChildren(Utils.getZooKeeperPath(String.class.getName()), false))
 //            .andReturn(Arrays.asList("x#y#z"));
-//        EasyMock.expect(zk.getData(Util.getZooKeeperPath(String.class.getName()) + "/x#y#z", false, null))
+//        EasyMock.expect(zk.getData(Utils.getZooKeeperPath(String.class.getName()) + "/x#y#z", false, null))
 //            .andReturn(modBytes2.toByteArray());
 //        EasyMock.replay(zk);
 //
@@ -150,7 +150,7 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //        // Test DiscoveredServiceNotification.UNAVAILABLE
 //        //----------------------------------------------------------------
 //        EasyMock.reset(zk);
-//        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
+//        EasyMock.expect(zk.getChildren(Utils.getZooKeeperPath(String.class.getName()), false))
 //            .andReturn(Collections.<String>emptyList());
 //        EasyMock.replay(zk);
 //
@@ -170,7 +170,7 @@ public class InterfaceDataMonitorListenerImplTest extends TestCase {
 //
 //        // Try the same again...
 //        EasyMock.reset(zk);
-//        EasyMock.expect(zk.getChildren(Util.getZooKeeperPath(String.class.getName()), false))
+//        EasyMock.expect(zk.getChildren(Utils.getZooKeeperPath(String.class.getName()), false))
 //            .andReturn(Collections.<String>emptyList());
 //        EasyMock.replay(zk);
 //

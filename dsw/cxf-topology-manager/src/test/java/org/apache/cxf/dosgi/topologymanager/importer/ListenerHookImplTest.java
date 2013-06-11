@@ -29,37 +29,10 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ListenerHookImplTest {
-
-    @Test
-    public void testGetNewUUID() {
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn(null).atLeastOnce();
-        EasyMock.replay(bc);
-        String uuid = ListenerHookImpl.getUUID(bc);
-        assertNotNull(uuid);
-
-        assertEquals(System.getProperty("org.osgi.framework.uuid"), uuid);
-
-        EasyMock.verify(bc);
-    }
-
-    @Test
-    public void testGetExistingUUID() {
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("MyUUID").atLeastOnce();
-        EasyMock.replay(bc);
-        String uuid = ListenerHookImpl.getUUID(bc);
-
-        assertEquals("MyUUID", uuid);
-
-        EasyMock.verify(bc);
-    }
 
     @Test
     public void testUUIDFilterExtension() throws InvalidSyntaxException {

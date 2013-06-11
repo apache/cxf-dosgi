@@ -34,6 +34,8 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
+import static org.apache.cxf.dosgi.dsw.util.OsgiUtils.checkPermission;
+
 public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
     private final BundleContext bctx;
@@ -47,14 +49,8 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List /* ExportRegistration */exportService(final ServiceReference ref, final Map properties)
-        throws IllegalArgumentException, UnsupportedOperationException {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            EndpointPermission epp = new EndpointPermission("*", EndpointPermission.EXPORT);
-            sm.checkPermission(epp);
-        }
-
+    public List /* ExportRegistration */exportService(final ServiceReference ref, final Map properties) {
+        checkPermission(new EndpointPermission("*", EndpointPermission.EXPORT));
         return AccessController.doPrivileged(new PrivilegedAction<List>() {
             public List<ExportRegistration> run() {
                 return closed ? Collections.<ExportRegistration>emptyList() : rsaCore.exportService(ref, properties);
@@ -64,37 +60,21 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Collection getExportedServices() {
-        SecurityManager sm = System.getSecurityManager();
-        EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
-        if (sm != null) {
-            sm.checkPermission(epp);
-        }
-
+        checkPermission(new EndpointPermission("*", EndpointPermission.READ));
         return closed ? null : rsaCore.getExportedServices();
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Collection getImportedEndpoints() {
-        SecurityManager sm = System.getSecurityManager();
-        EndpointPermission epp = new EndpointPermission("*", EndpointPermission.READ);
-        if (sm != null) {
-            sm.checkPermission(epp);
-        }
-
+        checkPermission(new EndpointPermission("*", EndpointPermission.READ));
         return closed ? null : rsaCore.getImportedEndpoints();
     }
 
-    public ImportRegistration importService(EndpointDescription endpoint) {
-        final EndpointDescription epd = endpoint;
-        SecurityManager sm = System.getSecurityManager();
-        EndpointPermission epp = new EndpointPermission(epd, OsgiUtils.getUUID(bctx), EndpointPermission.IMPORT);
-        if (sm != null) {
-            sm.checkPermission(epp);
-        }
-
+    public ImportRegistration importService(final EndpointDescription endpoint) {
+        checkPermission(new EndpointPermission(endpoint, OsgiUtils.getUUID(bctx), EndpointPermission.IMPORT));
         return AccessController.doPrivileged(new PrivilegedAction<ImportRegistration>() {
             public ImportRegistration run() {
-                return closed ? null : rsaCore.importService(epd);
+                return closed ? null : rsaCore.importService(endpoint);
             }
         });
     }

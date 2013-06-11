@@ -31,6 +31,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.EndpointPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,6 +172,29 @@ public final class OsgiUtils {
                 }
                 serviceProperties.put(origKey, e.getValue());
             }
+        }
+    }
+
+    /**
+     * Returns a service's properties as a map.
+     *
+     * @param serviceReference a service reference
+     * @return the service's properties as a map
+     */
+    public static Map<String, Object> getProperties(ServiceReference serviceReference) {
+        String[] keys = serviceReference.getPropertyKeys();
+        Map<String, Object> props = new HashMap<String, Object>(keys.length);
+        for (String key : keys) {
+            Object val = serviceReference.getProperty(key);
+            props.put(key, val);
+        }
+        return props;
+    }
+
+    public static void checkPermission(EndpointPermission permission) {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(permission);
         }
     }
 }

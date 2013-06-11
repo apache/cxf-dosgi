@@ -21,12 +21,9 @@ package org.apache.cxf.dosgi.topologymanager.importer;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.apache.cxf.dosgi.topologymanager.util.Utils;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
@@ -39,10 +36,6 @@ import org.slf4j.LoggerFactory;
 public class ListenerHookImpl implements ListenerHook {
 
     private static final Logger LOG = LoggerFactory.getLogger(ListenerHookImpl.class);
-
-    private static final String CLASS_NAME_EXPRESSION = ".*\\(" + Constants.OBJECTCLASS
-                                                        + "=([a-zA-Z_0-9.]+)\\).*";
-    private static final Pattern CLASS_NAME_PATTERN = Pattern.compile(CLASS_NAME_EXPRESSION);
 
     // From the old impl.
     private static final Set<String> SYSTEM_PACKAGES;
@@ -72,7 +65,7 @@ public class ListenerHookImpl implements ListenerHook {
             ListenerInfo listenerInfo = (ListenerInfo)li;
             LOG.debug("Filter {}", listenerInfo.getFilter());
 
-            String className = getClassNameFromFilter(listenerInfo.getFilter());
+            String className = Utils.getObjectClass(listenerInfo.getFilter());
 
             if (listenerInfo.getBundleContext().getBundle().equals(bctx.getBundle())) {
                 LOG.debug("ListenerHookImpl: skipping request from myself");
@@ -107,16 +100,6 @@ public class ListenerHookImpl implements ListenerHook {
         }
     }
 
-    private static String getClassNameFromFilter(String filter) {
-        if (filter != null) {
-            Matcher matcher = CLASS_NAME_PATTERN.matcher(filter);
-            if (matcher.matches() && matcher.groupCount() >= 1) {
-                return matcher.group(1);
-            }
-        }
-        return null;
-    }
-
     private static boolean isClassExcluded(String className) {
         if (className == null) {
             return true;
@@ -130,18 +113,7 @@ public class ListenerHookImpl implements ListenerHook {
         return false;
     }
 
-    static String getUUID(BundleContext bctx) {
-        synchronized ("org.osgi.framework.uuid") {
-            String uuid = bctx.getProperty("org.osgi.framework.uuid");
-            if (uuid == null) {
-                uuid = UUID.randomUUID().toString();
-                System.setProperty("org.osgi.framework.uuid", uuid);
-            }
-            return uuid;
-        }
-    }
-
     static String extendFilter(String filter, BundleContext bctx) {
-        return "(&" + filter + "(!(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID + "=" + getUUID(bctx) + ")))";
+        return "(&" + filter + "(!(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID + "=" + Utils.getUUID(bctx) + ")))";
     }
 }

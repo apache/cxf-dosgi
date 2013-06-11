@@ -92,7 +92,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.apache.cxf.dosgi.discovery.zookeeper.server.Activator</Bundle-Activator>
                         <Import-Package>*</Import-Package>
-                        <Private-Package>org.apache.cxf.dosgi.discovery.zookeeper.server</Private-Package>
+                        <Private-Package>org.apache.cxf.dosgi.discovery.zookeeper.server.*</Private-Package>
                         <Export-Package />
                     </instructions>
                 </configuration>

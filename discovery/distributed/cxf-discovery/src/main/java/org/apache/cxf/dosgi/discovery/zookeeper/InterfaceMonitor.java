@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper;
 
-import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
+import org.apache.cxf.dosgi.discovery.local.util.EndpointUtils;
+import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.apache.zookeeper.AsyncCallback.StatCallback;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.Code;
@@ -31,7 +31,6 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
-import org.jdom.Element;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.slf4j.Logger;
@@ -60,7 +59,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
     public InterfaceMonitor(ZooKeeper zk, String intf, EndpointListener epListener, String scope) {
         this.zookeeper = zk;
-        this.znode = Util.getZooKeeperPath(intf);
+        this.znode = Utils.getZooKeeperPath(intf);
         this.recursive = intf == null || intf.isEmpty();
         this.epListener = epListener;
         LOG.debug("Creating new InterfaceMonitor {} for scope [{}] and objectClass [{}]",
@@ -218,9 +217,9 @@ public class InterfaceMonitor implements Watcher, StatCallback {
             byte[] data = zookeeper.getData(node, false, null);
             LOG.debug("Got data for node: {}", node);
 
-            List<Element> elements = LocalDiscoveryUtils.getElements(new ByteArrayInputStream(data));
-            if (!elements.isEmpty()) {
-                return LocalDiscoveryUtils.getEndpointDescription(elements.get(0));
+            EndpointDescription endpoint = EndpointUtils.getFirstEnpointDescription(data);
+            if (endpoint != null) {
+                return endpoint;
             }
             LOG.warn("No Discovery information found for node: {}", node);
         } catch (Exception e) {

@@ -92,7 +92,7 @@
                         </Import-Package>
                         <Private-Package>org.apache.cxf.dosgi.discovery.local.internal</Private-Package>
                         <Export-Package>
-                            org.apache.cxf.dosgi.discovery.local
+                            org.apache.cxf.dosgi.discovery.local.util
                         </Export-Package>
                     </instructions>
                 </configuration>

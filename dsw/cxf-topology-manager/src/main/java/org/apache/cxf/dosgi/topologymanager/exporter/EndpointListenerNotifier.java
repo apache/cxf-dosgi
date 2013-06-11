@@ -21,9 +21,9 @@ package org.apache.cxf.dosgi.topologymanager.exporter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.cxf.dosgi.topologymanager.util.Utils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -156,33 +156,18 @@ public class EndpointListenerNotifier {
         return filters;
     }
 
-    private List<Filter> getMatchingFilters(List<Filter> filters,
-            EndpointDescription endpoint) {
+    private static List<Filter> getMatchingFilters(List<Filter> filters, EndpointDescription endpoint) {
         List<Filter> matchingFilters = new ArrayList<Filter>();
-        Dictionary<String, Object> d = getEndpointProperties(endpoint);
+        Dictionary<String, Object> dict = Utils.getEndpointProperties(endpoint);
 
         for (Filter filter : filters) {
-            if (filter.match(d)) {
-                LOG.debug("Filter {} matches endpoint {}", filter, d);
+            if (filter.match(dict)) {
+                LOG.debug("Filter {} matches endpoint {}", filter, dict);
                 matchingFilters.add(filter);
             } else {
-                LOG.debug("Filter {} does not match endpoint {}", filter, d);
+                LOG.debug("Filter {} does not match endpoint {}", filter, dict);
             }
         }
         return matchingFilters;
-    }
-
-    /**
-     * Retrieves an endpoint's properties as a Dictionary.
-     *
-     * @param ep an endpoint description
-     * @return endpoint properties (will never return null)
-     */
-    private Dictionary<String, Object> getEndpointProperties(EndpointDescription ep) {
-        if (ep == null || ep.getProperties() == null) {
-            return new Hashtable<String, Object>();
-        } else {
-            return new Hashtable<String, Object>(ep.getProperties());
-        }
     }
 }

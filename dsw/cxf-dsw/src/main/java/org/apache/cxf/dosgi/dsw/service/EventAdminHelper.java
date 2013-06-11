@@ -32,6 +32,8 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.cxf.dosgi.dsw.util.Utils.setIfNotNull;
+
 public class EventAdminHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventAdminHelper.class);
@@ -83,13 +85,6 @@ public class EventAdminHelper {
 
         Event event = createEvent(props, topic);
         notifyEventAdmins(topic, event);
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static void setIfNotNull(Dictionary props, String key, Object o) {
-        if (o != null) {
-            props.put(key, o);
-        }
     }
 
     private void notifyEventAdmins(String topic, Event event) {

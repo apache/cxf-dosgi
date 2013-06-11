@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.discovery.local;
+package org.apache.cxf.dosgi.discovery.local.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +48,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-public class LocalDiscoveryUtilsTest extends TestCase {
+public class EndpointUtilsTest extends TestCase {
 
     private static final String LF = "\n";
 
@@ -56,7 +56,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
         Bundle b = EasyMock.createNiceMock(Bundle.class);
         EasyMock.replay(b);
 
-        List<Element> rsElements = LocalDiscoveryUtils.getAllDescriptionElements(b);
+        List<Element> rsElements = EndpointUtils.getAllDescriptionElements(b);
         assertEquals(0, rsElements.size());
     }
 
@@ -70,7 +70,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
                 Collections.enumeration(Arrays.asList(ed1URL))).anyTimes();
         EasyMock.replay(b);
 
-        List<Element> edElements = LocalDiscoveryUtils.getAllDescriptionElements(b);
+        List<Element> edElements = EndpointUtils.getAllDescriptionElements(b);
         assertEquals(4, edElements.size());
     }
 
@@ -84,7 +84,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
                 Collections.enumeration(Arrays.asList(ed1URL))).anyTimes();
         EasyMock.replay(b);
 
-        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
+        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(b);
         assertEquals(4, eds.size());
         EndpointDescription ed0 = eds.get(0);
         assertEquals("http://somewhere:12345", ed0.getId());
@@ -116,7 +116,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
                 Collections.enumeration(Arrays.asList(ed2URL))).anyTimes();
         EasyMock.replay(b);
 
-        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
+        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(b);
         assertEquals(2, eds.size());
         EndpointDescription ed0 = eds.get(0);
         assertEquals("foo:bar", ed0.getId());
@@ -183,7 +183,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
                 Collections.enumeration(Arrays.asList(sdURL))).anyTimes();
         EasyMock.replay(b);
 
-        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
+        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(b);
         assertEquals(1, eds.size());
         EndpointDescription ed = eds.get(0);
         assertEquals("http://localhost:9090/greeter", ed.getId());
@@ -205,7 +205,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
                 Collections.enumeration(Arrays.asList(sdURL))).anyTimes();
         EasyMock.replay(b);
 
-        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(b);
+        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(b);
         assertEquals(2, eds.size());
 
         EndpointDescription ed0 = eds.get(0);
@@ -263,7 +263,7 @@ public class LocalDiscoveryUtilsTest extends TestCase {
             + "</xml>";
         m.put("someXML", xml);
 
-        String actual = LocalDiscoveryUtils.getEndpointDescriptionXML(m);
+        String actual = EndpointUtils.getEndpointDescriptionXML(m);
 
         URL edURL = getClass().getResource("/ed2-generated.xml");
         String expected = new String(drainStream(edURL.openStream()));

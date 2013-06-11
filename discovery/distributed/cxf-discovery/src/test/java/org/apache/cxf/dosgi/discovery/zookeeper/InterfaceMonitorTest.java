@@ -22,6 +22,7 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher.Event.EventType;
@@ -45,7 +46,7 @@ public class InterfaceMonitorTest extends TestCase {
 
         String scope = "(myProp=test)";
         String interf = "es.schaaf.test";
-        String node = Util.getZooKeeperPath(interf);
+        String node = Utils.getZooKeeperPath(interf);
 
         EndpointListener epListener = c.createMock(EndpointListener.class);
         InterfaceMonitor im = new InterfaceMonitor(zk, interf, epListener, scope);

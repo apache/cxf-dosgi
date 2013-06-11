@@ -20,7 +20,11 @@ package org.apache.cxf.dosgi.dsw.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +32,7 @@ import org.slf4j.LoggerFactory;
 public final class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+
     private Utils() {
         // never constructed
     }
@@ -66,5 +71,25 @@ public final class Utils {
         }
 
         return null;
+    }
+
+    public static <K, V> Map<K, V> toMap(Dictionary<K, V> dict) {
+        Map<K, V> map = new HashMap<K, V>();
+        if (dict == null) {
+            return map;
+        }
+        Enumeration<K> keys = dict.keys();
+        while (keys.hasMoreElements()) {
+            K key = keys.nextElement();
+            map.put(key, dict.get(key));
+        }
+        return map;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static void setIfNotNull(Dictionary dict, String key, Object val) {
+        if (val != null) {
+            dict.put(key, val);
+        }
     }
 }

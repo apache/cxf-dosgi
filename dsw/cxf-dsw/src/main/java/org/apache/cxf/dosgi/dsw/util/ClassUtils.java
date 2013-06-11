@@ -63,13 +63,9 @@ public final class ClassUtils {
     }
 
     /**
-     * <pre>
-     *
-     * The following method tries to deal specifically with classes that might have been proxied
+     * This method tries to deal specifically with classes that might have been proxied
      * eg. CGLIB proxies of which there might be a chain of proxies as different osgi frameworks
      * might be proxying the original service class that has been registered and then proxying the proxy.
-     *
-     * </pre>
      *
      * @param serviceClass
      * @param interfaceName

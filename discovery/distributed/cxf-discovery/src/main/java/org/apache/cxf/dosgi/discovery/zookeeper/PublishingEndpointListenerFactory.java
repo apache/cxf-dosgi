@@ -23,6 +23,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -74,7 +75,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE,
                   "(&(" + Constants.OBJECTCLASS + "=*)(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID
-                  + "=" + Util.getUUID(bctx) + "))");
+                  + "=" + Utils.getUUID(bctx) + "))");
         props.put(DISCOVERY_ZOOKEEPER_ID, "true");
         serviceRegistration = bctx.registerService(EndpointListener.class.getName(), this, props);
     }

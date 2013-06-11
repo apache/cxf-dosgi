@@ -20,12 +20,11 @@ package org.apache.cxf.dosgi.discovery.zookeeper.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Properties;
 
+import org.apache.cxf.dosgi.discovery.zookeeper.server.util.Utils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.server.ServerConfig;
@@ -65,39 +64,12 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
     }
 
     public void setDefaults(Dictionary<String, Object> dict) throws IOException {
-        removeEmptyValues(dict);
-        setDefault(dict, "tickTime", "2000");
-        setDefault(dict, "initLimit", "10");
-        setDefault(dict, "syncLimit", "5");
-        setDefault(dict, "clientPort", "2181");
-        setDefault(dict, "dataDir", new File(bundleContext.getDataFile(""), "zkdata").getCanonicalPath());
-    }
-
-    /**
-     * Remove empty values to avoid NumberFormatExceptions
-     *
-     * @param dict
-     */
-    private void removeEmptyValues(Dictionary<String, Object> dict) {
-        List<String> keysToRemove = new ArrayList<String>();
-        Enumeration<String> keys = dict.keys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            Object value = dict.get(key);
-            if (value instanceof String && "".equals(value)) {
-                keysToRemove.add(key);
-            }
-        }
-        for (String key : keysToRemove) {
-            dict.remove(key);
-        }
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void setDefault(Dictionary dict, String key, String value) {
-        if (dict.get(key) == null) {
-            dict.put(key, value);
-        }
+        Utils.removeEmptyValues(dict); // to avoid NumberFormatExceptions
+        Utils.setDefault(dict, "tickTime", "2000");
+        Utils.setDefault(dict, "initLimit", "10");
+        Utils.setDefault(dict, "syncLimit", "5");
+        Utils.setDefault(dict, "clientPort", "2181");
+        Utils.setDefault(dict, "dataDir", new File(bundleContext.getDataFile(""), "zkdata").getCanonicalPath());
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -130,11 +102,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
 
     protected void startFromConfig(final QuorumPeerConfig config) {
         int numServers = config.getServers().size();
-        if (numServers > 1) {
-            main = new MyQuorumPeerMain(config);
-        } else {
-            main = new MyZooKeeperServerMain(config);
-        }
+        main = numServers > 1 ? new MyQuorumPeerMain(config) : new MyZooKeeperServerMain(config);
         zkMainThread = new Thread(new Runnable() {
             public void run() {
                 try {

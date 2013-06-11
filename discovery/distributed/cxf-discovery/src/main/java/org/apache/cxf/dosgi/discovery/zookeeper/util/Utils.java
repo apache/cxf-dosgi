@@ -16,29 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.discovery.zookeeper;
+package org.apache.cxf.dosgi.discovery.zookeeper.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 
-public final class Util {
+public final class Utils {
 
     static final String PATH_PREFIX = "/osgi/service_registry";
+    static final Pattern OBJECTCLASS_PATTERN = Pattern.compile(".*\\(objectClass=([^)]+)\\).*");
 
-    private Util() {
+    private Utils() {
         // never constructed
     }
 
-    static String getZooKeeperPath(String name) {
-        if (name == null || "".equals(name)) {
-            return PATH_PREFIX;
-        }
-        return PATH_PREFIX + '/' + name.replace('.', '/');
+    public static String getZooKeeperPath(String name) {
+        return name == null || name.isEmpty() ? PATH_PREFIX : PATH_PREFIX + '/' + name.replace('.', '/');
     }
 
     /**
@@ -102,5 +103,22 @@ public final class Util {
             }
             return uuid;
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static String getProp(Dictionary props, String key, String def) {
+        Object val = props.get(key);
+        return val == null ? def : val.toString();
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static int getProp(Dictionary props, String key, int def) {
+        Object val = props.get(key);
+        return val == null ? def : Integer.parseInt(val.toString());
+    }
+
+    public static String getObjectClass(String scope) {
+        Matcher m = OBJECTCLASS_PATTERN.matcher(scope);
+        return m.matches() ? m.group(1) : null;
     }
 }

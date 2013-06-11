@@ -77,7 +77,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<ExportRegistration> exportService(ServiceReference serviceReference, Map additionalProperties)
         throws IllegalArgumentException, UnsupportedOperationException {
-        Map<String, Object> serviceProperties = getProperties(serviceReference);
+        Map<String, Object> serviceProperties = OsgiUtils.getProperties(serviceReference);
         if (additionalProperties != null) {
             OsgiUtils.overlayProperties(serviceProperties, additionalProperties);
         }
@@ -212,22 +212,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             Collections.addAll(interfaces, allowedInterfaces);
         }
         return interfaces;
-    }
-
-    /**
-     * Returns a service's properties as a map.
-     *
-     * @param serviceReference a service reference
-     * @return the service's properties as a map
-     */
-    private Map<String, Object> getProperties(ServiceReference serviceReference) {
-        String[] keys = serviceReference.getPropertyKeys();
-        Map<String, Object> props = new HashMap<String, Object>(keys.length);
-        for (String key : keys) {
-            Object val = serviceReference.getProperty(key);
-            props.put(key, val);
-        }
-        return props;
     }
 
     /**

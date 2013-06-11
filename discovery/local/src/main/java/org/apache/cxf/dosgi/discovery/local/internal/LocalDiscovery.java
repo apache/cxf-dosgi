@@ -21,29 +21,24 @@ package org.apache.cxf.dosgi.discovery.local.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
+import org.apache.cxf.dosgi.discovery.local.util.EndpointUtils;
+import org.apache.cxf.dosgi.discovery.local.util.Utils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.util.tracker.ServiceTracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LocalDiscovery implements BundleListener {
-
-    private static final Logger LOG = LoggerFactory.getLogger(LocalDiscovery.class);
 
     // this is effectively a set which allows for multiple service descriptions with the
     // same interface name but different properties and takes care of itself with respect to concurrency
@@ -126,7 +121,7 @@ public class LocalDiscovery implements BundleListener {
     private Collection<String> addListener(ServiceReference reference,
             EndpointListener listener) {
         List<String> filters =
-            LocalDiscoveryUtils.getStringPlusProperty(reference, EndpointListener.ENDPOINT_LISTENER_SCOPE);
+            Utils.getStringPlusProperty(reference, EndpointListener.ENDPOINT_LISTENER_SCOPE);
         if (filters.isEmpty()) {
             return filters;
         }
@@ -179,7 +174,7 @@ public class LocalDiscovery implements BundleListener {
     }
 
     private void findDeclaredRemoteServices(Bundle bundle) {
-        List<EndpointDescription> eds = LocalDiscoveryUtils.getAllEndpointDescriptions(bundle);
+        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(bundle);
         for (EndpointDescription ed : eds) {
             endpointDescriptions.put(ed, bundle);
             addedEndpointDescription(ed);
@@ -215,7 +210,7 @@ public class LocalDiscovery implements BundleListener {
 
     private void triggerCallbacks(EndpointListener listener, String toMatch,
             EndpointDescription ed, boolean added) {
-        if (!filterMatches(toMatch, ed)) {
+        if (!Utils.matchFilter(bundleContext, toMatch, ed)) {
             return;
         }
 
@@ -234,21 +229,4 @@ public class LocalDiscovery implements BundleListener {
         }
     }
 
-    private boolean filterMatches(String match, EndpointDescription ed) {
-        Filter filter = createFilter(match);
-        return filter != null && filter.match(new Hashtable<String, Object>(ed.getProperties()));
-    }
-
-    private Filter createFilter(String filterValue) {
-        if (filterValue == null) {
-            return null;
-        }
-
-        try {
-            return bundleContext.createFilter(filterValue);
-        } catch (Exception ex) {
-            LOG.error("Problem creating a Filter from " + filterValue, ex);
-        }
-        return null;
-    }
 }

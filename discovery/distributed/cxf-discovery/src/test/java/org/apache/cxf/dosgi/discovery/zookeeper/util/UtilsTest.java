@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.discovery.zookeeper;
+package org.apache.cxf.dosgi.discovery.zookeeper.util;
 
 import java.util.Arrays;
 
@@ -27,64 +27,64 @@ import org.easymock.classextension.IMocksControl;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 
-public class UtilTest extends TestCase {
+public class UtilsTest extends TestCase {
 
     public void testGetZooKeeperPath() {
-        assertEquals(Util.PATH_PREFIX + '/' + "org/example/Test",
-            Util.getZooKeeperPath("org.example.Test"));
+        assertEquals(Utils.PATH_PREFIX + '/' + "org/example/Test",
+            Utils.getZooKeeperPath("org.example.Test"));
 
         // used for the recursive discovery
-        assertEquals(Util.PATH_PREFIX, Util.getZooKeeperPath(null));
-        assertEquals(Util.PATH_PREFIX, Util.getZooKeeperPath(""));
+        assertEquals(Utils.PATH_PREFIX, Utils.getZooKeeperPath(null));
+        assertEquals(Utils.PATH_PREFIX, Utils.getZooKeeperPath(""));
     }
 
     @SuppressWarnings("unchecked")
     public void testGetStringPlusProperty() {
-        String[] out = Util.getStringPlusProperty("MyString");
+        String[] out = Utils.getStringPlusProperty("MyString");
         assertEquals(1, out.length);
         assertEquals("MyString", out[0]);
 
-        out = Util.getStringPlusProperty(new String[]{"MyString"});
+        out = Utils.getStringPlusProperty(new String[]{"MyString"});
         assertEquals(1, out.length);
         assertEquals("MyString", out[0]);
 
-        out = Util.getStringPlusProperty(Arrays.asList("MyString"));
+        out = Utils.getStringPlusProperty(Arrays.asList("MyString"));
         assertEquals(1, out.length);
         assertEquals("MyString", out[0]);
 
-        out = Util.getStringPlusProperty(Arrays.asList(1));
+        out = Utils.getStringPlusProperty(Arrays.asList(1));
         assertEquals(0, out.length);
 
-        out = Util.getStringPlusProperty(new Object());
+        out = Utils.getStringPlusProperty(new Object());
         assertEquals(0, out.length);
 
-        out = Util.getStringPlusProperty(null);
+        out = Utils.getStringPlusProperty(null);
         assertEquals(0, out.length);
     }
 
     public void testRemoveEmpty() {
-        String[] out = Util.removeEmpty(new String[0]);
+        String[] out = Utils.removeEmpty(new String[0]);
         assertEquals(0, out.length);
 
-        out = Util.removeEmpty(new String[] {null});
+        out = Utils.removeEmpty(new String[]{null});
         assertEquals(0, out.length);
 
-        out = Util.removeEmpty(new String[] {""});
+        out = Utils.removeEmpty(new String[]{""});
         assertEquals(0, out.length);
 
-        out = Util.removeEmpty(new String[] {"hi"});
+        out = Utils.removeEmpty(new String[]{"hi"});
         assertEquals(1, out.length);
         assertEquals("hi", out[0]);
 
-        out = Util.removeEmpty(new String[] {"", "hi", null});
+        out = Utils.removeEmpty(new String[]{"", "hi", null});
         assertEquals(1, out.length);
         assertEquals("hi", out[0]);
 
-        out = Util.removeEmpty(new String[] {"hi", null, "", ""});
+        out = Utils.removeEmpty(new String[]{"hi", null, "", ""});
         assertEquals(1, out.length);
         assertEquals("hi", out[0]);
 
-        out = Util.removeEmpty(new String[] {"", "hi", null, "", "", "bye", null});
+        out = Utils.removeEmpty(new String[]{"", "hi", null, "", "", "bye", null});
         assertEquals(2, out.length);
         assertEquals("hi", out[0]);
         assertEquals("bye", out[1]);
@@ -101,7 +101,7 @@ public class UtilTest extends TestCase {
 
         c.replay();
 
-        String[] ret = Util.getScopes(sref);
+        String[] ret = Utils.getScopes(sref);
 
         c.verify();
         assertEquals(1, ret.length);

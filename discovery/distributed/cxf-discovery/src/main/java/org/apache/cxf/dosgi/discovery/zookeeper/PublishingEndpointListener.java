@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.discovery.local.LocalDiscoveryUtils;
+import org.apache.cxf.dosgi.discovery.local.util.EndpointUtils;
+import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs.Ids;
@@ -96,7 +97,7 @@ public class PublishingEndpointListener implements EndpointListener {
         }
 
         for (String name : interfaces) {
-            String path = Util.getZooKeeperPath(name);
+            String path = Utils.getZooKeeperPath(name);
             String fullPath = path + '/' + endpointKey;
             LOG.debug("Creating ZooKeeper node: {}", fullPath);
             ensurePath(path, zookeeper);
@@ -129,7 +130,7 @@ public class PublishingEndpointListener implements EndpointListener {
         String endpointKey = getKey(endpoint.getId());
 
         for (String name : interfaces) {
-            String path = Util.getZooKeeperPath(name);
+            String path = Utils.getZooKeeperPath(name);
             String fullPath = path + '/' + endpointKey;
             LOG.debug("Removing ZooKeeper node: {}", fullPath);
             try {
@@ -142,7 +143,7 @@ public class PublishingEndpointListener implements EndpointListener {
 
     private static void ensurePath(String path, ZooKeeper zk) throws KeeperException, InterruptedException {
         StringBuilder current = new StringBuilder();
-        String[] parts = Util.removeEmpty(path.split("/"));
+        String[] parts = Utils.removeEmpty(path.split("/"));
         for (String part : parts) {
             current.append('/');
             current.append(part);
@@ -153,7 +154,7 @@ public class PublishingEndpointListener implements EndpointListener {
     }
 
     static byte[] getData(Map<String, Object> props) {
-        return LocalDiscoveryUtils.getEndpointDescriptionXML(props).getBytes();
+        return EndpointUtils.getEndpointDescriptionXML(props).getBytes();
     }
 
     static String getKey(String endpoint) throws URISyntaxException {
