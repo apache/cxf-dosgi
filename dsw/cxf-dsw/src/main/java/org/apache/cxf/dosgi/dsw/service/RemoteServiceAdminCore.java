@@ -119,12 +119,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         try {
             // do the export
             List<ExportRegistration> exportRegs = exportInterfaces(interfaces, serviceReference, serviceProperties);
-
-            // enlist initial export registrations in global list of exportRegistrations
-            synchronized (exportedServices) {
-                exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
+            if (!exportRegs.isEmpty()) {
+                // enlist initial export registrations in global list of exportRegistrations
+                synchronized (exportedServices) {
+                    exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
+                }
+                eventProducer.publishNotification(exportRegs);
             }
-            eventProducer.publishNotification(exportRegs);
             return exportRegs;
         } finally {
             synchronized (exportedServices) {
@@ -147,16 +148,22 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             return Collections.emptyList();
         }
         List<ExportRegistration> exportRegs = new ArrayList<ExportRegistration>(1);
-        Object serviceObject = bctx.getService(serviceReference);
-        BundleContext callingContext = serviceReference.getBundle().getBundleContext();
+        Object service = bctx.getService(serviceReference);
+        Bundle bundle = serviceReference.getBundle();
+
+        // if service has been unregistered in the meantime
+        if (service == null || bundle == null) {
+            LOG.info("service has been unregistered, aborting export");
+            return exportRegs;
+        }
 
         for (String iface : interfaces) {
             LOG.info("creating server for interface " + iface);
             // this is an extra sanity check, but do we really need it now?
-            Class<?> interfaceClass = ClassUtils.getInterfaceClass(serviceObject, iface);
+            Class<?> interfaceClass = ClassUtils.getInterfaceClass(service, iface);
             if (interfaceClass != null) {
-                ExportResult exportResult = handler.createServer(serviceReference, bctx, callingContext,
-                    serviceProperties, interfaceClass, serviceObject);
+                ExportResult exportResult = handler.createServer(serviceReference, bctx, bundle.getBundleContext(),
+                    serviceProperties, interfaceClass, service);
                 LOG.info("created server for interface " + iface);
                 EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
                 ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
@@ -261,7 +268,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
     private boolean isCreatedByThisRSA(ServiceReference sref) {
-        return (sref.getBundle() != null) && sref.getBundle().equals(bctx.getBundle());
+        return bctx.getBundle().equals(sref.getBundle()); // sref bundle can be null
     }
 
     public Collection<ExportReference> getExportedServices() {

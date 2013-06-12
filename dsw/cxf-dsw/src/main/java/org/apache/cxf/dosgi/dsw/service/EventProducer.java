@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.List;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -89,12 +90,15 @@ public class EventProducer {
             if (listenerRefs != null) {
                 for (ServiceReference sref : listenerRefs) {
                     RemoteServiceAdminListener rsal = (RemoteServiceAdminListener)bctx.getService(sref);
-                    try {
-                        LOG.debug("notify RemoteServiceAdminListener {} of bundle {}",
-                                rsal, sref.getBundle().getSymbolicName());
-                        rsal.remoteAdminEvent(rsae);
-                    } finally {
-                        if (rsal != null) {
+                    if (rsal != null) {
+                        try {
+                            Bundle bundle = sref.getBundle();
+                            if (bundle != null) {
+                                LOG.debug("notify RemoteServiceAdminListener {} of bundle {}",
+                                        rsal, bundle.getSymbolicName());
+                                rsal.remoteAdminEvent(rsae);
+                            }
+                        } finally {
                             bctx.ungetService(sref);
                         }
                     }

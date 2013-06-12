@@ -26,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.dosgi.discovery.local.util.Utils;
 import org.apache.zookeeper.ZooKeeper;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -139,21 +140,12 @@ public class InterfaceMonitorManager {
         for (ServiceReference sref : relatedServiceListeners) {
             Object service = bctx.getService(sref);
             try {
-                if (!(service instanceof EndpointListener)) { // including null
-                    continue;
-                }
-                EndpointListener epl = (EndpointListener) service;
-                LOG.debug("matching {} against {}", epd, currentScope);
-                if (Utils.matchFilter(bctx, currentScope, epd)) {
-                    LOG.debug("Matched {} against {}", epd, currentScope);
-                    if (isAdded) {
-                        LOG.info("calling EndpointListener.endpointAdded: " + epl + " from bundle "
-                            + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
-                        epl.endpointAdded(epd, currentScope);
-                    } else {
-                        LOG.info("calling EndpointListener.endpointRemoved: " + epl + " from bundle "
-                            + sref.getBundle().getSymbolicName() + " for endpoint: " + epd);
-                        epl.endpointRemoved(epd, currentScope);
+                if (service instanceof EndpointListener) {
+                    EndpointListener epl = (EndpointListener) service;
+                    LOG.trace("matching {} against {}", epd, currentScope);
+                    if (Utils.matchFilter(bctx, currentScope, epd)) {
+                        LOG.debug("Matched {} against {}", epd, currentScope);
+                        notifyListener(epd, currentScope, isAdded, sref.getBundle(), epl);
                     }
                 }
             } finally {
@@ -161,6 +153,21 @@ public class InterfaceMonitorManager {
                     bctx.ungetService(sref);
                 }
             }
+        }
+    }
+
+    private void notifyListener(EndpointDescription epd, String currentScope, boolean isAdded,
+                                Bundle eplBundle, EndpointListener epl) {
+        if (eplBundle == null) {
+            LOG.info("listening service was unregistered, ignoring");
+        } else if (isAdded) {
+            LOG.info("calling EndpointListener.endpointAdded: " + epl + " from bundle "
+                    + eplBundle.getSymbolicName() + " for endpoint: " + epd);
+            epl.endpointAdded(epd, currentScope);
+        } else {
+            LOG.info("calling EndpointListener.endpointRemoved: " + epl + " from bundle "
+                    + eplBundle.getSymbolicName() + " for endpoint: " + epd);
+            epl.endpointRemoved(epd, currentScope);
         }
     }
 

@@ -24,8 +24,10 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public final class Utils {
@@ -70,5 +72,10 @@ public final class Utils {
             }
             return uuid;
         }
+    }
+
+    public static String getBundleName(ServiceReference sref) {
+        Bundle bundle = sref.getBundle();
+        return bundle == null ? "<unregistered>" : bundle.getSymbolicName();
     }
 }

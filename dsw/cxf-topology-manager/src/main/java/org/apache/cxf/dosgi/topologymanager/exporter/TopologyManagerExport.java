@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
+import org.apache.cxf.dosgi.topologymanager.util.Utils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
@@ -144,7 +145,7 @@ public class TopologyManagerExport {
         List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getAllServices();
         if (rsaList.isEmpty()) {
             LOG.error("No RemoteServiceAdmin available! Unable to export service from bundle {}, interfaces: {}",
-                    sref.getBundle().getSymbolicName(),
+                    Utils.getBundleName(sref),
                     sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS));
         }
 
