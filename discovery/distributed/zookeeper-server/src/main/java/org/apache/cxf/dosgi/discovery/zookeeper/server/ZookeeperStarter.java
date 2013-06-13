@@ -21,8 +21,6 @@ package org.apache.cxf.dosgi.discovery.zookeeper.server;
 import java.io.File;
 import java.io.IOException;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Properties;
 
 import org.apache.cxf.dosgi.discovery.zookeeper.server.util.Utils;
 import org.apache.log4j.Level;
@@ -63,7 +61,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
         }
     }
 
-    public void setDefaults(Dictionary<String, Object> dict) throws IOException {
+    private void setDefaults(Dictionary<String, Object> dict) throws IOException {
         Utils.removeEmptyValues(dict); // to avoid NumberFormatExceptions
         Utils.setDefault(dict, "tickTime", "2000");
         Utils.setDefault(dict, "initLimit", "10");
@@ -90,13 +88,8 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
 
     @SuppressWarnings("rawtypes")
     private QuorumPeerConfig parseConfig(Dictionary dict) throws IOException, ConfigException {
-        Properties props = new Properties();
-        for (Enumeration e = dict.keys(); e.hasMoreElements();) {
-            Object key = e.nextElement();
-            props.put(key, dict.get(key));
-        }
         QuorumPeerConfig config = new QuorumPeerConfig();
-        config.parseProperties(props);
+        config.parseProperties(Utils.toProperties(dict));
         return config;
     }
 

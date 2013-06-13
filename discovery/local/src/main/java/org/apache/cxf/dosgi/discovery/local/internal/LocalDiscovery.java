@@ -118,10 +118,8 @@ public class LocalDiscovery implements BundleListener {
         }
     }
 
-    private Collection<String> addListener(ServiceReference reference,
-            EndpointListener listener) {
-        List<String> filters =
-            Utils.getStringPlusProperty(reference, EndpointListener.ENDPOINT_LISTENER_SCOPE);
+    private Collection<String> addListener(ServiceReference reference, EndpointListener listener) {
+        List<String> filters = Utils.getStringPlusProperty(reference, EndpointListener.ENDPOINT_LISTENER_SCOPE);
         if (filters.isEmpty()) {
             return filters;
         }

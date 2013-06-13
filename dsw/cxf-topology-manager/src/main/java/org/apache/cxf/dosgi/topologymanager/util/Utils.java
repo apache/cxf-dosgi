@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.topologymanager.util;
 
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.UUID;
@@ -61,6 +62,35 @@ public final class Utils {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the value of a "string+" property as an array of strings.
+     * <p>
+     * A "string+" property can have a value which is either a string,
+     * an array of strings, or a collection of strings.
+     * <p>
+     * If the given value is not of one of the valid types, or is null,
+     * an empty array is returned.
+     *
+     * @param property a "string+" property value
+     * @return the property value as an array of strings, or an empty array
+     */
+    public static String[] getStringPlusProperty(Object property) {
+        if (property instanceof String) {
+            return new String[] {(String)property};
+        } else if (property instanceof String[]) {
+            return (String[])property;
+        } else if (property instanceof Collection) {
+            try {
+                @SuppressWarnings("unchecked")
+                Collection<String> strings = (Collection<String>)property;
+                return strings.toArray(new String[strings.size()]);
+            } catch (ArrayStoreException ase) {
+                // ignore collections with wrong type
+            }
+        }
+        return new String[0];
     }
 
     public static String getUUID(BundleContext bctx) {

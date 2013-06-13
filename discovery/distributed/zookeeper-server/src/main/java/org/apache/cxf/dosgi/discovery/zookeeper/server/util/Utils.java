@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * General purpose utility methods.
@@ -64,5 +65,22 @@ public final class Utils {
         if (dict.get(key) == null) {
             dict.put(key, value);
         }
+    }
+
+    /**
+     * Converts a Dictionary into a Properties instance.
+     *
+     * @param dict a dictionary
+     * @param <K> the key type
+     * @param <V> the value type
+     * @return the properties
+     */
+    public static <K, V> Properties toProperties(Dictionary<K, V> dict) {
+        Properties props = new Properties();
+        for (Enumeration<K> e = dict.keys(); e.hasMoreElements();) {
+            K key = e.nextElement();
+            props.put(key, dict.get(key));
+        }
+        return props;
     }
 }

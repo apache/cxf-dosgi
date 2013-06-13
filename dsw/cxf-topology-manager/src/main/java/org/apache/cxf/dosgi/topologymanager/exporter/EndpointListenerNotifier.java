@@ -130,28 +130,13 @@ public class EndpointListenerNotifier {
 
     static List<Filter> getFiltersFromEndpointListenerScope(ServiceReference sref, BundleContext bctx) {
         List<Filter> filters = new ArrayList<Filter>();
-        try {
-            Object fo = sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE);
-            if (fo instanceof String) {
-                filters.add(bctx.createFilter((String) fo));
-            } else if (fo instanceof String[]) {
-                String[] foArray = (String[]) fo;
-                for (String f : foArray) {
-                    filters.add(bctx.createFilter(f));
-                }
-            } else if (fo instanceof Collection) {
-                @SuppressWarnings("rawtypes")
-                Collection c = (Collection) fo;
-                for (Object o : c) {
-                    if (o instanceof String) {
-                        filters.add(bctx.createFilter((String) o));
-                    } else {
-                        LOG.warn("Component of a EndpointListener filter is not a string -> skipped!");
-                    }
-                }
+        String[] scopes = Utils.getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
+        for (String scope : scopes) {
+            try {
+                filters.add(bctx.createFilter(scope));
+            } catch (InvalidSyntaxException e) {
+                LOG.error("invalid endpoint listener scope: {}", scope, e);
             }
-        } catch (InvalidSyntaxException e) {
-            LOG.error(e.getMessage(), e);
         }
         return filters;
     }
