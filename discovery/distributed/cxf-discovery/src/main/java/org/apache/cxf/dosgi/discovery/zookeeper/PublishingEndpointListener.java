@@ -41,6 +41,9 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.zookeeper.KeeperException.NoNodeException;
+import static org.apache.zookeeper.KeeperException.NodeExistsException;
+
 /**
  * Listens for local Endpoints and publishes them to Zookeeper
  */
@@ -101,7 +104,25 @@ public class PublishingEndpointListener implements EndpointListener {
             String fullPath = path + '/' + endpointKey;
             LOG.debug("Creating ZooKeeper node: {}", fullPath);
             ensurePath(path, zookeeper);
-            zookeeper.create(fullPath, getData(props), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+            createEphemeralNode(fullPath, getData(props));
+        }
+    }
+
+    private void createEphemeralNode(String fullPath, byte[] data) throws KeeperException, InterruptedException {
+        try {
+            zookeeper.create(fullPath, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+        } catch (NodeExistsException nee) {
+            // this sometimes happens after a ZooKeeper node dies and the ephemeral node
+            // that belonged to the old session was not yet deleted. We need to make our
+            // session the owner of the node so it won't get deleted automatically -
+            // we do this by deleting and recreating it ourselves.
+            LOG.info("node for endpoint already exists, recreating: {}", fullPath);
+            try {
+                zookeeper.delete(fullPath, -1);
+            } catch (NoNodeException nne) {
+                // it's a race condition, but as long as it got deleted - it's ok
+            }
+            zookeeper.create(fullPath, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
         }
     }
 
@@ -147,8 +168,10 @@ public class PublishingEndpointListener implements EndpointListener {
         for (String part : parts) {
             current.append('/');
             current.append(part);
-            if (zk.exists(current.toString(), false) == null) {
+            try {
                 zk.create(current.toString(), new byte[0], Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            } catch (NodeExistsException nee) {
+                // it's not the first node with this path to ever exist - that's normal
             }
         }
     }
