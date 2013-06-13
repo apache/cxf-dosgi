@@ -41,10 +41,9 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
 
     private PublishingEndpointListenerFactory endpointListenerFactory;
     private ServiceTracker endpointListenerTracker;
-
     private InterfaceMonitorManager imManager;
-
     private ZooKeeper zooKeeper;
+    private boolean closed;
 
     @SuppressWarnings("rawtypes")
     private Dictionary curConfiguration;
@@ -58,7 +57,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
     public synchronized void updated(Dictionary configuration) throws ConfigurationException {
         LOG.debug("Received configuration update for Zookeeper Discovery: {}", configuration);
 
-        stop();
+        stop(false);
 
         if (configuration == null) {
             return;
@@ -68,6 +67,9 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
     }
 
     private synchronized void start() {
+        if (closed) {
+            return;
+        }
         LOG.debug("starting ZookeeperDiscovery");
         endpointListenerFactory = new PublishingEndpointListenerFactory(zooKeeper, bctx);
         endpointListenerFactory.start();
@@ -77,7 +79,8 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         endpointListenerTracker.open();
     }
 
-    public synchronized void stop() {
+    public synchronized void stop(boolean close) {
+        closed |= close;
         if (endpointListenerFactory != null) {
             LOG.debug("stopping ZookeeperDiscovery");
             endpointListenerFactory.stop();
@@ -99,6 +102,9 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
 
     @SuppressWarnings("rawtypes")
     private synchronized void createZooKeeper(Dictionary props) {
+        if (closed) {
+            return;
+        }
         String host = Utils.getProp(props, "zookeeper.host", "localhost");
         String port = Utils.getProp(props, "zookeeper.port", "2181");
         int timeout = Utils.getProp(props, "zookeeper.timeout", 3000);
@@ -121,7 +127,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
 
         case Expired:
             LOG.info("Connection to zookeeper expired. Trying to create a new connection");
-            stop();
+            stop(false);
             createZooKeeper(curConfiguration);
             break;
 

@@ -38,6 +38,6 @@ public class Activator implements BundleActivator {
     }
 
     public synchronized void stop(BundleContext bc) throws Exception {
-        zkd.stop();
+        zkd.stop(true);
     }
 }
