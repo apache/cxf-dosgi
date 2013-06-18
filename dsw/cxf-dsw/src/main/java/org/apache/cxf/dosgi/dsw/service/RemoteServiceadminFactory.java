@@ -29,20 +29,21 @@ public class RemoteServiceadminFactory implements ServiceFactory {
     private static final Logger LOG = LoggerFactory.getLogger(RemoteServiceadminFactory.class);
 
     private final RemoteServiceAdminCore rsaCore;
+    private int instances;
 
     public RemoteServiceadminFactory(RemoteServiceAdminCore rsaCore) {
         this.rsaCore = rsaCore;
     }
 
-    public Object getService(Bundle b, ServiceRegistration sr) {
+    public synchronized Object getService(Bundle b, ServiceRegistration sreg) {
         LOG.debug("new RemoteServiceAdmin ServiceInstance created for Bundle {}", b.getSymbolicName());
+        instances++;
         return new RemoteServiceAdminInstance(b.getBundleContext(), rsaCore);
     }
 
-    public void ungetService(Bundle b, ServiceRegistration sr, Object serviceObject) {
+    public synchronized void ungetService(Bundle b, ServiceRegistration sreg, Object serviceObject) {
         LOG.debug("RemoteServiceAdmin ServiceInstance removed for Bundle {}", b.getSymbolicName());
-        if (serviceObject instanceof RemoteServiceAdminInstance) {
-            ((RemoteServiceAdminInstance)serviceObject).close();
-        }
+        instances--;
+        ((RemoteServiceAdminInstance)serviceObject).close(instances == 0);
     }
 }

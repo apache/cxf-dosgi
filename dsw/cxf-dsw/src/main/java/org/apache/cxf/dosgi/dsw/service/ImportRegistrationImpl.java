@@ -99,9 +99,6 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
 
         LOG.debug("really closing ImportRegistration now");
 
-        if (clientServiceFactory != null) {
-            clientServiceFactory.setCloseable(true);
-        }
         if (importedService != null) {
             try {
                 importedService.unregister();
@@ -109,6 +106,9 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
                 LOG.debug("imported service is already unregistered");
             }
             importedService = null;
+        }
+        if (clientServiceFactory != null) {
+            clientServiceFactory.setCloseable(true);
         }
     }
 

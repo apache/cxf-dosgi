@@ -449,15 +449,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             Collection<ImportRegistrationImpl> imRegs = importedServices.get(iri.getImportedEndpointAlways());
             if (imRegs != null && imRegs.contains(iri)) {
                 imRegs.remove(iri);
-            } else {
-                LOG.error("An importRegistration was intended to be removed from internal management "
-                    + "structure but couldn't be found in it!");
+                eventProducer.notifyRemoval(iri);
             }
             if (imRegs == null || imRegs.isEmpty()) {
                 importedServices.remove(iri.getImportedEndpointAlways());
             }
-
-            eventProducer.notifyRemoval(iri);
         }
     }
 }
