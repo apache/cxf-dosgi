@@ -74,12 +74,19 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
         children = new ArrayList<ImportRegistrationImpl>(1);
     }
 
+    private void ensureParent() {
+        if (parent != this) {
+            throw new IllegalStateException("this method may only be called on the parent");
+        }
+    }
+
     /**
      * Called on parent when a child is added.
      *
      * @param iri the child
      */
     private synchronized void instanceAdded(ImportRegistrationImpl iri) {
+        ensureParent();
         children.add(iri);
     }
 
@@ -89,6 +96,7 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
      * @param iri the child
      */
     private void instanceClosed(ImportRegistrationImpl iri) {
+        ensureParent();
         synchronized (this) {
             children.remove(iri);
             if (!children.isEmpty() || detached || !closed) {
@@ -181,15 +189,27 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
         return exception != null || closed;
     }
 
-    public void setImportedServiceRegistration(ServiceRegistration proxyRegistration) {
-        if (parent != this) {
-            throw new IllegalStateException("this method may only be called on the parent");
-        }
-
-        importedService = proxyRegistration;
+    /**
+     * Sets the {@link ServiceRegistration} representing the locally
+     * registered {@link ClientServiceFactory} service which provides
+     * proxies to the remote imported service. It is set only on the parent.
+     *
+     * @param sreg the ServiceRegistration
+     */
+    public void setImportedServiceRegistration(ServiceRegistration sreg) {
+        ensureParent();
+        importedService = sreg;
     }
 
+    /**
+     * Sets the {@link ClientServiceFactory} which is the implementation
+     * of the locally registered service which provides proxies to the
+     * remote imported service. It is set only on the parent.
+     *
+     * @param csf the ClientServiceFactory
+     */
     public void setClientServiceFactory(ClientServiceFactory csf) {
+        ensureParent();
         clientServiceFactory = csf;
     }
 

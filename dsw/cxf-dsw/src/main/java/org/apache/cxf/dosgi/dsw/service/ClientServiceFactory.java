@@ -20,6 +20,8 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.qos.IntentUnsatisfiedException;
@@ -39,7 +41,6 @@ public class ClientServiceFactory implements ServiceFactory {
     private Class<?> iClass;
     private EndpointDescription sd;
     private ConfigurationTypeHandler handler;
-
     private ImportRegistrationImpl importRegistration;
 
     private boolean closeable;
@@ -55,56 +56,38 @@ public class ClientServiceFactory implements ServiceFactory {
     }
 
     public Object getService(final Bundle requestingBundle, final ServiceRegistration sreg) {
-        String interfaceName = sd.getInterfaces() != null && !sd.getInterfaces().isEmpty() ? (String)sd
-            .getInterfaces().toArray()[0] : null;
-
+        List<String> interfaces = sd.getInterfaces();
+        String interfaceName = interfaces == null || interfaces.isEmpty() ? null : interfaces.get(0);
         LOG.debug("getService() from serviceFactory for {}", interfaceName);
-
         try {
             Object proxy = AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
-                    return handler.createProxy(sreg.getReference(), dswContext, requestingBundle
-                                                       .getBundleContext(), iClass, sd);
+                    return handler.createProxy(sreg.getReference(), dswContext,
+                            requestingBundle.getBundleContext(), iClass, sd);
                 }
             });
 
             synchronized (this) {
-                ++serviceCounter;
+                serviceCounter++;
             }
             return proxy;
         } catch (IntentUnsatisfiedException iue) {
-            LOG.info("Did not create proxy for " + interfaceName + " because intent " + iue.getIntent()
-                     + " could not be satisfied");
-        } catch (Exception ex) {
-            LOG.warn("Problem creating a remote proxy for " + interfaceName + " from CXF FindHook: ", ex);
+            LOG.info("Did not create proxy for {} because intent {} could not be satisfied",
+                    interfaceName, iue.getIntent());
+        } catch (Exception e) {
+            LOG.warn("Problem creating a remote proxy for {}", interfaceName, e);
         }
-
         return null;
     }
 
     public void ungetService(Bundle requestingBundle, ServiceRegistration sreg, Object serviceObject) {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append("Releasing a client object");
-        String[] objectClass = (String[])sreg.getReference().getProperty(org.osgi.framework.Constants.OBJECTCLASS);
-        if (objectClass != null) {
-            sb.append(", interfaces: ");
-            for (String s : objectClass) {
-                sb.append(' ').append(s);
-            }
-        }
-        LOG.info(sb.toString());
+        String[] interfaces = (String[])sreg.getReference().getProperty(org.osgi.framework.Constants.OBJECTCLASS);
+        LOG.info("Releasing a client object, interfaces: {}", Arrays.toString(interfaces));
 
         synchronized (this) {
-            --serviceCounter;
+            serviceCounter--;
             LOG.debug("Services still provided by this ServiceFactory: {}", serviceCounter);
             closeIfUnused();
-        }
-    }
-
-    // called only in synchronized block
-    private void closeIfUnused() {
-        if (serviceCounter <= 0 && closeable) {
-            importRegistration.closeAll();
         }
     }
 
@@ -112,6 +95,12 @@ public class ClientServiceFactory implements ServiceFactory {
         synchronized (this) {
             this.closeable = closeable;
             closeIfUnused();
+        }
+    }
+
+    private synchronized void closeIfUnused() {
+        if (serviceCounter <= 0 && closeable) {
+            importRegistration.closeAll();
         }
     }
 }

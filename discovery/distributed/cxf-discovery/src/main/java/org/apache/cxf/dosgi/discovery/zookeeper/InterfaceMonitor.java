@@ -211,7 +211,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     private EndpointDescription getEndpointDescriptionFromNode(String node) {
         try {
             Stat s = zookeeper.exists(node, false);
-            if (s.getDataLength() <= 0) {
+            if (s == null || s.getDataLength() <= 0) {
                 return null;
             }
             byte[] data = zookeeper.getData(node, false, null);

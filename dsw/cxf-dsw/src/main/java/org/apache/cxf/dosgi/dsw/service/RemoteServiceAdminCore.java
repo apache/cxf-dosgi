@@ -164,14 +164,14 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             if (interfaceClass != null) {
                 ExportResult exportResult = handler.createServer(serviceReference, bctx, bundle.getBundleContext(),
                     serviceProperties, interfaceClass, service);
-                LOG.info("created server for interface " + iface);
                 EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
                 ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
                 if (exportResult.getException() == null) {
+                    LOG.info("created server for interface " + iface);
                     exportRegistration.setServer(exportResult.getServer());
                     exportRegistration.startServiceTracker(bctx);
                 } else {
-                    LOG.error(exportResult.getException().getMessage(), exportResult.getException());
+                    LOG.error("failed to create server for interface " + iface, exportResult.getException());
                     exportRegistration.setException(exportResult.getException());
                 }
                 exportRegs.add(exportRegistration);
@@ -340,9 +340,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 imRegs.add(imReg);
                 eventProducer.publishNotification(imReg);
                 return imReg;
-            } else {
-                return null;
             }
+            return null;
         }
     }
 
@@ -371,7 +370,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             serviceProps.put(RemoteConstants.SERVICE_IMPORTED, true);
             serviceProps.remove(RemoteConstants.SERVICE_EXPORTED_INTERFACES);
 
-            // synchronized (discoveredServices) {
             ClientServiceFactory csf = new ClientServiceFactory(actualContext, iClass, ed, handler, imReg);
             imReg.setClientServiceFactory(csf);
             ServiceRegistration proxyReg = actualContext.registerService(interfaceName, csf, serviceProps);
@@ -414,7 +412,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         }
     }
 
-    // remove all import registrations associated with the given bundle
+    // remove all import registrations
     protected void removeImportRegistrations() {
         Collection<ImportRegistrationImpl> copy = new ArrayList<ImportRegistrationImpl>();
         synchronized (importedServices) {

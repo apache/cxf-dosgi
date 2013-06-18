@@ -76,8 +76,10 @@ public class TopologyManagerExport {
         epListenerNotifier = notif == null ? new EndpointListenerNotifier(ctx, endpointRepo) : notif;
         execService = new ThreadPoolExecutor(5, 10, 50, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         bctx = ctx;
-        this.remoteServiceAdminTracker = rsaTracker;
-        this.remoteServiceAdminTracker.addListener(new SimpleServiceTrackerListener<RemoteServiceAdmin>() {
+        remoteServiceAdminTracker = rsaTracker;
+
+        // track RemoteServiceAdmins through which we can export services
+        remoteServiceAdminTracker.addListener(new SimpleServiceTrackerListener<RemoteServiceAdmin>() {
 
             public void added(RemoteServiceAdmin rsa) {
                 LOG.debug("RemoteServiceAdmin added: {}, total {}",
@@ -94,6 +96,9 @@ public class TopologyManagerExport {
                 epListenerNotifier.notifyListeners(false, endpoints);
             }
         });
+
+        // track all service registrations so we can export any services that are configured to be exported
+        // ServiceListener events may be delivered out of order, concurrently, re-entrant, etc. (see spec or docs)
         serviceListener = new ServiceListener() {
 
             public void serviceChanged(ServiceEvent event) {
@@ -134,7 +139,11 @@ public class TopologyManagerExport {
     protected void triggerExport(final ServiceReference sref) {
         execService.execute(new Runnable() {
             public void run() {
-                doExportService(sref);
+                try {
+                    doExportService(sref);
+                } catch (Throwable t) {
+                    LOG.error("export failed", t);
+                }
             }
         });
     }
@@ -167,6 +176,7 @@ public class TopologyManagerExport {
         LOG.debug("exporting...");
         Collection<ExportRegistration> exportRegs = remoteServiceAdmin.exportService(sref, null);
         List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
+        // note: endpoints list may contain ExportRegistrations with an exception, not only successful ones
         if (exportRegs.isEmpty()) {
             // TODO export failed -> What should be done here?
             LOG.error("export failed");
