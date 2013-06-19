@@ -20,24 +20,99 @@ package org.apache.cxf.dosgi.dsw.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.easymock.classextension.EasyMock;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+
 public class ClassUtilsTest extends TestCase {
 
     public void testGetInterfaceClass() {
-        assertEquals(String.class, ClassUtils.getInterfaceClass("Hello", "java.lang.String"));
+        assertEquals(String.class,
+                ClassUtils.getInterfaceClass("Hello", "java.lang.String"));
         assertNull(ClassUtils.getInterfaceClass("Hello", "java.lang.Integer"));
-        assertEquals(List.class, ClassUtils.getInterfaceClass(new ArrayList<String>(), "java.util.List"));
-        assertEquals(Collection.class, ClassUtils.getInterfaceClass(new ArrayList<String>(), "java.util.Collection"));
+        assertEquals(List.class, ClassUtils.getInterfaceClass(
+                new ArrayList<String>(), "java.util.List"));
+        assertEquals(Collection.class, ClassUtils.getInterfaceClass(
+                new ArrayList<String>(), "java.util.Collection"));
     }
 
     public void testGetInterfaceClassFromSubclass() {
-        assertEquals(Map.class, ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.Map"));
-        assertNull(ClassUtils.getInterfaceClass(new MySubclassFour(), "java.util.UnknownType"));
+        assertEquals(Map.class, ClassUtils.getInterfaceClass(
+                new MySubclassFour(), "java.util.Map"));
+        assertNull(ClassUtils.getInterfaceClass(new MySubclassFour(),
+                "java.util.UnknownType"));
+    }
+
+    public void testLoadProvidersAsString() throws Exception {
+        BundleContext bc = mockBundleContext();
+        List<Object> providers = ClassUtils
+            .loadProviderClasses(bc, Collections.singletonMap("providers",
+                                Provider.class.getName()), "providers");
+        assertEquals(1, providers.size());
+        assertTrue(providers.get(0) instanceof Provider);
+    }
+
+    public void testLoadProvidersAsStringArray() throws Exception {
+        BundleContext bc = mockBundleContext();
+        List<Object> providers = ClassUtils
+           .loadProviderClasses(bc, Collections.singletonMap("providers",
+               new String[]{Provider.class.getName()}), "providers");
+        assertEquals(1, providers.size());
+        assertTrue(providers.get(0) instanceof Provider);
+    }
+
+    public void testLoadProvidersAsObject() throws Exception {
+        List<Object> providers = ClassUtils.loadProviderClasses(null,
+            Collections.singletonMap("providers", new Provider()),
+                "providers");
+        assertEquals(1, providers.size());
+        assertTrue(providers.get(0) instanceof Provider);
+    }
+
+    public void testLoadProvidersAsObjectArray() throws Exception {
+        List<Object> providers = ClassUtils.loadProviderClasses(null,
+            Collections.singletonMap("providers",
+                new Object[]{new Provider()}), "providers");
+        assertEquals(1, providers.size());
+        assertTrue(providers.get(0) instanceof Provider);
+    }
+
+    public void testLoadProvidersAsObjectList() throws Exception {
+        List<Object> list = new LinkedList<Object>();
+        list.add(new Provider());
+        List<Object> providers = ClassUtils.loadProviderClasses(null,
+            Collections.singletonMap("providers", list), "providers");
+        assertEquals(1, providers.size());
+        assertTrue(providers.get(0) instanceof Provider);
+    }
+
+    public void testLoadProvidersAsStringList() throws Exception {
+        List<Object> list = new LinkedList<Object>();
+        list.add(Provider.class.getName());
+        List<Object> providers = ClassUtils.loadProviderClasses(
+            mockBundleContext(),
+            Collections.singletonMap("providers", list), "providers");
+        assertEquals(1, providers.size());
+        assertTrue(providers.get(0) instanceof Provider);
+    }
+
+    private BundleContext mockBundleContext() throws Exception {
+        BundleContext bc = EasyMock.createMock(BundleContext.class);
+        Bundle bundle = EasyMock.createMock(Bundle.class);
+        bc.getBundle();
+        EasyMock.expectLastCall().andReturn(bundle);
+        bundle.loadClass(Provider.class.getName());
+        EasyMock.expectLastCall().andReturn(Provider.class);
+        EasyMock.replay(bc, bundle);
+        return bc;
     }
 
     @SuppressWarnings({ "serial", "rawtypes" })

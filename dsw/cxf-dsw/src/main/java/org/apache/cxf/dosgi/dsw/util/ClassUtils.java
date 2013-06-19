@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,12 +105,23 @@ public final class ClassUtils {
             } else if (serviceProviders.getClass() == String.class) {
                 String[] classNames = serviceProviders.toString().split(",");
                 return loadProviders(callingContext, classNames);
+            } else if (serviceProviders instanceof List) { 
+                List<Object> list = CastUtils.cast((List<?>)serviceProviders);
+                if (!list.isEmpty()) {
+                    List<Object> providers;
+                    if (list.get(0).getClass() == String.class) {
+                        providers = loadProviders(callingContext, list.toArray(new String[]{}));
+                    } else {
+                        providers = list;
+                    }
+                    return providers;
+                }
             } else {
                 return Arrays.asList(serviceProviders);
             }
-        } else {
-            return Collections.emptyList();
         }
+        return Collections.emptyList();
+        
     }
 
     private static List<Object> loadProviders(BundleContext callingContext, String[] classNames) {
