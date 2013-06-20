@@ -53,7 +53,7 @@
         <felix.version>3.0.8</felix.version>
         <spring.version>3.0.6.RELEASE</spring.version>
         <spring.osgi.version>1.2.1</spring.osgi.version>
-        <zookeeper.version>3.3.1</zookeeper.version>
+        <zookeeper.version>3.3.2</zookeeper.version>
 
         <remote.service.admin.interfaces.version>1.0.0</remote.service.admin.interfaces.version>
 
