@@ -21,6 +21,9 @@ package org.apache.cxf.dosgi.discovery.zookeeper;
 import java.io.IOException;
 import java.util.Dictionary;
 
+import org.apache.cxf.dosgi.discovery.zookeeper.publish.PublishingEndpointListenerFactory;
+import org.apache.cxf.dosgi.discovery.zookeeper.subscribe.EndpointListenerTrackerCustomizer;
+import org.apache.cxf.dosgi.discovery.zookeeper.subscribe.InterfaceMonitorManager;
 import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -34,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ZooKeeperDiscovery implements Watcher, ManagedService {
+
+    public static final String DISCOVERY_ZOOKEEPER_ID = "org.apache.cxf.dosgi.discovery.zookeeper";
 
     private static final Logger LOG = LoggerFactory.getLogger(ZooKeeperDiscovery.class);
 

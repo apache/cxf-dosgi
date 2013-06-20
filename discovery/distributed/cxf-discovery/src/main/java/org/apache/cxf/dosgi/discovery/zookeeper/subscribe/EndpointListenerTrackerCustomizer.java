@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.discovery.zookeeper;
+package org.apache.cxf.dosgi.discovery.zookeeper.subscribe;
 
+import org.apache.cxf.dosgi.discovery.zookeeper.ZooKeeperDiscovery;
 import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
@@ -73,7 +74,7 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
 
     private static boolean isOurOwnEndpointListener(ServiceReference sref) {
         return Boolean.parseBoolean(String.valueOf(
-                sref.getProperty(PublishingEndpointListenerFactory.DISCOVERY_ZOOKEEPER_ID)));
+                sref.getProperty(ZooKeeperDiscovery.DISCOVERY_ZOOKEEPER_ID)));
     }
 
 }

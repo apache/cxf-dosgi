@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.discovery.zookeeper;
+package org.apache.cxf.dosgi.discovery.zookeeper.publish;
 
 import java.util.Dictionary;
 import java.util.List;
@@ -30,7 +30,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 
-public class EndpointListenerFactoryTest extends TestCase {
+public class PublishingEndpointListenerFactoryTest extends TestCase {
 
     public void testScope() {
         IMocksControl c = EasyMock.createNiceControl();

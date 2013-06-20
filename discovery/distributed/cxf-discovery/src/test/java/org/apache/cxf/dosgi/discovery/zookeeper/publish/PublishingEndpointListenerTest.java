@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.discovery.zookeeper;
+package org.apache.cxf.dosgi.discovery.zookeeper.publish;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-public class EndpointListenerImplTest extends TestCase {
+public class PublishingEndpointListenerTest extends TestCase {
 
     public void testEndpointRemovalAdding() throws KeeperException, InterruptedException {
         IMocksControl c = EasyMock.createNiceControl();
@@ -104,7 +104,7 @@ public class EndpointListenerImplTest extends TestCase {
             }
         }).anyTimes();
         ctx.addServiceListener(EasyMock.isA(ServiceListener.class),
-                EasyMock.eq("(objectClass=org.apache.cxf.dosgi.discovery.zookeeper.DiscoveryPlugin)"));
+                EasyMock.eq("(objectClass=" + DiscoveryPlugin.class.getName() + ")"));
         EasyMock.expect(ctx.getService(sr1)).andReturn(plugin1).anyTimes();
         EasyMock.expect(ctx.getService(sr2)).andReturn(plugin2).anyTimes();
         EasyMock.expect(ctx.getServiceReferences(DiscoveryPlugin.class.getName(), null))

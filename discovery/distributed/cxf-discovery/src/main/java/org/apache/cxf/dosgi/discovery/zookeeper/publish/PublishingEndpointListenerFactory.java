@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.discovery.zookeeper;
+package org.apache.cxf.dosgi.discovery.zookeeper.publish;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.cxf.dosgi.discovery.zookeeper.ZooKeeperDiscovery;
 import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.Bundle;
@@ -40,7 +41,6 @@ import org.slf4j.LoggerFactory;
  */
 public class PublishingEndpointListenerFactory implements ServiceFactory {
 
-    public static final String DISCOVERY_ZOOKEEPER_ID = "org.apache.cxf.dosgi.discovery.zookeeper";
     private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListenerFactory.class);
 
     private final BundleContext bctx;
@@ -76,7 +76,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
         props.put(EndpointListener.ENDPOINT_LISTENER_SCOPE,
                   "(&(" + Constants.OBJECTCLASS + "=*)(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID
                   + "=" + Utils.getUUID(bctx) + "))");
-        props.put(DISCOVERY_ZOOKEEPER_ID, "true");
+        props.put(ZooKeeperDiscovery.DISCOVERY_ZOOKEEPER_ID, "true");
         serviceRegistration = bctx.registerService(EndpointListener.class.getName(), this, props);
     }
 
