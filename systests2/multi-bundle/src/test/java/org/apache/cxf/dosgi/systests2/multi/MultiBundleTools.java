@@ -113,9 +113,9 @@ public final class MultiBundleTools {
         return pomVersion;
     }
 
-    private static Option[] getDistroBundleOptions(boolean b) throws Exception {
+    private static Option[] getDistroBundleOptions(boolean discovery) throws Exception {
         Map<Integer, String> bundles = new TreeMap<Integer, String>();
-        getDistroBundles(bundles, true);
+        getDistroBundles(bundles, discovery);
         List<Option> opts = new ArrayList<Option>();
         for (Map.Entry<Integer, String> entry : bundles.entrySet()) {
             String bundleUri = entry.getValue();
