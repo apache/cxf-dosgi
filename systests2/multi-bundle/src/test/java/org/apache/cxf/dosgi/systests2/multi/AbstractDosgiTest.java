@@ -115,7 +115,6 @@ public class AbstractDosgiTest {
                 URL url = new URL(urlSt);
                 HttpURLConnection con = (HttpURLConnection)url.openConnection();
                 status = con.getResponseCode();
-                System.out.println("Waiting" + status);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e.getMessage(), e);
             } catch (IOException e) {
