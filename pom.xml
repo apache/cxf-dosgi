@@ -25,7 +25,7 @@
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation</name>
-
+ 
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/dosgi/trunk</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/dosgi/trunk</developerConnection>
