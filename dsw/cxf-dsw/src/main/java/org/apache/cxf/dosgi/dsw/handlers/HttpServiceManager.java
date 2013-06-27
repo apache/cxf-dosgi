@@ -24,7 +24,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.transport.http.DestinationRegistry;
@@ -74,7 +74,7 @@ public class HttpServiceManager {
 
     public Bus registerServletAndGetBus(String contextRoot, BundleContext callingContext,
             ServiceReference sref) {
-        Bus bus = BusFactory.newInstance().createBus();
+        Bus bus = new CXFBusFactory().createBus();
         bus.setExtension(new DestinationRegistryImpl(), DestinationRegistry.class);
         CXFNonSpringServlet cxf = new CXFNonSpringServlet();
         cxf.setBus(bus);

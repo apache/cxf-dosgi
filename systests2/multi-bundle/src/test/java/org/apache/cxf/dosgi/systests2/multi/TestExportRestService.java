@@ -20,6 +20,11 @@ package org.apache.cxf.dosgi.systests2.multi;
 
 import javax.inject.Inject;
 
+import org.apache.cxf.dosgi.samples.greeter.rest.GreeterInfo;
+import org.apache.cxf.dosgi.samples.greeter.rest.GreeterService;
+import org.apache.cxf.dosgi.samples.greeter.rest.GreetingPhrase;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
@@ -55,5 +60,12 @@ public class TestExportRestService extends AbstractDosgiTest {
     @Test
     public void testEndpointAvailable() throws Exception {
         waitPort(8080);
+        Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+        GreeterService greeterService = JAXRSClientFactory.create("http://localhost:8080/greeter",
+                                                                  GreeterService.class);
+        GreeterInfo result = greeterService.greetMe("Chris");
+        GreetingPhrase greeting = result.getGreetings().get(0);
+        Assert.assertEquals("Hello", greeting.getPhrase());
+        Assert.assertEquals("Chris", greeting.getName());
     }
 }
