@@ -41,12 +41,14 @@ public class TestExportRestService extends AbstractDosgiTest {
 
     @Inject
     BundleContext bundleContext;
+    
+    String webPort = "9091";
 
     @Configuration
-    public static Option[] configure() throws Exception {
+    public Option[] configure() throws Exception {
         return new Option[] {
                 MultiBundleTools.getDistroWithDiscovery(),
-                systemProperty("org.osgi.service.http.port").value("9090"),
+                systemProperty("org.osgi.service.http.port").value(webPort),
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
                 mavenBundle().groupId("org.apache.servicemix.bundles")
                     .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
@@ -60,11 +62,10 @@ public class TestExportRestService extends AbstractDosgiTest {
 
     @Test
     public void testEndpointAvailable() throws Exception {
-        waitWebPage("http://localhost:9090/greeter/greeter/greeting/Chris");
+        waitWebPage("http://localhost:" + webPort + "/greeter/greeter/greeting/Chris");
         try {
-            
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-            GreeterService greeterService = JAXRSClientFactory.create("http://localhost:9090/greeter",
+            GreeterService greeterService = JAXRSClientFactory.create("http://localhost:" + webPort + "/greeter",
                                                                       GreeterService.class);
             GreeterInfo result = greeterService.greetMe("Chris");
             GreetingPhrase greeting = result.getGreetings().get(0);
