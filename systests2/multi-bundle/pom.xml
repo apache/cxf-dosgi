@@ -62,14 +62,7 @@
             <version>${exam.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-aether</artifactId>
-            <version>1.5.0</version>
-            <scope>test</scope>
-        </dependency>
-
+        
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>

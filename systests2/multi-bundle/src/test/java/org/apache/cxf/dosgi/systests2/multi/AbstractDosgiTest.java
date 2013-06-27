@@ -19,8 +19,11 @@
 package org.apache.cxf.dosgi.systests2.multi;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
@@ -31,6 +34,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 public class AbstractDosgiTest {
+
+    private static final int TIMEOUT = 20;
 
     protected ServiceReference waitService(BundleContext bc, Class<?> cls, String filter, int timeout)
         throws Exception {
@@ -53,7 +58,7 @@ public class AbstractDosgiTest {
     }
 
     protected void waitPort(int port) throws Exception {
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < TIMEOUT; i++) {
             Socket s = null;
             try {
                 s = new Socket((String)null, port);
@@ -99,6 +104,28 @@ public class AbstractDosgiTest {
             return socket.getLocalPort();
         } finally {
             socket.close();
+        }
+    }
+
+    protected void waitWebPage(String urlSt) throws InterruptedException {
+        int status = 0;
+        int seconds = 0;
+        while (status != 200) {
+            try {
+                URL url = new URL(urlSt);
+                HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                status = con.getResponseCode();
+                System.out.println("Waiting" + status);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            Thread.sleep(1000);
+            seconds++;
+            if (seconds > TIMEOUT) {
+                throw new RuntimeException("Timeout waiting for web page " + urlSt);
+            }
         }
     }
 }

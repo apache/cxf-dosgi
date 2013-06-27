@@ -59,10 +59,9 @@ public class TestExportRestService extends AbstractDosgiTest {
 
     @Test
     public void testEndpointAvailable() throws Exception {
+        waitWebPage("http://localhost:8080/greeter/greeter/greeting/Chris");
         try {
-            waitPort(8080);
-            // wait for service to be exported
-            Thread.sleep(2000);
+            
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
             GreeterService greeterService = JAXRSClientFactory.create("http://localhost:8080/greeter",
                                                                       GreeterService.class);
