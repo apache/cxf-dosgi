@@ -59,13 +59,20 @@ public class TestExportRestService extends AbstractDosgiTest {
 
     @Test
     public void testEndpointAvailable() throws Exception {
-        waitPort(8080);
-        Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-        GreeterService greeterService = JAXRSClientFactory.create("http://localhost:8080/greeter",
-                                                                  GreeterService.class);
-        GreeterInfo result = greeterService.greetMe("Chris");
-        GreetingPhrase greeting = result.getGreetings().get(0);
-        Assert.assertEquals("Hello", greeting.getPhrase());
-        Assert.assertEquals("Chris", greeting.getName());
+        try {
+            waitPort(8080);
+            // wait for service to be exported
+            Thread.sleep(2000);
+            Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            GreeterService greeterService = JAXRSClientFactory.create("http://localhost:8080/greeter",
+                                                                      GreeterService.class);
+            GreeterInfo result = greeterService.greetMe("Chris");
+            GreetingPhrase greeting = result.getGreetings().get(0);
+            Assert.assertEquals("Hello", greeting.getPhrase());
+            Assert.assertEquals("Chris", greeting.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
     }
 }
