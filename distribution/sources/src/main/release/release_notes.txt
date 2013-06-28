@@ -1,5 +1,49 @@
 See: http://cxf.apache.org/dosgi-releases.html
 
+Release Notes - CXF Distributed OSGi - Version 1.5.0
+====================================================
+
+** Bug
+    * [DOSGI-158] - NPE on shutdown of DOSGi service
+    * [DOSGI-160] - RemoteServiceAdmin shuts itself down during startup
+    * [DOSGI-161] - services sometimes don't get exported
+    * [DOSGI-162] - Compilation errors when using OSGi core
+    * 4.3.0/4.3.1/5.0.0
+    * [DOSGI-164] - NullPointerException on export
+    * [DOSGI-165] - exported service is not properly closed and cannot be
+    * restarted
+    * [DOSGI-166] - List can not be used to register CXF providers with DSW
+    * [DOSGI-168] - RemoteServiceAdminCore service parameters handling bugs
+    * [DOSGI-172] - o.a.c.d.discovery.zookeeper package classes are not
+    * properly synchronized
+    * [DOSGI-173] - unregistering an exported service does not remove it
+    * from zookeeper (and remote clients)
+    * [DOSGI-174] - synchronization issues and resource leaks in
+    * TopologyManagerImport and related classes
+    * [DOSGI-175] - TopologyManagerImport's reference counter doesn't count
+    * [DOSGI-176] - zookeeper discovery sending multiple duplicate endpoint
+    * notifications
+    * [DOSGI-177] - stopped services still appear as available to clients
+    * [DOSGI-180] - CXF service does not disappear if exporting bundle is
+    * stopped
+    * [DOSGI-188] - services aren't re-imported after RemoteServiceAdmin
+    * restart
+    * [DOSGI-190] - NodeExistsException and missing endpoint after ZooKeeper
+    * is restarted
+    * [DOSGI-191] - ZooKeeperDiscovery instance reconnects to ZooKeeper
+    * after bundle is stopped
+    * [DOSGI-192] - Upgrade to zookeeper 3.3.2 to fix bug with zk event
+    * thread shutdown
+    * [DOSGI-195] - Exceptions in tests: ClassCastException on
+    * SpringBusFactory
+
+** Improvement
+    * [DOSGI-167] - Upgrade Aries to the 1.x version for distro
+    * [DOSGI-170] - Remove single bundle distro
+    * [DOSGI-181] - Reactivate or delete old systests
+    * [DOSGI-184] - Split Endpoint repository from TopologyManagerExport
+    * [DOSGI-193] - Split discovery.zookeeper package into subpackages
+
 Apache CXF Distributed OSGi 1.4.0 Release Notes
 ===============================================
 

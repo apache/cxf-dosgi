@@ -217,23 +217,14 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     private void unexportNotAvailableServices(String filter) {
         synchronized (importedServices) {
             List<ImportRegistration> importRegistrations = importedServices.get(filter);
-            if (importRegistrations == null) {
-                return;
-            }
-
-            Iterator<ImportRegistration> it = importRegistrations.iterator();
-            while (it.hasNext()) {
-                ImportRegistration ir = it.next();
-                EndpointDescription ep = ir.getImportReference().getImportedEndpoint();
-                if (!isImportPossibilityAvailable(ep, filter)) {
-                    // unexport service
-                    ir.close();
-                    it.remove();
+            if (importRegistrations != null) {
+                // iterate over a copy
+                for (ImportRegistration ir : new ArrayList<ImportRegistration>(importRegistrations)) {
+                    EndpointDescription ep = ir.getImportReference().getImportedEndpoint();
+                    if (!isImportPossibilityAvailable(ep, filter)) {
+                        removeImport(ir, null); // also unexports the service
+                    }
                 }
-            }
-
-            if (importRegistrations.isEmpty()) {
-                importedServices.remove(filter);
             }
         }
     }
@@ -308,13 +299,25 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
         return null;
     }
 
-    public void removeImportReference(ImportReference importReference) {
+    /**
+     * Remove and close (unexport) the given import. The import is specified either
+     * by its ImportRegistration or by its ImportReference (only one of them must
+     * be specified).
+     * <p>
+     * If this method is called from within iterations on the underlying data structure,
+     * the iterations must be made on copies of the structures rather than the original
+     * references in order to prevent ConcurrentModificationExceptions.
+     *
+     * @param reg the import registration to remove
+     * @param ref the import reference to remove
+     */
+    private void removeImport(ImportRegistration reg, ImportReference ref) {
         synchronized (importedServices) {
             for (Iterator<List<ImportRegistration>> it1 = importedServices.values().iterator(); it1.hasNext();) {
                 Collection<ImportRegistration> irs = it1.next();
                 for (Iterator<ImportRegistration> it2 = irs.iterator(); it2.hasNext();) {
                     ImportRegistration ir = it2.next();
-                    if (ir.getImportReference().equals(importReference)) {
+                    if (ir.equals(reg) || ir.getImportReference().equals(ref)) {
                         ir.close();
                         it2.remove();
                     }
@@ -328,7 +331,7 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
 
     public void remoteAdminEvent(RemoteServiceAdminEvent event) {
         if (event.getType() == RemoteServiceAdminEvent.IMPORT_UNREGISTRATION) {
-            removeImportReference(event.getImportReference());
+            removeImport(null, event.getImportReference());
         }
     }
 }
