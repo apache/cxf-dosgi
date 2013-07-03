@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper.subscribe;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,15 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         this.listener = listener;
         LOG.debug("Creating new InterfaceMonitor {} for scope [{}] and objectClass [{}]",
                 new Object[] {recursive ? "(recursive)" : "", scope, objClass});
+    }
+
+    /**
+     * Returns all endpoints that are currently known to this monitor.
+     *
+     * @return all endpoints that are currently known to this monitor
+     */
+    public synchronized List<EndpointDescription> getEndpoints() {
+        return new ArrayList<EndpointDescription>(nodes.values());
     }
 
     public void start() {
@@ -146,7 +156,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         LOG.info("Processing change on node: {}", znode);
 
         Map<String, EndpointDescription> newNodes = new HashMap<String, EndpointDescription>();
-        Map<String, EndpointDescription> prevNodes = nodes;
+        Map<String, EndpointDescription> prevNodes = new HashMap<String, EndpointDescription>(nodes);
         processChildren(znode, newNodes, prevNodes);
 
         // whatever is left in prevNodes now has been removed from Discovery

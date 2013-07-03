@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.discovery.zookeeper.subscribe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,9 +82,16 @@ public class InterfaceMonitorManager {
             interest.listeners.add(sref); // add it before monitor starts so we don't miss events
             interest.im = createInterfaceMonitor(scope, objClass, interest);
             interest.im.start();
-        } else if (!interest.listeners.contains(sref)) {
+        } else {
             // interest already exists, so just add listener to it
-            interest.listeners.add(sref);
+            if (!interest.listeners.contains(sref)) {
+                interest.listeners.add(sref);
+            }
+            // notify listener of all known endpoints for given scope
+            // (as EndpointListener contract requires of all added/modified listeners)
+            for (EndpointDescription endpoint : interest.im.getEndpoints()) {
+                notifyListeners(endpoint, scope, true, Arrays.asList(sref));
+            }
         }
 
         // add scope to listener's scopes list
