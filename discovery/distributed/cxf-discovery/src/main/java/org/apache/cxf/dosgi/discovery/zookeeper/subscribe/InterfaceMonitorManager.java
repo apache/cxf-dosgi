@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.cxf.dosgi.discovery.local.util.Utils;
+import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -34,24 +34,27 @@ import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.cxf.dosgi.discovery.local.util.Utils.matchFilter;
+
 /**
  * Manages the EndpointListeners and the scopes they are interested in.
  * For each scope with interested EndpointListeners an InterfaceMonitor is created.
  * The InterfaceMonitor calls back when it detects added or removed external Endpoints.
- * These events are then forwarded to all interested EndpointListeners
+ * These events are then forwarded to all interested EndpointListeners.
  */
 public class InterfaceMonitorManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitorManager.class);
 
-    private final ZooKeeper zooKeeper;
-    private final Map<ServiceReference, List<String> /* scopes of the epl */> handledEndpointListeners
-        = new HashMap<ServiceReference, List<String>>();
-    private final Map<String /* scope */, Interest> interestingScopes = new HashMap<String, Interest>();
     private final BundleContext bctx;
+    private final ZooKeeper zooKeeper;
+    // map of EndpointListeners and the scopes they are interested in
+    private final Map<ServiceReference, List<String>> listenerScopes = new HashMap<ServiceReference, List<String>>();
+    // map of scopes and their interest data
+    private final Map<String, Interest> interests = new HashMap<String, Interest>();
 
     protected static class Interest {
-        List<ServiceReference> relatedServiceListeners = new CopyOnWriteArrayList<ServiceReference>();
+        List<ServiceReference> listeners = new CopyOnWriteArrayList<ServiceReference>();
         InterfaceMonitor im;
     }
 
@@ -60,90 +63,83 @@ public class InterfaceMonitorManager {
         this.zooKeeper = zooKeeper;
     }
 
+    public void addInterest(ServiceReference sref) {
+        for (String scope : Utils.getScopes(sref)) {
+            String objClass = Utils.getObjectClass(scope);
+            LOG.debug("Adding interest in scope {}, objectClass {}", scope, objClass);
+            addInterest(sref, scope, objClass);
+        }
+    }
+
     public synchronized void addInterest(ServiceReference sref, String scope, String objClass) {
-        Interest interest = interestingScopes.get(scope);
+        // get or create interest for given scope and add listener to it
+        Interest interest = interests.get(scope);
         if (interest == null) {
+            // create interest, add listener and start monitor
             interest = new Interest();
-            interestingScopes.put(scope, interest);
-        }
-
-        if (!interest.relatedServiceListeners.contains(sref)) {
-            interest.relatedServiceListeners.add(sref);
-        }
-
-        if (interest.im == null) {
+            interests.put(scope, interest);
+            interest.listeners.add(sref); // add it before monitor starts so we don't miss events
             interest.im = createInterfaceMonitor(scope, objClass, interest);
             interest.im.start();
+        } else if (!interest.listeners.contains(sref)) {
+            // interest already exists, so just add listener to it
+            interest.listeners.add(sref);
         }
 
-        List<String> handledScopes = handledEndpointListeners.get(sref);
-        if (handledScopes == null) {
-            handledScopes = new ArrayList<String>(1);
-            handledEndpointListeners.put(sref, handledScopes);
+        // add scope to listener's scopes list
+        List<String> scopes = listenerScopes.get(sref);
+        if (scopes == null) {
+            scopes = new ArrayList<String>(1);
+            listenerScopes.put(sref, scopes);
         }
-
-        if (!handledScopes.contains(scope)) {
-            handledScopes.add(scope);
+        if (!scopes.contains(scope)) {
+            scopes.add(scope);
         }
     }
 
-    /**
-     * Only for test case!
-     */
-    protected synchronized Map<String, Interest> getInterestingScopes() {
-        return interestingScopes;
-    }
+    public synchronized void removeInterest(ServiceReference sref) {
+        List<String> scopes = listenerScopes.get(sref);
+        if (scopes == null) {
+            return;
+        }
 
-    /**
-     * Only for test case!
-     */
-    protected synchronized Map<ServiceReference, List<String>> getHandledEndpointListeners() {
-        return handledEndpointListeners;
+        for (String scope : scopes) {
+            Interest interest = interests.get(scope);
+            if (interest != null) {
+                interest.listeners.remove(sref);
+                if (interest.listeners.isEmpty()) {
+                    interest.im.close();
+                    interests.remove(scope);
+                }
+            }
+        }
+        listenerScopes.remove(sref);
     }
 
     private InterfaceMonitor createInterfaceMonitor(final String scope, String objClass, final Interest interest) {
         // holding this object's lock in the callbacks can lead to a deadlock with InterfaceMonitor
-        EndpointListener epListener = new EndpointListener() {
+        EndpointListener listener = new EndpointListener() {
 
             public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
-                notifyListeners(endpoint, scope, false, interest.relatedServiceListeners);
+                notifyListeners(endpoint, scope, false, interest.listeners);
             }
 
             public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
-                notifyListeners(endpoint, scope, true, interest.relatedServiceListeners);
+                notifyListeners(endpoint, scope, true, interest.listeners);
             }
         };
-        return new InterfaceMonitor(zooKeeper, objClass, epListener, scope);
-    }
-
-    public synchronized void removeInterest(ServiceReference sref) {
-        List<String> handledScopes = handledEndpointListeners.get(sref);
-        if (handledScopes == null) {
-            return;
-        }
-
-        for (String scope : handledScopes) {
-            Interest i = interestingScopes.get(scope);
-            if (i != null) {
-                i.relatedServiceListeners.remove(sref);
-                if (i.relatedServiceListeners.isEmpty()) {
-                    i.im.close();
-                    interestingScopes.remove(scope);
-                }
-            }
-        }
-        handledEndpointListeners.remove(sref);
+        return new InterfaceMonitor(zooKeeper, objClass, listener, scope);
     }
 
     private void notifyListeners(EndpointDescription epd, String currentScope, boolean isAdded,
-            List<ServiceReference> relatedServiceListeners) {
-        for (ServiceReference sref : relatedServiceListeners) {
+            List<ServiceReference> listeners) {
+        for (ServiceReference sref : listeners) {
             Object service = bctx.getService(sref);
             try {
                 if (service instanceof EndpointListener) {
                     EndpointListener epl = (EndpointListener) service;
                     LOG.trace("matching {} against {}", epd, currentScope);
-                    if (Utils.matchFilter(bctx, currentScope, epd)) {
+                    if (matchFilter(bctx, currentScope, epd)) {
                         LOG.debug("Matched {} against {}", epd, currentScope);
                         notifyListener(epd, currentScope, isAdded, sref.getBundle(), epl);
                     }
@@ -172,10 +168,24 @@ public class InterfaceMonitorManager {
     }
 
     public synchronized void close() {
-        for (Interest interest : interestingScopes.values()) {
+        for (Interest interest : interests.values()) {
             interest.im.close();
         }
-        interestingScopes.clear();
-        handledEndpointListeners.clear();
+        interests.clear();
+        listenerScopes.clear();
+    }
+
+    /**
+     * Only for test case!
+     */
+    protected synchronized Map<String, Interest> getInterests() {
+        return interests;
+    }
+
+    /**
+     * Only for test case!
+     */
+    protected synchronized Map<ServiceReference, List<String>> getListenerScopes() {
+        return listenerScopes;
     }
 }

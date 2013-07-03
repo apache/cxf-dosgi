@@ -43,6 +43,9 @@ import org.slf4j.LoggerFactory;
  * whose data is a serialized version of an EndpointDescription, and notifies an
  * EndpointListener when changes are detected (which can then propagate the
  * notification to other EndpointListeners with a matching scope).
+ * <p>
+ * Note that the EndpointListener is used here as a decoupling interface for
+ * convenience, and is not necessarily used according to its documented contract.
  */
 public class InterfaceMonitor implements Watcher, StatCallback {
 
@@ -50,20 +53,20 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
     private final String znode;
     private final ZooKeeper zookeeper;
-    private final EndpointListener epListener;
+    private final EndpointListener listener;
     private final boolean recursive;
     private volatile boolean closed;
 
     // This map reference changes, so don't synchronize on it
     private Map<String, EndpointDescription> nodes = new HashMap<String, EndpointDescription>();
 
-    public InterfaceMonitor(ZooKeeper zk, String intf, EndpointListener epListener, String scope) {
+    public InterfaceMonitor(ZooKeeper zk, String objClass, EndpointListener listener, String scope) {
         this.zookeeper = zk;
-        this.znode = Utils.getZooKeeperPath(intf);
-        this.recursive = intf == null || intf.isEmpty();
-        this.epListener = epListener;
+        this.znode = Utils.getZooKeeperPath(objClass);
+        this.recursive = objClass == null || objClass.isEmpty();
+        this.listener = listener;
         LOG.debug("Creating new InterfaceMonitor {} for scope [{}] and objectClass [{}]",
-                new Object[] {recursive ? "(recursive)" : "", scope, intf});
+                new Object[] {recursive ? "(recursive)" : "", scope, objClass});
     }
 
     public void start() {
@@ -131,7 +134,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     public synchronized void close() {
         closed = true;
         for (EndpointDescription epd : nodes.values()) {
-            epListener.endpointRemoved(epd, null);
+            listener.endpointRemoved(epd, null);
         }
         nodes.clear();
     }
@@ -149,7 +152,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         // whatever is left in prevNodes now has been removed from Discovery
         LOG.debug("processChildren done. Nodes that are missing now and need to be removed: {}", prevNodes.values());
         for (EndpointDescription epd : prevNodes.values()) {
-            epListener.endpointRemoved(epd, null);
+            listener.endpointRemoved(epd, null);
         }
         nodes = newNodes;
     }
@@ -183,7 +186,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
                     LOG.debug("Properties: {}", epd.getProperties());
                     if (prevEpd == null) {
                         // This guy is new
-                        epListener.endpointAdded(epd, null);
+                        listener.endpointAdded(epd, null);
                     } else if (!prevEpd.getProperties().equals(epd.getProperties())) {
                         // TODO
                     }

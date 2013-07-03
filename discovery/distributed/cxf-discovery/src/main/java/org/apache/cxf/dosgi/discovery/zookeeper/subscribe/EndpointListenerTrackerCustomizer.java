@@ -40,41 +40,37 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
     }
 
     public Object addingService(ServiceReference sref) {
-        handleEndpointListener(sref);
+        updateListenerScopes(sref);
         return sref;
     }
 
     public void modifiedService(ServiceReference sref, Object service) {
-        handleEndpointListener(sref);
+        // called when an EndpointListener updates its service properties,
+        // e.g. when its interest scope is expanded/reduced
+        updateListenerScopes(sref);
     }
 
     public void removedService(ServiceReference sref, Object service) {
-        LOG.info("removedService: {}", sref);
+        LOG.info("removing EndpointListener interests: {}", sref);
         imManager.removeInterest(sref);
     }
 
-    private void handleEndpointListener(ServiceReference sref) {
+    private void updateListenerScopes(ServiceReference sref) {
         if (isOurOwnEndpointListener(sref)) {
-            LOG.debug("Skipping our own endpointListener");
+            LOG.debug("Skipping our own EndpointListener");
             return;
         }
 
+        LOG.info("updating EndpointListener interests: {}", sref);
         if (LOG.isDebugEnabled()) {
-            for (String key : sref.getPropertyKeys()) {
-                LOG.debug("modifiedService: property: " + key + " => " + sref.getProperty(key));
-            }
+            LOG.debug("updated EndpointListener properties: {}", Utils.getProperties(sref));
         }
 
-        for (String scope : Utils.getScopes(sref)) {
-            String objClass = Utils.getObjectClass(scope);
-            LOG.debug("Adding interest in scope {}, objectClass {}", scope, objClass);
-            imManager.addInterest(sref, scope, objClass);
-        }
+        imManager.addInterest(sref);
     }
 
     private static boolean isOurOwnEndpointListener(ServiceReference sref) {
         return Boolean.parseBoolean(String.valueOf(
                 sref.getProperty(ZooKeeperDiscovery.DISCOVERY_ZOOKEEPER_ID)));
     }
-
 }

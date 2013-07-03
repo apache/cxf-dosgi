@@ -93,52 +93,52 @@ public class InterfaceMonitorManagerTest {
 
         // sref has no scope -> nothing should happen
 
-        assertEquals(0, eltc.getHandledEndpointListeners().size());
-        assertEquals(0, eltc.getInterestingScopes().size());
+        assertEquals(0, eltc.getListenerScopes().size());
+        assertEquals(0, eltc.getInterests().size());
 
         //p.put(EndpointListener.ENDPOINT_LISTENER_SCOPE, );
 
         eltc.addInterest(sref, "(objectClass=mine)", "mine");
 
-        assertEquals(1, eltc.getHandledEndpointListeners().size());
-        assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
-        assertEquals(1, eltc.getInterestingScopes().size());
+        assertEquals(1, eltc.getListenerScopes().size());
+        assertEquals(1, eltc.getListenerScopes().get(sref).size());
+        assertEquals("(objectClass=mine)", eltc.getListenerScopes().get(sref).get(0));
+        assertEquals(1, eltc.getInterests().size());
 
         eltc.addInterest(sref, "(objectClass=mine)", "mine");
 
-        assertEquals(1, eltc.getHandledEndpointListeners().size());
-        assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
-        assertEquals(1, eltc.getInterestingScopes().size());
+        assertEquals(1, eltc.getListenerScopes().size());
+        assertEquals(1, eltc.getListenerScopes().get(sref).size());
+        assertEquals("(objectClass=mine)", eltc.getListenerScopes().get(sref).get(0));
+        assertEquals(1, eltc.getInterests().size());
 
         eltc.addInterest(sref2, "(objectClass=mine)", "mine");
 
-        assertEquals(2, eltc.getHandledEndpointListeners().size());
-        assertEquals(1, eltc.getHandledEndpointListeners().get(sref).size());
-        assertEquals(1, eltc.getHandledEndpointListeners().get(sref2).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref).get(0));
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref2).get(0));
-        assertEquals(1, eltc.getInterestingScopes().size());
+        assertEquals(2, eltc.getListenerScopes().size());
+        assertEquals(1, eltc.getListenerScopes().get(sref).size());
+        assertEquals(1, eltc.getListenerScopes().get(sref2).size());
+        assertEquals("(objectClass=mine)", eltc.getListenerScopes().get(sref).get(0));
+        assertEquals("(objectClass=mine)", eltc.getListenerScopes().get(sref2).get(0));
+        assertEquals(1, eltc.getInterests().size());
 
         eltc.removeInterest(sref);
 
-        assertEquals(1, eltc.getHandledEndpointListeners().size());
-        assertEquals(1, eltc.getHandledEndpointListeners().get(sref2).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref2).get(0));
-        assertEquals(1, eltc.getInterestingScopes().size());
+        assertEquals(1, eltc.getListenerScopes().size());
+        assertEquals(1, eltc.getListenerScopes().get(sref2).size());
+        assertEquals("(objectClass=mine)", eltc.getListenerScopes().get(sref2).get(0));
+        assertEquals(1, eltc.getInterests().size());
 
         eltc.removeInterest(sref);
 
-        assertEquals(1, eltc.getHandledEndpointListeners().size());
-        assertEquals(1, eltc.getHandledEndpointListeners().get(sref2).size());
-        assertEquals("(objectClass=mine)", eltc.getHandledEndpointListeners().get(sref2).get(0));
-        assertEquals(1, eltc.getInterestingScopes().size());
+        assertEquals(1, eltc.getListenerScopes().size());
+        assertEquals(1, eltc.getListenerScopes().get(sref2).size());
+        assertEquals("(objectClass=mine)", eltc.getListenerScopes().get(sref2).get(0));
+        assertEquals(1, eltc.getInterests().size());
 
         eltc.removeInterest(sref2);
 
-        assertEquals(0, eltc.getHandledEndpointListeners().size());
-        assertEquals(0, eltc.getInterestingScopes().size());
+        assertEquals(0, eltc.getListenerScopes().size());
+        assertEquals(0, eltc.getInterests().size());
 
         c.verify();
         for (IMocksControl control : controls) {
