@@ -48,22 +48,22 @@ public class ImportRegistrationImplTest {
     @Test
     public void testDefaultCtor() {
         IMocksControl c = EasyMock.createNiceControl();
-        EndpointDescription ed = c.createMock(EndpointDescription.class);
+        EndpointDescription endpoint = c.createMock(EndpointDescription.class);
         RemoteServiceAdminCore rsac = c.createMock(RemoteServiceAdminCore.class);
 
         c.replay();
 
-        ImportRegistrationImpl i = new ImportRegistrationImpl(ed, rsac);
+        ImportRegistrationImpl i = new ImportRegistrationImpl(endpoint, rsac);
 
         assertNull(i.getException());
         assertEquals(i, i.getParent());
-        assertEquals(ed, i.getImportedEndpointDescription());
+        assertEquals(endpoint, i.getImportedEndpointDescription());
     }
 
     @Test
     public void testCloneAndClose() {
         IMocksControl c = EasyMock.createControl();
-        EndpointDescription ed = c.createMock(EndpointDescription.class);
+        EndpointDescription endpoint = c.createMock(EndpointDescription.class);
         RemoteServiceAdminCore rsac = c.createMock(RemoteServiceAdminCore.class);
 
         ServiceRegistration sr = c.createMock(ServiceRegistration.class);
@@ -72,7 +72,7 @@ public class ImportRegistrationImplTest {
 
         c.replay();
 
-        ImportRegistrationImpl i1 = new ImportRegistrationImpl(ed, rsac);
+        ImportRegistrationImpl i1 = new ImportRegistrationImpl(endpoint, rsac);
 
         ImportRegistrationImpl i2 = new ImportRegistrationImpl(i1);
 
@@ -91,9 +91,9 @@ public class ImportRegistrationImplTest {
         assertEquals(i1, i2.getParent());
         assertEquals(i1, i3.getParent());
 
-        assertEquals(ed, i1.getImportedEndpointDescription());
-        assertEquals(ed, i2.getImportedEndpointDescription());
-        assertEquals(ed, i3.getImportedEndpointDescription());
+        assertEquals(endpoint, i1.getImportedEndpointDescription());
+        assertEquals(endpoint, i2.getImportedEndpointDescription());
+        assertEquals(endpoint, i3.getImportedEndpointDescription());
 
         c.verify();
         c.reset();
@@ -137,12 +137,12 @@ public class ImportRegistrationImplTest {
     @Test
     public void testCloseAll() {
         IMocksControl c = EasyMock.createControl();
-        EndpointDescription ed = c.createMock(EndpointDescription.class);
+        EndpointDescription endpoint = c.createMock(EndpointDescription.class);
         RemoteServiceAdminCore rsac = c.createMock(RemoteServiceAdminCore.class);
 
         c.replay();
 
-        ImportRegistrationImpl i1 = new ImportRegistrationImpl(ed, rsac);
+        ImportRegistrationImpl i1 = new ImportRegistrationImpl(endpoint, rsac);
 
         ImportRegistrationImpl i2 = new ImportRegistrationImpl(i1);
 

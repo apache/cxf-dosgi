@@ -218,9 +218,9 @@ public class RemoteServiceAdminCoreTest {
         assertEquals(1, ereg.size());
         assertNull(ereg.get(0).getException());
         assertSame(sref, ereg.get(0).getExportReference().getExportedService());
-        EndpointDescription ed = ereg.get(0).getExportReference().getExportedEndpoint();
+        EndpointDescription endpoint = ereg.get(0).getExportReference().getExportedEndpoint();
 
-        Map<String, Object> edProps = ed.getProperties();
+        Map<String, Object> edProps = endpoint.getProperties();
         assertEquals("http://something", edProps.get("endpoint.id"));
         assertNotNull(edProps.get("service.imported"));
         assertTrue(Arrays.equals(new String[] {"java.lang.Runnable"},

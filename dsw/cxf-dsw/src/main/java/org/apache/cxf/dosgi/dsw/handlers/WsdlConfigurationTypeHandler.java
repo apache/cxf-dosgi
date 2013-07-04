@@ -57,8 +57,8 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
                               BundleContext dswContext,
                               BundleContext callingContext,
                               Class<?> iClass,
-                              EndpointDescription sd) {
-        String wsdlAddressProp = getWsdlAddress(sd, iClass);
+                              EndpointDescription endpoint) {
+        String wsdlAddressProp = getWsdlAddress(endpoint, iClass);
         if (wsdlAddressProp == null) {
             LOG.warn("WSDL address is unavailable");
             return null;
@@ -72,21 +72,22 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             return null;
         }
 
-        LOG.info("Creating a " + sd.getInterfaces().toArray()[0] + " client, wsdl address is "
-                 + OsgiUtils.getProperty(sd, Constants.WSDL_CONFIG_PREFIX));
+        LOG.info("Creating a " + endpoint.getInterfaces().toArray()[0] + " client, wsdl address is "
+                 + OsgiUtils.getProperty(endpoint, Constants.WSDL_CONFIG_PREFIX));
 
-        String serviceNs = OsgiUtils.getProperty(sd, Constants.WSDL_SERVICE_NAMESPACE);
+        String serviceNs = OsgiUtils.getProperty(endpoint, Constants.WSDL_SERVICE_NAMESPACE);
         if (serviceNs == null) {
             serviceNs = PackageUtils.getNamespace(PackageUtils.getPackageName(iClass));
         }
-        String serviceName = OsgiUtils.getProperty(sd, Constants.WSDL_SERVICE_NAME);
+        String serviceName = OsgiUtils.getProperty(endpoint, Constants.WSDL_SERVICE_NAME);
         if (serviceName == null) {
             serviceName = iClass.getSimpleName();
         }
-        QName serviceQname = getServiceQName(iClass, sd.getProperties(),
+        QName serviceQname = getServiceQName(iClass, endpoint.getProperties(),
                                              Constants.WSDL_SERVICE_NAMESPACE,
                                              Constants.WSDL_SERVICE_NAME);
-        QName portQname = getPortQName(serviceQname.getNamespaceURI(), sd.getProperties(), Constants.WSDL_PORT_NAME);
+        QName portQname = getPortQName(serviceQname.getNamespaceURI(),
+                endpoint.getProperties(), Constants.WSDL_PORT_NAME);
         Service service = createWebService(wsdlAddress, serviceQname);
         Object proxy = getProxy(portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass),
                                 iClass);
@@ -146,8 +147,8 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return createServerFromFactory(factory, endpointProps);
     }
 
-    private String getWsdlAddress(EndpointDescription sd, Class<?> iClass) {
-        String address = OsgiUtils.getProperty(sd, Constants.WSDL_CONFIG_PREFIX);
+    private String getWsdlAddress(EndpointDescription endpoint, Class<?> iClass) {
+        String address = OsgiUtils.getProperty(endpoint, Constants.WSDL_CONFIG_PREFIX);
         if (address == null) {
             address = httpServiceManager.getDefaultAddress(iClass);
             if (address != null) {

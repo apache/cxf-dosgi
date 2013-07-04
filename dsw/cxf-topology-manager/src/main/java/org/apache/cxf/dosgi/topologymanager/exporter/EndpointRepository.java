@@ -98,13 +98,13 @@ class EndpointRepository {
     }
 
     synchronized Collection<EndpointDescription> getAllEndpoints() {
-        List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
+        List<EndpointDescription> allEndpoints = new ArrayList<EndpointDescription>();
         for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
-            for (Collection<EndpointDescription> regs : exports.values()) {
-                endpoints.addAll(regs);
+            for (Collection<EndpointDescription> endpoints : exports.values()) {
+                allEndpoints.addAll(endpoints);
             }
         }
-        return endpoints;
+        return allEndpoints;
     }
 
     synchronized Set<ServiceReference> getServicesToBeExportedFor(RemoteServiceAdmin rsa) {

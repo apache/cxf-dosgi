@@ -146,43 +146,43 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
         }
     }
 
-    public void endpointAdded(EndpointDescription epd, String filter) {
+    public void endpointAdded(EndpointDescription endpoint, String filter) {
         if (filter == null) {
             LOG.error("Endpoint is not handled because no matching filter was provided!");
             return;
         }
-        LOG.debug("importable service added for filter {}, endpoint {}", filter, epd);
-        addImportPossibility(epd, filter);
+        LOG.debug("importable service added for filter {}, endpoint {}", filter, endpoint);
+        addImportPossibility(endpoint, filter);
         triggerImport(filter);
     }
 
-    public void endpointRemoved(EndpointDescription epd, String filter) {
-        LOG.debug("EndpointRemoved {}", epd);
-        removeImportPossibility(epd, filter);
+    public void endpointRemoved(EndpointDescription endpoint, String filter) {
+        LOG.debug("EndpointRemoved {}", endpoint);
+        removeImportPossibility(endpoint, filter);
         triggerImport(filter);
     }
 
-    private void addImportPossibility(EndpointDescription epd, String filter) {
+    private void addImportPossibility(EndpointDescription endpoint, String filter) {
         synchronized (importPossibilities) {
-            List<EndpointDescription> ips = importPossibilities.get(filter);
-            if (ips == null) {
-                ips = new ArrayList<EndpointDescription>();
-                importPossibilities.put(filter, ips);
+            List<EndpointDescription> endpoints = importPossibilities.get(filter);
+            if (endpoints == null) {
+                endpoints = new ArrayList<EndpointDescription>();
+                importPossibilities.put(filter, endpoints);
             }
             // prevent adding the same endpoint multiple times, which can happen sometimes,
             // and which causes imports to remain available even when services are actually down
-            if (!ips.contains(epd)) {
-                ips.add(epd);
+            if (!endpoints.contains(endpoint)) {
+                endpoints.add(endpoint);
             }
         }
     }
 
-    private void removeImportPossibility(EndpointDescription epd, String filter) {
+    private void removeImportPossibility(EndpointDescription endpoint, String filter) {
         synchronized (importPossibilities) {
-            List<EndpointDescription> ips = importPossibilities.get(filter);
-            if (ips != null) {
-                ips.remove(epd);
-                if (ips.isEmpty()) {
+            List<EndpointDescription> endpoints = importPossibilities.get(filter);
+            if (endpoints != null) {
+                endpoints.remove(endpoint);
+                if (endpoints.isEmpty()) {
                     importPossibilities.remove(filter);
                 }
             }
@@ -220,8 +220,8 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
             if (importRegistrations != null) {
                 // iterate over a copy
                 for (ImportRegistration ir : new ArrayList<ImportRegistration>(importRegistrations)) {
-                    EndpointDescription ep = ir.getImportReference().getImportedEndpoint();
-                    if (!isImportPossibilityAvailable(ep, filter)) {
+                    EndpointDescription endpoint = ir.getImportReference().getImportedEndpoint();
+                    if (!isImportPossibilityAvailable(endpoint, filter)) {
                         removeImport(ir, null); // also unexports the service
                     }
                 }
@@ -229,10 +229,10 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
         }
     }
 
-    private boolean isImportPossibilityAvailable(EndpointDescription ep, String filter) {
+    private boolean isImportPossibilityAvailable(EndpointDescription endpoint, String filter) {
         synchronized (importPossibilities) {
-            List<EndpointDescription> ips = importPossibilities.get(filter);
-            return ips != null && ips.contains(ep);
+            List<EndpointDescription> endpoints = importPossibilities.get(filter);
+            return endpoints != null && endpoints.contains(endpoint);
         }
     }
 
@@ -249,12 +249,12 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     private void importServices(String filter) {
         synchronized (importedServices) {
             List<ImportRegistration> importRegistrations = importedServices.get(filter);
-            for (EndpointDescription epd : getImportPossibilitiesCopy(filter)) {
+            for (EndpointDescription endpoint : getImportPossibilitiesCopy(filter)) {
                 // TODO but optional: if the service is already imported and the endpoint is still
                 // in the list of possible imports check if a "better" endpoint is now in the list
-                if (!alreadyImported(epd, importRegistrations)) {
+                if (!alreadyImported(endpoint, importRegistrations)) {
                     // service not imported yet -> import it now
-                    ImportRegistration ir = importService(epd);
+                    ImportRegistration ir = importService(endpoint);
                     if (ir != null) {
                         // import was successful
                         if (importRegistrations == null) {
@@ -271,10 +271,10 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
         }
     }
 
-    private boolean alreadyImported(EndpointDescription epd, List<ImportRegistration> importRegistrations) {
+    private boolean alreadyImported(EndpointDescription endpoint, List<ImportRegistration> importRegistrations) {
         if (importRegistrations != null) {
             for (ImportRegistration ir : importRegistrations) {
-                if (epd.equals(ir.getImportReference().getImportedEndpoint())) {
+                if (endpoint.equals(ir.getImportReference().getImportedEndpoint())) {
                     return true;
                 }
             }
@@ -285,12 +285,12 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     /**
      * Tries to import the service with each rsa until one import is successful
      *
-     * @param ep endpoint to import
+     * @param endpoint endpoint to import
      * @return import registration of the first successful import
      */
-    private ImportRegistration importService(EndpointDescription ep) {
+    private ImportRegistration importService(EndpointDescription endpoint) {
         for (RemoteServiceAdmin rsa : remoteServiceAdminTracker.getAllServices()) {
-            ImportRegistration ir = rsa.importService(ep);
+            ImportRegistration ir = rsa.importService(endpoint);
             if (ir != null && ir.getException() == null) {
                 LOG.debug("Service import was successful {}", ir);
                 return ir;

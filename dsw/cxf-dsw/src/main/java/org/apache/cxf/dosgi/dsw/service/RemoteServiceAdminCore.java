@@ -164,8 +164,9 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             if (interfaceClass != null) {
                 ExportResult exportResult = handler.createServer(serviceReference, bctx, bundle.getBundleContext(),
                     serviceProperties, interfaceClass, service);
-                EndpointDescription epd = new EndpointDescription(exportResult.getEndpointProps());
-                ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(serviceReference, epd, this);
+                EndpointDescription endpoint = new EndpointDescription(exportResult.getEndpointProps());
+                ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(
+                        serviceReference, endpoint, this);
                 if (exportResult.getException() == null) {
                     LOG.info("created server for interface " + iface);
                     exportRegistration.setServer(exportResult.getServer());
@@ -364,13 +365,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 actualContext = requestingContext;
             }
 
-            EndpointDescription ed = imReg.getImportedEndpointDescription();
+            EndpointDescription endpoint = imReg.getImportedEndpointDescription();
             /* TODO: add additional local params... */
-            Dictionary<String, Object> serviceProps = new Hashtable<String, Object>(ed.getProperties());
+            Dictionary<String, Object> serviceProps = new Hashtable<String, Object>(endpoint.getProperties());
             serviceProps.put(RemoteConstants.SERVICE_IMPORTED, true);
             serviceProps.remove(RemoteConstants.SERVICE_EXPORTED_INTERFACES);
 
-            ClientServiceFactory csf = new ClientServiceFactory(actualContext, iClass, ed, handler, imReg);
+            ClientServiceFactory csf = new ClientServiceFactory(actualContext, iClass, endpoint, handler, imReg);
             imReg.setClientServiceFactory(csf);
             ServiceRegistration proxyReg = actualContext.registerService(interfaceName, csf, serviceProps);
             imReg.setImportedServiceRegistration(proxyReg);

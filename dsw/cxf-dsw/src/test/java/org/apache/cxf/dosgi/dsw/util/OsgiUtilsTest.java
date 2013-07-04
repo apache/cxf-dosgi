@@ -183,10 +183,10 @@ public class OsgiUtilsTest extends TestCase {
         p.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{"my.class"});
         p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, new String[]{"my.config"});
 
-        EndpointDescription ep = new EndpointDescription(p);
+        EndpointDescription endpoint = new EndpointDescription(p);
 
-        assertNull(OsgiUtils.getProperty(ep, "unknownProp"));
-        assertEquals(p.get(RemoteConstants.ENDPOINT_ID), OsgiUtils.getProperty(ep, RemoteConstants.ENDPOINT_ID));
-        assertEquals(null, OsgiUtils.getProperty(ep, "notAString"));
+        assertNull(OsgiUtils.getProperty(endpoint, "unknownProp"));
+        assertEquals(p.get(RemoteConstants.ENDPOINT_ID), OsgiUtils.getProperty(endpoint, RemoteConstants.ENDPOINT_ID));
+        assertEquals(null, OsgiUtils.getProperty(endpoint, "notAString"));
     }
 }

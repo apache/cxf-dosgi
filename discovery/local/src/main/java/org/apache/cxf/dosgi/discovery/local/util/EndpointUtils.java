@@ -80,15 +80,15 @@ public final class EndpointUtils {
     public static List<EndpointDescription> getAllEndpointDescriptions(Bundle b) {
         List<Element> elements = getAllDescriptionElements(b);
 
-        List<EndpointDescription> eds = new ArrayList<EndpointDescription>(elements.size());
+        List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>(elements.size());
         for (Element el : elements) {
             if (ENDPOINT_DESCRIPTION_ELEMENT.equals(el.getName())) {
-                eds.add(getEndpointDescription(el));
+                endpoints.add(getEndpointDescription(el));
             } else if (SERVICE_DESCRIPTION_ELEMENT.equals(el.getName())) {
-                eds.add(getLegacyEndpointDescription(el));
+                endpoints.add(getLegacyEndpointDescription(el));
             }
         }
-        return eds;
+        return endpoints;
     }
 
     @SuppressWarnings("unchecked")

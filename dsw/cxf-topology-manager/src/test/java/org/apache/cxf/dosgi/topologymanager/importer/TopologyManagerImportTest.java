@@ -58,7 +58,7 @@ public class TopologyManagerImportTest {
                                            EasyMock.anyObject(),
                                            (Dictionary)EasyMock.anyObject())).andReturn(sreg).anyTimes();
 
-        EndpointDescription epd = c.createMock(EndpointDescription.class);
+        EndpointDescription endpoint = c.createMock(EndpointDescription.class);
         RemoteServiceAdmin rsa = c.createMock(RemoteServiceAdmin.class);
         final ImportRegistration ireg = c.createMock(ImportRegistration.class);
         EasyMock.expect(ireg.getException()).andReturn(null).anyTimes();
@@ -67,21 +67,21 @@ public class TopologyManagerImportTest {
         rsaTracker.addListener(EasyMock.<SimpleServiceTrackerListener>anyObject());
         EasyMock.expect(rsaTracker.getAllServices()).andReturn(Arrays.asList(rsa)).anyTimes();
 
-        EasyMock.expect(rsa.importService(EasyMock.eq(epd))).andAnswer(new IAnswer<ImportRegistration>() {
+        EasyMock.expect(rsa.importService(EasyMock.eq(endpoint))).andAnswer(new IAnswer<ImportRegistration>() {
             public ImportRegistration answer() throws Throwable {
                 sema.release();
                 return ireg;
             }
         }).once();
         EasyMock.expect(ireg.getImportReference()).andReturn(iref).anyTimes();
-        EasyMock.expect(iref.getImportedEndpoint()).andReturn(epd).anyTimes();
+        EasyMock.expect(iref.getImportedEndpoint()).andReturn(endpoint).anyTimes();
         c.replay();
 
         TopologyManagerImport tm = new TopologyManagerImport(bc, rsaTracker);
 
         tm.start();
         // no RSA available yet so no import...
-        tm.endpointAdded(epd, "myFilter");
+        tm.endpointAdded(endpoint, "myFilter");
         tm.triggerImportsForRemoteServiceAdmin(rsa);
         assertTrue("importService should have been called on RemoteServiceAdmin",
                    sema.tryAcquire(100, TimeUnit.SECONDS));

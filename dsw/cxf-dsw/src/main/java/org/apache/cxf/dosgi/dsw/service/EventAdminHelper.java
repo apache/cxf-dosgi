@@ -64,21 +64,21 @@ public class EventAdminHelper {
         Properties props = new Properties();
         setIfNotNull(props, "cause", rsae.getException());
 
-        EndpointDescription epd = null;
+        EndpointDescription endpoint = null;
         if (rsae.getImportReference() != null) {
-            epd = ((ImportRegistrationImpl)rsae.getImportReference()).getImportedEndpointAlways();
-            setIfNotNull(props, "import.registration", epd);
+            endpoint = ((ImportRegistrationImpl)rsae.getImportReference()).getImportedEndpointAlways();
+            setIfNotNull(props, "import.registration", endpoint);
         } else if (rsae.getExportReference() != null) {
-            epd = rsae.getExportReference().getExportedEndpoint();
-            setIfNotNull(props, "export.registration", epd);
+            endpoint = rsae.getExportReference().getExportedEndpoint();
+            setIfNotNull(props, "export.registration", endpoint);
         }
 
-        if (epd != null) {
-            setIfNotNull(props, "service.remote.id", epd.getServiceId());
-            setIfNotNull(props, "service.remote.uuid", epd.getFrameworkUUID());
-            setIfNotNull(props, "service.remote.uri", epd.getId());
-            setIfNotNull(props, "objectClass", epd.getInterfaces().toArray());
-            setIfNotNull(props, "service.imported.configs", epd.getConfigurationTypes());
+        if (endpoint != null) {
+            setIfNotNull(props, "service.remote.id", endpoint.getServiceId());
+            setIfNotNull(props, "service.remote.uuid", endpoint.getFrameworkUUID());
+            setIfNotNull(props, "service.remote.uri", endpoint.getId());
+            setIfNotNull(props, "objectClass", endpoint.getInterfaces().toArray());
+            setIfNotNull(props, "service.imported.configs", endpoint.getConfigurationTypes());
         }
         props.put("timestamp", System.currentTimeMillis());
         props.put("event", rsae);

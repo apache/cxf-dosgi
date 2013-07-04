@@ -173,10 +173,10 @@ public class LocalDiscovery implements BundleListener {
     }
 
     private void findDeclaredRemoteServices(Bundle bundle) {
-        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(bundle);
-        for (EndpointDescription ed : eds) {
-            endpointDescriptions.put(ed, bundle);
-            addedEndpointDescription(ed);
+        List<EndpointDescription> endpoints = EndpointUtils.getAllEndpointDescriptions(bundle);
+        for (EndpointDescription endpoint : endpoints) {
+            endpointDescriptions.put(endpoint, bundle);
+            addedEndpointDescription(endpoint);
         }
     }
 
@@ -191,39 +191,39 @@ public class LocalDiscovery implements BundleListener {
         }
     }
 
-    private void addedEndpointDescription(EndpointDescription ed) {
-        triggerCallbacks(ed, true);
+    private void addedEndpointDescription(EndpointDescription endpoint) {
+        triggerCallbacks(endpoint, true);
     }
 
-    private void removedEndpointDescription(EndpointDescription ed) {
-        triggerCallbacks(ed, false);
+    private void removedEndpointDescription(EndpointDescription endpoint) {
+        triggerCallbacks(endpoint, false);
     }
 
-    private void triggerCallbacks(EndpointDescription ed, boolean added) {
+    private void triggerCallbacks(EndpointDescription endpoint, boolean added) {
         for (Map.Entry<EndpointListener, Collection<String>> entry : listenerToFilters.entrySet()) {
             for (String match : entry.getValue()) {
-                triggerCallbacks(entry.getKey(), match, ed, added);
+                triggerCallbacks(entry.getKey(), match, endpoint, added);
             }
         }
     }
 
     private void triggerCallbacks(EndpointListener endpointListener, String toMatch,
-            EndpointDescription ed, boolean added) {
-        if (!Utils.matchFilter(bundleContext, toMatch, ed)) {
+            EndpointDescription endpoint, boolean added) {
+        if (!Utils.matchFilter(bundleContext, toMatch, endpoint)) {
             return;
         }
 
         if (added) {
-            endpointListener.endpointAdded(ed, toMatch);
+            endpointListener.endpointAdded(endpoint, toMatch);
         } else {
-            endpointListener.endpointRemoved(ed, toMatch);
+            endpointListener.endpointRemoved(endpoint, toMatch);
         }
     }
 
     private void triggerCallbacks(Collection<String> filters, EndpointListener endpointListener) {
         for (String filter : filters) {
-            for (EndpointDescription ed : endpointDescriptions.keySet()) {
-                triggerCallbacks(endpointListener, filter, ed, true);
+            for (EndpointDescription endpoint : endpointDescriptions.keySet()) {
+                triggerCallbacks(endpointListener, filter, endpoint, true);
             }
         }
     }

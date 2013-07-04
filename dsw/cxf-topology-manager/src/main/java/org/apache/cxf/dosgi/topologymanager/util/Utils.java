@@ -43,14 +43,14 @@ public final class Utils {
     /**
      * Retrieves an endpoint's properties as a Dictionary.
      *
-     * @param ep an endpoint description
+     * @param endpoint an endpoint description
      * @return endpoint properties (will never return null)
      */
-    public static Dictionary<String, Object> getEndpointProperties(EndpointDescription ep) {
-        if (ep == null || ep.getProperties() == null) {
+    public static Dictionary<String, Object> getEndpointProperties(EndpointDescription endpoint) {
+        if (endpoint == null || endpoint.getProperties() == null) {
             return new Hashtable<String, Object>();
         } else {
-            return new Hashtable<String, Object>(ep.getProperties());
+            return new Hashtable<String, Object>(endpoint.getProperties());
         }
     }
 

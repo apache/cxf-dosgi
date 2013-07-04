@@ -47,8 +47,8 @@ public class EndpointListenerNotifierTest {
         BundleContext bc = c.createMock(BundleContext.class);
         ServiceReference sref = c.createMock(ServiceReference.class);
         EndpointListener epl = EasyMock.createMock(EndpointListener.class);
-        EndpointDescription epd = c.createMock(EndpointDescription.class);
-        EndpointDescription epd2 = c.createMock(EndpointDescription.class);
+        EndpointDescription endpoint = c.createMock(EndpointDescription.class);
+        EndpointDescription endpoint2 = c.createMock(EndpointDescription.class);
 
         Map<String, Object> props = new HashMap<String, Object>();
         String[] oc = new String[1];
@@ -69,11 +69,11 @@ public class EndpointListenerNotifierTest {
         EasyMock.expect(sref.getProperty(EasyMock.eq(EndpointListener.ENDPOINT_LISTENER_SCOPE)))
             .andReturn("(objectClass=myClass)").anyTimes();
 
-        EasyMock.expect(epd.getProperties()).andReturn(props).anyTimes();
-        EasyMock.expect(epd2.getProperties()).andReturn(props2).anyTimes();
+        EasyMock.expect(endpoint.getProperties()).andReturn(props).anyTimes();
+        EasyMock.expect(endpoint2.getProperties()).andReturn(props2).anyTimes();
 
         // must only be called for the first EndpointDescription!
-        epl.endpointRemoved(EasyMock.eq(epd), EasyMock.eq("(objectClass=myClass)"));
+        epl.endpointRemoved(EasyMock.eq(endpoint), EasyMock.eq("(objectClass=myClass)"));
         EasyMock.expectLastCall().once();
 
         EndpointRepository exportRepository = EasyMock.createMock(EndpointRepository.class);
@@ -84,8 +84,8 @@ public class EndpointListenerNotifierTest {
         EndpointListenerNotifier tm = new EndpointListenerNotifier(bc, exportRepository);
 
         List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
-        endpoints.add(epd);
-        endpoints.add(epd2);
+        endpoints.add(endpoint);
+        endpoints.add(endpoint2);
 
         tm.notifyListener(false, sref, endpoints);
 

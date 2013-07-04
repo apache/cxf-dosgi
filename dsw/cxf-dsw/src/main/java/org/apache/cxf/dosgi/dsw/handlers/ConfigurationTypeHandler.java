@@ -39,5 +39,5 @@ public interface ConfigurationTypeHandler {
     Object createProxy(ServiceReference serviceReference,
                        BundleContext dswContext,
                        BundleContext callingContext,
-                       Class<?> iClass, EndpointDescription sd) throws IntentUnsatisfiedException;
+                       Class<?> iClass, EndpointDescription endpoint) throws IntentUnsatisfiedException;
 }

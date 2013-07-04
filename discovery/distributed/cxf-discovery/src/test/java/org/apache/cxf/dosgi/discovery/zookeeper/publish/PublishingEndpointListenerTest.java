@@ -68,13 +68,13 @@ public class PublishingEndpointListenerTest extends TestCase {
         props.put(RemoteConstants.ENDPOINT_ID, "http://google.de:80/test");
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myConfig");
 
-        EndpointDescription ed = new EndpointDescription(props);
+        EndpointDescription endpoint = new EndpointDescription(props);
 
-        eli.endpointAdded(ed, null);
-        eli.endpointAdded(ed, null); // should do nothing
+        eli.endpointAdded(endpoint, null);
+        eli.endpointAdded(endpoint, null); // should do nothing
 
-        eli.endpointRemoved(ed, null);
-        eli.endpointRemoved(ed, null); // should do nothing
+        eli.endpointRemoved(endpoint, null);
+        eli.endpointRemoved(endpoint, null); // should do nothing
 
         c.verify();
     }
@@ -115,7 +115,7 @@ public class PublishingEndpointListenerTest extends TestCase {
         props.put(Constants.OBJECTCLASS, new String[] {"org.foo.myClass"});
         props.put(RemoteConstants.ENDPOINT_ID, "http://localhost:9876/test");
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myConfig");
-        EndpointDescription ep = new EndpointDescription(props);
+        EndpointDescription endpoint = new EndpointDescription(props);
 
         Map<String, Object> expectedProps = new HashMap<String, Object>(props);
         expectedProps.put("endpoint.id", "http://localhost:9876/test/appended");
@@ -133,16 +133,16 @@ public class PublishingEndpointListenerTest extends TestCase {
 
         PublishingEndpointListener eli = new PublishingEndpointListener(zk, ctx);
 
-        List<EndpointDescription> endpointList = getEndpointsList(eli);
-        assertEquals("Precondition", 0, endpointList.size());
-        eli.endpointAdded(ep, null);
-        assertEquals(1, endpointList.size());
+        List<EndpointDescription> endpoints = getEndpoints(eli);
+        assertEquals("Precondition", 0, endpoints.size());
+        eli.endpointAdded(endpoint, null);
+        assertEquals(1, endpoints.size());
 
         EasyMock.verify(zk);
     }
 
     @SuppressWarnings("unchecked")
-    private List<EndpointDescription> getEndpointsList(PublishingEndpointListener eli) throws Exception {
+    private List<EndpointDescription> getEndpoints(PublishingEndpointListener eli) throws Exception {
         Field field = eli.getClass().getDeclaredField("endpoints");
         field.setAccessible(true);
         return (List<EndpointDescription>) field.get(eli);
@@ -173,9 +173,9 @@ public class PublishingEndpointListenerTest extends TestCase {
         props.put(RemoteConstants.ENDPOINT_ID, "http://google.de:80/test");
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myConfig");
 
-        EndpointDescription ed = new EndpointDescription(props);
+        EndpointDescription endpoint = new EndpointDescription(props);
 
-        eli.endpointAdded(ed, null);
+        eli.endpointAdded(endpoint, null);
 
         eli.close(); // should result in zk.delete(...)
 

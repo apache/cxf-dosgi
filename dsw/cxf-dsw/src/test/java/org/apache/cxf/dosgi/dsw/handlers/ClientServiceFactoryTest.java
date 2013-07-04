@@ -47,10 +47,10 @@ public class ClientServiceFactoryTest extends TestCase {
         map.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myGreatConfiguration");
         map.put(Constants.OBJECTCLASS, new String[]{"my.class"});
 
-        EndpointDescription ed = new EndpointDescription(map);
+        EndpointDescription endpoint = new EndpointDescription(map);
         ConfigurationTypeHandler handler = control.createMock(ConfigurationTypeHandler.class);
 
-        ImportRegistrationImpl iri = new ImportRegistrationImpl(ed, null);
+        ImportRegistrationImpl iri = new ImportRegistrationImpl(endpoint, null);
 
         BundleContext requestingContext = control.createMock(BundleContext.class);
         Bundle requestingBundle = control.createMock(Bundle.class);
@@ -60,11 +60,11 @@ public class ClientServiceFactoryTest extends TestCase {
         ServiceRegistration sreg = control.createMock(ServiceRegistration.class);
         EasyMock.expect(sreg.getReference()).andReturn(sr);
 
-        handler.createProxy(sr, dswContext, requestingContext, String.class, ed);
+        handler.createProxy(sr, dswContext, requestingContext, String.class, endpoint);
         EasyMock.expectLastCall().andReturn(myTestProxyObject);
         control.replay();
 
-        ClientServiceFactory csf = new ClientServiceFactory(dswContext, String.class, ed, handler, iri);
+        ClientServiceFactory csf = new ClientServiceFactory(dswContext, String.class, endpoint, handler, iri);
         assertSame(myTestProxyObject, csf.getService(requestingBundle, sreg));
     }
 }

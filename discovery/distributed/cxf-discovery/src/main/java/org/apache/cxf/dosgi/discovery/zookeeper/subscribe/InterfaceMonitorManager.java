@@ -140,17 +140,18 @@ public class InterfaceMonitorManager {
         return new InterfaceMonitor(zooKeeper, objClass, endpointListener, scope);
     }
 
-    private void notifyListeners(EndpointDescription epd, String currentScope, boolean isAdded,
+    private void notifyListeners(EndpointDescription endpoint, String currentScope, boolean isAdded,
             List<ServiceReference> endpointListeners) {
         for (ServiceReference endpointListenerRef : endpointListeners) {
             Object service = bctx.getService(endpointListenerRef);
             try {
                 if (service instanceof EndpointListener) {
                     EndpointListener endpointListener = (EndpointListener) service;
-                    LOG.trace("matching {} against {}", epd, currentScope);
-                    if (matchFilter(bctx, currentScope, epd)) {
-                        LOG.debug("Matched {} against {}", epd, currentScope);
-                        notifyListener(epd, currentScope, isAdded, endpointListenerRef.getBundle(), endpointListener);
+                    LOG.trace("matching {} against {}", endpoint, currentScope);
+                    if (matchFilter(bctx, currentScope, endpoint)) {
+                        LOG.debug("Matched {} against {}", endpoint, currentScope);
+                        notifyListener(endpoint, currentScope, isAdded,
+                                endpointListenerRef.getBundle(), endpointListener);
                     }
                 }
             } finally {
@@ -161,18 +162,18 @@ public class InterfaceMonitorManager {
         }
     }
 
-    private void notifyListener(EndpointDescription epd, String currentScope, boolean isAdded,
+    private void notifyListener(EndpointDescription endpoint, String currentScope, boolean isAdded,
                                 Bundle endpointListenerBundle, EndpointListener endpointListener) {
         if (endpointListenerBundle == null) {
             LOG.info("listening service was unregistered, ignoring");
         } else if (isAdded) {
             LOG.info("calling EndpointListener.endpointAdded: " + endpointListener + " from bundle "
-                    + endpointListenerBundle.getSymbolicName() + " for endpoint: " + epd);
-            endpointListener.endpointAdded(epd, currentScope);
+                    + endpointListenerBundle.getSymbolicName() + " for endpoint: " + endpoint);
+            endpointListener.endpointAdded(endpoint, currentScope);
         } else {
             LOG.info("calling EndpointListener.endpointRemoved: " + endpointListener + " from bundle "
-                    + endpointListenerBundle.getSymbolicName() + " for endpoint: " + epd);
-            endpointListener.endpointRemoved(epd, currentScope);
+                    + endpointListenerBundle.getSymbolicName() + " for endpoint: " + endpoint);
+            endpointListener.endpointRemoved(endpoint, currentScope);
         }
     }
 

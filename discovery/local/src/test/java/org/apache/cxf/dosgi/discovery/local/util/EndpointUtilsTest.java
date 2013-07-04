@@ -84,26 +84,26 @@ public class EndpointUtilsTest extends TestCase {
                 Collections.enumeration(Arrays.asList(ed1URL))).anyTimes();
         EasyMock.replay(b);
 
-        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(b);
-        assertEquals(4, eds.size());
-        EndpointDescription ed0 = eds.get(0);
-        assertEquals("http://somewhere:12345", ed0.getId());
-        assertEquals(Arrays.asList("SomeService"), ed0.getInterfaces());
+        List<EndpointDescription> endpoints = EndpointUtils.getAllEndpointDescriptions(b);
+        assertEquals(4, endpoints.size());
+        EndpointDescription endpoint0 = endpoints.get(0);
+        assertEquals("http://somewhere:12345", endpoint0.getId());
+        assertEquals(Arrays.asList("SomeService"), endpoint0.getInterfaces());
         assertEquals(Arrays.asList("confidentiality"),
-            ed0.getProperties().get("osgi.remote.requires.intents"));
-        assertEquals("testValue", ed0.getProperties().get("testKey"));
+            endpoint0.getProperties().get("osgi.remote.requires.intents"));
+        assertEquals("testValue", endpoint0.getProperties().get("testKey"));
 
-        EndpointDescription ed1 = eds.get(1);
-        assertEquals("myScheme://somewhere:12345", ed1.getId());
-        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed1.getInterfaces());
+        EndpointDescription endpoint1 = endpoints.get(1);
+        assertEquals("myScheme://somewhere:12345", endpoint1.getId());
+        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), endpoint1.getInterfaces());
 
-        EndpointDescription ed2 = eds.get(2);
-        assertEquals("http://somewhere", ed2.getId());
-        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed2.getInterfaces());
+        EndpointDescription endpoint2 = endpoints.get(2);
+        assertEquals("http://somewhere", endpoint2.getId());
+        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), endpoint2.getInterfaces());
 
-        EndpointDescription ed3 = eds.get(3);
-        assertEquals("http://somewhere:1/2/3/4?5", ed3.getId());
-        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed3.getInterfaces());
+        EndpointDescription endpoint3 = endpoints.get(3);
+        assertEquals("http://somewhere:1/2/3/4?5", endpoint3.getId());
+        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), endpoint3.getInterfaces());
     }
 
     public void testAllEndpoints2() throws Exception {
@@ -116,18 +116,18 @@ public class EndpointUtilsTest extends TestCase {
                 Collections.enumeration(Arrays.asList(ed2URL))).anyTimes();
         EasyMock.replay(b);
 
-        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(b);
-        assertEquals(2, eds.size());
-        EndpointDescription ed0 = eds.get(0);
-        assertEquals("foo:bar", ed0.getId());
-        assertEquals(Arrays.asList("com.acme.HelloService"), ed0.getInterfaces());
-        assertEquals(Arrays.asList("SOAP"), ed0.getIntents());
+        List<EndpointDescription> endpoints = EndpointUtils.getAllEndpointDescriptions(b);
+        assertEquals(2, endpoints.size());
+        EndpointDescription endpoint0 = endpoints.get(0);
+        assertEquals("foo:bar", endpoint0.getId());
+        assertEquals(Arrays.asList("com.acme.HelloService"), endpoint0.getInterfaces());
+        assertEquals(Arrays.asList("SOAP"), endpoint0.getIntents());
         // changed from exported to imported
-        assertEquals("org.apache.cxf.ws", ed0.getProperties().get("service.imported.configs"));
+        assertEquals("org.apache.cxf.ws", endpoint0.getProperties().get("service.imported.configs"));
 
-        EndpointDescription ed1 = eds.get(1);
-        Map<String, Object> props = ed1.getProperties();
-        assertEquals(Arrays.asList("com.acme.HelloService", "some.other.Service"), ed1.getInterfaces());
+        EndpointDescription endpoint1 = endpoints.get(1);
+        Map<String, Object> props = endpoint1.getProperties();
+        assertEquals(Arrays.asList("com.acme.HelloService", "some.other.Service"), endpoint1.getInterfaces());
         assertEquals("org.apache.cxf.ws", props.get("service.imported.configs"));
         // exports should have been removed
         assertNull(props.get("service.exported.configs"));
@@ -183,16 +183,16 @@ public class EndpointUtilsTest extends TestCase {
                 Collections.enumeration(Arrays.asList(sdURL))).anyTimes();
         EasyMock.replay(b);
 
-        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(b);
-        assertEquals(1, eds.size());
-        EndpointDescription ed = eds.get(0);
-        assertEquals("http://localhost:9090/greeter", ed.getId());
-        assertEquals(Arrays.asList("org.apache.cxf.ws"), ed.getConfigurationTypes());
-        assertEquals(Arrays.asList("org.apache.cxf.dosgi.samples.greeter.GreeterService"), ed.getInterfaces());
+        List<EndpointDescription> endpoints = EndpointUtils.getAllEndpointDescriptions(b);
+        assertEquals(1, endpoints.size());
+        EndpointDescription endpoint = endpoints.get(0);
+        assertEquals("http://localhost:9090/greeter", endpoint.getId());
+        assertEquals(Arrays.asList("org.apache.cxf.ws"), endpoint.getConfigurationTypes());
+        assertEquals(Arrays.asList("org.apache.cxf.dosgi.samples.greeter.GreeterService"), endpoint.getInterfaces());
         assertNull("Should not contain service.exported.*",
-                ed.getProperties().get(RemoteConstants.SERVICE_EXPORTED_INTERFACES));
+                endpoint.getProperties().get(RemoteConstants.SERVICE_EXPORTED_INTERFACES));
         assertNull("Should not contain service.exported.*",
-                ed.getProperties().get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
+                endpoint.getProperties().get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
     }
 
     public void testLegacyServiceDescriptionFormat2() {
@@ -205,18 +205,18 @@ public class EndpointUtilsTest extends TestCase {
                 Collections.enumeration(Arrays.asList(sdURL))).anyTimes();
         EasyMock.replay(b);
 
-        List<EndpointDescription> eds = EndpointUtils.getAllEndpointDescriptions(b);
-        assertEquals(2, eds.size());
+        List<EndpointDescription> endpoints = EndpointUtils.getAllEndpointDescriptions(b);
+        assertEquals(2, endpoints.size());
 
-        EndpointDescription ed0 = eds.get(0);
-        assertEquals("http://localhost:9000/org/example/SomeService", ed0.getId());
-        assertEquals(Arrays.asList("org.apache.cxf.ws"), ed0.getConfigurationTypes());
-        assertEquals(Arrays.asList("org.example.SomeService"), ed0.getInterfaces());
-        assertEquals(Arrays.asList("confidentiality"), ed0.getIntents());
+        EndpointDescription endpoint0 = endpoints.get(0);
+        assertEquals("http://localhost:9000/org/example/SomeService", endpoint0.getId());
+        assertEquals(Arrays.asList("org.apache.cxf.ws"), endpoint0.getConfigurationTypes());
+        assertEquals(Arrays.asList("org.example.SomeService"), endpoint0.getInterfaces());
+        assertEquals(Arrays.asList("confidentiality"), endpoint0.getIntents());
 
-        EndpointDescription ed1 = eds.get(1);
-        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), ed1.getInterfaces());
-        assertEquals("5", ed1.getProperties().get("blah"));
+        EndpointDescription endpoint1 = endpoints.get(1);
+        assertEquals(Arrays.asList("SomeOtherService", "WithSomeSecondInterface"), endpoint1.getInterfaces());
+        assertEquals("5", endpoint1.getProperties().get("blah"));
     }
 
     public void testCreateXML() throws Exception {

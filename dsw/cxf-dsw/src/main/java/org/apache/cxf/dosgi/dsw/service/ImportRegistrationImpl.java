@@ -35,7 +35,7 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
 
     private volatile Throwable exception;
     private volatile ServiceRegistration importedService; // used only in parent
-    private EndpointDescription importedEndpoint;
+    private EndpointDescription endpoint;
     private volatile ClientServiceFactory clientServiceFactory;
     private RemoteServiceAdminCore rsaCore;
     private boolean closed;
@@ -50,8 +50,8 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
     }
 
     public ImportRegistrationImpl(EndpointDescription endpoint, RemoteServiceAdminCore rsac) {
-        importedEndpoint = endpoint;
-        rsaCore = rsac;
+        this.endpoint = endpoint;
+        this.rsaCore = rsac;
         initParent();
     }
 
@@ -62,7 +62,7 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
         // we always want a link to the parent...
         parent = ir.getParent();
         exception = parent.getException();
-        importedEndpoint = parent.getImportedEndpointDescription();
+        endpoint = parent.getImportedEndpointDescription();
         clientServiceFactory = parent.clientServiceFactory;
         rsaCore = parent.rsaCore;
 
@@ -158,7 +158,7 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
     }
 
     public EndpointDescription getImportedEndpointDescription() {
-        return isInvalid() ? null : importedEndpoint;
+        return isInvalid() ? null : endpoint;
     }
 
     @Override
@@ -224,6 +224,6 @@ public class ImportRegistrationImpl implements ImportRegistration, ImportReferen
      * @return the imported endpoint
      */
     public EndpointDescription getImportedEndpointAlways() {
-        return importedEndpoint;
+        return endpoint;
     }
 }

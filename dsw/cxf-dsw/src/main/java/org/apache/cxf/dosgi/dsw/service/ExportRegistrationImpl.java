@@ -117,16 +117,16 @@ public class ExportRegistrationImpl implements ExportRegistration {
         if (exportReference == null) {
             return "Exportregistration closed";
         }
-        EndpointDescription endpointDescription = getExportReference().getExportedEndpoint();
+        EndpointDescription endpoint = getExportReference().getExportedEndpoint();
         ServiceReference serviceReference = getExportReference().getExportedService();
         String r = "EndpointDescription for ServiceReference " + serviceReference;
         r += "\n";
 
         r += "*** EndpointDescription: **** \n";
-        if (endpointDescription == null) {
+        if (endpoint == null) {
             r += "---> NULL <---- \n";
         } else {
-            Set<Map.Entry<String, Object>> props = endpointDescription.getProperties().entrySet();
+            Set<Map.Entry<String, Object>> props = endpoint.getProperties().entrySet();
             for (Map.Entry<String, Object> entry : props) {
                 Object value = entry.getValue();
                 r += entry.getKey() + " => "

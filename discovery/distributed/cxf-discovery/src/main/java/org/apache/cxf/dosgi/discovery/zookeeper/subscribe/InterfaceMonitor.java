@@ -143,8 +143,8 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
     public synchronized void close() {
         closed = true;
-        for (EndpointDescription epd : nodes.values()) {
-            endpointListener.endpointRemoved(epd, null);
+        for (EndpointDescription endpoint : nodes.values()) {
+            endpointListener.endpointRemoved(endpoint, null);
         }
         nodes.clear();
     }
@@ -161,8 +161,8 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
         // whatever is left in prevNodes now has been removed from Discovery
         LOG.debug("processChildren done. Nodes that are missing now and need to be removed: {}", prevNodes.values());
-        for (EndpointDescription epd : prevNodes.values()) {
-            endpointListener.endpointRemoved(epd, null);
+        for (EndpointDescription endpoint : prevNodes.values()) {
+            endpointListener.endpointRemoved(endpoint, null);
         }
         nodes = newNodes;
     }
@@ -185,19 +185,19 @@ public class InterfaceMonitor implements Watcher, StatCallback {
             boolean foundANode = false;
             for (String child : children) {
                 String childZNode = zn + '/' + child;
-                EndpointDescription epd = getEndpointDescriptionFromNode(childZNode);
-                if (epd != null) {
-                    EndpointDescription prevEpd = prevNodes.get(child);
+                EndpointDescription endpoint = getEndpointDescriptionFromNode(childZNode);
+                if (endpoint != null) {
+                    EndpointDescription prevEndpoint = prevNodes.get(child);
                     LOG.info("found new node " + zn + "/[" + child + "]   ( []->child )  props: "
-                            + epd.getProperties().values());
-                    newNodes.put(child, epd);
+                            + endpoint.getProperties().values());
+                    newNodes.put(child, endpoint);
                     prevNodes.remove(child);
                     foundANode = true;
-                    LOG.debug("Properties: {}", epd.getProperties());
-                    if (prevEpd == null) {
+                    LOG.debug("Properties: {}", endpoint.getProperties());
+                    if (prevEndpoint == null) {
                         // This guy is new
-                        endpointListener.endpointAdded(epd, null);
-                    } else if (!prevEpd.getProperties().equals(epd.getProperties())) {
+                        endpointListener.endpointAdded(endpoint, null);
+                    } else if (!prevEndpoint.getProperties().equals(endpoint.getProperties())) {
                         // TODO
                     }
                 }

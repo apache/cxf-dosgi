@@ -196,9 +196,9 @@ public class PublishingEndpointListener implements EndpointListener {
         LOG.debug("closing - removing all endpoints");
         synchronized (endpoints) {
             closed = true;
-            for (EndpointDescription ed : endpoints) {
+            for (EndpointDescription endpoint : endpoints) {
                 try {
-                    removeEndpoint(ed);
+                    removeEndpoint(endpoint);
                 } catch (Exception ex) {
                     LOG.error("Exception while removing endpoint during close", ex);
                 }

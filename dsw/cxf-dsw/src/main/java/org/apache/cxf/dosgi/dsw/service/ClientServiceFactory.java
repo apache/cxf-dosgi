@@ -39,31 +39,31 @@ public class ClientServiceFactory implements ServiceFactory {
 
     private BundleContext dswContext;
     private Class<?> iClass;
-    private EndpointDescription sd;
+    private EndpointDescription endpoint;
     private ConfigurationTypeHandler handler;
     private ImportRegistrationImpl importRegistration;
 
     private boolean closeable;
     private int serviceCounter;
 
-    public ClientServiceFactory(BundleContext dswContext, Class<?> iClass, EndpointDescription sd,
+    public ClientServiceFactory(BundleContext dswContext, Class<?> iClass, EndpointDescription endpoint,
                                 ConfigurationTypeHandler handler, ImportRegistrationImpl ir) {
         this.dswContext = dswContext;
         this.iClass = iClass;
-        this.sd = sd;
+        this.endpoint = endpoint;
         this.handler = handler;
         this.importRegistration = ir;
     }
 
     public Object getService(final Bundle requestingBundle, final ServiceRegistration sreg) {
-        List<String> interfaces = sd.getInterfaces();
+        List<String> interfaces = endpoint.getInterfaces();
         String interfaceName = interfaces == null || interfaces.isEmpty() ? null : interfaces.get(0);
         LOG.debug("getService() from serviceFactory for {}", interfaceName);
         try {
             Object proxy = AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
                     return handler.createProxy(sreg.getReference(), dswContext,
-                            requestingBundle.getBundleContext(), iClass, sd);
+                            requestingBundle.getBundleContext(), iClass, endpoint);
                 }
             });
 

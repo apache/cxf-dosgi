@@ -175,9 +175,9 @@ public class LocalDiscoveryTest extends TestCase {
         BundleEvent be = new BundleEvent(BundleEvent.STARTED, bundle);
         ld.bundleChanged(be);
         assertEquals(1, ld.endpointDescriptions.size());
-        EndpointDescription ed = ld.endpointDescriptions.keySet().iterator().next();
-        assertEquals("http://somewhere:12345", ed.getId());
-        assertSame(bundle, ld.endpointDescriptions.get(ed));
+        EndpointDescription endpoint = ld.endpointDescriptions.keySet().iterator().next();
+        assertEquals("http://somewhere:12345", endpoint.getId());
+        assertSame(bundle, ld.endpointDescriptions.get(endpoint));
 
         EasyMock.verify(endpointListener);
 
@@ -262,8 +262,8 @@ public class LocalDiscoveryTest extends TestCase {
                 EasyMock.eq("(|(objectClass=org.example.ClassA)(objectClass=org.example.ClassB))"));
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
             public Object answer() throws Throwable {
-                EndpointDescription ed = (EndpointDescription) EasyMock.getCurrentArguments()[0];
-                actualEndpoints.addAll(ed.getInterfaces());
+                EndpointDescription endpoint = (EndpointDescription) EasyMock.getCurrentArguments()[0];
+                actualEndpoints.addAll(endpoint.getInterfaces());
                 return null;
             }
         }).times(2);

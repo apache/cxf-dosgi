@@ -25,11 +25,11 @@ import org.osgi.service.remoteserviceadmin.ExportReference;
 public class ExportReferenceImpl implements ExportReference {
 
     private ServiceReference serviceReference;
-    private EndpointDescription endpointDescription;
+    private EndpointDescription endpoint;
 
-    public ExportReferenceImpl(ServiceReference serviceReference, EndpointDescription endpointDescription) {
+    public ExportReferenceImpl(ServiceReference serviceReference, EndpointDescription endpoint) {
         this.serviceReference = serviceReference;
-        this.endpointDescription = endpointDescription;
+        this.endpoint = endpoint;
     }
 
     public ExportReferenceImpl(ExportReference exportReference) {
@@ -37,7 +37,7 @@ public class ExportReferenceImpl implements ExportReference {
     }
 
     public EndpointDescription getExportedEndpoint() {
-        return endpointDescription;
+        return endpoint;
     }
 
     public ServiceReference getExportedService() {
@@ -48,7 +48,7 @@ public class ExportReferenceImpl implements ExportReference {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (endpointDescription == null ? 0 : endpointDescription.hashCode());
+        result = prime * result + (endpoint == null ? 0 : endpoint.hashCode());
         result = prime * result + (serviceReference == null ? 0 : serviceReference.hashCode());
         return result;
     }
@@ -62,15 +62,15 @@ public class ExportReferenceImpl implements ExportReference {
             return false;
         }
         ExportReferenceImpl other = (ExportReferenceImpl) obj;
-        boolean ed = endpointDescription == null ? other.endpointDescription == null
-                : endpointDescription.equals(other.endpointDescription);
+        boolean ed = endpoint == null ? other.endpoint == null
+                : endpoint.equals(other.endpoint);
         boolean sr = serviceReference == null ? other.serviceReference == null
                 : serviceReference.equals(other.serviceReference);
         return ed && sr;
     }
 
     synchronized void close() {
-        this.endpointDescription = null;
+        this.endpoint = null;
         this.serviceReference = null;
     }
 }

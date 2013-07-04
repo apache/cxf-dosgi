@@ -67,8 +67,8 @@ public final class OsgiUtils {
         }
     }
 
-    public static String getProperty(EndpointDescription sd, String name) {
-        return getProperty(sd.getProperties(), name);
+    public static String getProperty(EndpointDescription endpoint, String name) {
+        return getProperty(endpoint.getProperties(), name);
     }
 
     @SuppressWarnings("rawtypes")
