@@ -53,7 +53,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitor.class);
 
     private final String znode;
-    private final ZooKeeper zookeeper;
+    private final ZooKeeper zk;
     private final EndpointListener endpointListener;
     private final boolean recursive;
     private volatile boolean closed;
@@ -62,7 +62,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     private Map<String, EndpointDescription> nodes = new HashMap<String, EndpointDescription>();
 
     public InterfaceMonitor(ZooKeeper zk, String objClass, EndpointListener endpointListener, String scope) {
-        this.zookeeper = zk;
+        this.zk = zk;
         this.znode = Utils.getZooKeeperPath(objClass);
         this.recursive = objClass == null || objClass.isEmpty();
         this.endpointListener = endpointListener;
@@ -84,8 +84,8 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     }
 
     private void watch() {
-        LOG.debug("registering a zookeeper.exists({}) callback", znode);
-        zookeeper.exists(znode, this, this, null);
+        LOG.debug("registering a ZooKeeper.exists({}) callback", znode);
+        zk.exists(znode, this, this, null);
     }
 
     /**
@@ -124,14 +124,14 @@ public class InterfaceMonitor implements Watcher, StatCallback {
             return;
         }
 
-        if (zookeeper.getState() != ZooKeeper.States.CONNECTED) {
-            LOG.info("zookeeper connection was already closed! Not processing changed event.");
+        if (zk.getState() != ZooKeeper.States.CONNECTED) {
+            LOG.info("ZooKeeper connection was already closed! Not processing changed event.");
             return;
         }
 
         try {
-            if (zookeeper.exists(znode, false) != null) {
-                zookeeper.getChildren(znode, this);
+            if (zk.exists(znode, false) != null) {
+                zk.getChildren(znode, this);
                 refreshNodes();
             } else {
                 LOG.debug("znode {} doesn't exist -> not processing any changes", znode);
@@ -180,7 +180,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         List<String> children;
         try {
             LOG.debug("Processing the children of {}", zn);
-            children = zookeeper.getChildren(zn, false);
+            children = zk.getChildren(zn, false);
 
             boolean foundANode = false;
             for (String child : children) {
@@ -202,15 +202,15 @@ public class InterfaceMonitor implements Watcher, StatCallback {
                     }
                 }
                 if (recursive && processChildren(childZNode, newNodes, prevNodes)) {
-                    zookeeper.getChildren(childZNode, this);
+                    zk.getChildren(childZNode, this);
                 }
             }
 
             return foundANode;
         } catch (KeeperException e) {
-            LOG.error("Problem processing Zookeeper node", e);
+            LOG.error("Problem processing ZooKeeper node", e);
         } catch (InterruptedException e) {
-            LOG.error("Problem processing Zookeeper node", e);
+            LOG.error("Problem processing ZooKeeper node", e);
         }
         return false;
     }
@@ -223,11 +223,11 @@ public class InterfaceMonitor implements Watcher, StatCallback {
      */
     private EndpointDescription getEndpointDescriptionFromNode(String node) {
         try {
-            Stat s = zookeeper.exists(node, false);
-            if (s == null || s.getDataLength() <= 0) {
+            Stat stat = zk.exists(node, false);
+            if (stat == null || stat.getDataLength() <= 0) {
                 return null;
             }
-            byte[] data = zookeeper.getData(node, false, null);
+            byte[] data = zk.getData(node, false, null);
             LOG.debug("Got data for node: {}", node);
 
             EndpointDescription endpoint = EndpointUtils.getFirstEnpointDescription(data);

@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-dosgi-ri-discovery-distributed-zookeeper-server</artifactId>
     <packaging>bundle</packaging>
-    <name>Distributed OSGI Distributed Discovery Zookeeper Server Control Bundle</name>
+    <name>Distributed OSGI Distributed Discovery ZooKeeper Server Control Bundle</name>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
@@ -61,7 +61,7 @@
             </exclusions>
         </dependency>
 
-        <!--  We need the newer log4j as the one from zookeeper has some ugly dependencies -->
+        <!--  We need the newer log4j as the one from ZooKeeper has some ugly dependencies -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

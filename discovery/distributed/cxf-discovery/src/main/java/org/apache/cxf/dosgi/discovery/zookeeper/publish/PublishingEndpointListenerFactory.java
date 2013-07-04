@@ -37,26 +37,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Creates local EndpointListeners that publish to Zookeeper.
+ * Creates local EndpointListeners that publish to ZooKeeper.
  */
 public class PublishingEndpointListenerFactory implements ServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListenerFactory.class);
 
     private final BundleContext bctx;
-    private final ZooKeeper zookeeper;
+    private final ZooKeeper zk;
     private final List<PublishingEndpointListener> listeners = new ArrayList<PublishingEndpointListener>();
     private ServiceRegistration serviceRegistration;
 
-    public PublishingEndpointListenerFactory(ZooKeeper zooKeeper, BundleContext bctx) {
+    public PublishingEndpointListenerFactory(ZooKeeper zk, BundleContext bctx) {
         this.bctx = bctx;
-        this.zookeeper = zooKeeper;
+        this.zk = zk;
     }
 
     public Object getService(Bundle b, ServiceRegistration sr) {
         LOG.debug("new EndpointListener from factory");
         synchronized (listeners) {
-            PublishingEndpointListener epl = new PublishingEndpointListener(zookeeper, bctx);
+            PublishingEndpointListener epl = new PublishingEndpointListener(zk, bctx);
             listeners.add(epl);
             return epl;
         }

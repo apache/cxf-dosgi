@@ -48,7 +48,7 @@ public class InterfaceMonitorManager {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceMonitorManager.class);
 
     private final BundleContext bctx;
-    private final ZooKeeper zooKeeper;
+    private final ZooKeeper zk;
     // map of EndpointListeners and the scopes they are interested in
     private final Map<ServiceReference, List<String>> endpointListenerScopes =
             new HashMap<ServiceReference, List<String>>();
@@ -60,9 +60,9 @@ public class InterfaceMonitorManager {
         InterfaceMonitor monitor;
     }
 
-    public InterfaceMonitorManager(BundleContext bctx, ZooKeeper zooKeeper) {
+    public InterfaceMonitorManager(BundleContext bctx, ZooKeeper zk) {
         this.bctx = bctx;
-        this.zooKeeper = zooKeeper;
+        this.zk = zk;
     }
 
     public void addInterest(ServiceReference endpointListener) {
@@ -137,7 +137,7 @@ public class InterfaceMonitorManager {
                 notifyListeners(endpoint, scope, true, interest.endpointListeners);
             }
         };
-        return new InterfaceMonitor(zooKeeper, objClass, endpointListener, scope);
+        return new InterfaceMonitor(zk, objClass, endpointListener, scope);
     }
 
     private void notifyListeners(EndpointDescription endpoint, String currentScope, boolean isAdded,

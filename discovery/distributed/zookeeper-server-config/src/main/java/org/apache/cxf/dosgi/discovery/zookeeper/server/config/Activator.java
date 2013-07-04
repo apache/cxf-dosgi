@@ -46,7 +46,7 @@ public class Activator implements BundleActivator {
             if (System.getProperty(ZOOKEEPER_PORT) == null) {
                 String port = getFreePort();
                 System.setProperty(ZOOKEEPER_PORT, port);
-                LOG.info("Global zookeeper port: {}", port);
+                LOG.info("Global ZooKeeper port: {}", port);
             }
         }
 
@@ -62,9 +62,9 @@ public class Activator implements BundleActivator {
                         String zp = System.getProperty(ZOOKEEPER_PORT);
                         props.put("clientPort", zp);
                         cfg.update(props);
-                        LOG.debug("Set zookeeper client port to {}", zp);
+                        LOG.debug("Set ZooKeeper client port to {}", zp);
                     } catch (IOException e) {
-                        LOG.error("Failed to configure zookeeper server!", e);
+                        LOG.error("Failed to configure ZooKeeper server!", e);
                     }
                 }
                 return svc;
@@ -76,7 +76,7 @@ public class Activator implements BundleActivator {
         ServiceReference[] refs = context.getServiceReferences(ManagedService.class.getName(),
                 "(service.pid=org.apache.cxf.dosgi.discovery.zookeeper)");
         if (refs == null || refs.length == 0) {
-            throw new RuntimeException("This bundle must be started after the bundle with the Zookeeper "
+            throw new RuntimeException("This bundle must be started after the bundle with the ZooKeeper "
                                        + "Discovery Managed Service was started.");
         }
 
@@ -92,7 +92,7 @@ public class Activator implements BundleActivator {
                 context.ungetService(refs[0]);
             }
         }
-        LOG.debug("Passed the zookeeper.host property to the Zookeeper Client managed service.");
+        LOG.debug("Passed the zookeeper.host property to the ZooKeeper Client managed service.");
     }
 
     private String getFreePort() {

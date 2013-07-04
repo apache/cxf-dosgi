@@ -47,7 +47,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
     private PublishingEndpointListenerFactory endpointListenerFactory;
     private ServiceTracker endpointListenerTracker;
     private InterfaceMonitorManager imManager;
-    private ZooKeeper zooKeeper;
+    private ZooKeeper zk;
     private boolean closed;
 
     @SuppressWarnings("rawtypes")
@@ -76,9 +76,9 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
             return;
         }
         LOG.debug("starting ZookeeperDiscovery");
-        endpointListenerFactory = new PublishingEndpointListenerFactory(zooKeeper, bctx);
+        endpointListenerFactory = new PublishingEndpointListenerFactory(zk, bctx);
         endpointListenerFactory.start();
-        imManager = new InterfaceMonitorManager(bctx, zooKeeper);
+        imManager = new InterfaceMonitorManager(bctx, zk);
         EndpointListenerTrackerCustomizer customizer = new EndpointListenerTrackerCustomizer(imManager);
         endpointListenerTracker = new ServiceTracker(bctx, EndpointListener.class.getName(), customizer);
         endpointListenerTracker.open();
@@ -96,11 +96,11 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         if (imManager != null) {
             imManager.close();
         }
-        if (zooKeeper != null) {
+        if (zk != null) {
             try {
-                zooKeeper.close();
+                zk.close();
             } catch (InterruptedException e) {
-                LOG.error("Error closing zookeeper", e);
+                LOG.error("Error closing ZooKeeper", e);
             }
         }
     }
@@ -116,7 +116,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         LOG.debug("ZooKeeper configuration: connecting to {}:{} with timeout {}",
                 new Object[]{host, port, timeout});
         try {
-            zooKeeper = new ZooKeeper(host + ":" + port, timeout, this);
+            zk = new ZooKeeper(host + ":" + port, timeout, this);
         } catch (IOException e) {
             LOG.error("Failed to start the Zookeeper Discovery component.", e);
         }
@@ -126,12 +126,12 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
     public void process(WatchedEvent event) {
         switch (event.getState()) {
         case SyncConnected:
-            LOG.info("Connection to zookeeper established");
+            LOG.info("Connection to ZooKeeper established");
             start();
             break;
 
         case Expired:
-            LOG.info("Connection to zookeeper expired. Trying to create a new connection");
+            LOG.info("Connection to ZooKeeper expired. Trying to create a new connection");
             stop(false);
             createZooKeeper(curConfiguration);
             break;

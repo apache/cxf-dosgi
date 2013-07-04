@@ -150,7 +150,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
             try {
                 super.shutdown();
             } catch (Exception e) {
-                LOG.error("Error shutting down zookeeper", e);
+                LOG.error("Error shutting down ZooKeeper", e);
             }
         }
     }

@@ -45,19 +45,19 @@ import static org.apache.zookeeper.KeeperException.NoNodeException;
 import static org.apache.zookeeper.KeeperException.NodeExistsException;
 
 /**
- * Listens for local Endpoints and publishes them to Zookeeper
+ * Listens for local Endpoints and publishes them to ZooKeeper.
  */
 public class PublishingEndpointListener implements EndpointListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListener.class);
 
-    private final ZooKeeper zookeeper;
+    private final ZooKeeper zk;
     private final ServiceTracker discoveryPluginTracker;
     private final List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
     private boolean closed;
 
-    public PublishingEndpointListener(ZooKeeper zooKeeper, BundleContext bctx) {
-        this.zookeeper = zooKeeper;
+    public PublishingEndpointListener(ZooKeeper zk, BundleContext bctx) {
+        this.zk = zk;
         discoveryPluginTracker = new ServiceTracker(bctx, DiscoveryPlugin.class.getName(), null);
         discoveryPluginTracker.open();
     }
@@ -103,14 +103,14 @@ public class PublishingEndpointListener implements EndpointListener {
             String path = Utils.getZooKeeperPath(name);
             String fullPath = path + '/' + endpointKey;
             LOG.debug("Creating ZooKeeper node: {}", fullPath);
-            ensurePath(path, zookeeper);
+            ensurePath(path, zk);
             createEphemeralNode(fullPath, getData(props));
         }
     }
 
     private void createEphemeralNode(String fullPath, byte[] data) throws KeeperException, InterruptedException {
         try {
-            zookeeper.create(fullPath, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+            zk.create(fullPath, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
         } catch (NodeExistsException nee) {
             // this sometimes happens after a ZooKeeper node dies and the ephemeral node
             // that belonged to the old session was not yet deleted. We need to make our
@@ -118,11 +118,11 @@ public class PublishingEndpointListener implements EndpointListener {
             // we do this by deleting and recreating it ourselves.
             LOG.info("node for endpoint already exists, recreating: {}", fullPath);
             try {
-                zookeeper.delete(fullPath, -1);
+                zk.delete(fullPath, -1);
             } catch (NoNodeException nne) {
                 // it's a race condition, but as long as it got deleted - it's ok
             }
-            zookeeper.create(fullPath, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+            zk.create(fullPath, data, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
         }
     }
 
@@ -155,7 +155,7 @@ public class PublishingEndpointListener implements EndpointListener {
             String fullPath = path + '/' + endpointKey;
             LOG.debug("Removing ZooKeeper node: {}", fullPath);
             try {
-                zookeeper.delete(fullPath, -1);
+                zk.delete(fullPath, -1);
             } catch (Exception e) {
                 LOG.debug("Error while removing endpoint");
             }

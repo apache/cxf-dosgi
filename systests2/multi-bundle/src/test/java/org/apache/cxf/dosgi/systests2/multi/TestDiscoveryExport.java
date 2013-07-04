@@ -97,7 +97,7 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
                 // Ignore
             }
         }
-        Assert.assertNotNull("Zookeeper node " + zNode + " was not found", stat);
+        Assert.assertNotNull("ZooKeeper node " + zNode + " was not found", stat);
     }
 
     protected static InputStream getClientBundle() {
@@ -121,7 +121,7 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
     }
 
     protected void configureZookeeper(ConfigurationAdmin ca, int zkPort) throws IOException {
-        System.out.println("*** Port for Zookeeper Server: " + zkPort);
+        System.out.println("*** Port for ZooKeeper Server: " + zkPort);
         updateZkServerConfig(zkPort, ca);
         updateZkClientConfig(zkPort, ca);
     }
