@@ -38,35 +38,51 @@ public class AbstractDosgiTest {
 
     private static final int TIMEOUT = 20;
 
+    /**
+     * Sleeps for a short interval, throwing an exception if timeout has been reached.
+     * Used to facilitate a retry interval with timeout when used in a loop.
+     *
+     * @param startTime the start time of the entire operation in milliseconds
+     * @param timeout the timeout duration for the entire operation in seconds
+     * @param message the error message to use when timeout occurs
+     * @throws InterruptedException if interrupted while sleeping
+     */
+    private static void sleepOrTimeout(long startTime, long timeout, String message) throws
+            InterruptedException, TimeoutException {
+        timeout *= 1000; // seconds to millis
+        long elapsed = System.currentTimeMillis() - startTime;
+        long remaining = timeout - elapsed;
+        if (remaining <= 0) {
+            throw new TimeoutException(message);
+        }
+        long interval = Math.min(remaining, 1000);
+        Thread.sleep(interval);
+    }
+
     protected ServiceReference waitService(BundleContext bc, Class<?> cls, String filter, int timeout)
         throws Exception {
-        ServiceReference[] refs;
-        for (int i = 0; i < timeout; i++) {
-            refs = bc.getServiceReferences(cls.getName(), filter);
+        System.out.println("Waiting for service: " + cls + " " + filter);
+        long startTime = System.currentTimeMillis();
+        while (true) {
+            ServiceReference[] refs = bc.getServiceReferences(cls.getName(), filter);
             if (refs != null && refs.length > 0) {
                 return refs[0];
             }
-            System.out.println("Waiting for service: " + cls + filter);
-            Thread.sleep(1000);
+            sleepOrTimeout(startTime, timeout, "Service not found: " + cls + " " + filter);
         }
-        throw new Exception("Service not found: " + cls + filter);
-    }
-
-    protected int getIntSysProperty(String key, int defaultValue) {
-        String valueSt = System.getProperty(key);
-        int value = valueSt == null ? 0 : Integer.valueOf(valueSt);
-        return (value > 0) ? value : defaultValue;
     }
 
     protected void waitPort(int port) throws Exception {
-        for (int i = 0; i < TIMEOUT; i++) {
+        System.out.println("Waiting for server to appear on port: " + port);
+        long startTime = System.currentTimeMillis();
+        while (true) {
             Socket s = null;
             try {
                 s = new Socket((String)null, port);
                 // yep, its available
                 return;
             } catch (IOException e) {
-                // wait
+                sleepOrTimeout(startTime, TIMEOUT, "Timeout waiting for port " + port);
             } finally {
                 if (s != null) {
                     try {
@@ -76,10 +92,7 @@ public class AbstractDosgiTest {
                     }
                 }
             }
-            System.out.println("Waiting for server to appear on port: " + port);
-            Thread.sleep(1000);
         }
-        throw new TimeoutException();
     }
 
     protected GreeterService createGreeterServiceProxy(String serviceUri) {
@@ -108,15 +121,17 @@ public class AbstractDosgiTest {
         }
     }
 
-    protected void waitWebPage(String urlSt) throws InterruptedException {
-        int status = 0;
-        int seconds = 0;
+    protected void waitWebPage(String urlSt) throws InterruptedException, TimeoutException {
         System.out.println("Waiting for url " + urlSt);
-        while (status != 200) {
+        long startTime = System.currentTimeMillis();
+        while (true) {
             try {
                 URL url = new URL(urlSt);
                 HttpURLConnection con = (HttpURLConnection)url.openConnection();
-                status = con.getResponseCode();
+                int status = con.getResponseCode();
+                if (status == 200) {
+                    return;
+                }
             } catch (ConnectException e) {
                 // Ignore connection refused
             } catch (MalformedURLException e) {
@@ -124,11 +139,7 @@ public class AbstractDosgiTest {
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
-            Thread.sleep(1000);
-            seconds++;
-            if (seconds > TIMEOUT) {
-                throw new RuntimeException("Timeout waiting for web page " + urlSt);
-            }
+            sleepOrTimeout(startTime, TIMEOUT, "Timeout waiting for web page " + urlSt);
         }
     }
 }
