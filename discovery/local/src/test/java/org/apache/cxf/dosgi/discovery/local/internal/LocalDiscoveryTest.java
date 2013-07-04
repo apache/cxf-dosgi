@@ -165,11 +165,11 @@ public class LocalDiscoveryTest extends TestCase {
         }).anyTimes();
         EasyMock.replay(sr);
 
-        EndpointListener el = EasyMock.createMock(EndpointListener.class);
-        el.endpointAdded((EndpointDescription) EasyMock.anyObject(), EasyMock.eq("(objectClass=*)"));
+        EndpointListener endpointListener = EasyMock.createMock(EndpointListener.class);
+        endpointListener.endpointAdded((EndpointDescription) EasyMock.anyObject(), EasyMock.eq("(objectClass=*)"));
         EasyMock.expectLastCall();
-        EasyMock.replay(el);
-        ld.registerTracker(sr, el);
+        EasyMock.replay(endpointListener);
+        ld.registerTracker(sr, endpointListener);
 
         // Start the bundle
         BundleEvent be = new BundleEvent(BundleEvent.STARTED, bundle);
@@ -179,19 +179,19 @@ public class LocalDiscoveryTest extends TestCase {
         assertEquals("http://somewhere:12345", ed.getId());
         assertSame(bundle, ld.endpointDescriptions.get(ed));
 
-        EasyMock.verify(el);
+        EasyMock.verify(endpointListener);
 
         // Stop the bundle
-        EasyMock.reset(el);
-        el.endpointRemoved((EndpointDescription) EasyMock.anyObject(), EasyMock.eq("(objectClass=*)"));
+        EasyMock.reset(endpointListener);
+        endpointListener.endpointRemoved((EndpointDescription) EasyMock.anyObject(), EasyMock.eq("(objectClass=*)"));
         EasyMock.expectLastCall();
-        EasyMock.replay(el);
+        EasyMock.replay(endpointListener);
 
         BundleEvent be1 = new BundleEvent(BundleEvent.STOPPED, bundle);
         ld.bundleChanged(be1);
         assertEquals(0, ld.endpointDescriptions.size());
 
-        EasyMock.verify(el);
+        EasyMock.verify(endpointListener);
     }
 
     public void testEndpointListenerService() throws Exception {
@@ -305,17 +305,17 @@ public class LocalDiscoveryTest extends TestCase {
         }).anyTimes();
         EasyMock.replay(sr);
 
-        EndpointListener el = EasyMock.createMock(EndpointListener.class);
-        EasyMock.replay(el);
+        EndpointListener endpointListener = EasyMock.createMock(EndpointListener.class);
+        EasyMock.replay(endpointListener);
 
         assertEquals("Precondition failed", 0, ld.listenerToFilters.size());
         assertEquals("Precondition failed", 0, ld.filterToListeners.size());
-        ld.registerTracker(sr, el);
+        ld.registerTracker(sr, endpointListener);
 
         assertEquals(1, ld.listenerToFilters.size());
-        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(el));
+        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(endpointListener));
         assertEquals(1, ld.filterToListeners.size());
-        assertEquals(Collections.singletonList(el), ld.filterToListeners.get("(objectClass=Aaaa)"));
+        assertEquals(Collections.singletonList(endpointListener), ld.filterToListeners.get("(objectClass=Aaaa)"));
 
         // Add another one with the same scope filter
         ServiceReference sr2 = EasyMock.createMock(ServiceReference.class);
@@ -327,16 +327,17 @@ public class LocalDiscoveryTest extends TestCase {
         }).anyTimes();
         EasyMock.replay(sr2);
 
-        EndpointListener el2 = EasyMock.createMock(EndpointListener.class);
-        EasyMock.replay(el2);
-        ld.registerTracker(sr2, el2);
+        EndpointListener endpointListener2 = EasyMock.createMock(EndpointListener.class);
+        EasyMock.replay(endpointListener2);
+        ld.registerTracker(sr2, endpointListener2);
 
         assertEquals(2, ld.listenerToFilters.size());
-        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(el));
-        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(el2));
+        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(endpointListener));
+        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(endpointListener2));
 
         assertEquals(1, ld.filterToListeners.size());
-        assertEquals(Arrays.asList(el, el2), ld.filterToListeners.get("(objectClass=Aaaa)"));
+        List<EndpointListener> endpointListeners12 = Arrays.asList(endpointListener, endpointListener2);
+        assertEquals(endpointListeners12, ld.filterToListeners.get("(objectClass=Aaaa)"));
 
         // Add another listener with a multi-value scope
         final Map<String, Object> props2 = new Hashtable<String, Object>();
@@ -350,28 +351,30 @@ public class LocalDiscoveryTest extends TestCase {
         }).anyTimes();
         EasyMock.replay(sr3);
 
-        EndpointListener el3 = EasyMock.createMock(EndpointListener.class);
-        EasyMock.replay(el3);
-        ld.registerTracker(sr3, el3);
+        EndpointListener endpointListener3 = EasyMock.createMock(EndpointListener.class);
+        EasyMock.replay(endpointListener3);
+        ld.registerTracker(sr3, endpointListener3);
 
         assertEquals(3, ld.listenerToFilters.size());
-        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(el));
-        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(el2));
-        assertEquals(Arrays.asList("(objectClass=X)", "(objectClass=Y)"), ld.listenerToFilters.get(el3));
+        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(endpointListener));
+        assertEquals(Collections.singletonList("(objectClass=Aaaa)"), ld.listenerToFilters.get(endpointListener2));
+        assertEquals(Arrays.asList("(objectClass=X)", "(objectClass=Y)"), ld.listenerToFilters.get(endpointListener3));
 
         assertEquals(3, ld.filterToListeners.size());
-        assertEquals(Arrays.asList(el, el2), ld.filterToListeners.get("(objectClass=Aaaa)"));
-        assertEquals(Collections.singletonList(el3), ld.filterToListeners.get("(objectClass=X)"));
-        assertEquals(Collections.singletonList(el3), ld.filterToListeners.get("(objectClass=Y)"));
+        assertEquals(endpointListeners12, ld.filterToListeners.get("(objectClass=Aaaa)"));
+        assertEquals(Collections.singletonList(endpointListener3), ld.filterToListeners.get("(objectClass=X)"));
+        assertEquals(Collections.singletonList(endpointListener3), ld.filterToListeners.get("(objectClass=Y)"));
     }
 
     public void testClearTracker() throws Exception {
         LocalDiscovery ld = getLocalDiscovery();
 
-        EndpointListener el = EasyMock.createMock(EndpointListener.class);
-        ld.listenerToFilters.put(el, new ArrayList<String>(Arrays.asList("(a=b)", "(objectClass=foo.bar.Bheuaark)")));
-        ld.filterToListeners.put("(a=b)", new ArrayList<EndpointListener>(Arrays.asList(el)));
-        ld.filterToListeners.put("(objectClass=foo.bar.Bheuaark)", new ArrayList<EndpointListener>(Arrays.asList(el)));
+        EndpointListener endpointListener = EasyMock.createMock(EndpointListener.class);
+        ld.listenerToFilters.put(endpointListener,
+                new ArrayList<String>(Arrays.asList("(a=b)", "(objectClass=foo.bar.Bheuaark)")));
+        ld.filterToListeners.put("(a=b)", new ArrayList<EndpointListener>(Arrays.asList(endpointListener)));
+        ld.filterToListeners.put("(objectClass=foo.bar.Bheuaark)",
+                new ArrayList<EndpointListener>(Arrays.asList(endpointListener)));
 
         ld.clearTracker("foobar"); // should not barf
 
@@ -382,7 +385,7 @@ public class LocalDiscoveryTest extends TestCase {
         assertEquals(1, ld.listenerToFilters.size());
         assertEquals(2, ld.filterToListeners.size());
         assertEquals(1, ld.filterToListeners.values().iterator().next().size());
-        ld.clearTracker(el);
+        ld.clearTracker(endpointListener);
         assertEquals(0, ld.listenerToFilters.size());
         assertEquals(2, ld.filterToListeners.size());
         assertEquals(0, ld.filterToListeners.values().iterator().next().size());

@@ -102,36 +102,37 @@ public class LocalDiscovery implements BundleListener {
 
     void registerTracker(ServiceReference reference, Object svc) {
         if (svc instanceof EndpointListener) {
-            EndpointListener listener = (EndpointListener) svc;
-            Collection<String> filters = addListener(reference, listener);
-            triggerCallbacks(filters, listener);
+            EndpointListener endpointListener = (EndpointListener) svc;
+            Collection<String> filters = addListener(reference, endpointListener);
+            triggerCallbacks(filters, endpointListener);
         }
     }
 
     void clearTracker(Object svc) {
         if (svc instanceof EndpointListener) {
-            EndpointListener listener = (EndpointListener) svc;
-            removeListener(listener);
+            EndpointListener endpointListener = (EndpointListener) svc;
+            removeListener(endpointListener);
             // If the tracker was removed or the scope was changed this doesn't require
             // additional callbacks on the tracker. Its the responsibility of the tracker
             // itself to clean up any orphans. See Remote Service Admin spec 122.6.3
         }
     }
 
-    private Collection<String> addListener(ServiceReference reference, EndpointListener listener) {
-        List<String> filters = Utils.getStringPlusProperty(reference, EndpointListener.ENDPOINT_LISTENER_SCOPE);
+    private Collection<String> addListener(ServiceReference endpointListenerRef, EndpointListener endpointListener) {
+        List<String> filters = Utils.getStringPlusProperty(endpointListenerRef,
+                EndpointListener.ENDPOINT_LISTENER_SCOPE);
         if (filters.isEmpty()) {
             return filters;
         }
 
-        listenerToFilters.put(listener, filters);
+        listenerToFilters.put(endpointListener, filters);
         for (String filter : filters) {
             Collection<EndpointListener> listeners = filterToListeners.get(filter);
             if (listeners != null) {
-                listeners.add(listener);
+                listeners.add(endpointListener);
             } else {
                 List<EndpointListener> list = new ArrayList<EndpointListener>();
-                list.add(listener);
+                list.add(endpointListener);
                 filterToListeners.put(filter, list);
             }
         }
@@ -139,16 +140,16 @@ public class LocalDiscovery implements BundleListener {
         return filters;
     }
 
-    private void removeListener(EndpointListener listener) {
-        Collection<String> filters = listenerToFilters.remove(listener);
+    private void removeListener(EndpointListener endpointListener) {
+        Collection<String> filters = listenerToFilters.remove(endpointListener);
         if (filters == null) {
             return;
         }
 
         for (String filter : filters) {
-            Collection<EndpointListener> listeners = filterToListeners.get(filter);
-            if (listeners != null) {
-                listeners.remove(listener);
+            Collection<EndpointListener> endpointListeners = filterToListeners.get(filter);
+            if (endpointListeners != null) {
+                endpointListeners.remove(endpointListener);
             }
         }
     }
@@ -206,23 +207,23 @@ public class LocalDiscovery implements BundleListener {
         }
     }
 
-    private void triggerCallbacks(EndpointListener listener, String toMatch,
+    private void triggerCallbacks(EndpointListener endpointListener, String toMatch,
             EndpointDescription ed, boolean added) {
         if (!Utils.matchFilter(bundleContext, toMatch, ed)) {
             return;
         }
 
         if (added) {
-            listener.endpointAdded(ed, toMatch);
+            endpointListener.endpointAdded(ed, toMatch);
         } else {
-            listener.endpointRemoved(ed, toMatch);
+            endpointListener.endpointRemoved(ed, toMatch);
         }
     }
 
-    private void triggerCallbacks(Collection<String> filters, EndpointListener listener) {
+    private void triggerCallbacks(Collection<String> filters, EndpointListener endpointListener) {
         for (String filter : filters) {
             for (EndpointDescription ed : endpointDescriptions.keySet()) {
-                triggerCallbacks(listener, filter, ed, true);
+                triggerCallbacks(endpointListener, filter, ed, true);
             }
         }
     }

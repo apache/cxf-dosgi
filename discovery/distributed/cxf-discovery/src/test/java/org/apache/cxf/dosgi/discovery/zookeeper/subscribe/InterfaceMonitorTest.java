@@ -48,8 +48,8 @@ public class InterfaceMonitorTest extends TestCase {
         String interf = "es.schaaf.test";
         String node = Utils.getZooKeeperPath(interf);
 
-        EndpointListener epListener = c.createMock(EndpointListener.class);
-        InterfaceMonitor im = new InterfaceMonitor(zk, interf, epListener, scope);
+        EndpointListener endpointListener = c.createMock(EndpointListener.class);
+        InterfaceMonitor im = new InterfaceMonitor(zk, interf, endpointListener, scope);
         zk.exists(eq(node), eq(im), eq(im), EasyMock.anyObject());
         EasyMock.expectLastCall().once();
 

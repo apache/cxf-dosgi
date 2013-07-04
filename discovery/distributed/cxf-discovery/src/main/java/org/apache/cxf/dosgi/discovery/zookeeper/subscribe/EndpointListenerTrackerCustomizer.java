@@ -39,38 +39,38 @@ public class EndpointListenerTrackerCustomizer implements ServiceTrackerCustomiz
         this.imManager = imManager;
     }
 
-    public Object addingService(ServiceReference sref) {
-        updateListenerScopes(sref);
-        return sref;
+    public Object addingService(ServiceReference endpointListener) {
+        updateListenerScopes(endpointListener);
+        return endpointListener;
     }
 
-    public void modifiedService(ServiceReference sref, Object service) {
+    public void modifiedService(ServiceReference endpointListener, Object service) {
         // called when an EndpointListener updates its service properties,
         // e.g. when its interest scope is expanded/reduced
-        updateListenerScopes(sref);
+        updateListenerScopes(endpointListener);
     }
 
-    public void removedService(ServiceReference sref, Object service) {
-        LOG.info("removing EndpointListener interests: {}", sref);
-        imManager.removeInterest(sref);
+    public void removedService(ServiceReference endpointListener, Object service) {
+        LOG.info("removing EndpointListener interests: {}", endpointListener);
+        imManager.removeInterest(endpointListener);
     }
 
-    private void updateListenerScopes(ServiceReference sref) {
-        if (isOurOwnEndpointListener(sref)) {
+    private void updateListenerScopes(ServiceReference endpointListener) {
+        if (isOurOwnEndpointListener(endpointListener)) {
             LOG.debug("Skipping our own EndpointListener");
             return;
         }
 
-        LOG.info("updating EndpointListener interests: {}", sref);
+        LOG.info("updating EndpointListener interests: {}", endpointListener);
         if (LOG.isDebugEnabled()) {
-            LOG.debug("updated EndpointListener properties: {}", Utils.getProperties(sref));
+            LOG.debug("updated EndpointListener properties: {}", Utils.getProperties(endpointListener));
         }
 
-        imManager.addInterest(sref);
+        imManager.addInterest(endpointListener);
     }
 
-    private static boolean isOurOwnEndpointListener(ServiceReference sref) {
+    private static boolean isOurOwnEndpointListener(ServiceReference endpointListener) {
         return Boolean.parseBoolean(String.valueOf(
-                sref.getProperty(ZooKeeperDiscovery.DISCOVERY_ZOOKEEPER_ID)));
+                endpointListener.getProperty(ZooKeeperDiscovery.DISCOVERY_ZOOKEEPER_ID)));
     }
 }

@@ -102,28 +102,28 @@ public class EndpointListenerNotifier {
      * Notifies an endpoint listener about endpoints being added or removed.
      *
      * @param added specifies whether endpoints were added (true) or removed (false)
-     * @param eplReference the ServiceReference of an EndpointListener to notify
+     * @param endpointListenerRef the ServiceReference of an EndpointListener to notify
      * @param endpoints the endpoints the listener should be notified about
      */
-    void notifyListener(boolean added, ServiceReference eplReference,
+    void notifyListener(boolean added, ServiceReference endpointListenerRef,
                                 Collection<EndpointDescription> endpoints) {
-        List<Filter> filters = getFiltersFromEndpointListenerScope(eplReference, bctx);
-        EndpointListener epl = (EndpointListener)bctx.getService(eplReference);
+        List<Filter> filters = getFiltersFromEndpointListenerScope(endpointListenerRef, bctx);
+        EndpointListener endpointListener = (EndpointListener)bctx.getService(endpointListenerRef);
         try {
             LOG.debug("notifyListener (added={})", added);
             for (EndpointDescription endpoint : endpoints) {
                 List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
                 for (Filter filter : matchingFilters) {
                     if (added) {
-                        epl.endpointAdded(endpoint, filter.toString());
+                        endpointListener.endpointAdded(endpoint, filter.toString());
                     } else {
-                        epl.endpointRemoved(endpoint, filter.toString());
+                        endpointListener.endpointRemoved(endpoint, filter.toString());
                     }
                 }
             }
         } finally {
-            if (epl != null) {
-                bctx.ungetService(eplReference);
+            if (endpointListener != null) {
+                bctx.ungetService(endpointListenerRef);
             }
         }
     }

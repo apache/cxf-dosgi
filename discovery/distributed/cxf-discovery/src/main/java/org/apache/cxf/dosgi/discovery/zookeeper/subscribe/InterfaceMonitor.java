@@ -54,18 +54,18 @@ public class InterfaceMonitor implements Watcher, StatCallback {
 
     private final String znode;
     private final ZooKeeper zookeeper;
-    private final EndpointListener listener;
+    private final EndpointListener endpointListener;
     private final boolean recursive;
     private volatile boolean closed;
 
     // This map reference changes, so don't synchronize on it
     private Map<String, EndpointDescription> nodes = new HashMap<String, EndpointDescription>();
 
-    public InterfaceMonitor(ZooKeeper zk, String objClass, EndpointListener listener, String scope) {
+    public InterfaceMonitor(ZooKeeper zk, String objClass, EndpointListener endpointListener, String scope) {
         this.zookeeper = zk;
         this.znode = Utils.getZooKeeperPath(objClass);
         this.recursive = objClass == null || objClass.isEmpty();
-        this.listener = listener;
+        this.endpointListener = endpointListener;
         LOG.debug("Creating new InterfaceMonitor {} for scope [{}] and objectClass [{}]",
                 new Object[] {recursive ? "(recursive)" : "", scope, objClass});
     }
@@ -144,7 +144,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     public synchronized void close() {
         closed = true;
         for (EndpointDescription epd : nodes.values()) {
-            listener.endpointRemoved(epd, null);
+            endpointListener.endpointRemoved(epd, null);
         }
         nodes.clear();
     }
@@ -162,7 +162,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         // whatever is left in prevNodes now has been removed from Discovery
         LOG.debug("processChildren done. Nodes that are missing now and need to be removed: {}", prevNodes.values());
         for (EndpointDescription epd : prevNodes.values()) {
-            listener.endpointRemoved(epd, null);
+            endpointListener.endpointRemoved(epd, null);
         }
         nodes = newNodes;
     }
@@ -196,7 +196,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
                     LOG.debug("Properties: {}", epd.getProperties());
                     if (prevEpd == null) {
                         // This guy is new
-                        listener.endpointAdded(epd, null);
+                        endpointListener.endpointAdded(epd, null);
                     } else if (!prevEpd.getProperties().equals(epd.getProperties())) {
                         // TODO
                     }

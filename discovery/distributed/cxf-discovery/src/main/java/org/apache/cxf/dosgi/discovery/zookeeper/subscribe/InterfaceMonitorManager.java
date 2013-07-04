@@ -50,13 +50,14 @@ public class InterfaceMonitorManager {
     private final BundleContext bctx;
     private final ZooKeeper zooKeeper;
     // map of EndpointListeners and the scopes they are interested in
-    private final Map<ServiceReference, List<String>> listenerScopes = new HashMap<ServiceReference, List<String>>();
+    private final Map<ServiceReference, List<String>> endpointListenerScopes =
+            new HashMap<ServiceReference, List<String>>();
     // map of scopes and their interest data
     private final Map<String, Interest> interests = new HashMap<String, Interest>();
 
     protected static class Interest {
-        List<ServiceReference> listeners = new CopyOnWriteArrayList<ServiceReference>();
-        InterfaceMonitor im;
+        List<ServiceReference> endpointListeners = new CopyOnWriteArrayList<ServiceReference>();
+        InterfaceMonitor monitor;
     }
 
     public InterfaceMonitorManager(BundleContext bctx, ZooKeeper zooKeeper) {
@@ -64,49 +65,49 @@ public class InterfaceMonitorManager {
         this.zooKeeper = zooKeeper;
     }
 
-    public void addInterest(ServiceReference sref) {
-        for (String scope : Utils.getScopes(sref)) {
+    public void addInterest(ServiceReference endpointListener) {
+        for (String scope : Utils.getScopes(endpointListener)) {
             String objClass = Utils.getObjectClass(scope);
             LOG.debug("Adding interest in scope {}, objectClass {}", scope, objClass);
-            addInterest(sref, scope, objClass);
+            addInterest(endpointListener, scope, objClass);
         }
     }
 
-    public synchronized void addInterest(ServiceReference sref, String scope, String objClass) {
+    public synchronized void addInterest(ServiceReference endpointListener, String scope, String objClass) {
         // get or create interest for given scope and add listener to it
         Interest interest = interests.get(scope);
         if (interest == null) {
             // create interest, add listener and start monitor
             interest = new Interest();
             interests.put(scope, interest);
-            interest.listeners.add(sref); // add it before monitor starts so we don't miss events
-            interest.im = createInterfaceMonitor(scope, objClass, interest);
-            interest.im.start();
+            interest.endpointListeners.add(endpointListener); // add it before monitor starts so we don't miss events
+            interest.monitor = createInterfaceMonitor(scope, objClass, interest);
+            interest.monitor.start();
         } else {
             // interest already exists, so just add listener to it
-            if (!interest.listeners.contains(sref)) {
-                interest.listeners.add(sref);
+            if (!interest.endpointListeners.contains(endpointListener)) {
+                interest.endpointListeners.add(endpointListener);
             }
             // notify listener of all known endpoints for given scope
             // (as EndpointListener contract requires of all added/modified listeners)
-            for (EndpointDescription endpoint : interest.im.getEndpoints()) {
-                notifyListeners(endpoint, scope, true, Arrays.asList(sref));
+            for (EndpointDescription endpoint : interest.monitor.getEndpoints()) {
+                notifyListeners(endpoint, scope, true, Arrays.asList(endpointListener));
             }
         }
 
         // add scope to listener's scopes list
-        List<String> scopes = listenerScopes.get(sref);
+        List<String> scopes = endpointListenerScopes.get(endpointListener);
         if (scopes == null) {
             scopes = new ArrayList<String>(1);
-            listenerScopes.put(sref, scopes);
+            endpointListenerScopes.put(endpointListener, scopes);
         }
         if (!scopes.contains(scope)) {
             scopes.add(scope);
         }
     }
 
-    public synchronized void removeInterest(ServiceReference sref) {
-        List<String> scopes = listenerScopes.get(sref);
+    public synchronized void removeInterest(ServiceReference endpointListener) {
+        List<String> scopes = endpointListenerScopes.get(endpointListener);
         if (scopes == null) {
             return;
         }
@@ -114,73 +115,73 @@ public class InterfaceMonitorManager {
         for (String scope : scopes) {
             Interest interest = interests.get(scope);
             if (interest != null) {
-                interest.listeners.remove(sref);
-                if (interest.listeners.isEmpty()) {
-                    interest.im.close();
+                interest.endpointListeners.remove(endpointListener);
+                if (interest.endpointListeners.isEmpty()) {
+                    interest.monitor.close();
                     interests.remove(scope);
                 }
             }
         }
-        listenerScopes.remove(sref);
+        endpointListenerScopes.remove(endpointListener);
     }
 
     private InterfaceMonitor createInterfaceMonitor(final String scope, String objClass, final Interest interest) {
         // holding this object's lock in the callbacks can lead to a deadlock with InterfaceMonitor
-        EndpointListener listener = new EndpointListener() {
+        EndpointListener endpointListener = new EndpointListener() {
 
             public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
-                notifyListeners(endpoint, scope, false, interest.listeners);
+                notifyListeners(endpoint, scope, false, interest.endpointListeners);
             }
 
             public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
-                notifyListeners(endpoint, scope, true, interest.listeners);
+                notifyListeners(endpoint, scope, true, interest.endpointListeners);
             }
         };
-        return new InterfaceMonitor(zooKeeper, objClass, listener, scope);
+        return new InterfaceMonitor(zooKeeper, objClass, endpointListener, scope);
     }
 
     private void notifyListeners(EndpointDescription epd, String currentScope, boolean isAdded,
-            List<ServiceReference> listeners) {
-        for (ServiceReference sref : listeners) {
-            Object service = bctx.getService(sref);
+            List<ServiceReference> endpointListeners) {
+        for (ServiceReference endpointListenerRef : endpointListeners) {
+            Object service = bctx.getService(endpointListenerRef);
             try {
                 if (service instanceof EndpointListener) {
-                    EndpointListener epl = (EndpointListener) service;
+                    EndpointListener endpointListener = (EndpointListener) service;
                     LOG.trace("matching {} against {}", epd, currentScope);
                     if (matchFilter(bctx, currentScope, epd)) {
                         LOG.debug("Matched {} against {}", epd, currentScope);
-                        notifyListener(epd, currentScope, isAdded, sref.getBundle(), epl);
+                        notifyListener(epd, currentScope, isAdded, endpointListenerRef.getBundle(), endpointListener);
                     }
                 }
             } finally {
                 if (service != null) {
-                    bctx.ungetService(sref);
+                    bctx.ungetService(endpointListenerRef);
                 }
             }
         }
     }
 
     private void notifyListener(EndpointDescription epd, String currentScope, boolean isAdded,
-                                Bundle eplBundle, EndpointListener epl) {
-        if (eplBundle == null) {
+                                Bundle endpointListenerBundle, EndpointListener endpointListener) {
+        if (endpointListenerBundle == null) {
             LOG.info("listening service was unregistered, ignoring");
         } else if (isAdded) {
-            LOG.info("calling EndpointListener.endpointAdded: " + epl + " from bundle "
-                    + eplBundle.getSymbolicName() + " for endpoint: " + epd);
-            epl.endpointAdded(epd, currentScope);
+            LOG.info("calling EndpointListener.endpointAdded: " + endpointListener + " from bundle "
+                    + endpointListenerBundle.getSymbolicName() + " for endpoint: " + epd);
+            endpointListener.endpointAdded(epd, currentScope);
         } else {
-            LOG.info("calling EndpointListener.endpointRemoved: " + epl + " from bundle "
-                    + eplBundle.getSymbolicName() + " for endpoint: " + epd);
-            epl.endpointRemoved(epd, currentScope);
+            LOG.info("calling EndpointListener.endpointRemoved: " + endpointListener + " from bundle "
+                    + endpointListenerBundle.getSymbolicName() + " for endpoint: " + epd);
+            endpointListener.endpointRemoved(epd, currentScope);
         }
     }
 
     public synchronized void close() {
         for (Interest interest : interests.values()) {
-            interest.im.close();
+            interest.monitor.close();
         }
         interests.clear();
-        listenerScopes.clear();
+        endpointListenerScopes.clear();
     }
 
     /**
@@ -193,7 +194,7 @@ public class InterfaceMonitorManager {
     /**
      * Only for test case!
      */
-    protected synchronized Map<ServiceReference, List<String>> getListenerScopes() {
-        return listenerScopes;
+    protected synchronized Map<ServiceReference, List<String>> getEndpointListenerScopes() {
+        return endpointListenerScopes;
     }
 }
