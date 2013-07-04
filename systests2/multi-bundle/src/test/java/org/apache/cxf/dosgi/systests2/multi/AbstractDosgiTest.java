@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.systests2.multi;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -103,9 +104,9 @@ public class AbstractDosgiTest {
         return (GreeterService)factory.create();
     }
 
-    protected Bundle getBundleByName(BundleContext bc, String sn) {
+    protected Bundle getBundleByName(BundleContext bc, String name) {
         for (Bundle bundle : bc.getBundles()) {
-            if (bundle.getSymbolicName().equals(sn)) {
+            if (bundle.getSymbolicName().equals(name)) {
                 return bundle;
             }
         }
@@ -113,8 +114,10 @@ public class AbstractDosgiTest {
     }
 
     protected int getFreePort() throws IOException {
-        ServerSocket socket = new ServerSocket(0);
+        ServerSocket socket = new ServerSocket();
         try {
+            socket.setReuseAddress(true); // enables quickly reopening socket on same port
+            socket.bind(new InetSocketAddress(0)); // zero finds a free port
             return socket.getLocalPort();
         } finally {
             socket.close();
@@ -123,11 +126,12 @@ public class AbstractDosgiTest {
 
     protected void waitWebPage(String urlSt) throws InterruptedException, TimeoutException {
         System.out.println("Waiting for url " + urlSt);
+        HttpURLConnection con = null;
         long startTime = System.currentTimeMillis();
         while (true) {
             try {
                 URL url = new URL(urlSt);
-                HttpURLConnection con = (HttpURLConnection)url.openConnection();
+                con = (HttpURLConnection)url.openConnection();
                 int status = con.getResponseCode();
                 if (status == 200) {
                     return;
@@ -138,6 +142,10 @@ public class AbstractDosgiTest {
                 throw new RuntimeException(e.getMessage(), e);
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
+            } finally {
+                if (con != null) {
+                    con.disconnect();
+                }
             }
             sleepOrTimeout(startTime, TIMEOUT, "Timeout waiting for web page " + urlSt);
         }
