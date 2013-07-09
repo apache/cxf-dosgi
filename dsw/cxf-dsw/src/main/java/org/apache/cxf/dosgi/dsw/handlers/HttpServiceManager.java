@@ -99,7 +99,7 @@ public class HttpServiceManager {
         return (HttpService) service;
     }
 
-    public String getServletContextRoot(Map<?, ?> sd, Class<?> iClass) {
+    public String getServletContextRoot(Map<?, ?> sd) {
         return OsgiUtils.getFirstNonEmptyStringProperty(sd,
                 Constants.WS_HTTP_SERVICE_CONTEXT,
                 Constants.WS_HTTP_SERVICE_CONTEXT_OLD,
@@ -144,7 +144,7 @@ public class HttpServiceManager {
         return "/" + type.getName().replace('.', '/');
     }
 
-    protected String getAbsoluteAddress(BundleContext ctx, String contextRoot, String relativeEndpointAddress) {
+    protected String getAbsoluteAddress(String contextRoot, String relativeEndpointAddress) {
         if (relativeEndpointAddress.startsWith("http")) {
             return relativeEndpointAddress;
         }

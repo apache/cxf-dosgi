@@ -94,7 +94,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
                                      Object serviceBean) throws IntentUnsatisfiedException {
         try {
             String address = getPojoAddress(sd, iClass);
-            String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
+            String contextRoot = httpServiceManager.getServletContextRoot(sd);
 
             ServerFactoryBean factory = createServerFactoryBean(sd, iClass);
             factory.setDataBinding(getDataBinding(sd, iClass));
@@ -109,7 +109,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             setWsdlProperties(factory, callingContext, sd, false);
             String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
 
-            String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(dswContext, contextRoot, address);
+            String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
 
             // The properties for the EndpointDescription
             Map<String, Object> endpointProps = createEndpointProps(sd, iClass,

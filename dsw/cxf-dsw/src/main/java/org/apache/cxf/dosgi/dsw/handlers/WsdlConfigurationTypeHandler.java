@@ -116,7 +116,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         }
 
         String address = getServerAddress(sd, iClass);
-        String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
+        String contextRoot = httpServiceManager.getServletContextRoot(sd);
         if (address == null && contextRoot == null) {
             throw new RuntimeException("Remote address is unavailable");
         }

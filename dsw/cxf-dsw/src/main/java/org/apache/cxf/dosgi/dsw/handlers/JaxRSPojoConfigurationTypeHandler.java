@@ -102,7 +102,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         } else {
             bean.setServiceClass(iClass);
         }
-        List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, endpoint.getProperties());
+        List<Object> providers = JaxRSUtils.getProviders(callingContext, endpoint.getProperties());
         if (providers != null && !providers.isEmpty()) {
             bean.setProviders(providers);
         }
@@ -115,7 +115,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
                                      BundleContext callingContext,
                                      Map<String, Object> sd, Class<?> iClass,
                                      Object serviceBean) throws IntentUnsatisfiedException {
-        String contextRoot = httpServiceManager.getServletContextRoot(sd, iClass);
+        String contextRoot = httpServiceManager.getServletContextRoot(sd);
         String address;
         if (contextRoot == null) {
             address = getServerAddress(sd, iClass);
@@ -132,9 +132,8 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         LOG.info("Creating a " + iClass.getName()
                  + " endpoint via JaxRSPojoConfigurationTypeHandler, address is " + address);
 
-        JAXRSServerFactoryBean factory = createServerFactory(dswContext, callingContext, sd,
-                                                             iClass, serviceBean, address, bus);
-        String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(dswContext, contextRoot, address);
+        JAXRSServerFactoryBean factory = createServerFactory(callingContext, sd, iClass, serviceBean, address, bus);
+        String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
 
         // The properties for the EndpointDescription
         Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {Constants.RS_CONFIG_TYPE},
@@ -157,8 +156,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         }
     }
 
-    private JAXRSServerFactoryBean createServerFactory(BundleContext dswContext,
-                                                       BundleContext callingContext,
+    private JAXRSServerFactoryBean createServerFactory(BundleContext callingContext,
                                                        Map<String, Object> sd,
                                                        Class<?> iClass,
                                                        Object serviceBean,
@@ -177,7 +175,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
             factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
         }
         factory.setAddress(address);
-        List<Object> providers = JaxRSUtils.getProviders(callingContext, dswContext, sd);
+        List<Object> providers = JaxRSUtils.getProviders(callingContext, sd);
         if (providers != null && !providers.isEmpty()) {
             factory.setProviders(providers);
         }

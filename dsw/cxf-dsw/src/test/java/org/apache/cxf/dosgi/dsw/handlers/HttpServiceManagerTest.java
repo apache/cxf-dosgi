@@ -53,10 +53,10 @@ public class HttpServiceManagerTest extends TestCase {
         HttpServiceManager manager = new HttpServiceManager(bundleContext, null, null, null);
         String localIp = LocalHostUtil.getLocalIp();
 
-        String address1 = manager.getAbsoluteAddress(bundleContext, null, "/myservice");
+        String address1 = manager.getAbsoluteAddress(null, "/myservice");
         assertEquals("http://" + localIp + ":8181/cxf/myservice", address1);
 
-        String address2 = manager.getAbsoluteAddress(bundleContext, "/mycontext", "/myservice");
+        String address2 = manager.getAbsoluteAddress("/mycontext", "/myservice");
         assertEquals("http://" + localIp + ":8181/mycontext/myservice", address2);
 
         c.verify();
