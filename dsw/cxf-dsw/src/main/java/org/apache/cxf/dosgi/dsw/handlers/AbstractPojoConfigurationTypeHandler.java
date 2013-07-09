@@ -172,7 +172,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         return new QName(ns, portName);
     }
 
-    protected String getClientAddress(Map<String, Object> sd, Class<?> iClass) {
+    protected String getClientAddress(Map<String, Object> sd) {
         return OsgiUtils.getFirstNonEmptyStringProperty(sd, RemoteConstants.ENDPOINT_ID,
                                                         Constants.WS_ADDRESS_PROPERTY,
                                                         Constants.WS_ADDRESS_PROPERTY_OLD,
@@ -182,7 +182,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
     protected String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
         String address;
         try {
-            address = getClientAddress(sd, iClass);
+            address = getClientAddress(sd);
         } catch (RuntimeException e) {
             LOG.error(e.getMessage(), e);
             return null;
@@ -210,7 +210,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         addInterceptors(factory, callingContext, sd, Constants.WS_OUT_FAULT_INTERCEPTORS_PROP_KEY);
         addInterceptors(factory, callingContext, sd, Constants.WS_IN_FAULT_INTERCEPTORS_PROP_KEY);
         addFeatures(factory, callingContext, sd, Constants.WS_FEATURES_PROP_KEY);
-        addContextProperties(factory, callingContext, sd, Constants.WS_CONTEXT_PROPS_PROP_KEY);
+        addContextProperties(factory, sd, Constants.WS_CONTEXT_PROPS_PROP_KEY);
     }
 
     static void addRsInterceptorsFeaturesProps(AbstractEndpointFactory factory, BundleContext callingContext,
@@ -220,7 +220,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         addInterceptors(factory, callingContext, sd, Constants.RS_OUT_FAULT_INTERCEPTORS_PROP_KEY);
         addInterceptors(factory, callingContext, sd, Constants.RS_IN_FAULT_INTERCEPTORS_PROP_KEY);
         addFeatures(factory, callingContext, sd, Constants.RS_FEATURES_PROP_KEY);
-        addContextProperties(factory, callingContext, sd, Constants.RS_CONTEXT_PROPS_PROP_KEY);
+        addContextProperties(factory, sd, Constants.RS_CONTEXT_PROPS_PROP_KEY);
     }
 
     private static void addInterceptors(AbstractEndpointFactory factory, BundleContext callingContext,
@@ -252,8 +252,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         }
     }
 
-    private static void addContextProperties(AbstractEndpointFactory factory, BundleContext callingContext,
-                                             Map<String, Object> sd, String propName) {
+    private static void addContextProperties(AbstractEndpointFactory factory, Map<String, Object> sd, String propName) {
         @SuppressWarnings("unchecked")
         Map<String, Object> props = (Map<String, Object>)sd.get(propName);
         if (props != null) {

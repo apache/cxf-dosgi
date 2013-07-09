@@ -56,7 +56,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     public Object createProxy(ServiceReference sref, BundleContext dswContext, BundleContext callingContext,
                               Class<?> iClass, EndpointDescription endpoint) throws IntentUnsatisfiedException {
         Map<String, Object> sd = endpoint.getProperties();
-        String address = getClientAddress(sd, iClass);
+        String address = getClientAddress(sd);
         if (address == null) {
             LOG.warn("Remote address is unavailable");
             // TODO: fire Event
@@ -123,7 +123,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     private String getPojoAddress(Map<String, Object> sd, Class<?> iClass) {
-        String address = getClientAddress(sd, iClass);
+        String address = getClientAddress(sd);
         if (address != null) {
             return address;
         }

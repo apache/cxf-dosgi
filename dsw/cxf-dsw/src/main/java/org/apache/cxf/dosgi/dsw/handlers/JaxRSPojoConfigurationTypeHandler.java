@@ -120,7 +120,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         if (contextRoot == null) {
             address = getServerAddress(sd, iClass);
         } else {
-            address = getClientAddress(sd, iClass);
+            address = getClientAddress(sd);
             if (address == null) {
                 address = "/";
             }
