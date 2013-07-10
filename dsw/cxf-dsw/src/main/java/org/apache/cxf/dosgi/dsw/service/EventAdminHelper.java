@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.util.Dictionary;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -44,8 +44,7 @@ public class EventAdminHelper {
         bctx = bc;
     }
 
-    @SuppressWarnings("rawtypes")
-    private Event createEvent(Properties props, String type) {
+    private Event createEvent(Map<String, Object> props, String type) {
         String topic = "org/osgi/service/remoteserviceadmin/" + type;
         props.put("bundle", bctx.getBundle());
         props.put("bundle.id", bctx.getBundle().getBundleId());
@@ -55,13 +54,13 @@ public class EventAdminHelper {
         Version v = version != null ? new Version(version) : Version.emptyVersion;
         setIfNotNull(props, "bundle.version", v);
 
-        return new Event(topic, (Dictionary)props);
+        return new Event(topic, props);
     }
 
     public void notifyEventAdmin(RemoteServiceAdminEvent rsae) {
         String topic = remoteServiceAdminEventTypeToString(rsae.getType());
 
-        Properties props = new Properties();
+        Map<String, Object> props = new HashMap<String, Object>();
         setIfNotNull(props, "cause", rsae.getException());
 
         EndpointDescription endpoint = null;

@@ -53,34 +53,31 @@ public class ClassUtilsTest extends TestCase {
 
     public void testLoadProvidersAsString() throws Exception {
         BundleContext bc = mockBundleContext();
-        List<Object> providers = ClassUtils
-            .loadProviderClasses(bc, Collections.singletonMap("providers",
-                                Provider.class.getName()), "providers");
+        Map<String, Object> sd = Collections.<String, Object>singletonMap("providers", Provider.class.getName());
+        List<Object> providers = ClassUtils.loadProviderClasses(bc, sd, "providers");
         assertEquals(1, providers.size());
         assertTrue(providers.get(0) instanceof Provider);
     }
 
     public void testLoadProvidersAsStringArray() throws Exception {
         BundleContext bc = mockBundleContext();
-        List<Object> providers = ClassUtils
-           .loadProviderClasses(bc, Collections.singletonMap("providers",
-               new String[]{Provider.class.getName()}), "providers");
+        Map<String, Object> sd = Collections.<String, Object>singletonMap("providers",
+                new String[]{Provider.class.getName()});
+        List<Object> providers = ClassUtils.loadProviderClasses(bc, sd, "providers");
         assertEquals(1, providers.size());
         assertTrue(providers.get(0) instanceof Provider);
     }
 
     public void testLoadProvidersAsObject() throws Exception {
-        List<Object> providers = ClassUtils.loadProviderClasses(null,
-            Collections.singletonMap("providers", new Provider()),
-                "providers");
+        Map<String, Object> sd = Collections.<String, Object>singletonMap("providers", new Provider());
+        List<Object> providers = ClassUtils.loadProviderClasses(null, sd, "providers");
         assertEquals(1, providers.size());
         assertTrue(providers.get(0) instanceof Provider);
     }
 
     public void testLoadProvidersAsObjectArray() throws Exception {
-        List<Object> providers = ClassUtils.loadProviderClasses(null,
-            Collections.singletonMap("providers",
-                new Object[]{new Provider()}), "providers");
+        Map<String, Object> sd = Collections.<String, Object>singletonMap("providers", new Object[]{new Provider()});
+        List<Object> providers = ClassUtils.loadProviderClasses(null, sd, "providers");
         assertEquals(1, providers.size());
         assertTrue(providers.get(0) instanceof Provider);
     }
@@ -88,8 +85,8 @@ public class ClassUtilsTest extends TestCase {
     public void testLoadProvidersAsObjectList() throws Exception {
         List<Object> list = new LinkedList<Object>();
         list.add(new Provider());
-        List<Object> providers = ClassUtils.loadProviderClasses(null,
-            Collections.singletonMap("providers", list), "providers");
+        Map<String, Object> sd = Collections.<String, Object>singletonMap("providers", list);
+        List<Object> providers = ClassUtils.loadProviderClasses(null, sd, "providers");
         assertEquals(1, providers.size());
         assertTrue(providers.get(0) instanceof Provider);
     }
@@ -97,9 +94,8 @@ public class ClassUtilsTest extends TestCase {
     public void testLoadProvidersAsStringList() throws Exception {
         List<Object> list = new LinkedList<Object>();
         list.add(Provider.class.getName());
-        List<Object> providers = ClassUtils.loadProviderClasses(
-            mockBundleContext(),
-            Collections.singletonMap("providers", list), "providers");
+        Map<String, Object> sd = Collections.<String, Object>singletonMap("providers", list);
+        List<Object> providers = ClassUtils.loadProviderClasses(mockBundleContext(), sd, "providers");
         assertEquals(1, providers.size());
         assertTrue(providers.get(0) instanceof Provider);
     }

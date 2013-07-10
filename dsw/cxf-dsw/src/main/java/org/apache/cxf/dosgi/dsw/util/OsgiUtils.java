@@ -42,10 +42,7 @@ public final class OsgiUtils {
     private OsgiUtils() {
     }
 
-    // TODO : move these property helpers into PropertyUtils?
-
-    @SuppressWarnings("rawtypes")
-    public static boolean getBooleanProperty(Map sd, String name) {
+    public static boolean getBooleanProperty(Map<String, Object> sd, String name) {
         return toBoolean(sd.get(name));
     }
 
@@ -71,13 +68,12 @@ public final class OsgiUtils {
         return getProperty(endpoint.getProperties(), name);
     }
 
-    @SuppressWarnings("rawtypes")
-    public static String getProperty(Map dict, String name) {
-        Object o = dict.get(name);
-        return o instanceof String ? (String) o : null;
+    public static String getProperty(Map<String, Object> dict, String name) {
+        Object value = dict.get(name);
+        return value instanceof String ? (String) value : null;
     }
 
-    public static String getFirstNonEmptyStringProperty(@SuppressWarnings("rawtypes") Map dict, String ... keys) {
+    public static String getFirstNonEmptyStringProperty(Map<String, Object> dict, String ... keys) {
         for (String key : keys) {
             String value = getProperty(dict, key);
             if (value != null) {

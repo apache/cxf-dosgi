@@ -38,7 +38,6 @@ public class UtilsTest extends TestCase {
         assertEquals(Utils.PATH_PREFIX, Utils.getZooKeeperPath(""));
     }
 
-    @SuppressWarnings("unchecked")
     public void testGetStringPlusProperty() {
         String[] out = Utils.getStringPlusProperty("MyString");
         assertEquals(1, out.length);

@@ -38,8 +38,7 @@ public final class IntentUtils {
         // never constructed
     }
 
-    @SuppressWarnings("rawtypes")
-    public static String[] getIntentsImplementedByTheService(Map serviceProperties) {
+    public static String[] getIntentsImplementedByTheService(Map<String, Object> serviceProperties) {
         // Get the Intents that are implemented by the service
         return Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_INTENTS));
     }
@@ -63,7 +62,7 @@ public final class IntentUtils {
         return list.toArray(new String[list.size()]);
     }
 
-    public static Set<String> getRequestedIntents(Map<?, ?> sd) {
+    public static Set<String> getRequestedIntents(Map<String, Object> sd) {
         Collection<String> intents = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
         Collection<String> intents2
             = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));

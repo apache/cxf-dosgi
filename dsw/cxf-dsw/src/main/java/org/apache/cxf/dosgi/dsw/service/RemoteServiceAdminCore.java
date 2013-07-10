@@ -74,6 +74,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         this.configTypeHandlerFactory = configTypeHandlerFactory;
     }
 
+    @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<ExportRegistration> exportService(ServiceReference serviceReference, Map additionalProperties)
         throws IllegalArgumentException, UnsupportedOperationException {
@@ -272,6 +273,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         return bctx.getBundle().equals(sref.getBundle()); // sref bundle can be null
     }
 
+    @Override
     public Collection<ExportReference> getExportedServices() {
         synchronized (exportedServices) {
             List<ExportReference> ers = new ArrayList<ExportReference>();
@@ -284,6 +286,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         }
     }
 
+    @Override
     public Collection<ImportReference> getImportedEndpoints() {
         synchronized (importedServices) {
             List<ImportReference> irs = new ArrayList<ImportReference>();
@@ -299,6 +302,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     /**
      * Importing form here...
      */
+    @Override
     public ImportRegistration importService(EndpointDescription endpoint) {
         LOG.debug("importService() Endpoint: {}", endpoint.getProperties());
 

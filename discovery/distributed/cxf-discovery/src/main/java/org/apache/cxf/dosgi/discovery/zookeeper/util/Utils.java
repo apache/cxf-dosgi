@@ -107,15 +107,13 @@ public final class Utils {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    public static String getProp(Dictionary props, String key, String def) {
-        Object val = props.get(key);
+    public static <K, V> String getProp(Dictionary<K, V> props, String key, String def) {
+        V val = props.get(key);
         return val == null ? def : val.toString();
     }
 
-    @SuppressWarnings("rawtypes")
-    public static int getProp(Dictionary props, String key, int def) {
-        Object val = props.get(key);
+    public static <K, V> int getProp(Dictionary<K, V> props, String key, int def) {
+        V val = props.get(key);
         return val == null ? def : Integer.parseInt(val.toString());
     }
 

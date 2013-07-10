@@ -30,7 +30,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointPermission;
+import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
+import org.osgi.service.remoteserviceadmin.ImportReference;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
@@ -48,28 +50,30 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
         rsaCore = core;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List /* ExportRegistration */exportService(final ServiceReference ref, final Map properties) {
+    @Override
+    @SuppressWarnings("rawtypes")
+    public List<ExportRegistration> exportService(final ServiceReference ref, final Map properties) {
         checkPermission(new EndpointPermission("*", EndpointPermission.EXPORT));
-        return AccessController.doPrivileged(new PrivilegedAction<List>() {
+        return AccessController.doPrivileged(new PrivilegedAction<List<ExportRegistration>>() {
             public List<ExportRegistration> run() {
                 return closed ? Collections.<ExportRegistration>emptyList() : rsaCore.exportService(ref, properties);
             }
         });
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public Collection getExportedServices() {
+    @Override
+    public Collection<ExportReference> getExportedServices() {
         checkPermission(new EndpointPermission("*", EndpointPermission.READ));
         return closed ? null : rsaCore.getExportedServices();
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public Collection getImportedEndpoints() {
+    @Override
+    public Collection<ImportReference> getImportedEndpoints() {
         checkPermission(new EndpointPermission("*", EndpointPermission.READ));
         return closed ? null : rsaCore.getImportedEndpoints();
     }
 
+    @Override
     public ImportRegistration importService(final EndpointDescription endpoint) {
         checkPermission(new EndpointPermission(endpoint, OsgiUtils.getUUID(bctx), EndpointPermission.IMPORT));
         return AccessController.doPrivileged(new PrivilegedAction<ImportRegistration>() {

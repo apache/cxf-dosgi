@@ -53,8 +53,7 @@ public final class JaxRSUtils {
         // never constructed
     }
 
-    @SuppressWarnings("rawtypes")
-    static List<Object> getProviders(BundleContext callingContext, Map sd) {
+    static List<Object> getProviders(BundleContext callingContext, Map<String, Object> sd) {
         List<Object> providers = new ArrayList<Object>();
         if ("aegis".equals(sd.get(org.apache.cxf.dosgi.dsw.Constants.RS_DATABINDING_PROP_KEY))) {
             providers.add(new AegisElementProvider());

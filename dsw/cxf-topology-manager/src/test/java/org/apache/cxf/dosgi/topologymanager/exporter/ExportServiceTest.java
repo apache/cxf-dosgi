@@ -49,7 +49,6 @@ public class ExportServiceTest {
      *
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void testServiceExport() throws Exception {
         IMocksControl c = EasyMock.createControl();

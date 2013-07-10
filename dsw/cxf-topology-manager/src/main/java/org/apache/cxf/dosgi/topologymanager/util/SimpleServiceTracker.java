@@ -114,7 +114,6 @@ public class SimpleServiceTracker<T> extends ServiceTracker {
      *
      * @return all currently tracked services
      */
-    @SuppressWarnings("unchecked")
     public List<T> getAllServices() {
         return new ArrayList<T>(services.values());
     }

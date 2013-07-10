@@ -86,10 +86,9 @@ public final class Utils {
         return map;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static void setIfNotNull(Dictionary dict, String key, Object val) {
+    public static <K, V> void setIfNotNull(Map<K, V> map, K key, V val) {
         if (val != null) {
-            dict.put(key, val);
+            map.put(key, val);
         }
     }
 }

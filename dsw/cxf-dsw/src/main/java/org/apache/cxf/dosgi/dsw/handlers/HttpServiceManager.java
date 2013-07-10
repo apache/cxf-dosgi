@@ -99,7 +99,7 @@ public class HttpServiceManager {
         return (HttpService) service;
     }
 
-    public String getServletContextRoot(Map<?, ?> sd) {
+    public String getServletContextRoot(Map<String, Object> sd) {
         return OsgiUtils.getFirstNonEmptyStringProperty(sd,
                 Constants.WS_HTTP_SERVICE_CONTEXT,
                 Constants.WS_HTTP_SERVICE_CONTEXT_OLD,
