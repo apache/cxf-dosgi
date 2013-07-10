@@ -180,13 +180,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
     }
 
     protected String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
-        String address;
-        try {
-            address = getClientAddress(sd);
-        } catch (RuntimeException e) {
-            LOG.error(e.getMessage(), e);
-            return null;
-        }
+        String address = getClientAddress(sd);
         return address == null ? httpServiceManager.getDefaultAddress(iClass) : address;
     }
 
