@@ -1,0 +1,63 @@
+Welcome to the Apache CXF Distributed OSGi DSW Reference Implementation
+=======================================================================
+
+
+The dOSGi subproject of Apache CXF provides the Reference Implementation
+of the Remote Services Specification version 1.0, Chapter 13 in the OSGi
+Compendium Specification, and OSGi Remote Service Admin Specification
+version 1.0, Chapter 122 in the OSGi Enterprise Specification[1].
+
+
+This release is provided for your convenience in three different
+distribution formats:
+
+1. Multi-bundle distro: cxf-dosgi-ri-multibundle-distribution-1.2.{tar.gaz|zip}
+
+Contains the dOSGi implementation and all 3rd party dependencies as
+separate bundles within an archive. The current distribution is an
+instance of this type. The easiest way to get started is to explode
+this archive into your Felix or Equinox installation tree. Then
+append the contents of the felix.config.properties.append or
+equinox.config.ini.append snippets found in the conf directory to
+your felix.config.properties or equinox.config.ini. This will cause
+all the required bundles to be loaded on start-up. The bundles required
+for the Zookeeper-based Discovery Service implementation are also provided
+in this distribution, and similarly may be automatically loaded by
+appending the felix.discovery.config.properties.append or
+equinox.discovery.config.ini.append snippets as appropriate.
+
+
+2. Single-bundle distro: cxf-dosgi-ri-singlebundle-distribution-1.2.jar
+
+Contains the dOSGi implementation and all 3rd party dependencies wrapped
+in a single OSGi bundle so as to allow direct installation in your favourite
+OSGi container in one fell swoop.
+
+
+3. Source distro: cxf-dosgi-ri-source-distribution-1.2.{tar.gz|zip}
+
+Contains the entire source tree for dOSGi.
+
+
+The best starting point for using dOSGi is the Getting Started Guide[2].
+
+Also note the very detailed walk-through of the greeter demo[3].
+
+If you need more help, or want to provide any feedback, please feel free
+to drop us a note on the CXF dev or users list[4].
+
+If you trip over any problems with dOSGi, don't hesitate to submit an issue
+to the CXF JIRA[5] with the component set to "Distributed-OSGi".
+
+
+Thanks for using dOSGi!
+
+Regards,
+The CXF dOSGi team.
+
+
+[1] see chapter 122 http://www.osgi.org/Download/Release4V42
+[2] http://cxf.apache.org/distributed-osgi.html#DistributedOSGi-GettingStarted
+[3] http://cxf.apache.org/distributed-osgi-greeter-demo-walkthrough.htm
+[4] http://cxf.apache.org/mailing-lists.html
+[5] https://issues.apache.org/jira/browse/CXF
