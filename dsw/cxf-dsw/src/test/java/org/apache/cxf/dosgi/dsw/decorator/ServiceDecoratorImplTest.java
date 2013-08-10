@@ -37,10 +37,15 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
 public class ServiceDecoratorImplTest extends TestCase {
+    private static final Map<String, Object> EMPTY = new HashMap<String, Object>();
+    private static final URL RES_SD = getResource("/test-resources/sd.xml");
+    private static final URL RES_SD1 = getResource("/test-resources/sd1.xml");
+    private static final URL RES_SD2 = getResource("/test-resources/sd2.xml");
+    private static final URL RES_SD0 = getResource("/test-resources/sd0.xml");
+    private static final URL RES_SD_1 = getResource("/test-resources/sd-1.xml");
 
     public void testGetDecoratorElements() {
-        URL sdURL = getValidResource("/test-resources/sd.xml");
-        Enumeration<URL> urls = Collections.enumeration(Collections.singletonList(sdURL));
+        Enumeration<URL> urls = Collections.enumeration(Collections.singletonList(RES_SD));
 
         List<Element> elements = ServiceDecoratorImpl.getDecorationElementsForEntries(urls);
         assertEquals(1, elements.size());
@@ -54,16 +59,11 @@ public class ServiceDecoratorImplTest extends TestCase {
     }
 
     public void testAddRemoveDecorations() {
-        URL res = getValidResource("/test-resources/sd.xml");
         final Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.acme.foo.Bar"});
         serviceProps.put("test.prop", "xyz");
 
-        Bundle b = EasyMock.createMock(Bundle.class);
-        EasyMock.expect(b.findEntries("OSGI-INF/remote-service", "*.xml", false))
-                .andReturn(Collections.enumeration(Arrays.asList(res))).anyTimes();
-        EasyMock.replay(b);
-
+        Bundle b = createBundleContaining(RES_SD);
         ServiceDecoratorImpl sd = new ServiceDecoratorImpl();
         assertEquals("Precondition failed", 0, sd.decorations.size());
         sd.addDecorations(b);
@@ -88,116 +88,86 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertEquals(0, sd.decorations.size());
         Map<String, Object> target2 = new HashMap<String, Object>();
         sd.decorate(sref, target2);
-        Map<String, Object> expected2 = new HashMap<String, Object>();
-        assertEquals(expected2, target2);
+        assertEquals(EMPTY, target2);
     }
 
     public void testAddDecorations() {
-        URL res = getValidResource("/test-resources/sd.xml");
         final Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.acme.foo.Bar"});
         serviceProps.put("test.prop", "xyz");
 
-        Map<String, Object> target = testDecorate(serviceProps, res);
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("test.too", "ahaha");
-        assertEquals(expected, target);
+        assertDecorate(serviceProps, expected, RES_SD);
     }
 
     public void testAddDecorations1() {
-        URL r1 = getValidResource("/test-resources/sd1.xml");
-        URL r2 = getValidResource("/test-resources/sd2.xml");
-
         Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.A"});
 
-        Map<String, Object> actual = testDecorate(serviceProps, r1, r2);
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("A", "B");
         expected.put("C", 2);
-        assertEquals(expected, actual);
+        assertDecorate(serviceProps, expected, RES_SD1, RES_SD2);
     }
 
     public void testAddDecorations2() {
-        URL r1 = getValidResource("/test-resources/sd1.xml");
-        URL r2 = getValidResource("/test-resources/sd2.xml");
-
         Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.D"});
 
-        Map<String, Object> actual = testDecorate(serviceProps, r1, r2);
-        Map<String, Object> expected = new HashMap<String, Object>();
-        assertEquals(expected, actual);
+        assertDecorate(serviceProps, EMPTY, RES_SD1, RES_SD2);
     }
 
     public void testAddDecorations3() {
-        URL r1 = getValidResource("/test-resources/sd1.xml");
-        URL r2 = getValidResource("/test-resources/sd2.xml");
-
         Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.B"});
         serviceProps.put("x", "y");
 
-        Map<String, Object> actual = testDecorate(serviceProps, r1, r2);
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("bool", Boolean.TRUE);
-        assertEquals(expected, actual);
+        assertDecorate(serviceProps, expected, RES_SD1, RES_SD2);
     }
 
     public void testAddDecorations4() {
-        URL r1 = getValidResource("/test-resources/sd1.xml");
-        URL r2 = getValidResource("/test-resources/sd2.xml");
-
         Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.C"});
         serviceProps.put("x", "z");
 
-        Map<String, Object> actual = testDecorate(serviceProps, r1, r2);
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("bool", Boolean.FALSE);
-        assertEquals(expected, actual);
+        assertDecorate(serviceProps, expected, RES_SD1, RES_SD2);
     }
 
     public void testAddDecorations5() {
-        URL r1 = getValidResource("/test-resources/sd1.xml");
-        URL r2 = getValidResource("/test-resources/sd2.xml");
-
         Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.C"});
         serviceProps.put("x", "x");
 
-        Map<String, Object> actual = testDecorate(serviceProps, r1, r2);
-        Map<String, Object> expected = new HashMap<String, Object>();
-        assertEquals(expected, actual);
+        assertDecorate(serviceProps, EMPTY, RES_SD1, RES_SD2);
     }
 
     public void testAddDecorations6() {
-        URL r1 = getValidResource("/test-resources/sd0.xml");
-
         Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.D"});
 
-        Map<String, Object> actual = testDecorate(serviceProps, r1);
-        Map<String, Object> expected = new HashMap<String, Object>();
-        assertEquals(expected, actual);
+        assertDecorate(serviceProps, EMPTY, RES_SD0);
     }
 
     public void testAddDecorations7() {
-        URL r1 = getValidResource("/test-resources/sd-1.xml");
-
         Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.D"});
 
-        Map<String, Object> actual = testDecorate(serviceProps, r1);
-        Map<String, Object> expected = new HashMap<String, Object>();
+        assertDecorate(serviceProps, EMPTY, RES_SD_1);
+    }
+    
+    private void assertDecorate(final Map<String, Object> serviceProps, 
+                                Map<String, Object> expected, URL ... resources) {
+        Map<String, Object> actual = testDecorate(serviceProps, resources);
         assertEquals(expected, actual);
     }
 
     private Map<String, Object> testDecorate(final Map<String, Object> serviceProps, URL ... resources) {
-        Bundle b = EasyMock.createMock(Bundle.class);
-        EasyMock.expect(b.findEntries("OSGI-INF/remote-service", "*.xml", false)).andReturn(
-            Collections.enumeration(Arrays.asList(resources))).anyTimes();
-        EasyMock.replay(b);
+        Bundle b = createBundleContaining(resources);
 
         ServiceDecoratorImpl sd = new ServiceDecoratorImpl();
         sd.addDecorations(b);
@@ -214,9 +184,15 @@ public class ServiceDecoratorImplTest extends TestCase {
         return target;
     }
 
+    private Bundle createBundleContaining(URL... resources) {
+        Bundle b = EasyMock.createMock(Bundle.class);
+        EasyMock.expect(b.findEntries("OSGI-INF/remote-service", "*.xml", false)).andReturn(
+            Collections.enumeration(Arrays.asList(resources))).anyTimes();
+        EasyMock.replay(b);
+        return b;
+    }
 
-    
-    private URL getValidResource(String path) {
+    private static URL getResource(String path) {
         URL resource = ServiceDecoratorImplTest.class.getResource(path);
         Assert.assertNotNull("Resource " + path + " not found!", resource);
         return resource;
