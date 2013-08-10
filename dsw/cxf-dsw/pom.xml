@@ -33,15 +33,6 @@
 
     <properties>
         <topDirectoryLocation>../..</topDirectoryLocation>
-        <bundle.import.package>
-            org.osgi.service.remoteserviceadmin;version="[${remote.service.admin.interfaces.version},2.0)",
-            javax.servlet*;version="[0.0,4)",
-            javax.xml.ws*;version="[2.1,3)",
-            *
-        </bundle.import.package>
-        <bundle.export.package>
-            org.apache.cxf.dosgi.*;version="${project.version}"
-        </bundle.export.package>
     </properties>
 
     <dependencies>
@@ -119,8 +110,15 @@
                         <Bundle-Description>The CXF Remote Service Admin as described in the OSGi Remote Service Admin specification</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
-                        <Import-Package>${bundle.import.package}</Import-Package>
-                        <Export-Package>${bundle.export.package}</Export-Package>
+                        <Import-Package>
+                            org.osgi.service.remoteserviceadmin;version="[${remote.service.admin.interfaces.version},2.0)",
+                            javax.servlet*;version="[0.0,4)",
+                            javax.xml.ws*;version="[2.1,3)",
+                            *
+                        </Import-Package>
+                        <Export-Package>
+                            !*
+                        </Export-Package>
                         <Bundle-Activator>org.apache.cxf.dosgi.dsw.Activator</Bundle-Activator>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

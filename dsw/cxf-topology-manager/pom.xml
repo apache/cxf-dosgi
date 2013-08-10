@@ -33,13 +33,6 @@
 
     <properties>
         <topDirectoryLocation>../..</topDirectoryLocation>
-        <bundle.import.package>
-            org.osgi.service.remoteserviceadmin;version="[${remote.service.admin.interfaces.version},2)",
-            *
-        </bundle.import.package>
-        <bundle.export.package>
-            !*
-        </bundle.export.package>
     </properties>
 
     <dependencies>
@@ -86,8 +79,13 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
                         <Bundle-Activator>org.apache.cxf.dosgi.topologymanager.Activator</Bundle-Activator>
-                        <Import-Package>${bundle.import.package}</Import-Package>
-                        <Export-Package>${bundle.export.package}</Export-Package>
+                        <Import-Package>
+                            org.osgi.service.remoteserviceadmin;version="[${remote.service.admin.interfaces.version},2)",
+                            *
+                        </Import-Package>
+                        <Export-Package>
+                            !*
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>

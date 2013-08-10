@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
+import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorBundleListener;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.HttpServiceManager;
@@ -40,6 +41,7 @@ import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
@@ -59,6 +61,7 @@ public class Activator implements ManagedService, BundleActivator {
     private IntentTracker intentTracker;
     private HttpServiceManager httpServiceManager;
     private BundleContext bc;
+    private BundleListener bundleListener;
 
     public void start(BundleContext bundlecontext) throws Exception {
         LOG.debug("RemoteServiceAdmin Implementation is starting up");
@@ -89,7 +92,10 @@ public class Activator implements ManagedService, BundleActivator {
                   obtainSupportedConfigTypes(configTypeHandlerFactory.getSupportedConfigurationTypes()));
         LOG.info("Registering RemoteServiceAdminFactory...");
         rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
-        decoratorReg = bc.registerService(ServiceDecorator.class.getName(), new ServiceDecoratorImpl(bc), null);
+        ServiceDecoratorImpl serviceDecorator = new ServiceDecoratorImpl();
+        bundleListener = new ServiceDecoratorBundleListener(serviceDecorator);
+        bc.addBundleListener(bundleListener);
+        decoratorReg = bc.registerService(ServiceDecorator.class.getName(), serviceDecorator, null);
     }
 
     // The CT sometimes uses the first element returned to register a service, but
@@ -114,11 +120,7 @@ public class Activator implements ManagedService, BundleActivator {
 
     public void stop(BundleContext context) throws Exception {
         LOG.debug("RemoteServiceAdmin Implementation is shutting down now");
-        uninit();
-        shutdownCXFBus();
-    }
-
-    private synchronized void uninit() {
+        bc.removeBundleListener(bundleListener);
         intentTracker.close();
         // This also triggers the unimport and unexport of the remote services
         rsaFactoryReg.unregister();
@@ -128,6 +130,7 @@ public class Activator implements ManagedService, BundleActivator {
         intentTracker = null;
         rsaFactoryReg = null;
         decoratorReg = null;
+        shutdownCXFBus();
     }
 
     /**
@@ -146,7 +149,16 @@ public class Activator implements ManagedService, BundleActivator {
         LOG.debug("RemoteServiceAdmin Implementation configuration is updated with {}", config);
         if (config != null) {
             try {
-                uninit();
+                bc.removeBundleListener(bundleListener);
+                intentTracker.close();
+                // This also triggers the unimport and unexport of the remote services
+                rsaFactoryReg.unregister();
+                decoratorReg.unregister();
+                httpServiceManager.close();
+                httpServiceManager = null;
+                intentTracker = null;
+                rsaFactoryReg = null;
+                decoratorReg = null;
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
             }

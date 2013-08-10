@@ -31,9 +31,6 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,18 +40,6 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceDecoratorImpl.class);
 
     final List<Rule> decorations = new CopyOnWriteArrayList<Rule>();
-    private final BundleContext bundleContext;
-    private final BundleListenerImpl bundleListener;
-
-    public ServiceDecoratorImpl(BundleContext bc) {
-        bundleContext = bc;
-        bundleListener = new BundleListenerImpl();
-        bc.addBundleListener(bundleListener);
-    }
-
-    public void shutdown() {
-        bundleContext.removeBundleListener(bundleListener);
-    }
 
     public void decorate(ServiceReference sref, Map<String, Object> target) {
         for (Rule matcher : decorations) {
@@ -81,16 +66,25 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     static List<Element> getDecorationElements(Bundle bundle) {
         Enumeration entries = bundle.findEntries("OSGI-INF/remote-service", "*.xml", false);
+        return getDecorationElementsForEntries(entries);
+    }
+
+    /**
+     * Only for tests
+     * @param entries
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    static List<Element> getDecorationElementsForEntries(Enumeration<URL> entries) {
         if (entries == null) {
             return Collections.emptyList();
         }
-
         List<Element> elements = new ArrayList<Element>();
         while (entries.hasMoreElements()) {
-            URL resourceURL = (URL) entries.nextElement();
+            URL resourceURL = entries.nextElement();
             try {
                 Document d = new SAXBuilder().build(resourceURL.openStream());
                 Namespace ns = Namespace.getNamespace("http://cxf.apache.org/xmlns/service-decoration/1.0.0");
@@ -106,20 +100,6 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         for (Rule r : decorations) {
             if (bundle.equals(r.getBundle())) {
                 decorations.remove(r); // the iterator doesn't support 'remove'
-            }
-        }
-    }
-
-    private class BundleListenerImpl implements BundleListener {
-        public void bundleChanged(BundleEvent be) {
-            switch(be.getType()) {
-            case BundleEvent.STARTED:
-                addDecorations(be.getBundle());
-                break;
-            case BundleEvent.STOPPING:
-                removeDecorations(be.getBundle());
-                break;
-            default:
             }
         }
     }
