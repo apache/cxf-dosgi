@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.cxf.dosgi.discovery.local.util.EndpointUtils;
 import org.apache.cxf.dosgi.discovery.local.util.Utils;
+import org.apache.cxf.dosgi.endpointdesc.EndpointDescriptionBundleParser;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -50,9 +50,11 @@ public class LocalDiscovery implements BundleListener {
         new HashMap<String, Collection<EndpointListener>>();
     final BundleContext bundleContext;
 
+    EndpointDescriptionBundleParser bundleParser;
     ServiceTracker listenerTracker;
 
     public LocalDiscovery(BundleContext bc) {
+        this.bundleParser = new EndpointDescriptionBundleParser();
         bundleContext = bc;
 
         listenerTracker = new ServiceTracker(bundleContext, EndpointListener.class.getName(), null) {
@@ -173,7 +175,7 @@ public class LocalDiscovery implements BundleListener {
     }
 
     private void findDeclaredRemoteServices(Bundle bundle) {
-        List<EndpointDescription> endpoints = EndpointUtils.getAllEndpointDescriptions(bundle);
+        List<EndpointDescription> endpoints = bundleParser.getAllEndpointDescriptions(bundle);
         for (EndpointDescription endpoint : endpoints) {
             endpointDescriptions.put(endpoint, bundle);
             addedEndpointDescription(endpoint);

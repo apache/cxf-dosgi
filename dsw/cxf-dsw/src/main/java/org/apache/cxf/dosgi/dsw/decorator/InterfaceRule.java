@@ -51,7 +51,7 @@ public class InterfaceRule implements Rule {
     public synchronized void addProperty(String name, String value, String type) {
         Object obj = value;
 
-        if (!String.class.getName().equals(type)) {
+        if (type != null && !String.class.getName().equals(type)) {
             try {
                 Class<?> cls = getClass().getClassLoader().loadClass(type);
                 Constructor<?> ctor = cls.getConstructor(new Class[] {String.class});

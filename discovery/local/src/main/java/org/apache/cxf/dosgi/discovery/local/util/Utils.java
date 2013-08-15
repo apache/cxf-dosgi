@@ -18,12 +18,21 @@
  */
 package org.apache.cxf.dosgi.discovery.local.util;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -88,5 +97,29 @@ public final class Utils {
             LOG.error("Problem creating a Filter from " + filter, e);
             return false;
         }
+    }
+    
+    public static String normXML(String s) {
+        String s2 = stripComment(s);
+        String s3 = stripProlog(s2);
+        try {
+            TransformerFactory transFactory = TransformerFactory.newInstance();
+            Transformer transformer = transFactory.newTransformer();
+            StringWriter buffer = new StringWriter();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.transform(new StreamSource(new StringReader(s3)), new StreamResult(buffer));
+            return buffer.toString();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private static String stripComment(String s) {
+        return Pattern.compile("<!--(.*?)-->", Pattern.DOTALL).matcher(s).replaceAll("");
+    }
+
+    private static String stripProlog(String s) {
+        return s.replaceAll("<\\?(.*?)\\?>", "");
     }
 }

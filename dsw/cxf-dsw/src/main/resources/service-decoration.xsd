@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<schema targetNamespace="http://cxf.apache.org/xmlns/service-decoration/1.0.0" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://cxf.apache.org/xmlns/service-decoration/1.0.0">
+    <element name="service-decorations" type="tns:ServiceDecorationsType"></element>
+
+    <complexType name="ServiceDecorationsType">
+        <sequence>
+            <element maxOccurs="unbounded" minOccurs="0"
+                ref="tns:service-decoration">
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="ServiceDecorationType">
+        <sequence>
+            <element maxOccurs="unbounded" minOccurs="0"
+                ref="tns:match">
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="MatchType">
+        <sequence>
+            <element maxOccurs="unbounded" minOccurs="0"
+                ref="tns:match-property">
+            </element>
+            <element maxOccurs="unbounded" minOccurs="0"
+                ref="tns:add-property">
+            </element>
+        </sequence>
+        <attribute name="interface" type="string"></attribute>
+    </complexType>
+
+    <complexType name="MatchPropertyType">
+        <attribute name="name" type="string"></attribute>
+        <attribute name="value" type="string"></attribute>
+    </complexType>
+
+    <complexType name="AddPropertyType">
+        <attribute name="name" type="string"></attribute>
+        <attribute name="value" type="string"></attribute>
+        <attribute name="type" type="string"></attribute>
+    </complexType>
+    <element name="service-decoration"
+        type="tns:ServiceDecorationType">
+    </element>
+    <element name="match" type="tns:MatchType"></element>
+    <element name="match-property" type="tns:MatchPropertyType"></element>
+    <element name="add-property" type="tns:AddPropertyType"></element>
+</schema>

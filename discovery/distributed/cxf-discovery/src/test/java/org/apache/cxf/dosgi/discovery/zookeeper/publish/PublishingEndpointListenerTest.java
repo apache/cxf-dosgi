@@ -25,6 +25,8 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.endpointdesc.EndpointDescriptionParser;
+import org.apache.cxf.dosgi.endpointdesc.PropertiesMapper;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs.Ids;
@@ -40,6 +42,8 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+import org.osgi.xmlns.rsa.v1_0.EndpointDescriptionType;
+import org.osgi.xmlns.rsa.v1_0.PropertyType;
 
 public class PublishingEndpointListenerTest extends TestCase {
 
@@ -124,9 +128,14 @@ public class PublishingEndpointListenerTest extends TestCase {
 
         final ZooKeeper zk = EasyMock.createNiceMock(ZooKeeper.class);
         String expectedFullPath = "/osgi/service_registry/org/foo/myClass/some.machine#9876##test";
+        
+        List<PropertyType> props2 = new PropertiesMapper().fromProps(expectedProps);
+        EndpointDescriptionType epd = new EndpointDescriptionType();
+        epd.getProperty().addAll(props2);
+        byte[] data = new EndpointDescriptionParser().getData(epd);
         EasyMock.expect(zk.create(
                 EasyMock.eq(expectedFullPath),
-                EasyMock.aryEq(PublishingEndpointListener.getData(expectedProps)),
+                EasyMock.aryEq(data),
                 EasyMock.eq(Ids.OPEN_ACL_UNSAFE),
                 EasyMock.eq(CreateMode.EPHEMERAL))).andReturn("");
         EasyMock.replay(zk);

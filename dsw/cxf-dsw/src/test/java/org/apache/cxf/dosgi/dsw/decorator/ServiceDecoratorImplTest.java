@@ -21,9 +21,7 @@ package org.apache.cxf.dosgi.dsw.decorator;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -31,7 +29,6 @@ import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.jdom.Element;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
@@ -43,20 +40,6 @@ public class ServiceDecoratorImplTest extends TestCase {
     private static final URL RES_SD2 = getResource("/test-resources/sd2.xml");
     private static final URL RES_SD0 = getResource("/test-resources/sd0.xml");
     private static final URL RES_SD_1 = getResource("/test-resources/sd-1.xml");
-
-    public void testGetDecoratorElements() {
-        Enumeration<URL> urls = Collections.enumeration(Collections.singletonList(RES_SD));
-
-        List<Element> elements = ServiceDecoratorImpl.getDecorationElementsForEntries(urls);
-        assertEquals(1, elements.size());
-        assertEquals("service-decoration", elements.get(0).getName());
-        assertEquals("http://cxf.apache.org/xmlns/service-decoration/1.0.0", elements.get(0).getNamespaceURI());
-    }
-
-    public void testGetDecoratorElements2() {
-        List<Element> elements = ServiceDecoratorImpl.getDecorationElementsForEntries(null);
-        assertEquals(0, elements.size());
-    }
 
     public void testAddRemoveDecorations() {
         final Map<String, Object> serviceProps = new HashMap<String, Object>();

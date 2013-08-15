@@ -75,8 +75,6 @@
         <slf4j.version>1.6.4</slf4j.version>
         <felix.plugin.version>2.4.0</felix.plugin.version>
         <exam.version>2.6.0</exam.version>
-        <jdom.version>1.1.2_1</jdom.version>
-
         <cxf.resources.base.path />
         <cxf.checkstyle.extension />
     </properties>

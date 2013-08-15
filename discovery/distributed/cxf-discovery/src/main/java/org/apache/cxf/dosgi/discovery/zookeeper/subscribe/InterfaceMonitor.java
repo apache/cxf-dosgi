@@ -18,13 +18,15 @@
  */
 package org.apache.cxf.dosgi.discovery.zookeeper.subscribe;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.discovery.local.util.EndpointUtils;
 import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
+import org.apache.cxf.dosgi.endpointdesc.EndpointDescriptionParser;
+import org.apache.cxf.dosgi.endpointdesc.PropertiesMapper;
 import org.apache.zookeeper.AsyncCallback.StatCallback;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.Code;
@@ -34,6 +36,7 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
+import org.osgi.xmlns.rsa.v1_0.EndpointDescriptionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,11 +64,14 @@ public class InterfaceMonitor implements Watcher, StatCallback {
     // This map reference changes, so don't synchronize on it
     private Map<String, EndpointDescription> nodes = new HashMap<String, EndpointDescription>();
 
+    private EndpointDescriptionParser parser;
+
     public InterfaceMonitor(ZooKeeper zk, String objClass, EndpointListener endpointListener, String scope) {
         this.zk = zk;
         this.znode = Utils.getZooKeeperPath(objClass);
         this.recursive = objClass == null || objClass.isEmpty();
         this.endpointListener = endpointListener;
+        this.parser = new EndpointDescriptionParser();
         LOG.debug("Creating new InterfaceMonitor {} for scope [{}] and objectClass [{}]",
                 new Object[] {recursive ? "(recursive)" : "", scope, objClass});
     }
@@ -230,7 +236,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
             byte[] data = zk.getData(node, false, null);
             LOG.debug("Got data for node: {}", node);
 
-            EndpointDescription endpoint = EndpointUtils.getFirstEnpointDescription(data);
+            EndpointDescription endpoint = getFirstEnpointDescription(data);
             if (endpoint != null) {
                 return endpoint;
             }
@@ -239,5 +245,14 @@ public class InterfaceMonitor implements Watcher, StatCallback {
             LOG.error("Problem getting EndpointDescription from node " + node, e);
         }
         return null;
+    }
+
+    public EndpointDescription getFirstEnpointDescription(byte[] data) {
+        List<EndpointDescriptionType> elements = parser.getEndpointDescriptions(new ByteArrayInputStream(data));
+        if (elements.isEmpty()) {
+            return null;
+        }
+        Map<String, Object> props = new PropertiesMapper().toProps(elements.get(0).getProperty());
+        return new EndpointDescription(props);
     }
 }

@@ -28,21 +28,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.discovery.local.util.EndpointUtils;
 import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
+import org.apache.cxf.dosgi.endpointdesc.EndpointDescriptionParser;
+import org.apache.cxf.dosgi.endpointdesc.PropertiesMapper;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.apache.zookeeper.KeeperException.NodeExistsException;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooKeeper;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.xmlns.rsa.v1_0.EndpointDescriptionType;
+import org.osgi.xmlns.rsa.v1_0.PropertyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.zookeeper.KeeperException.NoNodeException;
-import static org.apache.zookeeper.KeeperException.NodeExistsException;
 
 /**
  * Listens for local Endpoints and publishes them to ZooKeeper.
@@ -56,10 +58,13 @@ public class PublishingEndpointListener implements EndpointListener {
     private final List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
     private boolean closed;
 
+    private final EndpointDescriptionParser endpointDescriptionParser;
+
     public PublishingEndpointListener(ZooKeeper zk, BundleContext bctx) {
         this.zk = zk;
         discoveryPluginTracker = new ServiceTracker(bctx, DiscoveryPlugin.class.getName(), null);
         discoveryPluginTracker.open();
+        endpointDescriptionParser = new EndpointDescriptionParser();
     }
 
     public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
@@ -104,7 +109,11 @@ public class PublishingEndpointListener implements EndpointListener {
             String fullPath = path + '/' + endpointKey;
             LOG.debug("Creating ZooKeeper node: {}", fullPath);
             ensurePath(path, zk);
-            createEphemeralNode(fullPath, getData(props));
+            List<PropertyType> propsOut = new PropertiesMapper().fromProps(props);
+            EndpointDescriptionType epd = new EndpointDescriptionType();
+            epd.getProperty().addAll(propsOut);
+            byte[] epData = endpointDescriptionParser.getData(epd);
+            createEphemeralNode(fullPath, epData);
         }
     }
 
@@ -174,10 +183,6 @@ public class PublishingEndpointListener implements EndpointListener {
                 // it's not the first node with this path to ever exist - that's normal
             }
         }
-    }
-
-    static byte[] getData(Map<String, Object> props) {
-        return EndpointUtils.getEndpointDescriptionXML(props).getBytes();
     }
 
     static String getKey(String endpoint) throws URISyntaxException {
