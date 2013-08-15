@@ -44,6 +44,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -60,12 +61,16 @@ import static org.junit.Assert.assertTrue;
 public class RemoteServiceAdminCoreTest {
 
     @Test
-    public void testDontExportOwnServiceProxies() {
+    public void testDontExportOwnServiceProxies() throws InvalidSyntaxException {
         IMocksControl c = EasyMock.createControl();
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
 
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
+        bc.addServiceListener(EasyMock.<ServiceListener>anyObject(), EasyMock.<String>anyObject());
+        EasyMock.expectLastCall().anyTimes();
+        bc.removeServiceListener(EasyMock.<ServiceListener>anyObject());
+        EasyMock.expectLastCall().anyTimes();
 
         Dictionary<String, String> d = new Hashtable<String, String>();
         EasyMock.expect(b.getHeaders()).andReturn(d).anyTimes();
@@ -171,6 +176,8 @@ public class RemoteServiceAdminCoreTest {
         BundleContext bc = EasyMock.createMock(BundleContext.class);
         EasyMock.expect(bc.getProperty(Constants.FRAMEWORK_VERSION)).andReturn(null).anyTimes();
         bc.addServiceListener(EasyMock.<ServiceListener>anyObject(), EasyMock.<String>anyObject());
+        EasyMock.expectLastCall().anyTimes();
+        bc.removeServiceListener(EasyMock.<ServiceListener>anyObject());
         EasyMock.expectLastCall().anyTimes();
         EasyMock.expect(bc.getServiceReferences(EasyMock.<String>anyObject(),
                                                 EasyMock.<String>anyObject())).andReturn(null).anyTimes();

@@ -40,6 +40,9 @@ import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -67,11 +70,26 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private final BundleContext bctx;
     private final EventProducer eventProducer;
     private final ConfigTypeHandlerFactory configTypeHandlerFactory;
+    private final ServiceListener exportedServiceListener;
 
     public RemoteServiceAdminCore(BundleContext bc, ConfigTypeHandlerFactory configTypeHandlerFactory) {
         this.bctx = bc;
         this.eventProducer = new EventProducer(bctx);
         this.configTypeHandlerFactory = configTypeHandlerFactory;
+        // listen for exported services being unregistered so we can close the export
+        this.exportedServiceListener = new ServiceListener() {
+            public void serviceChanged(ServiceEvent event) {
+                if (event.getType() == ServiceEvent.UNREGISTERING) {
+                    removeServiceExports(event.getServiceReference());
+                }
+            }
+        };
+        try {
+            String filter = "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)";
+            bc.addServiceListener(exportedServiceListener, filter);
+        } catch (InvalidSyntaxException ise) {
+            throw new RuntimeException(ise); // can never happen
+        }
     }
 
     @Override
@@ -166,15 +184,15 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 ExportResult exportResult = handler.createServer(serviceReference, bctx, bundle.getBundleContext(),
                     serviceProperties, interfaceClass, service);
                 EndpointDescription endpoint = new EndpointDescription(exportResult.getEndpointProps());
-                ExportRegistrationImpl exportRegistration = new ExportRegistrationImpl(
-                        serviceReference, endpoint, this);
+                ExportRegistrationImpl exportRegistration;
                 if (exportResult.getException() == null) {
                     LOG.info("created server for interface " + iface);
-                    exportRegistration.setServer(exportResult.getServer());
-                    exportRegistration.startServiceTracker(bctx);
+                    exportRegistration = new ExportRegistrationImpl(serviceReference, endpoint, this,
+                            exportResult.getServer());
                 } else {
                     LOG.error("failed to create server for interface " + iface, exportResult.getException());
-                    exportRegistration.setException(exportResult.getException());
+                    exportRegistration = new ExportRegistrationImpl(serviceReference, endpoint, this,
+                            exportResult.getException());
                 }
                 exportRegs.add(exportRegistration);
             }
@@ -387,8 +405,38 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
     /**
-     * Removes the provided Export Registration from the internal management structures -> intended to be used
-     * when the export Registration is closed
+     * Removes and closes all exports for the given service.
+     * This is called when the service is unregistered.
+     *
+     * @param sref the service whose exports should be removed and closed
+     */
+    protected void removeServiceExports(ServiceReference sref) {
+        List<ExportRegistration> regs = new ArrayList<ExportRegistration>(1);
+        synchronized (exportedServices) {
+            for (Iterator<Collection<ExportRegistration>> it = exportedServices.values().iterator(); it.hasNext();) {
+                Collection<ExportRegistration> value = it.next();
+                for (Iterator<ExportRegistration> it2 = value.iterator(); it2.hasNext();) {
+                    ExportRegistration er = it2.next();
+                    if (er.getExportReference().getExportedService().equals(sref)) {
+                        regs.add(er);
+                    }
+                }
+            }
+            // do this outside of iteration to avoid concurrent modification
+            for (ExportRegistration er : regs) {
+                LOG.debug("closing export for service {}", sref);
+                er.close();
+            }
+        }
+
+    }
+
+    /**
+     * Removes the provided Export Registration from the internal management structures.
+     * This is called from the ExportRegistration itself when it is closed (so should
+     * not attempt to close it again here).
+     *
+     * @param eri the export registration to remove
      */
     protected void removeExportRegistration(ExportRegistrationImpl eri) {
         synchronized (exportedServices) {
@@ -458,5 +506,10 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 importedServices.remove(iri.getImportedEndpointAlways());
             }
         }
+    }
+
+    public void close() {
+        removeImportRegistrations();
+        bctx.removeServiceListener(exportedServiceListener);
     }
 }

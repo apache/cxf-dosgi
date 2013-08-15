@@ -24,6 +24,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.cxf.endpoint.Server;
 import org.easymock.IAnswer;
 import org.easymock.classextension.EasyMock;
 import org.junit.Assert;
@@ -113,14 +114,14 @@ public class EventProducerTest {
         EasyMock.replay(bc);
         EventProducer eventProducer = new EventProducer(bc);
 
-        ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore);
+        ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore, (Server)null);
         eventProducer.publishNotification(ereg);
     }
 
     @Test
     public void testPublishErrorNotification() throws Exception {
-        RemoteServiceAdminCore remoteServiceAdminCore = EasyMock.createNiceMock(RemoteServiceAdminCore.class);
-        EasyMock.replay(remoteServiceAdminCore);
+        RemoteServiceAdminCore rsaCore = EasyMock.createNiceMock(RemoteServiceAdminCore.class);
+        EasyMock.replay(rsaCore);
 
         final EndpointDescription endpoint = EasyMock.createNiceMock(EndpointDescription.class);
         EasyMock.expect(endpoint.getInterfaces()).andReturn(Arrays.asList("org.foo.Bar")).anyTimes();
@@ -177,8 +178,7 @@ public class EventProducerTest {
         EasyMock.replay(bc);
         EventProducer eventProducer = new EventProducer(bc);
 
-        ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore);
-        ereg.setException(exportException);
+        ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, rsaCore, exportException);
         eventProducer.publishNotification(Arrays.<ExportRegistration>asList(ereg));
     }
 }

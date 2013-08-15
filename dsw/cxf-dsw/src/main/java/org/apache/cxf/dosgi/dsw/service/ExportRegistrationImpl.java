@@ -23,16 +23,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.endpoint.Server;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,73 +34,86 @@ public class ExportRegistrationImpl implements ExportRegistration {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExportRegistrationImpl.class);
 
-    private Server server;
-    private boolean closed;
-    private Throwable exception;
+    private final RemoteServiceAdminCore rsaCore;
+    private final ExportReferenceImpl exportReference;
+    private final Server server;
+    private final Throwable exception;
 
-    private ExportRegistrationImpl parent;
-    private volatile int instanceCount = 1;
+    private final ExportRegistrationImpl parent;
+    private int instanceCount;
+    private volatile boolean closed;
 
-    private RemoteServiceAdminCore rsaCore;
-
-    private ExportReferenceImpl exportReference;
-
-    private ServiceTracker serviceTracker;
-
-    // provide a clone of the provided exp.Reg that is linked to this instance
-    public ExportRegistrationImpl(ExportRegistrationImpl exportRegistration) {
-        parent = exportRegistration;
-        exportReference = new ExportReferenceImpl(parent.getExportReference());
-        exception = parent.getException();
-        rsaCore = parent.getRsaCore();
-        parent.instanceAdded();
+    private ExportRegistrationImpl(ExportRegistrationImpl parent, RemoteServiceAdminCore rsaCore,
+            ExportReferenceImpl exportReference, Server server, Throwable exception) {
+        this.parent = parent != null ? parent.parent : this; // a parent points to itself
+        this.parent.addInstance();
+        this.rsaCore = rsaCore;
+        this.exportReference = exportReference;
+        this.server = server;
+        this.exception = exception;
     }
 
+    // create a clone of the provided ExportRegistrationImpl that is linked to it
+    public ExportRegistrationImpl(ExportRegistrationImpl parent) {
+        this(parent, parent.rsaCore, new ExportReferenceImpl(parent.exportReference),
+            parent.server, parent.exception);
+    }
+
+    // create a new (parent) instance which was exported successfully with the given server
     public ExportRegistrationImpl(ServiceReference sref, EndpointDescription endpoint,
-                                  RemoteServiceAdminCore remoteServiceAdminCore) {
-        exportReference = new ExportReferenceImpl(sref, endpoint);
-        parent = this;
-        rsaCore = remoteServiceAdminCore;
+            RemoteServiceAdminCore rsaCore, Server server) {
+        this(null, rsaCore, new ExportReferenceImpl(sref, endpoint), server, null);
     }
 
-    private void instanceAdded() {
-        ++instanceCount;
+    // create a new (parent) instance which failed to be exported with the given exception
+    public ExportRegistrationImpl(ServiceReference sref, EndpointDescription endpoint,
+            RemoteServiceAdminCore rsaCore, Throwable exception) {
+        this(null, rsaCore, new ExportReferenceImpl(sref, endpoint), null, exception);
     }
 
-    public synchronized void close() {
-        if (closed) {
-            return;
+    private void ensureParent() {
+        if (parent != this) {
+            throw new IllegalStateException("this method may only be called on the parent");
         }
-        closed = true;
+    }
+
+    public ExportReference getExportReference() {
+        return closed ? null : exportReference;
+    }
+
+    public Throwable getException() {
+        return closed ? null : exception;
+    }
+
+    public final void close() {
+        synchronized (this) {
+            if (closed) {
+                return;
+            }
+            closed = true;
+        }
 
         rsaCore.removeExportRegistration(this);
-
-        parent.instanceClosed();
-        if (server != null) {
-            server.stop();
-            server = null;
-        }
         exportReference.close();
+        parent.removeInstance();
+    }
 
-        if (serviceTracker != null) {
-            serviceTracker.close();
-            serviceTracker = null;
+    private void addInstance() {
+        ensureParent();
+        synchronized (this) {
+            instanceCount++;
         }
     }
 
-    private void instanceClosed() {
-        --instanceCount;
-        if (instanceCount <= 0) {
-            // really close the ExReg
-            // TODO close it and remove from management structure!
+    private void removeInstance() {
+        ensureParent();
+        synchronized (this) {
+            instanceCount--;
+            if (instanceCount <= 0) {
+                LOG.debug("really closing ExportRegistration now!");
 
-            LOG.debug("really closing ExportRegistration now!");
-
-            synchronized (this) {
                 if (server != null) {
-                    // FIXME: is this done like this?
-                    server.stop();
-                    server = null;
+                    server.destroy();
                 }
             }
         }
@@ -114,15 +121,14 @@ public class ExportRegistrationImpl implements ExportRegistration {
 
     @Override
     public String toString() {
-        if (exportReference == null) {
-            return "Exportregistration closed";
+        if (closed) {
+            return "ExportRegistration closed";
         }
         EndpointDescription endpoint = getExportReference().getExportedEndpoint();
         ServiceReference serviceReference = getExportReference().getExportedService();
         String r = "EndpointDescription for ServiceReference " + serviceReference;
-        r += "\n";
 
-        r += "*** EndpointDescription: **** \n";
+        r += "\n*** EndpointDescription: ****\n";
         if (endpoint == null) {
             r += "---> NULL <---- \n";
         } else {
@@ -135,70 +141,4 @@ public class ExportRegistrationImpl implements ExportRegistration {
         }
         return r;
     }
-
-    public Throwable getException() {
-        return closed ? null : exception;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
-    }
-
-    public void setException(Throwable ex) {
-        exception = ex;
-    }
-
-    public ExportReference getExportReference() {
-        return exportReference;
-    }
-
-    public RemoteServiceAdminCore getRsaCore() {
-        return rsaCore;
-    }
-
-    /**
-     * Start the service tracker that monitors the osgi service that
-     * is exported by this exportRegistration
-     * */
-    public void startServiceTracker(BundleContext bctx) {
-        // only the parent should do this
-        if (parent != this) {
-            parent.startServiceTracker(bctx);
-            return;
-        }
-
-        // do it only once
-        if (serviceTracker != null) {
-            return;
-        }
-
-        Filter f;
-        final Long sid = (Long)getExportReference().getExportedService().getProperty(Constants.SERVICE_ID);
-        try {
-            f = bctx.createFilter("(" + Constants.SERVICE_ID + "=" + sid + ")");
-        } catch (InvalidSyntaxException e) {
-            LOG.warn("Service tracker could not be started. The service will not be automatically unexported "
-                + e.getMessage(), e);
-            return;
-        }
-        serviceTracker = new ServiceTracker(bctx, f, new ServiceTrackerCustomizer() {
-
-            public void removedService(ServiceReference sr, Object s) {
-                LOG.info("Service [" + sid + "] has been unregistered: Removing service export");
-                close();
-            }
-
-            public void modifiedService(ServiceReference sr, Object s) {
-                // FIXME:
-                LOG.warn("Service modifications after the service is exported are "
-                         + "currently not supported. The export is not modified!");
-            }
-
-            public Object addingService(ServiceReference sr) {
-                return sr;
-            }
-        });
-        serviceTracker.open();
-    }
-
 }
