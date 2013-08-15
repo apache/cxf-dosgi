@@ -90,6 +90,9 @@ public class EndpointListenerNotifier {
      * @param endpoints the endpoints the listeners should be notified about
      */
     void notifyListeners(boolean added, Collection<EndpointDescription> endpoints) {
+        if (endpoints.isEmpty()) { // a little optimization to prevent unnecessary processing
+            return;
+        }
         ServiceReference[] listeners = stEndpointListeners.getServiceReferences();
         if (listeners != null) {
             for (ServiceReference eplReference : listeners) {
@@ -150,7 +153,7 @@ public class EndpointListenerNotifier {
                 LOG.debug("Filter {} matches endpoint {}", filter, dict);
                 matchingFilters.add(filter);
             } else {
-                LOG.debug("Filter {} does not match endpoint {}", filter, dict);
+                LOG.trace("Filter {} does not match endpoint {}", filter, dict);
             }
         }
         return matchingFilters;

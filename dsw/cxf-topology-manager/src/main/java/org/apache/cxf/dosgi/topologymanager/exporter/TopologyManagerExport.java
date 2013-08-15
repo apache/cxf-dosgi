@@ -149,7 +149,7 @@ public class TopologyManagerExport {
     }
 
     protected void doExportService(final ServiceReference sref) {
-        LOG.debug("Exporting service");
+        LOG.debug("Exporting service {}", sref);
         endpointRepo.addService(sref); // mark for future export even if there are currently no RSAs
         List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getAllServices();
         if (rsaList.isEmpty()) {
@@ -172,22 +172,50 @@ public class TopologyManagerExport {
 
     private void exportServiceUsingRemoteServiceAdmin(final ServiceReference sref,
                                                       final RemoteServiceAdmin remoteServiceAdmin) {
-        // TODO: additional parameter Map?
-        LOG.debug("exporting...");
-        Collection<ExportRegistration> exportRegs = remoteServiceAdmin.exportService(sref, null);
-        List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
-        // note: endpoints list may contain ExportRegistrations with an exception, not only successful ones
-        if (exportRegs.isEmpty()) {
-            // TODO export failed -> What should be done here?
-            LOG.error("export failed");
-        } else {
-            for (ExportRegistration exportReg : exportRegs) {
-                endpoints.add(getExportedEndpoint(exportReg));
-            }
-            LOG.info("TopologyManager: export successful Endpoints: {}", endpoints);
-            epListenerNotifier.notifyListeners(true, endpoints);
+        // abort if the service was unregistered by the time we got here
+        // (we check again at the end, but this optimization saves unnecessary heavy processing)
+        if (sref.getBundle() == null) {
+            LOG.info("TopologyManager: export aborted for {} since it was unregistered", sref);
+            endpointRepo.removeService(sref);
+            return;
         }
-        endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
+        // do the export
+        LOG.debug("exporting {}...", sref);
+        // TODO: additional parameter Map?
+        Collection<ExportRegistration> exportRegs = remoteServiceAdmin.exportService(sref, null);
+        if (exportRegs.isEmpty()) {
+            LOG.warn("TopologyManager: nothing was exported for {}", sref);
+            return;
+        }
+        // process successful/failed registrations
+        List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
+        for (ExportRegistration reg : exportRegs) {
+            if (reg.getException() == null) {
+                EndpointDescription endpoint = getExportedEndpoint(reg);
+                LOG.info("TopologyManager: export succeeded for {}, endpoint ", sref, endpoint);
+                endpoints.add(endpoint);
+            } else {
+                // TODO: what should we do with failed exports?
+                LOG.error("TopologyManager: export failed for {}", sref);
+                reg.close();
+            }
+        }
+        // abort export if service was unregistered in the meanwhile (since we have a race
+        // with the unregister event which may have already been handled, so we'll miss it)
+        if (sref.getBundle() == null) {
+            LOG.info("TopologyManager: export reverted for {} since service was unregistered", sref);
+            endpointRepo.removeService(sref);
+            for (ExportRegistration reg : exportRegs) {
+                reg.close();
+            }
+            return;
+        }
+        // add the new exported endpoints
+        if (!endpoints.isEmpty()) {
+            LOG.info("TopologyManager: export successful for {}, endpoints: {}", sref, endpoints);
+            epListenerNotifier.notifyListeners(true, endpoints);
+            endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
+        }
     }
 
     /**

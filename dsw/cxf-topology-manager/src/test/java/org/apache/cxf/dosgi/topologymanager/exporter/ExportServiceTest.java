@@ -115,6 +115,7 @@ public class ExportServiceTest {
         ExportRegistration exportRegistration = c.createMock(ExportRegistration.class);
         ExportReference exportReference = c.createMock(ExportReference.class);
         EasyMock.expect(exportRegistration.getExportReference()).andReturn(exportReference).anyTimes();
+        EasyMock.expect(exportRegistration.getException()).andReturn(null).anyTimes();
         EasyMock.expect(exportReference.getExportedEndpoint()).andReturn(endpoint).anyTimes();
         return exportRegistration;
     }
