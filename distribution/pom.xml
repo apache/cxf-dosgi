@@ -39,7 +39,7 @@
 
     <modules>
       <module>features</module>
-      <module>multi-bundle</module>
+      <module>multi-bundle2</module>
       <module>sources</module>
     </modules>
 </project>

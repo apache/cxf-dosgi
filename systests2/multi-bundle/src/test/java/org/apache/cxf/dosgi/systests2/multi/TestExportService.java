@@ -30,7 +30,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
 import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 import org.apache.cxf.dosgi.samples.greeter.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
@@ -57,17 +56,18 @@ public class TestExportService extends AbstractDosgiTest {
     @Configuration
     public static Option[] configure() throws Exception {
         return new Option[] {
-                MultiBundleTools.getDistroWithDiscovery(),
-                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
-                mavenBundle().groupId("org.apache.servicemix.bundles")
-                    .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
-                mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-                    .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-                    .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf.dosgi.systests")
-                    .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
-                frameworkStartLevel(100)};
+            MultiBundleTools.getDistroWithDiscovery(),
+            systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("DEBUG"),
+            mavenBundle().groupId("org.apache.servicemix.bundles")
+                .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
+            mavenBundle().groupId("org.apache.cxf.dosgi.samples")
+                .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
+            mavenBundle().groupId("org.apache.cxf.dosgi.samples")
+                .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
+            mavenBundle().groupId("org.apache.cxf.dosgi.systests")
+                .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(), frameworkStartLevel(100),
+            //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
+        };
     }
 
     @Test

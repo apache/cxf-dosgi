@@ -176,6 +176,31 @@
 
     <build>
         <plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+            <execution>
+                <id>unpack</id>
+                <phase>generate-resources</phase>
+                <goals>
+                    <goal>unpack</goal>
+                </goals>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>org.apache.cxf.dosgi</groupId>
+                            <artifactId>cxf-dosgi-ri-multibundle-distribution2</artifactId>
+                            <version>1.6-SNAPSHOT</version>
+                            <type>zip</type>
+                            <classifier>dir</classifier>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+
             <!-- use pax exam maven plugin -->
 
             <!-- Note: settings and dependencies for the final osgi runtime

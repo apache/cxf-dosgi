@@ -26,14 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.jar.Attributes;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 
@@ -42,26 +38,14 @@ public final class MultiBundleTools {
     private MultiBundleTools() {
     }
 
-    private static int getDistroBundles(Map<Integer, String> bundles, boolean discovery) throws Exception {
-        File root = getRootDirectory();
-        File mdRoot = new File(root, "distribution/multi-bundle");
-        String pomVersion = getPomVersion(mdRoot);
-
-        return getDistroBundles(mdRoot, pomVersion, bundles, discovery);
-    }
-
     private static int getDistroBundles(File mdRoot,
-                                        String pomVersion,
-                                        Map<Integer,
-                                        String> bundles,
-                                        boolean discovery) throws Exception {
-        File distroDir = new File(mdRoot, "target/cxf-dosgi-ri-multibundle-distribution-" + pomVersion + "-dir");
+                                        Map<Integer, String> bundles) throws Exception {
+        File depRoot = new File(mdRoot, "target/dependency");
+        File distroDir = depRoot.listFiles()[0];
+                                
         Properties p = new Properties();
-        File confDir = new File(distroDir, "apache-cxf-dosgi-ri-" + pomVersion + "/conf");
-        p.load(new FileInputStream(new File(confDir, "felix.config.properties.append")));
-        if (discovery) {
-            p.load(new FileInputStream(new File(confDir, "felix.discovery.config.properties.append")));
-        }
+        File confFile = new File(distroDir, "conf/felix.config.properties.append");
+        p.load(new FileInputStream(confFile));
 
         int startLevel = Integer.parseInt(p.getProperty("org.osgi.framework.startlevel.beginning"));
         for (int i = 0; i <= startLevel; i++) {
@@ -87,38 +71,24 @@ public final class MultiBundleTools {
         File curFile = new File(curURL.getFile());
         String curString = curFile.getAbsolutePath();
         File curBase = new File(curString.substring(0, curString.length() - resourceName.length()));
-        return curBase.getParentFile().getParentFile().getParentFile().getParentFile();
+        return curBase.getParentFile().getParentFile();
     }
 
-    private static String getPomVersion(File mdRoot) throws Exception {
-        File mdPom = new File(mdRoot, "pom.xml");
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setValidating(false);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(mdPom);
-        Element el = doc.getDocumentElement();
-        String pomVersion = null;
-        NodeList children = el.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
-            if ("version".equals(child.getLocalName())) {
-                pomVersion = child.getTextContent().trim();
-                break;
-            }
-        }
-        if (pomVersion == null) {
-            throw new RuntimeException("Failed to retrieved version from pom file " + mdPom);
-        }
-        return pomVersion;
-    }
-
-    private static Option[] getDistroBundleOptions(boolean discovery) throws Exception {
+    private static Option[] getDistroBundleOptions() throws Exception {
         Map<Integer, String> bundles = new TreeMap<Integer, String>();
-        getDistroBundles(bundles, discovery);
+        File root = getRootDirectory();
+        getDistroBundles(root, bundles);
         List<Option> opts = new ArrayList<Option>();
         for (Map.Entry<Integer, String> entry : bundles.entrySet()) {
             String bundleUri = entry.getValue();
+            URL bundleURL = new URL(bundleUri);
+            JarInputStream bundleJar = new JarInputStream(bundleURL.openStream());
+            Manifest manifest = bundleJar.getManifest();
+            Attributes host = manifest.getAttributes("Fragment-Host");
+            if (host != null) {
+                System.out.println(bundleUri);
+            }
+            bundleJar.close();
             if (!bundleUri.contains("pax-logging")) {
                 opts.add(CoreOptions.bundle(bundleUri));
             }
@@ -127,10 +97,10 @@ public final class MultiBundleTools {
     }
 
     public static Option getDistroWithDiscovery() throws Exception {
-        return CoreOptions.composite(getDistroBundleOptions(true));
+        return getDistro();
     }
 
     public static Option getDistro() throws Exception {
-        return CoreOptions.composite(getDistroBundleOptions(false));
+        return CoreOptions.composite(getDistroBundleOptions());
     }
 }

@@ -109,6 +109,7 @@ public class TestImportService extends AbstractDosgiTest {
         //    a service property.
 
         // Set up a Server in the test
+        Thread.sleep(10000);
         ServerFactoryBean factory = new ServerFactoryBean();
         factory.setServiceClass(GreeterService.class);
         factory.setAddress("http://localhost:9191/grrr");
