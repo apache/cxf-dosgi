@@ -78,6 +78,7 @@ public class HttpServiceManagerTest extends TestCase {
         final HttpService httpService = new DummyHttpService(config);
         ServiceReference sr = c.createMock(ServiceReference.class);
         expect(sr.getProperty(EasyMock.eq("service.id"))).andReturn(12345L).atLeastOnce();
+        expect(servletContext.getResourceAsStream((String)EasyMock.anyObject())).andReturn(null).anyTimes();
         c.replay();
 
         HttpServiceManager h = new HttpServiceManager(dswContext, null, null, null) {
