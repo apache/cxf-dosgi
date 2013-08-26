@@ -18,12 +18,8 @@
  */
 package org.apache.cxf.dosgi.endpointdesc;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -32,8 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cxf.dosgi.discovery.local.util.Utils;
-import org.junit.Assert;
+import org.xml.sax.InputSource;
+
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
 import org.osgi.xmlns.rsa.v1_0.EndpointDescriptionType;
 import org.osgi.xmlns.rsa.v1_0.PropertyType;
@@ -90,41 +87,11 @@ public class PropertiesMapperTest {
         EndpointDescriptionType epd = new EndpointDescriptionType();
         epd.getProperty().addAll(props);
         byte[] epData = new EndpointDescriptionParser().getData(epd);
-        String actual = new String(epData, Charset.defaultCharset());
 
         URL edURL = getClass().getResource("/ed2-generated.xml");
-        String expected = new String(drainStream(edURL.openStream()));
-        Assert.assertEquals(Utils.normXML(expected), Utils.normXML(actual));
+        InputSource expectedXml = new InputSource(edURL.openStream());
+        InputSource actualXml = new InputSource(new ByteArrayInputStream(epData)); 
+        XMLAssert.assertXMLEqual(expectedXml, actualXml);
     }
 
-
-
-    private static void drainStream(InputStream is, OutputStream os) throws IOException {
-        byte[] bytes = new byte[8192];
-
-        int length;
-        int offset = 0;
-
-        while ((length = is.read(bytes, offset, bytes.length - offset)) != -1) {
-            offset += length;
-
-            if (offset == bytes.length) {
-                os.write(bytes, 0, bytes.length);
-                offset = 0;
-            }
-        }
-        if (offset != 0) {
-            os.write(bytes, 0, offset);
-        }
-    }
-
-    private static byte[] drainStream(InputStream is) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            drainStream(is, baos);
-            return baos.toByteArray();
-        } finally {
-            is.close();
-        }
-    }
 }

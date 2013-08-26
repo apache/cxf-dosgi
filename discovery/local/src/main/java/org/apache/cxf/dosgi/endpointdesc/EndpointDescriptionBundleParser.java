@@ -88,7 +88,6 @@ public final class EndpointDescriptionBundleParser {
             }
         }
 
-        @SuppressWarnings("unchecked")
         Enumeration<URL> urls = b.findEntries(dir, filePattern, false);
         return (urls == null) ? Collections.enumeration(new ArrayList<URL>()) : urls;
     }
