@@ -61,14 +61,14 @@ public class AbstractDosgiTest {
         Thread.sleep(interval);
     }
 
-    protected <T> ServiceReference<T> waitService(BundleContext bc, Class<T> cls, String filter, int timeout)
+    protected ServiceReference waitService(BundleContext bc, Class cls, String filter, int timeout)
         throws Exception {
         System.out.println("Waiting for service: " + cls + " " + filter);
         long startTime = System.currentTimeMillis();
         while (true) {
-            Collection<ServiceReference<T>> refs = bc.getServiceReferences(cls, filter);
+            Collection refs = bc.getServiceReferences(cls, filter);
             if (refs != null && refs.size() > 0) {
-                return refs.iterator().next();
+                return (ServiceReference)refs.iterator().next();
             }
             sleepOrTimeout(startTime, timeout, "Service not found: " + cls + " " + filter);
         }

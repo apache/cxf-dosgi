@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="text" version="1.0" encoding="UTF-8" indent="yes"/>
-  <xsl:param name="Version"/>
-  <xsl:variable name = "Basename">-dir/apache-cxf-dosgi-ri-<xsl:value-of select="$Version"/>/dosgi_bundles/</xsl:variable>
-  <xsl:template match="/">
+<xsl:template match="/">
+# equinox config
 org.ops4j.pax.web.session.timeout=30
 
 osgi.bundles=org.eclipse.osgi.services@start, \
-<xsl:for-each select="//bundles/bundle">../apache-cxf-dosgi-ri-<xsl:value-of select="$Version"/>/dosgi_bundles/<xsl:value-of select="substring-after(text(), $Basename)"/><xsl:value-of select="string('@start, ')"/></xsl:for-each>
+../plugins/org.eclipse.equinox.console_1.0.0.v20120522-1841.jar@start, \
+../plugins/org.apache.felix.gogo.shell_0.8.0.v201110170705.jar@start, \
+../plugins/org.apache.felix.gogo.command_0.8.0.v201108120515.jar@start, \
+../plugins/org.apache.felix.gogo.runtime_0.8.0.v201108120515.jar@start, \
+<xsl:for-each select="//bundle[not(contains(@name,'cxf-karaf-commands'))]">../dosgi_bundles/<xsl:value-of select="@name"/>@start, \
+</xsl:for-each>
   </xsl:template>
 </xsl:transform>
 

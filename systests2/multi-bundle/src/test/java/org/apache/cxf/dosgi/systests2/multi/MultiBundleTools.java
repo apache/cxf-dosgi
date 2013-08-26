@@ -20,6 +20,8 @@ package org.apache.cxf.dosgi.systests2.multi;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,19 +39,20 @@ public final class MultiBundleTools {
 
     private MultiBundleTools() {
     }
-
-    private static int getDistroBundles(File mdRoot,
-                                        Map<Integer, String> bundles) throws Exception {
-        File depRoot = new File(mdRoot, "target/dependency");
-        File distroDir = depRoot.listFiles()[0];
-                                
+    
+    private static Properties getProps(File distroDir) throws FileNotFoundException, IOException {
         Properties p = new Properties();
         File confFile = new File(distroDir, "conf/felix.config.properties.append");
         p.load(new FileInputStream(confFile));
+        return p;
+    }
 
-        int startLevel = Integer.parseInt(p.getProperty("org.osgi.framework.startlevel.beginning"));
+    private static int getDistroBundles(File distroDir,
+                                        Properties props, 
+                                        Map<Integer, String> bundles) throws Exception {
+        int startLevel = Integer.parseInt(props.getProperty("org.osgi.framework.startlevel.beginning"));
         for (int i = 0; i <= startLevel; i++) {
-            String val = p.getProperty("felix.auto.start." + i);
+            String val = props.getProperty("felix.auto.start." + i);
             if (val != null) {
                 if (val.startsWith("file:")) {
                     File fullDir = new File(distroDir, val.substring("file:".length()));
@@ -77,8 +80,18 @@ public final class MultiBundleTools {
     private static Option[] getDistroBundleOptions() throws Exception {
         Map<Integer, String> bundles = new TreeMap<Integer, String>();
         File root = getRootDirectory();
-        getDistroBundles(root, bundles);
+        File depRoot = new File(root, "target/dependency");
+        File distroDir = depRoot.listFiles()[0];
+        Properties props = getProps(distroDir);
+        getDistroBundles(distroDir, props, bundles);
         List<Option> opts = new ArrayList<Option>();
+        
+        /*
+        String sysPackagesValue = props.getProperty("org.osgi.framework.system.packages");
+        opts.add(CoreOptions.frameworkProperty("org.osgi.framework.system.packages")
+                 .value(sysPackagesValue));
+        */
+
         for (Map.Entry<Integer, String> entry : bundles.entrySet()) {
             String bundleUri = entry.getValue();
             URL bundleURL = new URL(bundleUri);
