@@ -15,18 +15,9 @@ This product also includes WS-* schemas developed by International
    (http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm.xsd)
    (http://www.w3.org/2005/08/addressing/ws-addr.xsd)
 
-
-This product contains includes JDOM:
-  Copyright (C) 2000-2004 Jason Hunter & Brett McLaughlin.
-  All rights reserved.
-  See the NOTICE.jdom file for additional information
-
-
 The product contains code (StaxBuilder.java) that is
   Copyright (C) 2000-2004 Jason Hunter & Brett McLaughlin.
   All rights reserved.
-  See the NOTICE.jdom file for additional information
-
 
 Java classes (source and binary) under org.apache.cxf.jaxws.javaee
 are generated from schema available here:
@@ -45,5 +36,7 @@ Portions of the included xml-apis library were originally based on the following
 Portions of the included xmlbeans library were originally based on the following:
    - software copyright (c) 2000-2003, BEA Systems, <http://www.bea.com/>.
 
-
+This product includes xmlunit
+Copyright (c) 2001-2007, Jeff Martin, Tim Bacon
+All rights reserved. 
 
