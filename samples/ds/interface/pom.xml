@@ -28,7 +28,7 @@
 
   <parent>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
-    <artifactId>cxf-dosgi-ri-bundles-ds-parent</artifactId>
+    <artifactId>cxf-dosgi-ri-samples-ds-parent</artifactId>
     <version>1.6-SNAPSHOT</version>
   </parent>
 
