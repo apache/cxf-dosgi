@@ -79,12 +79,11 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.enterprise</artifactId>
-            <scope>test</scope>
+            <artifactId>org.osgi.compendium</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.cxf.dosgi.systests</groupId>
             <artifactId>cxf-dosgi-ri-systests2-common</artifactId>

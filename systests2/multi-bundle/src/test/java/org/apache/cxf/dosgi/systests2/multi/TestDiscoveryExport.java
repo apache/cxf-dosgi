@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.systests2.multi;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -27,11 +26,6 @@ import javax.inject.Inject;
 
 import junit.framework.Assert;
 
-import org.apache.cxf.dosgi.systests2.common.test2.Test2Service;
-import org.apache.cxf.dosgi.systests2.common.test2.client.ClientActivator;
-import org.apache.cxf.dosgi.systests2.common.test2.client.Test2ServiceTracker;
-import org.apache.cxf.dosgi.systests2.common.test2.server.ServerActivator;
-import org.apache.cxf.dosgi.systests2.common.test2.server.Test2ServiceImpl;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.junit.Test;
@@ -39,9 +33,7 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.swissbox.tinybundles.core.TinyBundles;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationAdmin;
 
 import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
@@ -73,16 +65,19 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
                     .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf.dosgi.systests")
                     .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
-                frameworkStartLevel(100)
+                frameworkStartLevel(100),
+                //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
     }
 
     @Test
     public void testDiscoveryExport() throws Exception {
         final int zkPort = getFreePort();
-        configureZookeeper(configAdmin, zkPort);
+        System.out.println("*** Port for ZooKeeper Server: " + zkPort);
+        updateZkServerConfig(zkPort, configAdmin);
+        updateZkClientConfig(zkPort, configAdmin);
         ZooKeeper zk = new ZooKeeper("localhost:" + zkPort, 1000, null);
-        assertNodeExists(zk, GREETER_ZOOKEEPER_NODE, 4000);
+        assertNodeExists(zk, GREETER_ZOOKEEPER_NODE, 14000);
         zk.close();
     }
 
@@ -98,32 +93,6 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
             }
         }
         Assert.assertNotNull("ZooKeeper node " + zNode + " was not found", stat);
-    }
-
-    protected static InputStream getClientBundle() {
-        return TinyBundles.newBundle()
-            .add(ClientActivator.class)
-            .add(Test2Service.class)
-            .add(Test2ServiceTracker.class)
-            .set(Constants.BUNDLE_SYMBOLICNAME, "test2ClientBundle")
-            .set(Constants.BUNDLE_ACTIVATOR, ClientActivator.class.getName())
-            .build(TinyBundles.withBnd());
-    }
-
-    protected static InputStream getServerBundle() {
-        return TinyBundles.newBundle()
-            .add(ServerActivator.class)
-            .add(Test2Service.class)
-            .add(Test2ServiceImpl.class)
-            .set(Constants.BUNDLE_SYMBOLICNAME, "test2ServerBundle")
-            .set(Constants.BUNDLE_ACTIVATOR, ServerActivator.class.getName())
-            .build(TinyBundles.withBnd());
-    }
-
-    protected void configureZookeeper(ConfigurationAdmin ca, int zkPort) throws IOException {
-        System.out.println("*** Port for ZooKeeper Server: " + zkPort);
-        updateZkServerConfig(zkPort, ca);
-        updateZkClientConfig(zkPort, ca);
     }
 
     protected void updateZkClientConfig(final int zkPort, ConfigurationAdmin cadmin) throws IOException {

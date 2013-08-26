@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.enterprise</artifactId>
+            <artifactId>org.osgi.compendium</artifactId>
         </dependency>
 
         <dependency>

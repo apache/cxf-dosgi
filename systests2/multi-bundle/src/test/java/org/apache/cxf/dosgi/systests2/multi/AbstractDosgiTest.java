@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
@@ -60,14 +61,14 @@ public class AbstractDosgiTest {
         Thread.sleep(interval);
     }
 
-    protected ServiceReference waitService(BundleContext bc, Class<?> cls, String filter, int timeout)
+    protected <T> ServiceReference<T> waitService(BundleContext bc, Class<T> cls, String filter, int timeout)
         throws Exception {
         System.out.println("Waiting for service: " + cls + " " + filter);
         long startTime = System.currentTimeMillis();
         while (true) {
-            ServiceReference[] refs = bc.getServiceReferences(cls.getName(), filter);
-            if (refs != null && refs.length > 0) {
-                return refs[0];
+            Collection<ServiceReference<T>> refs = bc.getServiceReferences(cls, filter);
+            if (refs != null && refs.size() > 0) {
+                return refs.iterator().next();
             }
             sleepOrTimeout(startTime, timeout, "Service not found: " + cls + " " + filter);
         }

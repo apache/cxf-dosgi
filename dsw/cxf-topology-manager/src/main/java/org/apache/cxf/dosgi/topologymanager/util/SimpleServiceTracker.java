@@ -47,10 +47,10 @@ import org.osgi.util.tracker.ServiceTracker;
  *
  * @param <T> the service interface type
  */
-public class SimpleServiceTracker<T> extends ServiceTracker {
+public class SimpleServiceTracker<T> extends ServiceTracker<T, T> {
 
     // we must use a map with references as keys, so as not to invoke equals remotely on service objects
-    private ConcurrentMap<ServiceReference, T> services;
+    private ConcurrentMap<ServiceReference<T>, T> services;
     private List<SimpleServiceTrackerListener<T>> listeners;
 
     /**
@@ -65,7 +65,7 @@ public class SimpleServiceTracker<T> extends ServiceTracker {
     public SimpleServiceTracker(BundleContext context, Class<T> clazz) {
         super(context, clazz.getName(), null);
         this.listeners = new CopyOnWriteArrayList<SimpleServiceTrackerListener<T>>();
-        this.services = new ConcurrentHashMap<ServiceReference, T>();
+        this.services = new ConcurrentHashMap<ServiceReference<T>, T>();
     }
 
     /**
@@ -78,8 +78,7 @@ public class SimpleServiceTracker<T> extends ServiceTracker {
     }
 
     @Override
-    public Object addingService(ServiceReference reference) {
-        @SuppressWarnings("unchecked")
+    public T addingService(ServiceReference<T> reference) {
         T service = (T) super.addingService(reference);
         services.put(reference, service);
         for (SimpleServiceTrackerListener<T> listener : listeners) {
@@ -89,9 +88,7 @@ public class SimpleServiceTracker<T> extends ServiceTracker {
     }
 
     @Override
-    public void removedService(ServiceReference reference, Object serviceObject) {
-        @SuppressWarnings("unchecked")
-        T service = (T) serviceObject;
+    public void removedService(ServiceReference<T> reference, T service) {
         services.remove(reference, service);
         for (SimpleServiceTrackerListener<T> listener : listeners) {
             listener.removed(service);

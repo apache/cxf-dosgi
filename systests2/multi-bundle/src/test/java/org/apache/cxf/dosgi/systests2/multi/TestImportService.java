@@ -127,7 +127,7 @@ public class TestImportService extends AbstractDosgiTest {
             bundleContext.registerService(Object.class.getName(), new Object(), props);
 
             // Wait for the service tracker in the test bundle to register a service with the test result
-            ServiceReference ref = waitService(bundleContext, String.class, "(testResult=test1)", 20);
+            ServiceReference<String> ref = waitService(bundleContext, String.class, "(testResult=test1)", 20);
             Assert.assertEquals("HiOSGi;exception", ref.getProperty("result"));
         } finally {
             if (server != null) {

@@ -45,7 +45,6 @@ public class IntentTrackerTest {
         BundleContext bc = c.createMock(BundleContext.class);
         Filter filter = c.createMock(Filter.class);
         expect(bc.createFilter(EasyMock.<String>anyObject())).andReturn(filter);
-        expect(bc.getProperty(org.osgi.framework.Constants.FRAMEWORK_VERSION)).andReturn("1.6.0");
         final Capture<ServiceListener> capturedListener = new Capture<ServiceListener>();
         bc.addServiceListener(EasyMock.capture(capturedListener), EasyMock.<String>anyObject());
         EasyMock.expectLastCall().atLeastOnce();
@@ -54,7 +53,8 @@ public class IntentTrackerTest {
         IntentMap intentMap = new IntentMap();
 
         // Create a custom intent
-        ServiceReference reference = c.createMock(ServiceReference.class);
+        @SuppressWarnings("unchecked")
+        ServiceReference<AbstractFeature> reference = c.createMock(ServiceReference.class);
         expect(reference.getProperty(Constants.INTENT_NAME_PROP)).andReturn(MY_INTENT_NAME);
         AbstractFeature testIntent = new AbstractFeature() {
         };

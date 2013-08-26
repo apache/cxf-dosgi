@@ -46,11 +46,11 @@
         <!-- portable text resource processing -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <osgi.version>4.2.0</osgi.version>
-        <osgi.enterprise.version>4.2.0</osgi.enterprise.version>
+        <osgi.version>4.3.1</osgi.version>
+        <osgi.compendium.version>4.3.1</osgi.compendium.version>
         <cxf.version>2.7.6</cxf.version>
         <cxf.build-utils.version>2.5.0</cxf.build-utils.version>
-        <felix.version>3.2.2</felix.version>
+        <felix.version>4.2.1</felix.version>
         <spring.version>3.0.6.RELEASE</spring.version>
         <spring.osgi.version>1.2.1</spring.osgi.version>
         <zookeeper.version>3.3.2</zookeeper.version>
@@ -88,8 +88,8 @@
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.enterprise</artifactId>
-                <version>${osgi.enterprise.version}</version>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>${osgi.compendium.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

@@ -108,7 +108,7 @@ public class LocalDiscoveryTest extends TestCase {
         EasyMock.replay(b1);
         Bundle b2 = EasyMock.createMock(Bundle.class);
         EasyMock.expect(b2.getState()).andReturn(Bundle.ACTIVE);
-        Dictionary<String, Object> headers = new Hashtable<String, Object>();
+        Dictionary<String, String> headers = new Hashtable<String, String>();
         headers.put("Remote-Service", "OSGI-INF/remote-service/");
         EasyMock.expect(b2.getHeaders()).andReturn(headers);
 
@@ -141,7 +141,7 @@ public class LocalDiscoveryTest extends TestCase {
         Bundle bundle = EasyMock.createMock(Bundle.class);
         EasyMock.expect(bundle.getSymbolicName()).andReturn("testing.bundle").anyTimes();
         EasyMock.expect(bundle.getState()).andReturn(Bundle.ACTIVE);
-        Dictionary<String, Object> headers = new Hashtable<String, Object>();
+        Dictionary<String, String> headers = new Hashtable<String, String>();
         headers.put("Remote-Service", "OSGI-INF/rsa/");
         EasyMock.expect(bundle.getHeaders()).andReturn(headers);
         EasyMock.expect(bundle.findEntries("OSGI-INF/rsa", "*.xml", false))
@@ -199,7 +199,7 @@ public class LocalDiscoveryTest extends TestCase {
 
         Bundle bundle = EasyMock.createMock(Bundle.class);
         EasyMock.expect(bundle.getState()).andReturn(Bundle.ACTIVE);
-        Dictionary<String, Object> headers = new Hashtable<String, Object>();
+        Dictionary<String, String> headers = new Hashtable<String, String>();
         headers.put("Remote-Service", "OSGI-INF/rsa/ed4.xml");
         EasyMock.expect(bundle.getHeaders()).andReturn(headers);
         EasyMock.expect(bundle.findEntries("OSGI-INF/rsa", "ed4.xml", false))

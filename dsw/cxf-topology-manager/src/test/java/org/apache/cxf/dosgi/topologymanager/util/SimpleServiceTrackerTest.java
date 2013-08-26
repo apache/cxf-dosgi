@@ -49,8 +49,9 @@ import static org.junit.Assert.assertFalse;
 
 public class SimpleServiceTrackerTest {
 
-    private ServiceReference createUserServiceBundle(IMocksControl c, BundleContext context) {
-        final ServiceReference sref = c.createMock(ServiceReference.class);
+    private ServiceReference<RemoteServiceAdmin> createUserServiceBundle(IMocksControl c, BundleContext context) {
+        @SuppressWarnings("unchecked")
+        final ServiceReference<RemoteServiceAdmin> sref = c.createMock(ServiceReference.class);
         Bundle srefBundle = c.createMock(Bundle.class);
         expect(srefBundle.getBundleContext()).andReturn(context).anyTimes();
         expect(sref.getBundle()).andReturn(srefBundle).anyTimes();
@@ -79,17 +80,17 @@ public class SimpleServiceTrackerTest {
                 .andReturn(filter).atLeastOnce();
         // support context.getServiceReferences based on our list
         final List<RemoteServiceAdmin> services = new ArrayList<RemoteServiceAdmin>();
-        final List<ServiceReference> srefs = new ArrayList<ServiceReference>();
+        final List<ServiceReference<RemoteServiceAdmin>> srefs = new ArrayList<ServiceReference<RemoteServiceAdmin>>();
         expect(context.getServiceReferences((String)anyObject(), eq((String)null))).andAnswer(
-                new IAnswer<ServiceReference[]>() {
+                new IAnswer<ServiceReference<?>[]>() {
                 @Override
-                public ServiceReference[] answer() {
+                public ServiceReference<?>[] answer() {
                     return srefs.toArray(new ServiceReference[srefs.size()]);
                 }
             });
         // create services
-        ServiceReference sref1 = createUserServiceBundle(c, context);
-        ServiceReference sref2 = createUserServiceBundle(c, context);
+        ServiceReference<RemoteServiceAdmin> sref1 = createUserServiceBundle(c, context);
+        ServiceReference<RemoteServiceAdmin> sref2 = createUserServiceBundle(c, context);
         RemoteServiceAdmin service1 = c.createMock(RemoteServiceAdmin.class);
         RemoteServiceAdmin service2 = c.createMock(RemoteServiceAdmin.class);
         expect(context.getService(sref1)).andReturn(service1).atLeastOnce();
@@ -107,12 +108,16 @@ public class SimpleServiceTrackerTest {
         // add our listener
         SimpleServiceTrackerListener<RemoteServiceAdmin> listener =
                 new SimpleServiceTrackerListener<RemoteServiceAdmin>() {
+                @SuppressWarnings({
+                    "unchecked", "rawtypes"
+                })
                 @Override
-                @SuppressWarnings("unchecked")
                 public void added(RemoteServiceAdmin service) {
                     // prove that original ServiceTracker fails here
-                    Object[] trackerServices = tracker.getServices() != null ? tracker.getServices() : new Object[0];
-                    assertFalse(new HashSet(services).equals(new HashSet(Arrays.asList(trackerServices))));
+                    Object[] trackerServices = (Object[])
+                        (tracker.getServices() != null ? tracker.getServices() : new Object[0]);
+                    assertFalse(new HashSet(services)
+                                .equals(new HashSet(Arrays.asList(trackerServices))));
                     // but we succeed
                     assertEqualsUnordered(services, tracker.getAllServices());
                 }
