@@ -33,6 +33,12 @@
     <packaging>jar</packaging>
 
     <name>Distributed OSGi System Tests Multi-Bundle</name>
+    
+    <!-- 
+        When changing code make sure to run the distro before testing
+        or you will be testing the old code.
+     
+     -->
 
     <dependencies>
         <dependency>

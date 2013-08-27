@@ -59,6 +59,7 @@
             </goals>
             <configuration>
               <descriptors>
+                <descriptor>mvn:org.apache.karaf.assemblies.features/standard/2.3.2/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.dosgi/cxf-dosgi/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
