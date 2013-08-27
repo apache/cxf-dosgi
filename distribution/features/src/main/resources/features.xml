@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
-    <repository>mvn:org.apache.karaf.assemblies.features/standard/2.3.1/xml/features</repository>
 
 	<feature name="cxf-dosgi-base" description="base libs needed outside karaf" version="${project.version}" resolver="(obr)">
-		<bundle start-level="8">mvn:org.osgi/org.osgi.compendium/${osgi.compendium.version}</bundle>
         <bundle start-level="8">mvn:org.ops4j.base/ops4j-base-lang/1.4.0</bundle>
         <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-api/1.7.0</bundle>
         <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-service/1.7.0</bundle>
@@ -24,6 +22,8 @@
         <feature>cxf-jaxrs</feature>
         <feature>cxf-databinding-aegis</feature>
         <feature>cxf-http-jetty</feature>
+        <feature>cxf-http</feature>
+        <bundle start-level="8">mvn:org.osgi/org.osgi.compendium/${osgi.compendium.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-topology-manager/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-dsw-cxf/${project.version}</bundle>
     </feature>
