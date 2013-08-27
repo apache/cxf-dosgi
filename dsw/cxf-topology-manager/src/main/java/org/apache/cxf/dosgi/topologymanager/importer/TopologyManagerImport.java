@@ -291,9 +291,13 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     private ImportRegistration importService(EndpointDescription endpoint) {
         for (RemoteServiceAdmin rsa : remoteServiceAdminTracker.getAllServices()) {
             ImportRegistration ir = rsa.importService(endpoint);
-            if (ir != null && ir.getException() == null) {
-                LOG.debug("Service import was successful {}", ir);
-                return ir;
+            if (ir != null) {
+                if (ir.getException() == null) {
+                    LOG.debug("Service import was successful {}", ir);
+                    return ir;
+                } else {
+                    LOG.info("Error importing service " + endpoint, ir.getException());
+                }
             }
         }
         return null;
