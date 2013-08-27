@@ -74,7 +74,8 @@ public class TestImportService extends AbstractDosgiTest {
                 // increase for debugging
                 systemProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout").value(
                         System.getProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout", "20")),
-                frameworkStartLevel(100)
+                frameworkStartLevel(100),
+                //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
     }
 
