@@ -35,10 +35,10 @@ import org.apache.cxf.dosgi.systests2.multi.customintent.service.GreeterServiceW
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.Configuration;
-import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.swissbox.tinybundles.core.TinyBundles;
+import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
@@ -48,14 +48,14 @@ import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
-@RunWith(JUnit4TestRunner.class)
+@RunWith(PaxExam.class)
 public class TestCustomIntent extends AbstractDosgiTest {
 
     @Inject
     BundleContext bundleContext;
 
     protected static InputStream getCustomIntentBundle() {
-        return TinyBundles.newBundle()
+        return TinyBundles.bundle()
                 .add(CustomIntentActivator.class)
                 .add(CustomFeature.class)
                 .add(AddGreetingPhraseInterceptor.class)
@@ -64,7 +64,7 @@ public class TestCustomIntent extends AbstractDosgiTest {
     }
 
     protected static InputStream getServiceBundle() {
-        return TinyBundles.newBundle()
+        return TinyBundles.bundle()
                 .add(GreeterServiceWithCustomIntentActivator.class)
                 .add(EmptyGreeterService.class)
                 .set(Constants.BUNDLE_SYMBOLICNAME, "EmptyGreeterService")

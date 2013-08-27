@@ -40,10 +40,10 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.Configuration;
-import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.swissbox.tinybundles.core.TinyBundles;
+import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
@@ -53,7 +53,7 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
-@RunWith(JUnit4TestRunner.class)
+@RunWith(PaxExam.class)
 public class TestImportService extends AbstractDosgiTest {
 
     @Inject
@@ -79,7 +79,7 @@ public class TestImportService extends AbstractDosgiTest {
     }
 
     protected static InputStream createServiceConsumerBundle() {
-        return TinyBundles.newBundle()
+        return TinyBundles.bundle()
             .add(MyActivator.class)
             .add(MyServiceTracker.class)
             .add(StartServiceTracker.class)
@@ -109,7 +109,6 @@ public class TestImportService extends AbstractDosgiTest {
         //    a service property.
 
         // Set up a Server in the test
-        Thread.sleep(10000);
         ServerFactoryBean factory = new ServerFactoryBean();
         factory.setServiceClass(GreeterService.class);
         factory.setAddress("http://localhost:9191/grrr");
@@ -127,6 +126,7 @@ public class TestImportService extends AbstractDosgiTest {
             bundleContext.registerService(Object.class.getName(), new Object(), props);
 
             // Wait for the service tracker in the test bundle to register a service with the test result
+            @SuppressWarnings("rawtypes")
             ServiceReference ref = waitService(bundleContext, String.class, "(testResult=test1)", 20);
             Assert.assertEquals("HiOSGi;exception", ref.getProperty("result"));
         } finally {
