@@ -39,21 +39,20 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates local EndpointListeners that publish to ZooKeeper.
  */
-public class PublishingEndpointListenerFactory implements ServiceFactory {
+public class PublishingEndpointListenerFactory implements ServiceFactory<PublishingEndpointListener> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListenerFactory.class);
 
     private final BundleContext bctx;
     private final ZooKeeper zk;
     private final List<PublishingEndpointListener> listeners = new ArrayList<PublishingEndpointListener>();
-    private ServiceRegistration serviceRegistration;
 
     public PublishingEndpointListenerFactory(ZooKeeper zk, BundleContext bctx) {
         this.bctx = bctx;
         this.zk = zk;
     }
 
-    public Object getService(Bundle b, ServiceRegistration sr) {
+    public PublishingEndpointListener getService(Bundle b, ServiceRegistration<PublishingEndpointListener> sr) {
         LOG.debug("new EndpointListener from factory");
         synchronized (listeners) {
             PublishingEndpointListener epl = new PublishingEndpointListener(zk, bctx);
@@ -62,7 +61,8 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
         }
     }
 
-    public void ungetService(Bundle b, ServiceRegistration sr, Object service) {
+    public void ungetService(Bundle b, ServiceRegistration<PublishingEndpointListener> sr, 
+                             PublishingEndpointListener service) {
         LOG.debug("remove EndpointListener");
         synchronized (listeners) {
             if (listeners.remove(service)) {
@@ -77,15 +77,10 @@ public class PublishingEndpointListenerFactory implements ServiceFactory {
                   "(&(" + Constants.OBJECTCLASS + "=*)(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID
                   + "=" + Utils.getUUID(bctx) + "))");
         props.put(ZooKeeperDiscovery.DISCOVERY_ZOOKEEPER_ID, "true");
-        serviceRegistration = bctx.registerService(EndpointListener.class.getName(), this, props);
+        bctx.registerService(EndpointListener.class.getName(), this, props);
     }
 
     public synchronized void stop() {
-        if (serviceRegistration != null) {
-            serviceRegistration.unregister();
-            serviceRegistration = null;
-        }
-
         synchronized (listeners) {
             for (PublishingEndpointListener epl : listeners) {
                 epl.close();

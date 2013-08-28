@@ -91,7 +91,8 @@ public class PublishingEndpointListenerTest extends TestCase {
                 return endpointKey;
             }
         };
-        ServiceReference sr1 = EasyMock.createMock(ServiceReference.class);
+        @SuppressWarnings("unchecked")
+        ServiceReference<DiscoveryPlugin> sr1 = EasyMock.createMock(ServiceReference.class);
 
         DiscoveryPlugin plugin2 = new DiscoveryPlugin() {
             public String process(Map<String, Object> mutableProperties, String endpointKey) {
@@ -99,7 +100,8 @@ public class PublishingEndpointListenerTest extends TestCase {
                 return endpointKey.replaceAll("localhost", "some.machine");
             }
         };
-        ServiceReference sr2 = EasyMock.createMock(ServiceReference.class);
+        @SuppressWarnings("unchecked")
+        ServiceReference<DiscoveryPlugin> sr2 = EasyMock.createMock(ServiceReference.class);
 
         BundleContext ctx = EasyMock.createMock(BundleContext.class);
         EasyMock.expect(ctx.createFilter(EasyMock.isA(String.class))).andAnswer(new IAnswer<Filter>() {

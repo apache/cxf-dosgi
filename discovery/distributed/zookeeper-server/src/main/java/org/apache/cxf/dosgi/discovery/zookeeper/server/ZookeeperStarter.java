@@ -61,7 +61,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
         }
     }
 
-    private void setDefaults(Dictionary<String, Object> dict) throws IOException {
+    private void setDefaults(Dictionary<String, String> dict) throws IOException {
         Utils.removeEmptyValues(dict); // to avoid NumberFormatExceptions
         Utils.setDefault(dict, "tickTime", "2000");
         Utils.setDefault(dict, "initLimit", "10");
@@ -70,14 +70,14 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
         Utils.setDefault(dict, "dataDir", new File(bundleContext.getDataFile(""), "zkdata").getCanonicalPath());
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public synchronized void updated(Dictionary dict) throws ConfigurationException {
+    @SuppressWarnings("unchecked")
+    public synchronized void updated(Dictionary<String, ?> dict) throws ConfigurationException {
         shutdown();
         if (dict == null) {
             return;
         }
         try {
-            setDefaults(dict);
+            setDefaults((Dictionary<String, String>)dict);
             QuorumPeerConfig config = parseConfig(dict);
             startFromConfig(config);
             LOG.info("Applied configuration update: " + dict);
@@ -86,8 +86,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    private QuorumPeerConfig parseConfig(Dictionary dict) throws IOException, ConfigException {
+    private QuorumPeerConfig parseConfig(Dictionary<String, ?> dict) throws IOException, ConfigException {
         QuorumPeerConfig config = new QuorumPeerConfig();
         config.parseProperties(Utils.toProperties(dict));
         return config;

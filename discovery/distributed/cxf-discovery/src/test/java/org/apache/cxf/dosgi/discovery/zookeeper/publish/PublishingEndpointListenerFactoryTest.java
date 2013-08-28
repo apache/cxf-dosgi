@@ -32,11 +32,13 @@ import org.osgi.service.remoteserviceadmin.EndpointListener;
 
 public class PublishingEndpointListenerFactoryTest extends TestCase {
 
+    @SuppressWarnings("unchecked")
     public void testScope() {
         IMocksControl c = EasyMock.createNiceControl();
 
         BundleContext ctx = c.createMock(BundleContext.class);
         ZooKeeper zk = c.createMock(ZooKeeper.class);
+        @SuppressWarnings("rawtypes")
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
 
         PublishingEndpointListenerFactory eplf = new PublishingEndpointListenerFactory(zk, ctx);
@@ -50,19 +52,15 @@ public class PublishingEndpointListenerFactoryTest extends TestCase {
         eplf.start();
         c.verify();
 
-        c.reset();
-        sreg.unregister();
-        EasyMock.expectLastCall().once();
-        c.replay();
-        eplf.stop();
-        c.verify();
     }
 
+    @SuppressWarnings("unchecked")
     public void testServiceFactory() {
         IMocksControl c = EasyMock.createNiceControl();
 
         BundleContext ctx = c.createMock(BundleContext.class);
         ZooKeeper zk = c.createMock(ZooKeeper.class);
+        @SuppressWarnings("rawtypes")
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
 
         PublishingEndpointListenerFactory eplf = new PublishingEndpointListenerFactory(zk, ctx);
@@ -79,7 +77,7 @@ public class PublishingEndpointListenerFactoryTest extends TestCase {
         c.replay();
         eplf.start();
 
-        Object service = eplf.getService(null, null);
+        PublishingEndpointListener service = eplf.getService(null, null);
         assertNotNull(service);
         assertTrue(service instanceof EndpointListener);
 

@@ -30,6 +30,7 @@ import org.easymock.classextension.IMocksControl;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.remoteserviceadmin.EndpointListener;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,8 +43,10 @@ public class InterfaceMonitorManagerTest {
         BundleContext ctx = c.createMock(BundleContext.class);
         ZooKeeper zk = c.createMock(ZooKeeper.class);
 
-        ServiceReference sref = c.createMock(ServiceReference.class);
-        ServiceReference sref2 = c.createMock(ServiceReference.class);
+        @SuppressWarnings("unchecked")
+        ServiceReference<EndpointListener> sref = c.createMock(ServiceReference.class);
+        @SuppressWarnings("unchecked")
+        ServiceReference<EndpointListener> sref2 = c.createMock(ServiceReference.class);
 
         final Map<String, ?> p = new HashMap<String, Object>();
 
@@ -75,19 +78,7 @@ public class InterfaceMonitorManagerTest {
 
         final List<IMocksControl> controls = new ArrayList<IMocksControl>();
 
-        InterfaceMonitorManager eltc = new InterfaceMonitorManager(ctx, zk) {
-            protected InterfaceMonitor createInterfaceMonitor(String scope, String objClass, Interest interest) {
-                IMocksControl lc = EasyMock.createNiceControl();
-                InterfaceMonitor im = lc.createMock(InterfaceMonitor.class);
-                im.start();
-                EasyMock.expectLastCall().once();
-                im.close();
-                EasyMock.expectLastCall().once();
-                lc.replay();
-                controls.add(lc);
-                return im;
-            }
-        };
+        InterfaceMonitorManager eltc = new InterfaceMonitorManager(ctx, zk);
 
         c.replay();
 

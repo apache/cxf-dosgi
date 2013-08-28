@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Dictionary;
 
 import org.apache.cxf.dosgi.discovery.zookeeper.publish.PublishingEndpointListenerFactory;
-import org.apache.cxf.dosgi.discovery.zookeeper.subscribe.EndpointListenerTrackerCustomizer;
+import org.apache.cxf.dosgi.discovery.zookeeper.subscribe.EndpointListenerTracker;
 import org.apache.cxf.dosgi.discovery.zookeeper.subscribe.InterfaceMonitorManager;
 import org.apache.cxf.dosgi.discovery.zookeeper.util.Utils;
 import org.apache.zookeeper.WatchedEvent;
@@ -45,21 +45,19 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
     private final BundleContext bctx;
 
     private PublishingEndpointListenerFactory endpointListenerFactory;
-    private ServiceTracker endpointListenerTracker;
+    private ServiceTracker<EndpointListener, EndpointListener> endpointListenerTracker;
     private InterfaceMonitorManager imManager;
     private ZooKeeper zk;
     private boolean closed;
 
-    @SuppressWarnings("rawtypes")
-    private Dictionary curConfiguration;
+    private Dictionary<String , ?> curConfiguration;
 
     public ZooKeeperDiscovery(BundleContext bctx) {
         this.bctx = bctx;
         this.curConfiguration = null;
     }
 
-    @SuppressWarnings("rawtypes")
-    public synchronized void updated(Dictionary configuration) throws ConfigurationException {
+    public synchronized void updated(Dictionary<String, ?> configuration) throws ConfigurationException {
         LOG.debug("Received configuration update for Zookeeper Discovery: {}", configuration);
 
         stop(false);
@@ -79,8 +77,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         endpointListenerFactory = new PublishingEndpointListenerFactory(zk, bctx);
         endpointListenerFactory.start();
         imManager = new InterfaceMonitorManager(bctx, zk);
-        EndpointListenerTrackerCustomizer customizer = new EndpointListenerTrackerCustomizer(imManager);
-        endpointListenerTracker = new ServiceTracker(bctx, EndpointListener.class.getName(), customizer);
+        endpointListenerTracker = new EndpointListenerTracker(bctx, imManager); 
         endpointListenerTracker.open();
     }
 
@@ -105,8 +102,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    private synchronized void createZooKeeper(Dictionary props) {
+    private synchronized void createZooKeeper(Dictionary<String, ?> props) {
         if (closed) {
             return;
         }

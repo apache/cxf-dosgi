@@ -38,7 +38,7 @@ public final class Utils {
      *
      * @param dict a dictionary
      */
-    public static void removeEmptyValues(Dictionary<String, Object> dict) {
+    public static void removeEmptyValues(Dictionary<String, ?> dict) {
         List<String> keysToRemove = new ArrayList<String>();
         Enumeration<String> keys = dict.keys();
         while (keys.hasMoreElements()) {
@@ -61,7 +61,7 @@ public final class Utils {
      * @param key the key
      * @param value the default value to set
      */
-    public static void setDefault(Dictionary<String, Object> dict, String key, String value) {
+    public static void setDefault(Dictionary<String, String> dict, String key, String value) {
         if (dict.get(key) == null) {
             dict.put(key, value);
         }

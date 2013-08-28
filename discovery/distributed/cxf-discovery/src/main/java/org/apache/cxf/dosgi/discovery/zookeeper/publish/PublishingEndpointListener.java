@@ -54,7 +54,7 @@ public class PublishingEndpointListener implements EndpointListener {
     private static final Logger LOG = LoggerFactory.getLogger(PublishingEndpointListener.class);
 
     private final ZooKeeper zk;
-    private final ServiceTracker discoveryPluginTracker;
+    private final ServiceTracker<DiscoveryPlugin, DiscoveryPlugin> discoveryPluginTracker;
     private final List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
     private boolean closed;
 
@@ -62,7 +62,8 @@ public class PublishingEndpointListener implements EndpointListener {
 
     public PublishingEndpointListener(ZooKeeper zk, BundleContext bctx) {
         this.zk = zk;
-        discoveryPluginTracker = new ServiceTracker(bctx, DiscoveryPlugin.class.getName(), null);
+        discoveryPluginTracker = new ServiceTracker<DiscoveryPlugin, DiscoveryPlugin>(bctx, 
+            DiscoveryPlugin.class, null);
         discoveryPluginTracker.open();
         endpointDescriptionParser = new EndpointDescriptionParser();
     }

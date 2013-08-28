@@ -91,7 +91,7 @@ public final class Utils {
         return copied == result.length ? result : Arrays.copyOf(result, copied);
     }
 
-    public static String[] getScopes(ServiceReference sref) {
+    public static String[] getScopes(ServiceReference<?> sref) {
         return removeEmpty(getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE)));
     }
 
@@ -128,7 +128,7 @@ public final class Utils {
      * @param serviceReference a service reference
      * @return the service's properties as a map
      */
-    public static Map<String, Object> getProperties(ServiceReference serviceReference) {
+    public static Map<String, Object> getProperties(ServiceReference<?> serviceReference) {
         String[] keys = serviceReference.getPropertyKeys();
         Map<String, Object> props = new HashMap<String, Object>(keys.length);
         for (String key : keys) {
