@@ -61,6 +61,9 @@ public class AbstractDosgiTest {
         Thread.sleep(interval);
     }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     protected ServiceReference waitService(BundleContext bc, Class cls, String filter, int timeout)
         throws Exception {
         System.out.println("Waiting for service: " + cls + " " + filter);

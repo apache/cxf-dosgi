@@ -49,7 +49,7 @@ public final class Utils {
         // prevent instantiation
     }
 
-    public static List<String> getStringPlusProperty(ServiceReference sr, String key) {
+    public static List<String> getStringPlusProperty(ServiceReference<?> sr, String key) {
         Object value = sr.getProperty(key);
         if (value == null) {
             return Collections.emptyList();

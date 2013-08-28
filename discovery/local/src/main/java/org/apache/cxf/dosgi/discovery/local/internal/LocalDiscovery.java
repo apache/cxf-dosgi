@@ -51,36 +51,37 @@ public class LocalDiscovery implements BundleListener {
     final BundleContext bundleContext;
 
     EndpointDescriptionBundleParser bundleParser;
-    ServiceTracker listenerTracker;
+    ServiceTracker<EndpointListener, EndpointListener> listenerTracker;
 
     public LocalDiscovery(BundleContext bc) {
         this.bundleParser = new EndpointDescriptionBundleParser();
         bundleContext = bc;
 
-        listenerTracker = new ServiceTracker(bundleContext, EndpointListener.class.getName(), null) {
+        listenerTracker = new ServiceTracker<EndpointListener, EndpointListener>(bundleContext, 
+            EndpointListener.class, null) {
 
             @Override
-            public Object addingService(ServiceReference reference) {
-                Object svc = super.addingService(reference);
-                registerTracker(reference, svc);
+            public EndpointListener addingService(ServiceReference<EndpointListener> reference) {
+                EndpointListener svc = super.addingService(reference);
+                addListener(reference, svc);
                 return svc;
             }
 
             @Override
-            public void modifiedService(ServiceReference reference, Object service) {
+            public void modifiedService(ServiceReference<EndpointListener> reference, EndpointListener service) {
                 super.modifiedService(reference, service);
-                clearTracker(service);
+                removeListener(service);
 
                 // This may cause duplicate registrations of remote services,
                 // but that's fine and should be filtered out on another level.
-                // See Remove Service Admin spec section 122.6.3
-                registerTracker(reference, service);
+                // See Remote Service Admin spec section 122.6.3
+                addListener(reference, service);
             }
 
             @Override
-            public void removedService(ServiceReference reference, Object service) {
+            public void removedService(ServiceReference<EndpointListener> reference, EndpointListener service) {
                 super.removedService(reference, service);
-                clearTracker(service);
+                removeListener(service);
             }
         };
         listenerTracker.open();
@@ -102,29 +103,11 @@ public class LocalDiscovery implements BundleListener {
         }
     }
 
-    void registerTracker(ServiceReference reference, Object svc) {
-        if (svc instanceof EndpointListener) {
-            EndpointListener endpointListener = (EndpointListener) svc;
-            Collection<String> filters = addListener(reference, endpointListener);
-            triggerCallbacks(filters, endpointListener);
-        }
-    }
-
-    void clearTracker(Object svc) {
-        if (svc instanceof EndpointListener) {
-            EndpointListener endpointListener = (EndpointListener) svc;
-            removeListener(endpointListener);
-            // If the tracker was removed or the scope was changed this doesn't require
-            // additional callbacks on the tracker. Its the responsibility of the tracker
-            // itself to clean up any orphans. See Remote Service Admin spec 122.6.3
-        }
-    }
-
-    private Collection<String> addListener(ServiceReference endpointListenerRef, EndpointListener endpointListener) {
+    void addListener(ServiceReference<EndpointListener> endpointListenerRef, EndpointListener endpointListener) {
         List<String> filters = Utils.getStringPlusProperty(endpointListenerRef,
                 EndpointListener.ENDPOINT_LISTENER_SCOPE);
         if (filters.isEmpty()) {
-            return filters;
+            return;
         }
 
         listenerToFilters.put(endpointListener, filters);
@@ -138,11 +121,16 @@ public class LocalDiscovery implements BundleListener {
                 filterToListeners.put(filter, list);
             }
         }
-
-        return filters;
+        triggerCallbacks(filters, endpointListener);
     }
 
-    private void removeListener(EndpointListener endpointListener) {
+    /**
+     * If the tracker was removed or the scope was changed this doesn't require
+     * additional callbacks on the tracker. Its the responsibility of the tracker
+     * itself to clean up any orphans. See Remote Service Admin spec 122.6.3
+     * @param endpointListener
+     */
+    void removeListener(EndpointListener endpointListener) {
         Collection<String> filters = listenerToFilters.remove(endpointListener);
         if (filters == null) {
             return;
