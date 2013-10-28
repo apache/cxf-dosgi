@@ -56,6 +56,7 @@
             <phase>generate-resources</phase>
             <goals>
               <goal>features-export-meta-data</goal>
+              <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
               <descriptors>
