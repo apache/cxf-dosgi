@@ -41,7 +41,7 @@
 
         <osgi.version>4.3.1</osgi.version>
         <osgi.compendium.version>4.3.1</osgi.compendium.version>
-        <cxf.version>2.7.6</cxf.version>
+        <cxf.version>2.7.7-SNAPSHOT</cxf.version>
         <cxf.build-utils.version>2.5.0</cxf.build-utils.version>
         <felix.version>4.2.1</felix.version>
         <spring.version>3.0.6.RELEASE</spring.version>
@@ -65,7 +65,7 @@
         <commons.pool.bundle.version>1.5.4_1</commons.pool.bundle.version>
         <woodstox.bundle.version>4.1.4</woodstox.bundle.version>
         <jaxbimpl.bundle.version>2.2.1.1_2</jaxbimpl.bundle.version>
-        <slf4j.version>1.6.4</slf4j.version>
+        <slf4j.version>1.7.0</slf4j.version>
         <felix.plugin.version>2.4.0</felix.plugin.version>
         <exam.version>3.2.0</exam.version>
         <cxf.resources.base.path />
@@ -355,41 +355,6 @@
                         </configuration>
                         <goals>
                             <goal>checkstyle</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.7.1</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.cxf.build-utils</groupId>
-                        <artifactId>cxf-buildtools</artifactId>
-                        <version>${cxf.build-utils.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <rulesets>
-                        <ruleset>${cxf.resources.base.path}cxf-pmd-ruleset.xml</ruleset>
-                        <ruleset>${cxf.resources.base.path}cxf-pmd-custom.xml</ruleset>
-                    </rulesets>
-                    <sourceEncoding>UTF-8</sourceEncoding>
-                    <targetJdk>1.6</targetJdk>
-                    <linkXRef>false</linkXRef>
-                    <includeTests>true</includeTests>
-                    <verbose>true</verbose>
-                    <excludeRoots>
-                        <excludeRoot>${basedir}/src/main/generated</excludeRoot>
-                    </excludeRoots>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>

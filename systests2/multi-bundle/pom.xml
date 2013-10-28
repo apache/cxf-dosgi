@@ -170,6 +170,24 @@
             <scope>test</scope>
         </dependency>
         
+        <dependency>
+        	<groupId>org.apache.cxf.services.xkms</groupId>
+        	<artifactId>cxf-services-xkms-features</artifactId>
+        	<version>${cxf.version}</version>
+        	<type>xml</type>
+        </dependency>
+        <dependency>
+        	<groupId>org.apache.cxf.services.xkms</groupId>
+        	<artifactId>cxf-services-xkms-common</artifactId>
+        	<version>${cxf.version}</version>
+        	<scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.apache.cxf.services.xkms</groupId>
+        	<artifactId>cxf-services-xkms-client</artifactId>
+        	<version>${cxf.version}</version>
+        	<scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -102,10 +102,10 @@ public final class MultiBundleTools {
                 System.out.println(bundleUri);
             }
             bundleJar.close();
-            if (!bundleUri.contains("pax-logging")) {
-                opts.add(CoreOptions.bundle(bundleUri));
-            }
+            
+            opts.add(CoreOptions.bundle(bundleUri));
         }
+        System.out.println(opts);
         return opts.toArray(new Option[opts.size()]);
     }
 
