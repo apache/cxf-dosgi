@@ -10,7 +10,7 @@ osgi.bundles=org.eclipse.osgi.services@start, \
 ../plugins/org.apache.felix.gogo.shell_0.8.0.v201110170705.jar@start, \
 ../plugins/org.apache.felix.gogo.command_0.8.0.v201108120515.jar@start, \
 ../plugins/org.apache.felix.gogo.runtime_0.8.0.v201108120515.jar@start, \
-<xsl:for-each select="//bundle[not(contains(@name,'cxf-karaf-commands'))]">../dosgi_bundles/<xsl:value-of select="@name"/>@start, \
+<xsl:for-each select="//bundle"><xsl:sort select="@start-level" data-type="number" order="ascending"/>../dosgi_bundles/<xsl:value-of select="@name"/>@start,\
 </xsl:for-each>
   </xsl:template>
 </xsl:transform>

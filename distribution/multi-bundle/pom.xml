@@ -73,7 +73,7 @@
               <repository>target/distribution_bundles</repository>
               <resolveDefinedRepositoriesRecursively>true</resolveDefinedRepositoriesRecursively>
               <flatRepoLayout>true</flatRepoLayout>
-              <exportMetaData>true</exportMetaData>
+              <mergedFeature>true</mergedFeature>
               <karafVersion>2.3.2</karafVersion>
             </configuration>
           </execution>
@@ -87,19 +87,9 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <path id="current.dir.path">
-                  <pathelement location="." />
-                </path>
-                <pathconvert targetos="unix" property="current.dir" refid="current.dir.path" />
-
-                <xslt processor="trax" in="target/features.xml" out="target/distribution_configs/felix.config.properties.append" style="src/main/xsl/felix_distro_config.xslt">
-                    <param name="Version" expression="${dosgi.version}" />
-                    <param name="Offset" expression="50" />
-                </xslt>
-
-                <xslt processor="trax" in="target/features.xml" out="target/distribution_configs/config.ini" style="src/main/xsl/equinox_distro_config.xslt">
-                      <param name="TargetDir" expression="${current.dir}/target/" />
-                </xslt>
+                <xslt processor="trax" in="target/features.xml" out="target/filtered-features.xml" style="src/main/xsl/filter_features.xslt"/>
+                <xslt processor="trax" in="target/filtered-features.xml" out="target/distribution_configs/felix.config.properties.append" style="src/main/xsl/felix_distro_config.xslt"/>
+                <xslt processor="trax" in="target/filtered-features.xml" out="target/distribution_configs/config.ini" style="src/main/xsl/equinox_distro_config.xslt"/>
               </target>
             </configuration>
             <goals>
