@@ -23,7 +23,7 @@
         <feature>cxf-databinding-aegis</feature>
         <feature>cxf-http-jetty</feature>
         <feature>cxf-http</feature>
-        <bundle start-level="8">mvn:org.osgi/org.osgi.compendium/${osgi.compendium.version}</bundle>
+        <bundle start-level="8">mvn:${project.groupId}/cxf-dosgi-ri-osgi-api/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-topology-manager/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-dsw-cxf/${project.version}</bundle>
     </feature>

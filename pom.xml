@@ -105,6 +105,7 @@
         <module>dsw</module>
         <module>discovery</module>
         <module>samples</module>
+        <module>osgi-api</module>
         <module>distribution</module>
         <module>systests2</module>
     </modules>
