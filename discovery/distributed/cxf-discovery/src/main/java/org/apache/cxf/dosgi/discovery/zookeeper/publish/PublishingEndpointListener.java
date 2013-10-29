@@ -166,8 +166,8 @@ public class PublishingEndpointListener implements EndpointListener {
             LOG.debug("Removing ZooKeeper node: {}", fullPath);
             try {
                 zk.delete(fullPath, -1);
-            } catch (Exception e) {
-                LOG.debug("Error while removing endpoint");
+            } catch (Exception ex) {
+                LOG.debug("Error while removing endpoint: {}", ex); // e.g. session expired
             }
         }
     }

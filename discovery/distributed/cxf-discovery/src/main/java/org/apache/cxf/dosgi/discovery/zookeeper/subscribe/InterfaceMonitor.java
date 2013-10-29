@@ -98,7 +98,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
      * Zookeeper Watcher interface callback.
      */
     public void process(WatchedEvent event) {
-        LOG.debug("ZooKeeper watcher callback for event {}", event);
+        LOG.debug("ZooKeeper watcher callback on node {} for event {}", znode, event);
         processDelta();
     }
 
@@ -131,7 +131,7 @@ public class InterfaceMonitor implements Watcher, StatCallback {
         }
 
         if (zk.getState() != ZooKeeper.States.CONNECTED) {
-            LOG.info("ZooKeeper connection was already closed! Not processing changed event.");
+            LOG.debug("ZooKeeper connection was already closed! Not processing changed event.");
             return;
         }
 
@@ -143,7 +143,11 @@ public class InterfaceMonitor implements Watcher, StatCallback {
                 LOG.debug("znode {} doesn't exist -> not processing any changes", znode);
             }
         } catch (Exception e) {
-            LOG.error("Error getting ZooKeeper data.", e);
+            if (zk.getState() != ZooKeeper.States.CONNECTED) {
+                LOG.debug("Error getting Zookeeper data: " + e); // e.g. session expired, handled by ZooKeeperDiscovery
+            } else {
+                LOG.error("Error getting ZooKeeper data.", e);
+            }
         }
     }
 
