@@ -46,6 +46,7 @@ public class PublishingEndpointListenerFactory implements ServiceFactory<Publish
     private final BundleContext bctx;
     private final ZooKeeper zk;
     private final List<PublishingEndpointListener> listeners = new ArrayList<PublishingEndpointListener>();
+    private ServiceRegistration serviceRegistration;
 
     public PublishingEndpointListenerFactory(ZooKeeper zk, BundleContext bctx) {
         this.bctx = bctx;
@@ -55,18 +56,18 @@ public class PublishingEndpointListenerFactory implements ServiceFactory<Publish
     public PublishingEndpointListener getService(Bundle b, ServiceRegistration<PublishingEndpointListener> sr) {
         LOG.debug("new EndpointListener from factory");
         synchronized (listeners) {
-            PublishingEndpointListener epl = new PublishingEndpointListener(zk, bctx);
-            listeners.add(epl);
-            return epl;
+            PublishingEndpointListener pel = new PublishingEndpointListener(zk, bctx);
+            listeners.add(pel);
+            return pel;
         }
     }
 
     public void ungetService(Bundle b, ServiceRegistration<PublishingEndpointListener> sr, 
-                             PublishingEndpointListener service) {
+                             PublishingEndpointListener pel) {
         LOG.debug("remove EndpointListener");
         synchronized (listeners) {
-            if (listeners.remove(service)) {
-                ((PublishingEndpointListener)service).close();
+            if (listeners.remove(pel)) {
+                pel.close();
             }
         }
     }
@@ -77,13 +78,17 @@ public class PublishingEndpointListenerFactory implements ServiceFactory<Publish
                   "(&(" + Constants.OBJECTCLASS + "=*)(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID
                   + "=" + Utils.getUUID(bctx) + "))");
         props.put(ZooKeeperDiscovery.DISCOVERY_ZOOKEEPER_ID, "true");
-        bctx.registerService(EndpointListener.class.getName(), this, props);
+        serviceRegistration = bctx.registerService(EndpointListener.class.getName(), this, props);
     }
 
     public synchronized void stop() {
+        if (serviceRegistration != null) {
+            serviceRegistration.unregister();
+            serviceRegistration = null;
+        }
         synchronized (listeners) {
-            for (PublishingEndpointListener epl : listeners) {
-                epl.close();
+            for (PublishingEndpointListener pel : listeners) {
+                pel.close();
             }
             listeners.clear();
         }
