@@ -49,6 +49,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
     private InterfaceMonitorManager imManager;
     private ZooKeeper zk;
     private boolean closed;
+    private boolean started;
 
     private Dictionary<String , ?> curConfiguration;
 
@@ -73,18 +74,27 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         if (closed) {
             return;
         }
+        if (started) {
+            // we must be re-entrant, i.e. can be called when already started
+            LOG.debug("ZookeeperDiscovery already started");
+            return;
+        }
         LOG.debug("starting ZookeeperDiscovery");
         endpointListenerFactory = new PublishingEndpointListenerFactory(zk, bctx);
         endpointListenerFactory.start();
         imManager = new InterfaceMonitorManager(bctx, zk);
         endpointListenerTracker = new EndpointListenerTracker(bctx, imManager); 
         endpointListenerTracker.open();
+        started = true;
     }
 
     public synchronized void stop(boolean close) {
+        if (started) {
+            LOG.debug("stopping ZookeeperDiscovery");
+        }
+        started = false;
         closed |= close;
         if (endpointListenerFactory != null) {
-            LOG.debug("stopping ZookeeperDiscovery");
             endpointListenerFactory.stop();
         }
         if (endpointListenerTracker != null) {
@@ -114,15 +124,18 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         try {
             zk = new ZooKeeper(host + ":" + port, timeout, this);
         } catch (IOException e) {
-            LOG.error("Failed to start the Zookeeper Discovery component.", e);
+            LOG.error("Failed to start the ZooKeeper Discovery component.", e);
         }
     }
 
     /* Callback for ZooKeeper */
     public void process(WatchedEvent event) {
+        LOG.debug("got ZooKeeper event " + event);
         switch (event.getState()) {
         case SyncConnected:
             LOG.info("Connection to ZooKeeper established");
+            // this event can be triggered more than once in a row (e.g. after Disconnected event),
+            // so we must be re-entrant here
             start();
             break;
 
