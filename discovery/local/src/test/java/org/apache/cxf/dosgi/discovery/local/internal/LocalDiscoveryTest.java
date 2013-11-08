@@ -21,12 +21,10 @@ package org.apache.cxf.dosgi.discovery.local.internal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -275,10 +273,9 @@ public class LocalDiscoveryTest extends TestCase {
         assertEquals(1, ld.listenerToFilters.size());
         assertEquals(Arrays.asList("(|(objectClass=org.example.ClassA)(objectClass=org.example.ClassB))"),
             ld.listenerToFilters.get(el));
-        assertEquals(2, ld.filterToListeners.size());
+        assertEquals(1, ld.filterToListeners.size());
         assertEquals(Collections.singletonList(el),
             ld.filterToListeners.get("(|(objectClass=org.example.ClassA)(objectClass=org.example.ClassB))"));
-        assertEquals(0, ld.filterToListeners.get("(objectClass=org.example.ClassA)").size());
 
         EasyMock.verify(el);
         Set<String> expectedEndpoints = new HashSet<String>(Arrays.asList("org.example.ClassA", "org.example.ClassB"));
@@ -287,10 +284,7 @@ public class LocalDiscoveryTest extends TestCase {
         // Remove the EndpointListener Service
         ld.listenerTracker.removedService(sr, el);
         assertEquals(0, ld.listenerToFilters.size());
-        assertEquals(2, ld.filterToListeners.size());
-        Iterator<Collection<EndpointListener>> valIter = ld.filterToListeners.values().iterator();
-        assertEquals(0, valIter.next().size());
-        assertEquals(0, valIter.next().size());
+        assertEquals(0, ld.filterToListeners.size());
     }
 
     public void testRegisterTracker() throws Exception {
@@ -390,8 +384,7 @@ public class LocalDiscoveryTest extends TestCase {
         assertEquals(1, ld.filterToListeners.values().iterator().next().size());
         ld.removeListener(endpointListener);
         assertEquals(0, ld.listenerToFilters.size());
-        assertEquals(2, ld.filterToListeners.size());
-        assertEquals(0, ld.filterToListeners.values().iterator().next().size());
+        assertEquals(0, ld.filterToListeners.size());
     }
 
     private LocalDiscovery getLocalDiscovery() throws InvalidSyntaxException {

@@ -110,17 +110,18 @@ public class LocalDiscovery implements BundleListener {
             return;
         }
 
-        listenerToFilters.put(endpointListener, filters);
-        for (String filter : filters) {
-            Collection<EndpointListener> listeners = filterToListeners.get(filter);
-            if (listeners != null) {
+        synchronized (listenerToFilters) {
+            listenerToFilters.put(endpointListener, filters);
+            for (String filter : filters) {
+                Collection<EndpointListener> listeners = filterToListeners.get(filter);
+                if (listeners == null) {
+                    listeners = new ArrayList<EndpointListener>();
+                    filterToListeners.put(filter, listeners);
+                }
                 listeners.add(endpointListener);
-            } else {
-                List<EndpointListener> list = new ArrayList<EndpointListener>();
-                list.add(endpointListener);
-                filterToListeners.put(filter, list);
             }
         }
+
         triggerCallbacks(filters, endpointListener);
     }
 
@@ -131,17 +132,36 @@ public class LocalDiscovery implements BundleListener {
      * @param endpointListener
      */
     void removeListener(EndpointListener endpointListener) {
-        Collection<String> filters = listenerToFilters.remove(endpointListener);
-        if (filters == null) {
-            return;
-        }
+        synchronized (listenerToFilters) {
+            Collection<String> filters = listenerToFilters.remove(endpointListener);
+            if (filters == null) {
+                return;
+            }
 
-        for (String filter : filters) {
-            Collection<EndpointListener> endpointListeners = filterToListeners.get(filter);
-            if (endpointListeners != null) {
-                endpointListeners.remove(endpointListener);
+            for (String filter : filters) {
+                Collection<EndpointListener> listeners = filterToListeners.get(filter);
+                if (listeners != null) {
+                    listeners.remove(endpointListener);
+                    if (listeners.isEmpty()) {
+                        filterToListeners.remove(filter);
+                    }
+                }
             }
         }
+    }
+
+    private Map<String, Collection<EndpointListener>> getMatchingListeners(EndpointDescription endpoint) {
+        // return a copy of matched filters/listeners so that caller doesn't need to hold locks while triggering events
+        Map<String, Collection<EndpointListener>> matched = new HashMap<String, Collection<EndpointListener>>();
+        synchronized (listenerToFilters) {
+            for (Entry<String, Collection<EndpointListener>> entry : filterToListeners.entrySet()) {
+                String filter = entry.getKey();
+                if (Utils.matchFilter(bundleContext, filter, endpoint)) {
+                    matched.put(filter, new ArrayList<EndpointListener>(entry.getValue()));
+                }
+            }
+        }
+        return matched;
     }
 
     public void shutDown() {
@@ -190,23 +210,24 @@ public class LocalDiscovery implements BundleListener {
     }
 
     private void triggerCallbacks(EndpointDescription endpoint, boolean added) {
-        for (Map.Entry<EndpointListener, Collection<String>> entry : listenerToFilters.entrySet()) {
-            for (String match : entry.getValue()) {
-                triggerCallbacks(entry.getKey(), match, endpoint, added);
+        for (Map.Entry<String, Collection<EndpointListener>> entry : getMatchingListeners(endpoint).entrySet()) {
+            String filter = entry.getKey();
+            for (EndpointListener listener : entry.getValue()) {
+                triggerCallbacks(listener, filter, endpoint, added);
             }
         }
     }
 
-    private void triggerCallbacks(EndpointListener endpointListener, String toMatch,
+    private void triggerCallbacks(EndpointListener endpointListener, String filter,
             EndpointDescription endpoint, boolean added) {
-        if (!Utils.matchFilter(bundleContext, toMatch, endpoint)) {
+        if (!Utils.matchFilter(bundleContext, filter, endpoint)) {
             return;
         }
 
         if (added) {
-            endpointListener.endpointAdded(endpoint, toMatch);
+            endpointListener.endpointAdded(endpoint, filter);
         } else {
-            endpointListener.endpointRemoved(endpoint, toMatch);
+            endpointListener.endpointRemoved(endpoint, filter);
         }
     }
 
