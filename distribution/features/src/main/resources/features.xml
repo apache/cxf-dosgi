@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-dosgi-${project.version}">
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
 
 	<feature name="cxf-dosgi-base" description="base libs needed outside karaf" version="${project.version}" resolver="(obr)">
