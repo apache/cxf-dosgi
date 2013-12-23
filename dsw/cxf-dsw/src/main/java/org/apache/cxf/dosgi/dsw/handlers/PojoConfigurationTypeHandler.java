@@ -141,6 +141,10 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     private DataBinding getDataBinding(Map<String, Object> sd, Class<?> iClass) {
+        Object dataBindingBeanProp = sd.get(Constants.WS_DATABINDING_BEAN_PROP_KEY);
+        if (dataBindingBeanProp instanceof DataBinding) {
+            return (DataBinding)dataBindingBeanProp;
+        } 
         return isJAXB(sd, iClass) ? new JAXBDataBinding() : new AegisDatabinding();
     }
 

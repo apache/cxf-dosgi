@@ -77,6 +77,7 @@ public final class Constants {
     public static final String WS_FEATURES_PROP_KEY = WS_CONFIG_TYPE + ".features";
 
     public static final String WS_DATABINDING_PROP_KEY = WS_CONFIG_TYPE + ".databinding";
+    public static final String WS_DATABINDING_BEAN_PROP_KEY = WS_DATABINDING_PROP_KEY + ".bean";
     public static final String WS_DATA_BINDING_JAXB = "jaxb";
     public static final String WS_DATA_BINDING_AEGIS = "aegis";
 
