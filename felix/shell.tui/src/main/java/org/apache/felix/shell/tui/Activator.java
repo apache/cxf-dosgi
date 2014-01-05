@@ -39,6 +39,7 @@ public class Activator implements BundleActivator {
     private BundleContext context;
     private ShellTuiRunnable shellRunnable;
     private Thread thread;
+    private ServiceListener listener;
     private ServiceReference shellRef;
     private ShellService shell;
 
@@ -46,29 +47,9 @@ public class Activator implements BundleActivator {
         context = bcontext;
 
         // Listen for registering/unregistering impl service.
-        ServiceListener sl = new ServiceListener() {
-            public void serviceChanged(ServiceEvent event) {
-                synchronized (Activator.this) {
-                    // Ignore additional services if we already have one.
-                    if (event.getType() == ServiceEvent.REGISTERED && shellRef != null) {
-                        return;
-                    } else if (event.getType() == ServiceEvent.REGISTERED && shellRef == null) {
-                        // Initialize the service if we don't have one.
-                        initializeService();
-                    } else if (event.getType() == ServiceEvent.UNREGISTERING
-                        && event.getServiceReference().equals(shellRef)) {
-                        // Unget the service if it is unregistering.
-                        context.ungetService(shellRef);
-                        shellRef = null;
-                        shell = null;
-                        // Try to get another service.
-                        initializeService();
-                    }
-                }
-            }
-        };
+        listener = new ShellServiceListener();
         try {
-            context.addServiceListener(sl,
+            context.addServiceListener(listener,
                     "(objectClass=" + org.apache.felix.shell.ShellService.class.getName() + ")");
         } catch (InvalidSyntaxException ex) {
             System.err.println("ShellTui: Cannot add service listener.");
@@ -85,6 +66,17 @@ public class Activator implements BundleActivator {
         thread.start();
     }
 
+    public void stop(BundleContext bcontext) {
+        if (shellRunnable != null) {
+            shellRunnable.stop();
+            thread.interrupt();
+        }
+        if (listener != null) {
+            context.removeServiceListener(listener);
+        }
+        uninitializeService();
+    }
+
     private synchronized void initializeService() {
         if (shell != null) {
             return;
@@ -96,16 +88,37 @@ public class Activator implements BundleActivator {
         shell = (ShellService)context.getService(shellRef);
     }
 
-    public void stop(BundleContext bcontext) {
-        if (shellRunnable != null) {
-            shellRunnable.stop();
-            thread.interrupt();
+    private synchronized void uninitializeService() {
+        if (shellRef != null) {
+            context.ungetService(shellRef);
+        }
+        shellRef = null;
+        shell = null;
+    }
+
+    private class ShellServiceListener implements ServiceListener {
+        public void serviceChanged(ServiceEvent event) {
+            synchronized (Activator.this) {
+                if (event.getType() == ServiceEvent.REGISTERED) {
+                    // Ignore additional services if we already have one.
+                    if (shellRef == null) {
+                        // Initialize the service if we don't have one.
+                        initializeService();
+                    }
+                } else if (event.getType() == ServiceEvent.UNREGISTERING
+                        && event.getServiceReference().equals(shellRef)) {
+                    // Unget the service if it is unregistering.
+                    uninitializeService();
+                    // Try to get another service.
+                    initializeService();
+                }
+            }
         }
     }
 
     private class ShellTuiRunnable implements Runnable {
 
-        private boolean stop;
+        private volatile boolean stop;
 
         public void stop() {
             stop = true;
