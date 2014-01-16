@@ -60,15 +60,13 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>mvn:org.apache.karaf.assemblies.features/standard/2.3.2/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.assemblies.features/standard/2.3.3/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.dosgi/cxf-dosgi/${project.version}/xml/features</descriptor>
-                <descriptor>mvn:org.apache.cxf.services.xkms/cxf-services-xkms-features/${cxf.version}/xml</descriptor>
               </descriptors>
               <features>
                 <feature>cxf-dosgi-base</feature>
                 <feature>cxf-dosgi-discovery-distributed</feature>
                 <feature>cxf-dosgi-zookeeper-server</feature>
-                <feature>cxf-xkms-client</feature>
               </features>
               <repository>target/distribution_bundles</repository>
               <resolveDefinedRepositoriesRecursively>true</resolveDefinedRepositoriesRecursively>
