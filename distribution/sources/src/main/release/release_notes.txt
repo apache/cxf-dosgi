@@ -1,4 +1,26 @@
-See: http://cxf.apache.org/dosgi-releases.html
+
+Release Notes - CXF Distributed OSGi - Version 1.6.0
+====================================================
+
+** Bug
+    * [DOSGI-11] - dOSGi creates new databinding instance instead of using a spring-loaded databinding if available
+    * [DOSGI-196] - Greeter demo does not work in standalone Felix
+    * [DOSGI-198] - Imported service is gone after client bundle is restarted
+    * [DOSGI-206] - Parse errors for xml files in discovery local and dsw
+    * [DOSGI-207] - Update karaf maven plugin to release version
+    * [DOSGI-208] - OSGi compendium bundle installed by feature causes problems
+    * [DOSGI-210] - Service registration and memory leaks
+
+** Improvement
+    * [DOSGI-201] - Create DSOGi distro from karaf feature file
+    * [DOSGI-202] - Make DOSGi independent of jdom
+    * [DOSGI-203] - Upgrade to cxf 2.7.6
+    * [DOSGI-204] - Update osgi spec version to 4.3.1 and felix to 4.2.1
+    * [DOSGI-205] - Upgrade to pax exam 3.2
+
+** Task
+    * [DOSGI-212] - Update CXF version to 2.7.8
+
 
 Release Notes - CXF Distributed OSGi - Version 1.5.0
 ====================================================
@@ -44,19 +66,80 @@ Release Notes - CXF Distributed OSGi - Version 1.5.0
     * [DOSGI-184] - Split Endpoint repository from TopologyManagerExport
     * [DOSGI-193] - Split discovery.zookeeper package into subpackages
 
-Apache CXF Distributed OSGi 1.4.0 Release Notes
-===============================================
 
-* 30 issues resolved (see jira) https://issues.apache.org/jira/browse/DOSGI/fixforversion/12319877
-* Karaf feature for easy installation in Apache Karaf
-* Zookeeper discovery now supports automatic reconnects and Cluster configuration
-* DOSGi is now independent of spring dm
-* Custom intents are now created by publishing e.g. CXF Features as services
-* Big refactorings make the code much easier to understand
+Release Notes - CXF Distributed OSGi - Version 1.4.0
+====================================================
 
-Known issues
+** Bug
+    * [DOSGI-10] - Spring schema handling (intents) doesn't work properly
+    * for the single-bundle case
+    * [DOSGI-18] - RESTful Proxies can not be created in multibundle DOSGI
+    * distributions 
+    * [DOSGI-63] - The discovery can be used be used before the connection
+    * to the server is completely established
+    * [DOSGI-69] - CXF-DOSGi requires internet access when reading XML
+    * [DOSGI-90] - Do not use/assume that endpoint.id is an address
+    * [DOSGI-92] - Exception : Applying intent: SOAP via binding config
+    * [DOSGI-109] - NullPointerException in ToloplogyManager during bundle
+    * stop
+    * [DOSGI-110] - Unable to export multiple services
+    * [DOSGI-111] - DOSGi bundle attempts to load WSDL using wrong bundle in
+    * WSDL-first configuration 
+    * [DOSGI-113] - Integration with pax-logging not possible
+    * [DOSGI-114] - RemoteServiceAdmin is not available warnings in DOSGi
+    * 1.3
+    * [DOSGI-116] - Build fails when downloading Zookeeper artifacts
+    * [DOSGI-119] - Single bundle activator fails to stop all the bundles if
+    * one of the activators throws an exception
+    * [DOSGI-120] - NullPointerException on export
+    * [DOSGI-121] - Fix logging: System.out prints, printStackTrace, verbose
+    * logs
+    * [DOSGI-123] - ZooKeeper registrations are not recreated on ZooKeeper
+    * server restart
+    * [DOSGI-125] - The dead lock in TopologyManagerImport
+    * [DOSGI-129] - NPE when stopping a bundle that exports a DOSGI service
+    * [DOSGI-135] - Switch logging api to slf4j
+    * [DOSGI-136] - Refactor zookeeper server and add metatype config
+    * [DOSGI-137] - Possible bug in TopologyManagerImport when checking if
+    * an Endpoint is already imported
+    * [DOSGI-142] - Upgrade CXF to 2.7.0
+    * [DOSGI-145] - Multiple services using HTTP Service and published from
+    * the same bundle do not work 
+    * [DOSGI-150] - Update to Java 1.6
+    * [DOSGI-153] - Error starting greeter sample in karaf 2.3.0 in aegis
+    * setup: ExceptionInInitializerError ... failed to create an
+    * XPathFactory for the default object model:
+    * http://java.sun.com/jaxp/xpath/dom
+    * [DOSGI-154] - Problems with api packages since update to cxf 2.7.2
 
-* The default aegis data format will not work with Apache Karaf 2.3.0. (See DOSGI-153). Please upgrade to Apache Karaf 2.3.1
+** Improvement
+    * [DOSGI-70] - Reconnect automatically to Zookeeper after a connection
+    * loss / timeout
+    * [DOSGI-86] - Decouple DOSGi DSW from Spring DM.
+    * [DOSGI-126] - Allow to use the servlet transport with automatic
+    * discovery
+    * [DOSGI-127] - Default address for services should use the servlet
+    * transport
+    * [DOSGI-128] - Allow to use JAXWS/JAXB service without frontend and
+    * databinding properties
+    * [DOSGI-130] - Clean up unused code and fix warnings, use interfaces
+    * where possible in DSW
+    * [DOSGI-131] - Switch slf4j from springsource bundles to org.slf4j,
+    * update slf4j version
+    * [DOSGI-132] - Switch logging at runtime to pax logging
+    * [DOSGI-133] - Create a Karaf feature file for CXF DOSGi
+    * [DOSGI-134] - Refactoring of TopologyManager
+    * [DOSGI-138] - Refactoring of discovery distributed
+    * [DOSGI-139] - Refactor dsw-cxf to remove dep cycles
+    * [DOSGI-141] - ZooKeeper is not support cluster (ensemble) mode
+    * [DOSGI-143] - Remove all repos except for apache snapshot and central
+    * [DOSGI-146] - Allow to define intents as OSGi services
+    * [DOSGI-147] - Deprecate some Constants that are defined in the spec
+    * [DOSGI-148] - Refactoring of dsw ConfigTypeHandlers
+    * [DOSGI-149] - Optimize distributions and karaf feature
+
+** New Feature
+    * [DOSGI-115] - Use Spring DM and Eclipse Gemini Blueprint with DOSGi
 
 Apache CXF Distributed OSGi 1.3.1 Release Notes
 ===============================================
