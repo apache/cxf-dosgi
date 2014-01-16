@@ -15,12 +15,12 @@
     <artifactId>cxf-dosgi-ri-samples-discovery-client</artifactId>
     <packaging>bundle</packaging>
     <name>Distributed OSGI Discovery Sample Client Bundle</name>
-    <version>1.6.0</version>
+    <version>1.7-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.dosgi.samples</groupId>
         <artifactId>cxf-dosgi-ri-samples-discovery-parent</artifactId>
-        <version>1.6.0</version>
+        <version>1.7-SNAPSHOT</version>
     </parent>
 
     <dependencies>
