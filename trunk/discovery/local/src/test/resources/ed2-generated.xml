@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoint-descriptions xmlns="http://www.osgi.org/xmlns/rsa/v1.0.0">
+    <endpoint-description>
+        <property name="service.imported.configs" value="org.apache.cxf.ws" />
+        <property name="endpoint.id" value="foo:bar" />
+        <property name="objectClass">
+            <array>
+                <value>com.acme.HelloService</value>
+                <value>some.other.Service</value>
+            </array>
+        </property>
+        <property name="long" value-type="Long" value="9223372036854775807" />
+        <property name="Long2" value-type="Long" value="-1" />
+        <property name="double" value-type="Double"
+            value="1.7976931348623157E308" />
+        <property name="Double2" value-type="Double" value="1.0" />
+        <property name="float" value-type="Float" value="42.24" />
+        <property name="Float2" value-type="Float" value="1.0" />
+        <property name="int" value-type="Integer" value="17" />
+        <property name="Integer2" value-type="Integer" value="42" />
+        <property name="byte" value-type="Byte" value="127" />
+        <property name="Byte2" value-type="Byte" value="-128" />
+        <property name="boolean" value-type="Boolean" value="true" />
+        <property name="Boolean2" value-type="Boolean" value="false" />
+        <property name="short" value-type="Short" value="99" />
+        <property name="Short2" value-type="Short" value="-99" />
+        <property name="char" value-type="Character" value="@" />
+        <property name="Character2" value-type="Character"
+            value="X" />
+        <property name="bool-list" value-type="Boolean">
+            <list>
+                <value>true</value>
+                <value>false</value>
+            </list>
+        </property>
+        <property name="empty-set">
+            <set />
+        </property>
+        <property name="string-set">
+            <set>
+                <value>Hello there</value>
+                <value>How are you?</value>
+            </set>
+        </property>
+        <property name="int-array" value-type="Integer">
+            <array>
+                <value>1</value>
+                <value>2</value>
+            </array>
+        </property>
+        <property name="someXML"
+            value="&lt;xml&gt;&#xA;&lt;t1 xmlns=&quot;http://www.acme.org/xmlns/other/v1.0.0&quot;&gt;&#xA;&lt;foo type='bar'&gt;haha&lt;/foo&gt;&#xA;&lt;/t1&gt;&#xA;&lt;/xml&gt;" />
+    </endpoint-description>
+</endpoint-descriptions>

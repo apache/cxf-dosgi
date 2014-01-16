@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-dosgi-${project.version}">
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
+
+	<feature name="cxf-dosgi-base" description="base libs needed outside karaf" version="${project.version}" resolver="(obr)">
+        <bundle start-level="8">mvn:org.ops4j.base/ops4j-base-lang/1.4.0</bundle>
+        <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-api/1.7.0</bundle>
+        <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-service/1.7.0</bundle>
+        <bundle start-level="10">mvn:org.apache.felix/org.apache.felix.configadmin/1.6.0</bundle>
+        <bundle start-level="11">mvn:org.apache.felix/org.apache.felix.fileinstall/3.2.6</bundle>
+        <bundle start-level="20">mvn:org.apache.aries/org.apache.aries.util/1.1.0</bundle>
+        <bundle start-level="20">mvn:org.apache.aries.proxy/org.apache.aries.proxy.api/1.0.0</bundle>
+        <bundle start-level="20">mvn:org.apache.aries.proxy/org.apache.aries.proxy.impl/1.0.1</bundle>
+        <bundle start-level="20">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.api/1.0.0</bundle>
+        <bundle start-level="20">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.core/1.1.0</bundle>
+        <bundle start-level="20">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.cm/1.0.1</bundle>
+    </feature>
+
+    <feature name="cxf-dosgi-core" version="${project.version}">
+        <feature>cxf-specs</feature>
+        <feature>cxf-jaxws</feature>
+        <feature>cxf-jaxrs</feature>
+        <feature>cxf-databinding-aegis</feature>
+        <feature>cxf-http-jetty</feature>
+        <feature>cxf-http</feature>
+        <bundle start-level="8">mvn:${project.groupId}/cxf-dosgi-ri-osgi-api/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-topology-manager/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-dsw-cxf/${project.version}</bundle>
+    </feature>
+
+    <feature name="cxf-dosgi-discovery-local" version="${project.version}">
+        <feature>cxf-dosgi-core</feature>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-discovery-local/${project.version}</bundle>
+    </feature>
+
+    <feature name="cxf-dosgi-discovery-distributed" version="${project.version}">
+        <feature>cxf-dosgi-core</feature>
+        <bundle>mvn:org.apache.zookeeper/zookeeper/${zookeeper.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-discovery-local/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-discovery-distributed/${project.version}</bundle>
+    </feature>
+
+    <feature name="cxf-dosgi-zookeeper-server">
+        <bundle>mvn:org.apache.zookeeper/zookeeper/${zookeeper.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-discovery-distributed-zookeeper-server/${project.version}</bundle>
+    </feature>
+</features>

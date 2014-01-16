@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoint-descriptions xmlns="http://www.osgi.org/xmlns/rsa/v1.0.0"
+  xmlns:other="http://www.acme.org/xmlns/other/v1.0.0">
+  <endpoint-description>
+    <property name="objectClass">
+      <array>
+        <value>com.acme.HelloService</value>
+      </array>
+    </property>
+    <property name="service.intents">SOAP</property>
+    <property name="service.imported.configs" value="org.apache.cxf.ws"/>
+    <property name="endpoint.id">foo:bar</property>
+  </endpoint-description>
+  <endpoint-description>
+    <property name="service.imported.configs" value="org.apache.cxf.ws"/>
+    <property name="endpoint.id">foo:bar</property>
+    <property name="objectClass" value-type="String">
+      <array>
+        <value>com.acme.HelloService</value>
+        <value>some.other.Service</value>
+      </array>
+    </property>
+
+    <property name="someXML" value-type="String">
+      <!-- Literal XML to be parsed into the String -->
+      <xml>
+        <other:t1 xmlns="http://www.acme.org/xmlns/other/v1.0.0">
+          <foo type="bar">haha</foo>
+        </other:t1>
+      </xml>
+    </property>
+
+    <property name="long" value-type="long">9223372036854775807</property>
+    <property name="Long2" value-type="Long" value="-1"/>
+    <property name="double" value-type="double">1.7976931348623157E308</property>
+    <property name="Double2" value-type="Double">1.0</property>
+    <property name="float" value-type="float">42.24</property>
+    <property name="Float2" value-type="Float" value="1.0"/>
+    <property name="int" value-type="int">17</property>
+    <property name="Integer2" value-type="Integer" value="42"/>
+    <property name="byte" value-type="byte">127</property>
+    <property name="Byte2" value-type="Byte" value="-128"/>
+    <property name="boolean" value-type="boolean">true</property>
+    <property name="Boolean2" value-type="Boolean" value="true"/>
+    <property name="short" value-type="short">99</property>
+    <property name="Short2" value-type="Short" value="-99"/>
+    <property name="char" value-type="char">@</property>
+    <property name="Character2" value-type="Character" value="X"/>
+
+    <property name="bool-list" value-type="boolean">
+      <list>
+        <value>true</value>
+        <value>false</value>
+      </list>
+    </property>
+    <property name="long-set" value-type="long">
+      <set/> <!-- empty set -->
+    </property>
+    <property name="string-set">
+      <set>
+        <value>Hello there</value>
+        <value>How are you?</value>
+      </set>
+    </property>
+    <property name="int-array" value-type="int">
+      <array>
+        <value>1</value>
+        <value>2</value>
+      </array>
+    </property>
+    <property name="Integer-array" value-type="Integer">
+      <array>
+        <value>2</value>
+        <value>1</value>
+      </array>
+    </property>
+    <property name="service.exported.configs">
+      org.apache.cxf.ws
+    </property>
+
+    <property name="other1">
+        Hello
+      <other:t1/>
+      <!-- the above tag is a custom extension -->
+    </property>
+    <property name="other2">
+      <list>
+        <value>
+          <!-- A value specified as literal XML -->
+          <xml>
+            <other:t2/>
+          </xml>
+        </value>
+      </list>
+      <!-- This is a custom extension -->
+      <other:t1/>
+    </property>
+  </endpoint-description>
+</endpoint-descriptions>

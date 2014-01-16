@@ -1,0 +1,394 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+    license agreements. See the NOTICE file distributed with this work for additional 
+    information regarding copyright ownership. The ASF licenses this file to 
+    you under the Apache License, Version 2.0 (the "License"); you may not use 
+    this file except in compliance with the License. You may obtain a copy of 
+    the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+    by applicable law or agreed to in writing, software distributed under the 
+    License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+    OF ANY KIND, either express or implied. See the License for the specific 
+    language governing permissions and limitations under the License. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.apache.cxf.dosgi</groupId>
+        <artifactId>cxf-dosgi-ri</artifactId>
+        <version>1.6.0</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.apache.cxf.dosgi</groupId>
+    <artifactId>cxf-dosgi-ri-parent</artifactId>
+    <version>1.6.0</version>
+
+    <packaging>pom</packaging>
+    <name>Distributed OSGI Reference Implementation Parent</name>
+
+    <!-- Some versions of libraries used are different to the ones from CXF, 
+        this is generally caused by the fact that not all versions are available 
+        yet as OSGi bundles. -->
+
+    <!-- Note: the Felix Framework bundle contains the org.osgi core packages, 
+        which may override the standalone org.osgi dependency bundles - so if the 
+        org.osgi bundle versions are modified below, the corresponding Felix Framework 
+        version must be updated as well. -->
+
+    <properties>
+        <!-- portable text resource processing -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <osgi.version>4.3.1</osgi.version>
+        <osgi.compendium.version>4.3.1</osgi.compendium.version>
+        <cxf.version>2.7.8</cxf.version>
+        <cxf.build-utils.version>2.5.0</cxf.build-utils.version>
+        <felix.version>4.2.1</felix.version>
+        <spring.version>3.0.6.RELEASE</spring.version>
+        <spring.osgi.version>1.2.1</spring.osgi.version>
+        <zookeeper.version>3.3.2</zookeeper.version>
+
+        <remote.service.admin.interfaces.version>1.0.0</remote.service.admin.interfaces.version>
+
+        <servicemix.specs.version>2.2.0</servicemix.specs.version>
+        <pax.web.version>1.0.11</pax.web.version>
+        <pax.logging.version>1.7.0</pax.logging.version>
+        <servlet.version>3.0</servlet.version>
+        <log4j.version>1.2.17</log4j.version>
+        <jetty.version>7.4.2.v20110526</jetty.version>
+        <xmlschema.bundle.version>2.0.3</xmlschema.bundle.version>
+        <xmlresolver.bundle.version>1.2_5</xmlresolver.bundle.version>
+        <neethi.bundle.version>3.0.2</neethi.bundle.version>
+        <wsdl4j.bundle.version>1.6.2_6</wsdl4j.bundle.version>
+        <xmlsec.version>1.5.3</xmlsec.version>
+        <asm.bundle.version>3.3.1_1</asm.bundle.version>
+        <commons.pool.bundle.version>1.5.4_1</commons.pool.bundle.version>
+        <woodstox.bundle.version>4.1.4</woodstox.bundle.version>
+        <jaxbimpl.bundle.version>2.2.1.1_2</jaxbimpl.bundle.version>
+        <slf4j.version>1.7.0</slf4j.version>
+        <felix.plugin.version>2.4.0</felix.plugin.version>
+        <exam.version>3.2.0</exam.version>
+        <cxf.resources.base.path />
+        <cxf.checkstyle.extension />
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${osgi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>${osgi.compendium.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jcl</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.7</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>2.5.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymockclassextension</artifactId>
+                <version>2.5.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>xmlunit</groupId>
+                <artifactId>xmlunit</artifactId>
+                <version>1.4</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-atinject_1.0_spec</artifactId>
+                <version>1.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-junit4</artifactId>
+                <version>${exam.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-inject</artifactId>
+                <version>${exam.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-container-forked</artifactId>
+                <version>${exam.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-link-mvn</artifactId>
+                <version>${exam.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse</groupId>
+                <artifactId>org.eclipse.osgi</artifactId>
+                <version>3.8.0.v20120529-1548</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.framework</artifactId> 
+                <version>${felix.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.ops4j.pax.tinybundles</groupId>
+                <artifactId>tinybundles</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>${felix.plugin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.8.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.5.1</version>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                        <maxmem>256M</maxmem>
+                        <fork>false</fork>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.6</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>ant</groupId>
+                            <artifactId>ant-trax</artifactId>
+                            <version>1.6.5</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.8</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-remote-resources-plugin</artifactId>
+                    <version>1.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.cxf.build-utils</groupId>
+                            <artifactId>cxf-buildtools</artifactId>
+                            <version>${cxf.build-utils.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>process</goal>
+                            </goals>
+                            <configuration>
+                                <resourceBundles>
+                                    <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+                                </resourceBundles>
+                                <supplementalModels>
+                                    <supplementalModel>notice-supplements.xml</supplementalModel>
+                                </supplementalModels>
+                                <properties>
+                                    <projectName>Apache CXF Distributed
+                                        OSGi DSW Reference
+                                        Implementation</projectName>
+                                </properties>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-eclipse-plugin</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.cxf.build-utils</groupId>
+                            <artifactId>cxf-buildtools</artifactId>
+                            <version>${cxf.build-utils.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <buildcommands>
+                            <java.lang.String>org.eclipse.jdt.core.javabuilder</java.lang.String>
+                            <java.lang.String>net.sf.eclipsecs.core.CheckstyleBuilder</java.lang.String>
+                            <java.lang.String>net.sourceforge.pmd.eclipse.plugin.pmdBuilder</java.lang.String>
+                        </buildcommands>
+                        <projectnatures>
+                            <nature>org.eclipse.jdt.core.javanature</nature>
+                            <nature>net.sf.eclipsecs.core.CheckstyleNature</nature>
+                            <nature>net.sourceforge.pmd.eclipse.plugin.pmdNature</nature>
+                        </projectnatures>
+                        <ajdtVersion>none</ajdtVersion>
+                        <additionalConfig>
+                            <file>
+                                <name>.checkstyle</name>
+                                <location>/cxf-eclipse-checkstyle</location>
+                            </file>
+                            <file>
+                                <name>.pmd</name>
+                                <location>/cxf-eclipse-pmd</location>
+                            </file>
+                            <file>
+                                <name>.ruleset</name>
+                                <location>/cxf-pmd-ruleset.xml</location>
+                            </file>
+                        </additionalConfig>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>1.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.build-utils</groupId>
+                        <artifactId>cxf-buildtools</artifactId>
+                        <version>${cxf.build-utils.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <resourceBundles>
+                                <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+                            </resourceBundles>
+                            <supplementalModels>
+                                <supplementalModel>notice-supplements.xml</supplementalModel>
+                            </supplementalModels>
+                            <properties>
+                                <projectName>Apache CXF Distributed OSGi
+                                    DSW Reference Implementation</projectName>
+                            </properties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.9.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.build-utils</groupId>
+                        <artifactId>cxf-buildtools</artifactId>
+                        <version>${cxf.build-utils.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <configuration>
+                            <configLocation>${cxf.resources.base.path}cxf-checkstyle${cxf.checkstyle.extension}.xml</configLocation>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>true</failsOnError>
+                            <linkXRef>false</linkXRef>
+                            <suppressionsLocation>${cxf.resources.base.path}cxf-checkstyle-suppressions.xml</suppressionsLocation>
+                            <sourceDirectory>${basedir}/src</sourceDirectory>
+                            <excludes>**/archetype-resources/**/*.java</excludes>
+                        </configuration>
+                        <goals>
+                            <goal>checkstyle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Maven Snapshot Repository</name>
+            <url>http://repository.apache.org/content/groups/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>apache.snapshots</id>
+            <name>Apache Maven Snapshot Repository</name>
+            <url>http://repository.apache.org/content/groups/snapshots/</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
+</project>

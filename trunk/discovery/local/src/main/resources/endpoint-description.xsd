@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.osgi.org/xmlns/rsa/v1.0.0" targetNamespace="http://www.osgi.org/xmlns/rsa/v1.0.0">
+    <element name="endpoint-descriptions"
+        type="tns:EndpointDescriptionsType">
+    </element>
+    
+    <complexType name="EndpointDescriptionsType">
+        <sequence>
+            <element maxOccurs="unbounded" minOccurs="0"
+                ref="tns:endpoint-description">
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="EndpointDescriptionType">
+        <sequence>
+            <element ref="tns:property" maxOccurs="unbounded" minOccurs="0"></element>
+        </sequence>
+    </complexType>
+
+    <complexType name="PropertyType" mixed="true">
+        <choice>
+            <element ref="tns:array"></element>
+            <element ref="tns:list"></element>
+            <element ref="tns:set"></element>
+            <element ref="tns:xml"></element>
+        </choice>
+        <attribute name="name" type="string"></attribute>
+        <attribute name="value-type" type="string"></attribute>
+        <attribute name="value" type="string"></attribute>
+    </complexType>
+
+    <complexType name="ArrayType">
+        <sequence>
+            <element maxOccurs="unbounded" minOccurs="0"
+                ref="tns:value">
+            </element>
+        </sequence>
+    </complexType>
+    <element name="endpoint-description"
+        type="tns:EndpointDescriptionType">
+    </element>
+    <element name="property" type="tns:PropertyType"></element>
+    <element name="array" type="tns:ArrayType"></element>
+    <element name="list" type="tns:ArrayType"></element>
+    <element name="set" type="tns:ArrayType"></element>
+
+    <complexType name="XmlType">
+        <sequence>
+            <any></any>
+        </sequence>
+    </complexType>
+    <element name="value" type="tns:ValueType"></element>
+    <element name="xml" type="tns:XmlType"></element>
+
+    <complexType name="ValueType" mixed="true">
+        <sequence>
+            <element ref="tns:xml"></element>
+        </sequence>
+    </complexType>
+</schema>
