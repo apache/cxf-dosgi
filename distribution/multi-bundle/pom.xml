@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-distribution-parent</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.6-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -85,9 +85,9 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <xslt processor="trax" in="target/features.xml" out="target/filtered-features.xml" style="src/main/xsl/filter_features.xslt" />
-                <xslt processor="trax" in="target/filtered-features.xml" out="target/distribution_configs/felix.config.properties.append" style="src/main/xsl/felix_distro_config.xslt" />
-                <xslt processor="trax" in="target/filtered-features.xml" out="target/distribution_configs/config.ini" style="src/main/xsl/equinox_distro_config.xslt" />
+                <xslt processor="trax" in="target/features.xml" out="target/filtered-features.xml" style="src/main/xsl/filter_features.xslt"/>
+                <xslt processor="trax" in="target/filtered-features.xml" out="target/distribution_configs/felix.config.properties.append" style="src/main/xsl/felix_distro_config.xslt"/>
+                <xslt processor="trax" in="target/filtered-features.xml" out="target/distribution_configs/config.ini" style="src/main/xsl/equinox_distro_config.xslt"/>
               </target>
             </configuration>
             <goals>
