@@ -1,4 +1,27 @@
 
+Release Notes - CXF Distributed OSGi - Version 1.6.0
+====================================================
+
+** Bug
+    * [DOSGI-11] - dOSGi creates new databinding instance instead of using a spring-loaded databinding if available
+    * [DOSGI-196] - Greeter demo does not work in standalone Felix
+    * [DOSGI-198] - Imported service is gone after client bundle is restarted
+    * [DOSGI-206] - Parse errors for xml files in discovery local and dsw
+    * [DOSGI-207] - Update karaf maven plugin to release version
+    * [DOSGI-208] - OSGi compendium bundle installed by feature causes problems
+    * [DOSGI-210] - Service registration and memory leaks
+
+** Improvement
+    * [DOSGI-201] - Create DSOGi distro from karaf feature file
+    * [DOSGI-202] - Make DOSGi independent of jdom
+    * [DOSGI-203] - Upgrade to cxf 2.7.6
+    * [DOSGI-204] - Update osgi spec version to 4.3.1 and felix to 4.2.1
+    * [DOSGI-205] - Upgrade to pax exam 3.2
+
+** Task
+    * [DOSGI-212] - Update CXF version to 2.7.8
+
+
 Release Notes - CXF Distributed OSGi - Version 1.5.0
 ====================================================
 
