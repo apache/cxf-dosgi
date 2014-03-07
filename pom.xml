@@ -27,8 +27,8 @@
     <name>Distributed OSGI Reference Implementation</name>
  
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/dosgi/trunk</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/dosgi/trunk</developerConnection>
+        <connection>scm:git:http://git-wip-us.apache.org/repos/asf/cxf-dosgi.git</connection>
+        <developerConnection>scm:git:http://git-wip-us.apache.org/repos/asf/cxf-dosgi.git</developerConnection>
     </scm>
 
     <issueManagement>
@@ -151,7 +151,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <configuration>
-                        <tagBase>https://svn.apache.org/repos/asf/cxf/dosgi/tags</tagBase>
                         <useReleaseProfile>false</useReleaseProfile>
                         <preparationGoals>clean install</preparationGoals>
                         <goals>deploy</goals>
