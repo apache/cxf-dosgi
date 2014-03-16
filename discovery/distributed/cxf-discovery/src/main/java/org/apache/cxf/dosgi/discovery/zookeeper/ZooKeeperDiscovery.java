@@ -51,23 +51,34 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
     private boolean closed;
     private boolean started;
 
-    private Dictionary<String , ?> curConfiguration;
+    private Dictionary<String, ?> curConfiguration;
 
     public ZooKeeperDiscovery(BundleContext bctx) {
         this.bctx = bctx;
-        this.curConfiguration = null;
     }
 
+    private void setDefaults(Dictionary<String, String> configuration) {
+        Utils.setDefault(configuration, "zookeeper.host", "localhost");
+        Utils.setDefault(configuration, "zookeeper.port", "2181");
+        Utils.setDefault(configuration, "zookeeper.timeout", "3000");
+    }
+
+    @SuppressWarnings("unchecked")
     public synchronized void updated(Dictionary<String, ?> configuration) throws ConfigurationException {
         LOG.debug("Received configuration update for Zookeeper Discovery: {}", configuration);
-
-        stop(false);
-
-        if (configuration == null) {
-            return;
+        if (configuration != null) {
+            setDefaults((Dictionary<String, String>)configuration);
         }
-        curConfiguration = configuration;
-        createZooKeeper(configuration);
+        // make changes only if config actually changed, to prevent unnecessary ZooKeeper reconnections
+        if (!Utils.toMap(configuration).equals(Utils.toMap(curConfiguration))) {
+            stop(false);
+            curConfiguration = configuration;
+            // config is null if it doesn't exist, is being deleted or has not yet been loaded
+            // in which case we just stop running
+            if (configuration != null) {
+                createZooKeeper(configuration);
+            }
+        }
     }
 
     private synchronized void start() {
@@ -83,7 +94,7 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         endpointListenerFactory = new PublishingEndpointListenerFactory(zk, bctx);
         endpointListenerFactory.start();
         imManager = new InterfaceMonitorManager(bctx, zk);
-        endpointListenerTracker = new EndpointListenerTracker(bctx, imManager); 
+        endpointListenerTracker = new EndpointListenerTracker(bctx, imManager);
         endpointListenerTracker.open();
         started = true;
     }
@@ -112,13 +123,13 @@ public class ZooKeeperDiscovery implements Watcher, ManagedService {
         }
     }
 
-    private synchronized void createZooKeeper(Dictionary<String, ?> props) {
+    private synchronized void createZooKeeper(Dictionary<String, ?> configuration) {
         if (closed) {
             return;
         }
-        String host = Utils.getProp(props, "zookeeper.host", "localhost");
-        String port = Utils.getProp(props, "zookeeper.port", "2181");
-        int timeout = Utils.getProp(props, "zookeeper.timeout", 3000);
+        String host = configuration.get("zookeeper.host").toString();
+        String port = configuration.get("zookeeper.port").toString();
+        int timeout = Integer.parseInt(configuration.get("zookeeper.timeout").toString());
         LOG.debug("ZooKeeper configuration: connecting to {}:{} with timeout {}",
                 new Object[]{host, port, timeout});
         try {

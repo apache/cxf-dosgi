@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -62,14 +63,20 @@ public class Activator implements ManagedService, BundleActivator {
     private HttpServiceManager httpServiceManager;
     private BundleContext bc;
     private BundleListener bundleListener;
+    private Map<String, Object> curConfiguration;
 
     public void start(BundleContext bundlecontext) throws Exception {
         LOG.debug("RemoteServiceAdmin Implementation is starting up");
         this.bc = bundlecontext;
         // Disable the fast infoset as it's not compatible (yet) with OSGi
         System.setProperty("org.apache.cxf.nofastinfoset", "true");
-        init(new Hashtable<String, Object>());
+        curConfiguration = getDefaultConfig();
+        init(curConfiguration);
         registerManagedService(bc);
+    }
+
+    private Map<String, Object> getDefaultConfig() {
+        return new HashMap<String, Object>();
     }
 
     private synchronized void init(Map<String, Object> config) {
@@ -98,6 +105,30 @@ public class Activator implements ManagedService, BundleActivator {
         decoratorReg = bc.registerService(ServiceDecorator.class.getName(), serviceDecorator, null);
     }
 
+    private synchronized void uninit() {
+        if (decoratorReg != null) {
+            decoratorReg.unregister();
+            decoratorReg = null;
+        }
+        if (bundleListener != null) {
+            bc.removeBundleListener(bundleListener);
+            bundleListener = null;
+        }
+        if (rsaFactoryReg != null) {
+            // This also triggers the unimport and unexport of the remote services
+            rsaFactoryReg.unregister();
+            rsaFactoryReg = null;
+        }
+        if (httpServiceManager != null) {
+            httpServiceManager.close();
+            httpServiceManager = null;
+        }
+        if (intentTracker != null) {
+            intentTracker.close();
+            intentTracker = null;
+        }
+    }
+
     // The CT sometimes uses the first element returned to register a service, but
     // does not provide any additional configuration.
     // Return the configuration type that works without additional configuration as the first in the list.
@@ -120,16 +151,7 @@ public class Activator implements ManagedService, BundleActivator {
 
     public void stop(BundleContext context) throws Exception {
         LOG.debug("RemoteServiceAdmin Implementation is shutting down now");
-        bc.removeBundleListener(bundleListener);
-        intentTracker.close();
-        // This also triggers the unimport and unexport of the remote services
-        rsaFactoryReg.unregister();
-        decoratorReg.unregister();
-        httpServiceManager.close();
-        httpServiceManager = null;
-        intentTracker = null;
-        rsaFactoryReg = null;
-        decoratorReg = null;
+        uninit();
         shutdownCXFBus();
     }
 
@@ -147,22 +169,13 @@ public class Activator implements ManagedService, BundleActivator {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public synchronized void updated(Dictionary config) throws ConfigurationException {
         LOG.debug("RemoteServiceAdmin Implementation configuration is updated with {}", config);
-        if (config != null) {
-            try {
-                bc.removeBundleListener(bundleListener);
-                intentTracker.close();
-                // This also triggers the unimport and unexport of the remote services
-                rsaFactoryReg.unregister();
-                decoratorReg.unregister();
-                httpServiceManager.close();
-                httpServiceManager = null;
-                intentTracker = null;
-                rsaFactoryReg = null;
-                decoratorReg = null;
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-            }
-            init(Utils.toMap(config));
+        // config is null if it doesn't exist, is being deleted or has not yet been loaded
+        // in which case we run with defaults (just like we do manually when bundle is first started)
+        Map<String, Object> configMap = config == null ? getDefaultConfig() : Utils.toMap(config);
+        if (!configMap.equals(curConfiguration)) { // only if something actually changed
+            curConfiguration = configMap;
+            uninit();
+            init(configMap);
         }
     }
 

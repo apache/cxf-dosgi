@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.discovery.zookeeper.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -107,14 +108,38 @@ public final class Utils {
         }
     }
 
-    public static <K, V> String getProp(Dictionary<K, V> props, String key, String def) {
-        V val = props.get(key);
-        return val == null ? def : val.toString();
+    /**
+     * Puts the given key-value pair in the given dictionary if the key does not
+     * already exist in it or if its existing value is null.
+     *
+     * @param dict a dictionary
+     * @param key the key
+     * @param value the default value to set
+     */
+    public static void setDefault(Dictionary<String, String> dict, String key, String value) {
+        if (dict.get(key) == null) {
+            dict.put(key, value);
+        }
     }
 
-    public static <K, V> int getProp(Dictionary<K, V> props, String key, int def) {
-        V val = props.get(key);
-        return val == null ? def : Integer.parseInt(val.toString());
+    /**
+     * Converts the given Dictionary to a Map.
+     *
+     * @param dict a dictionary
+     * @param <K> the key type
+     * @param <V> the value type
+     * @return the converted map, or an empty map if the given dictionary is null
+     */
+    public static <K, V> Map<K, V> toMap(Dictionary<K, V> dict) {
+        Map<K, V> map = new HashMap<K, V>();
+        if (dict != null) {
+            Enumeration<K> keys = dict.keys();
+            while (keys.hasMoreElements()) {
+                K key = keys.nextElement();
+                map.put(key, dict.get(key));
+            }
+        }
+        return map;
     }
 
     public static String getObjectClass(String scope) {

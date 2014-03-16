@@ -73,15 +73,22 @@ public final class Utils {
         return null;
     }
 
+    /**
+     * Converts the given Dictionary to a Map.
+     *
+     * @param dict a dictionary
+     * @param <K> the key type
+     * @param <V> the value type
+     * @return the converted map, or an empty map if the given dictionary is null
+     */
     public static <K, V> Map<K, V> toMap(Dictionary<K, V> dict) {
         Map<K, V> map = new HashMap<K, V>();
-        if (dict == null) {
-            return map;
-        }
-        Enumeration<K> keys = dict.keys();
-        while (keys.hasMoreElements()) {
-            K key = keys.nextElement();
-            map.put(key, dict.get(key));
+        if (dict != null) {
+            Enumeration<K> keys = dict.keys();
+            while (keys.hasMoreElements()) {
+                K key = keys.nextElement();
+                map.put(key, dict.get(key));
+            }
         }
         return map;
     }

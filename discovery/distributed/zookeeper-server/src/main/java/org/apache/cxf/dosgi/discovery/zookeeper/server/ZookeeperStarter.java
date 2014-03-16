@@ -72,17 +72,19 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
 
     @SuppressWarnings("unchecked")
     public synchronized void updated(Dictionary<String, ?> dict) throws ConfigurationException {
+        LOG.debug("Received configuration update for Zookeeper Server: " + dict);
         shutdown();
-        if (dict == null) {
-            return;
-        }
-        try {
-            setDefaults((Dictionary<String, String>)dict);
-            QuorumPeerConfig config = parseConfig(dict);
-            startFromConfig(config);
-            LOG.info("Applied configuration update: " + dict);
-        } catch (Exception th) {
-            LOG.error("Problem applying configuration update: " + dict, th);
+        // config is null if it doesn't exist, is being deleted or has not yet been loaded
+        // in which case we just stop running
+        if (dict != null) {
+            try {
+                setDefaults((Dictionary<String, String>) dict);
+                QuorumPeerConfig config = parseConfig(dict);
+                startFromConfig(config);
+                LOG.info("Applied configuration update: " + dict);
+            } catch (Exception th) {
+                LOG.error("Problem applying configuration update: " + dict, th);
+            }
         }
     }
 
