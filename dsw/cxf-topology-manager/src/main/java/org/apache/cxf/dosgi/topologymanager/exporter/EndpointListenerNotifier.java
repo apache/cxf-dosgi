@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.List;
 
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
+import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
 import org.apache.cxf.dosgi.topologymanager.util.Utils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -31,7 +33,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,7 @@ public class EndpointListenerNotifier {
         + "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*))";
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
     private BundleContext bctx;
-    private ServiceTracker stEndpointListeners;
+    private SimpleServiceTracker<EndpointListener> endpointListenerTracker;
 
     public EndpointListenerNotifier(BundleContext bctx, final EndpointRepository endpointRepository) {
         this.bctx = bctx;
@@ -55,32 +56,32 @@ public class EndpointListenerNotifier {
         } catch (InvalidSyntaxException e) {
             throw new RuntimeException("Unexpected exception creating filter", e);
         }
-        this.stEndpointListeners = new ServiceTracker(bctx, filter, null) {
+        this.endpointListenerTracker = new SimpleServiceTracker(bctx, filter);
+        this.endpointListenerTracker.addListener(new SimpleServiceTrackerListener<EndpointListener>() {
             @Override
-            public Object addingService(ServiceReference epListenerRef) {
+            public void added(ServiceReference<EndpointListener> reference, EndpointListener service) {
                 LOG.debug("new EndpointListener detected");
-                // the super.addingService call must come before notifyListener, since we need
-                // to keep at least one service reference alive when ungetService is called
-                Object service = super.addingService(epListenerRef);
-                notifyListener(true, epListenerRef, endpointRepository.getAllEndpoints());
-                return service;
+                notifyListener(true, reference, endpointRepository.getAllEndpoints());
             }
 
             @Override
-            public void modifiedService(ServiceReference epListenerRef, Object service) {
+            public void modified(ServiceReference<EndpointListener> reference, EndpointListener service) {
                 LOG.debug("EndpointListener modified");
-                notifyListener(true, epListenerRef, endpointRepository.getAllEndpoints());
-                super.modifiedService(epListenerRef, service);
+                notifyListener(true, reference, endpointRepository.getAllEndpoints());
             }
-        };
+
+            @Override
+            public void removed(ServiceReference<EndpointListener> reference, EndpointListener service) {
+            }
+        });
     }
 
     public void start() {
-        stEndpointListeners.open();
+        endpointListenerTracker.open();
     }
 
     public void stop() {
-        stEndpointListeners.close();
+        endpointListenerTracker.close();
     }
 
     /**
@@ -93,11 +94,8 @@ public class EndpointListenerNotifier {
         if (endpoints.isEmpty()) { // a little optimization to prevent unnecessary processing
             return;
         }
-        ServiceReference[] listeners = stEndpointListeners.getServiceReferences();
-        if (listeners != null) {
-            for (ServiceReference eplReference : listeners) {
-                notifyListener(added, eplReference, endpoints);
-            }
+        for (ServiceReference eplReference : endpointListenerTracker.getAllServiceReferences()) {
+            notifyListener(added, eplReference, endpoints);
         }
     }
 

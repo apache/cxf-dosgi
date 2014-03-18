@@ -216,8 +216,8 @@ public class TopologyManagerExport {
         // add the new exported endpoints
         if (!endpoints.isEmpty()) {
             LOG.info("TopologyManager: export successful for {}, endpoints: {}", sref, endpoints);
-            epListenerNotifier.notifyListeners(true, endpoints);
             endpointRepo.addEndpoints(sref, remoteServiceAdmin, endpoints);
+            epListenerNotifier.notifyListeners(true, endpoints); // notify after endpoints are added to repo
         }
     }
 
