@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -50,22 +51,34 @@ import org.osgi.util.tracker.ServiceTracker;
 public class SimpleServiceTracker<T> extends ServiceTracker<T, T> {
 
     // we must use a map with references as keys, so as not to invoke equals remotely on service objects
-    private ConcurrentMap<ServiceReference<T>, T> services;
-    private List<SimpleServiceTrackerListener<T>> listeners;
+    private final ConcurrentMap<ServiceReference<T>, T> services = new ConcurrentHashMap<ServiceReference<T>, T>();
+    private final List<SimpleServiceTrackerListener<T>> listeners =
+        new CopyOnWriteArrayList<SimpleServiceTrackerListener<T>>();
 
     /**
-     * Create a <code>SimpleServiceTracker</code> on the specified class' name.
+     * Create a {@code SimpleServiceTracker} on the specified class name.
      * <p>
-     * Services registered under the specified class' name will be tracked by
-     * this <code>SimpleServiceTracker</code>.
+     * Services registered under the specified class name will be tracked by
+     * this {@code SimpleServiceTracker}.
      *
      * @param context the {@code BundleContext} against which the tracking is done
      * @param clazz the class of the services to be tracked
      */
     public SimpleServiceTracker(BundleContext context, Class<T> clazz) {
         super(context, clazz.getName(), null);
-        this.listeners = new CopyOnWriteArrayList<SimpleServiceTrackerListener<T>>();
-        this.services = new ConcurrentHashMap<ServiceReference<T>, T>();
+    }
+
+    /**
+     * Create a {@code SimpleServiceTracker} on the specified {@code Filter} object.
+     * <p>
+     * Services which match the specified {@code Filter} object will be tracked by
+     * this {@code SimpleServiceTracker}.
+     *
+     * @param context the {@code BundleContext} against which the tracking is done
+     * @param filter The {@code Filter} to select the services to be tracked
+     */
+    public SimpleServiceTracker(BundleContext context, Filter filter) {
+        super(context, filter, null);
     }
 
     /**
@@ -82,16 +95,24 @@ public class SimpleServiceTracker<T> extends ServiceTracker<T, T> {
         T service = (T) super.addingService(reference);
         services.put(reference, service);
         for (SimpleServiceTrackerListener<T> listener : listeners) {
-            listener.added(service);
+            listener.added(reference, service);
         }
         return service;
+    }
+
+    @Override
+    public void modifiedService(ServiceReference<T> reference, T service) {
+        for (SimpleServiceTrackerListener<T> listener : listeners) {
+            listener.modified(reference, service);
+        }
+        super.modifiedService(reference, service);
     }
 
     @Override
     public void removedService(ServiceReference<T> reference, T service) {
         services.remove(reference, service);
         for (SimpleServiceTrackerListener<T> listener : listeners) {
-            listener.removed(service);
+            listener.removed(reference, service);
         }
         super.removedService(reference, service);
     }
@@ -113,5 +134,18 @@ public class SimpleServiceTracker<T> extends ServiceTracker<T, T> {
      */
     public List<T> getAllServices() {
         return new ArrayList<T>(services.values());
+    }
+
+    /**
+     * Returns all currently tracked service references.
+     * <p>
+     * Unlike {@link ServiceTracker#getServiceReferences()}, if it is called from within a service
+     * {@link SimpleServiceTrackerListener#added added} event handler, the returned list
+     * will include the newly added service reference.
+     *
+     * @return all currently tracked service references
+     */
+    public List<ServiceReference<T>> getAllServiceReferences() {
+        return new ArrayList<ServiceReference<T>>(services.keySet());
     }
 }

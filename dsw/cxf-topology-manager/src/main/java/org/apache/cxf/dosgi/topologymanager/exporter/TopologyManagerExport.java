@@ -81,7 +81,7 @@ public class TopologyManagerExport {
         // track RemoteServiceAdmins through which we can export services
         remoteServiceAdminTracker.addListener(new SimpleServiceTrackerListener<RemoteServiceAdmin>() {
 
-            public void added(RemoteServiceAdmin rsa) {
+            public void added(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin rsa) {
                 LOG.debug("RemoteServiceAdmin added: {}, total {}",
                         rsa, remoteServiceAdminTracker.getAllServices().size());
                 for (ServiceReference serviceRef : endpointRepo.getServicesToBeExportedFor(rsa)) {
@@ -89,7 +89,10 @@ public class TopologyManagerExport {
                 }
             }
 
-            public void removed(RemoteServiceAdmin rsa) {
+            public void modified(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin rsa) {
+            }
+
+            public void removed(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin rsa) {
                 LOG.debug("RemoteServiceAdmin removed: {}, total {}", rsa,
                         remoteServiceAdminTracker.getAllServices().size());
                 List<EndpointDescription> endpoints = endpointRepo.removeRemoteServiceAdmin(rsa);

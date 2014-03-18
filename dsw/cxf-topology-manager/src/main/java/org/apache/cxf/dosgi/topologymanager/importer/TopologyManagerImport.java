@@ -34,6 +34,7 @@ import org.apache.cxf.dosgi.topologymanager.util.ReferenceCounter;
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
@@ -94,11 +95,14 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
         remoteServiceAdminTracker = rsaTracker;
         remoteServiceAdminTracker.addListener(new SimpleServiceTrackerListener<RemoteServiceAdmin>() {
 
-            public void added(RemoteServiceAdmin rsa) {
+            public void added(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin rsa) {
                 triggerImportsForRemoteServiceAdmin(rsa);
             }
 
-            public void removed(RemoteServiceAdmin rsa) {
+            public void modified(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin rsa) {
+            }
+
+            public void removed(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin rsa) {
                 // the RSA's imports will be closed by its shutdown, so nothing to do here
             }
         });

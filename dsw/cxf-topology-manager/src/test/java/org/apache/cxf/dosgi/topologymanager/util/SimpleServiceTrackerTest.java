@@ -108,11 +108,9 @@ public class SimpleServiceTrackerTest {
         // add our listener
         SimpleServiceTrackerListener<RemoteServiceAdmin> listener =
                 new SimpleServiceTrackerListener<RemoteServiceAdmin>() {
-                @SuppressWarnings({
-                    "unchecked", "rawtypes"
-                })
+                @SuppressWarnings({ "unchecked", "rawtypes" })
                 @Override
-                public void added(RemoteServiceAdmin service) {
+                public void added(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin service) {
                     // prove that original ServiceTracker fails here
                     Object[] trackerServices = (Object[])
                         (tracker.getServices() != null ? tracker.getServices() : new Object[0]);
@@ -123,7 +121,11 @@ public class SimpleServiceTrackerTest {
                 }
 
                 @Override
-                public void removed(RemoteServiceAdmin service) {
+                public void modified(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin service) {
+                }
+
+                @Override
+                public void removed(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin service) {
                     assertEqualsUnordered(services, tracker.getAllServices());
                 }
             };

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.dosgi.topologymanager.util;
 
+import org.osgi.framework.ServiceReference;
+
 /**
  * Callback interface for notifications of services that are
  * added to or removed from tracking by a {@link SimpleServiceTracker}.
@@ -29,14 +31,24 @@ public interface SimpleServiceTrackerListener<T> {
     /**
      * Called when a new service is added to the tracked services.
      *
+     * @param reference the newly added service reference
      * @param service the newly added service
      */
-    void added(T service);
+    void added(ServiceReference<T> reference, T service);
+
+    /**
+     * Called when a tracked service is modified.
+     *
+     * @param reference the modified service reference
+     * @param service the modified service
+     */
+    void modified(ServiceReference<T> reference, T service);
 
     /**
      * Called when a service is removed from the tracked services.
      *
+     * @param reference the removed service reference
      * @param service the removed service
      */
-    void removed(T service);
+    void removed(ServiceReference<T> reference, T service);
 }
