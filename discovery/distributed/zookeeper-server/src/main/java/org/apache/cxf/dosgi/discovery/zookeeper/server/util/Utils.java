@@ -21,7 +21,9 @@ package org.apache.cxf.dosgi.discovery.zookeeper.server.util;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -65,6 +67,26 @@ public final class Utils {
         if (dict.get(key) == null) {
             dict.put(key, value);
         }
+    }
+
+    /**
+     * Converts the given Dictionary to a Map.
+     *
+     * @param dict a dictionary
+     * @param <K> the key type
+     * @param <V> the value type
+     * @return the converted map, or an empty map if the given dictionary is null
+     */
+    public static <K, V> Map<K, V> toMap(Dictionary<K, V> dict) {
+        Map<K, V> map = new HashMap<K, V>();
+        if (dict != null) {
+            Enumeration<K> keys = dict.keys();
+            while (keys.hasMoreElements()) {
+                K key = keys.nextElement();
+                map.put(key, dict.get(key));
+            }
+        }
+        return map;
     }
 
     /**

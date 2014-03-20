@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.discovery.zookeeper.server;
 import java.io.File;
 import java.io.IOException;
 import java.util.Dictionary;
+import java.util.Map;
 
 import org.apache.cxf.dosgi.discovery.zookeeper.server.util.Utils;
 import org.apache.log4j.Level;
@@ -40,6 +41,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
     protected ZookeeperServer main;
     private final BundleContext bundleContext;
     private Thread zkMainThread;
+    private Map<String, ?> curConfiguration;
 
     public ZookeeperStarter(BundleContext ctx) {
         bundleContext = ctx;
@@ -73,18 +75,23 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
     @SuppressWarnings("unchecked")
     public synchronized void updated(Dictionary<String, ?> dict) throws ConfigurationException {
         LOG.debug("Received configuration update for Zookeeper Server: " + dict);
-        shutdown();
-        // config is null if it doesn't exist, is being deleted or has not yet been loaded
-        // in which case we just stop running
-        if (dict != null) {
-            try {
-                setDefaults((Dictionary<String, String>) dict);
-                QuorumPeerConfig config = parseConfig(dict);
-                startFromConfig(config);
-                LOG.info("Applied configuration update: " + dict);
-            } catch (Exception th) {
-                LOG.error("Problem applying configuration update: " + dict, th);
+        try {
+            if (dict != null) {
+                setDefaults((Dictionary<String, String>)dict);
             }
+            Map<String, ?> configMap = Utils.toMap(dict);
+            if (!configMap.equals(curConfiguration)) { // only if something actually changed
+                shutdown();
+                curConfiguration = configMap;
+                // config is null if it doesn't exist, is being deleted or has not yet been loaded
+                // in which case we just stop running
+                if (dict != null) {
+                    startFromConfig(parseConfig(dict));
+                    LOG.info("Applied configuration update: " + dict);
+                }
+            }
+        } catch (Exception th) {
+            LOG.error("Problem applying configuration update: " + dict, th);
         }
     }
 
