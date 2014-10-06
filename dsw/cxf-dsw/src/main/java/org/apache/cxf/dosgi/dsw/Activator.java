@@ -64,6 +64,7 @@ public class Activator implements ManagedService, BundleActivator {
     private BundleContext bc;
     private BundleListener bundleListener;
     private Map<String, Object> curConfiguration;
+    private Bus bus;
 
     public void start(BundleContext bundlecontext) throws Exception {
         LOG.debug("RemoteServiceAdmin Implementation is starting up");
@@ -80,6 +81,8 @@ public class Activator implements ManagedService, BundleActivator {
     }
 
     private synchronized void init(Map<String, Object> config) {
+        bus = BusFactory.newInstance().createBus();
+        
         String httpBase = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.HTTP_BASE);
         String cxfServletAlias = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.CXF_SERVLET_ALIAS);
 
@@ -159,10 +162,9 @@ public class Activator implements ManagedService, BundleActivator {
      * Causes also the shutdown of the embedded HTTP server
      */
     private void shutdownCXFBus() {
-        Bus b = BusFactory.getDefaultBus();
-        if (b != null) {
+        if (bus != null) {
             LOG.debug("Shutting down the CXF Bus");
-            b.shutdown(true);
+            bus.shutdown(true);
         }
     }
 
