@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
+
+
 import java.io.InputStream;
 
 import javax.inject.Inject;
@@ -36,6 +38,7 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+
 
 import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUnsatisfiedException;
@@ -31,7 +32,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.client.ProxyClassLoader;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.osgi.framework.BundleContext;
@@ -71,8 +71,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         }
 
         try {
-            ProxyClassLoader cl = new ProxyClassLoader();
-            cl.addLoader(iClass.getClassLoader());
+            ProxyClassLoader cl = new ProxyClassLoader(iClass.getClassLoader());
             cl.addLoader(Client.class.getClassLoader());
             return createJaxrsProxy(address, callingContext, dswContext, iClass, cl, endpoint);
         } catch (Throwable e) {

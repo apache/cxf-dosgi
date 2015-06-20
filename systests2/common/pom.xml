@@ -49,7 +49,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-core</artifactId>
+            <artifactId>cxf-core</artifactId>
             <version>${cxf.version}</version>
         </dependency>
         <dependency>
