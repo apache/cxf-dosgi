@@ -29,6 +29,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -87,8 +88,8 @@ public class HttpServiceManagerTest extends TestCase {
                 return httpService;
             }
         };
-        Bus bus = h.registerServletAndGetBus("/myService", dswContext, sr);
-        Assert.assertNotNull(bus);
+        Bus bus = BusFactory.newInstance().createBus();
+        h.registerServlet(bus, "/myService", dswContext, sr);
 
         ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING, sr);
         captured.getValue().serviceChanged(event);

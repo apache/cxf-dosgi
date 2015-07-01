@@ -114,7 +114,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
                                      BundleContext callingContext,
                                      Map<String, Object> sd, Class<?> iClass,
                                      Object serviceBean) throws IntentUnsatisfiedException {
-        String contextRoot = httpServiceManager.getServletContextRoot(sd);
+        String contextRoot = getServletContextRoot(sd);
         String address;
         if (contextRoot == null) {
             address = getServerAddress(sd, iClass);
@@ -125,8 +125,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
             }
         }
 
-        Bus bus = contextRoot != null
-                ? httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref) : null;
+        Bus bus = createBus(sref, callingContext, contextRoot);
 
         LOG.info("Creating a " + iClass.getName()
                  + " endpoint via JaxRSPojoConfigurationTypeHandler, address is " + address);
@@ -162,9 +161,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
                                                        String address,
                                                        Bus bus) {
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-        if (bus != null) {
-            factory.setBus(bus);
-        }
+        factory.setBus(bus);
         List<UserResource> resources = JaxRSUtils.getModel(callingContext, iClass);
         if (resources != null) {
             factory.setModelBeansWithServiceClass(resources, iClass);

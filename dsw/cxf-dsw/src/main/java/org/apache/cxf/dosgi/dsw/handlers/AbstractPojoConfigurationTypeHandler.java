@@ -27,6 +27,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
@@ -42,6 +44,7 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,6 +185,23 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
     protected String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
         String address = getClientAddress(sd);
         return address == null ? httpServiceManager.getDefaultAddress(iClass) : address;
+    }
+    
+    public String getServletContextRoot(Map<String, Object> sd) {
+        return OsgiUtils.getFirstNonEmptyStringProperty(sd,
+                Constants.WS_HTTP_SERVICE_CONTEXT,
+                Constants.WS_HTTP_SERVICE_CONTEXT_OLD,
+                Constants.WSDL_HTTP_SERVICE_CONTEXT,
+                Constants.RS_HTTP_SERVICE_CONTEXT);
+    }
+
+    
+    protected Bus createBus(ServiceReference<?> sref, BundleContext callingContext, String contextRoot) {
+        Bus bus = BusFactory.newInstance().createBus();
+        if (contextRoot != null) {
+            httpServiceManager.registerServlet(bus, contextRoot, callingContext, sref);
+        }
+        return bus;
     }
 
     protected ExportResult createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {

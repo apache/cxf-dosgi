@@ -48,7 +48,7 @@
     <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.3</version>
 
         <executions>
           <execution>
@@ -60,7 +60,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>mvn:org.apache.karaf.assemblies.features/standard/2.3.3/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/standard/3.0.3/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.dosgi/cxf-dosgi/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
@@ -72,7 +72,7 @@
               <resolveDefinedRepositoriesRecursively>true</resolveDefinedRepositoriesRecursively>
               <flatRepoLayout>true</flatRepoLayout>
               <mergedFeature>true</mergedFeature>
-              <karafVersion>2.3.2</karafVersion>
+              <karafVersion>3.0.3</karafVersion>
             </configuration>
           </execution>
         </executions>

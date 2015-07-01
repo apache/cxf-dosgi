@@ -116,7 +116,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         }
 
         String address = getServerAddress(sd, iClass);
-        String contextRoot = httpServiceManager.getServletContextRoot(sd);
+        String contextRoot = getServletContextRoot(sd);
         if (address == null && contextRoot == null) {
             throw new RuntimeException("Remote address is unavailable");
         }
@@ -125,10 +125,9 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         DataBinding databinding = new JAXBDataBinding();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
-        if (contextRoot != null) {
-            Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref);
-            factory.setBus(bus);
-        }
+        
+        Bus bus = createBus(sref, callingContext, contextRoot);
+        factory.setBus(bus);
         factory.setServiceClass(iClass);
         factory.setAddress(address != null ? address : "/");
         factory.getServiceFactory().setDataBinding(databinding);

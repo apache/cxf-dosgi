@@ -24,9 +24,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusFactory;
-import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
@@ -72,9 +69,8 @@ public class HttpServiceManager {
         return value == null ? defaultValue : value;
     }
 
-    public Bus registerServletAndGetBus(String contextRoot, BundleContext callingContext,
+    public Bus registerServlet(Bus bus, String contextRoot, BundleContext callingContext,
             ServiceReference sref) {
-        Bus bus = new CXFBusFactory().createBus();
         bus.setExtension(new DestinationRegistryImpl(), DestinationRegistry.class);
         CXFNonSpringServlet cxf = new CXFNonSpringServlet();
         cxf.setBus(bus);
@@ -97,14 +93,6 @@ public class HttpServiceManager {
             throw new RuntimeException("No HTTPService found");
         }
         return (HttpService) service;
-    }
-
-    public String getServletContextRoot(Map<String, Object> sd) {
-        return OsgiUtils.getFirstNonEmptyStringProperty(sd,
-                Constants.WS_HTTP_SERVICE_CONTEXT,
-                Constants.WS_HTTP_SERVICE_CONTEXT_OLD,
-                Constants.WSDL_HTTP_SERVICE_CONTEXT,
-                Constants.RS_HTTP_SERVICE_CONTEXT);
     }
 
     private HttpContext getHttpContext(BundleContext bc, HttpService httpService) {

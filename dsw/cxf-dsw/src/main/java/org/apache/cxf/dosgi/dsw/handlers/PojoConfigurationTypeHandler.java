@@ -94,14 +94,11 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
                                      Object serviceBean) throws IntentUnsatisfiedException {
         try {
             String address = getPojoAddress(sd, iClass);
-            String contextRoot = httpServiceManager.getServletContextRoot(sd);
-
             ServerFactoryBean factory = createServerFactoryBean(sd, iClass);
             factory.setDataBinding(getDataBinding(sd, iClass));
-            if (contextRoot != null) {
-                Bus bus = httpServiceManager.registerServletAndGetBus(contextRoot, callingContext, sref);
-                factory.setBus(bus);
-            }
+            String contextRoot = getServletContextRoot(sd);
+            Bus bus = createBus(sref, callingContext, contextRoot);
+            factory.setBus(bus);
             factory.setServiceClass(iClass);
             factory.setAddress(address);
             factory.setServiceBean(serviceBean);

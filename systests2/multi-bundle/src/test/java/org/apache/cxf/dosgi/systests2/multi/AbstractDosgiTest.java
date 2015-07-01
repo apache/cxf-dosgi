@@ -29,16 +29,22 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
+import javax.inject.Inject;
+
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 
 public class AbstractDosgiTest {
-
+    
     private static final int TIMEOUT = 20;
+    
+    @Inject
+    BundleContext bundleContext;
 
     /**
      * Sleeps for a short interval, throwing an exception if timeout has been reached.
@@ -152,6 +158,19 @@ public class AbstractDosgiTest {
                 }
             }
             sleepOrTimeout(startTime, TIMEOUT, "Timeout waiting for web page " + urlSt);
+        }
+    }
+
+    protected void assertBundlesStarted() {
+        for (Bundle bundle : bundleContext.getBundles()) {
+            //System.out.println(bundle.getSymbolicName() + ":" + bundle.getVersion() + ": " + bundle.getState());
+            if (bundle.getState() != Bundle.ACTIVE) {
+                try {
+                    bundle.start();
+                } catch (BundleException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

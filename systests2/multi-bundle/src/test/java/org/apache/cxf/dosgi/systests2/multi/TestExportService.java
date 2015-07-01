@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,7 +40,6 @@ import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
-import org.osgi.framework.BundleContext;
 
 import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
@@ -49,9 +47,6 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 @RunWith(PaxExam.class)
 public class TestExportService extends AbstractDosgiTest {
-
-    @Inject
-    BundleContext bundleContext;
 
     @Configuration
     public static Option[] configure() throws Exception {
@@ -72,6 +67,7 @@ public class TestExportService extends AbstractDosgiTest {
 
     @Test
     public void testAccessEndpoint() throws Exception {
+        assertBundlesStarted();
         waitPort(9090);
 
         checkWsdl(new URL("http://localhost:9090/greeter?wsdl"));
