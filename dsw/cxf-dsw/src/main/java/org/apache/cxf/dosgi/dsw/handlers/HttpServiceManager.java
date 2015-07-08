@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 public class HttpServiceManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpServiceManager.class);
+    private static final long SERVICE_LOOKUP_TIMEOUT = 100000;
     private ServiceTracker tracker;
     private BundleContext bundleContext;
     private Map<Long, String> exportedAliases = Collections.synchronizedMap(new HashMap<Long, String>());
@@ -88,7 +89,12 @@ public class HttpServiceManager {
     }
 
     protected HttpService getHttpService() {
-        Object service = tracker.getService();
+        Object service = null;
+        try {
+            service = tracker.waitForService(120000);
+        } catch (InterruptedException ex) {
+            LOG.warn("waitForService interrupeted", ex);
+        }
         if (service == null) {
             throw new RuntimeException("No HTTPService found");
         }
