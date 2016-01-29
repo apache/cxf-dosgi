@@ -38,7 +38,7 @@ public class Activator implements BundleActivator {
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
     private static final String ZOOKEEPER_PORT = "org.apache.cxf.dosgi.discovery.zookeeper.port";
     private static final String PID = "org.apache.cxf.dosgi.discovery.zookeeper.server";
-    private ServiceTracker st;
+    private ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> st;
 
     public void start(BundleContext context) throws Exception {
         synchronized (Activator.class) {
@@ -50,24 +50,21 @@ public class Activator implements BundleActivator {
             }
         }
 
-        st = new ServiceTracker(context, ConfigurationAdmin.class.getName(), null) {
+        st = new ServiceTracker<ConfigurationAdmin, ConfigurationAdmin>(context, ConfigurationAdmin.class, null) {
             @Override
-            public Object addingService(ServiceReference reference) {
-                Object svc = super.addingService(reference);
-                if (svc instanceof ConfigurationAdmin) {
-                    try {
-                        ConfigurationAdmin cadmin = (ConfigurationAdmin) svc;
-                        Configuration cfg = cadmin.getConfiguration(PID, null);
-                        Dictionary<String, Object> props = new Hashtable<String, Object>();
-                        String zp = System.getProperty(ZOOKEEPER_PORT);
-                        props.put("clientPort", zp);
-                        cfg.update(props);
-                        LOG.debug("Set ZooKeeper client port to {}", zp);
-                    } catch (IOException e) {
-                        LOG.error("Failed to configure ZooKeeper server!", e);
-                    }
+            public ConfigurationAdmin addingService(ServiceReference<ConfigurationAdmin> reference) {
+                ConfigurationAdmin service = super.addingService(reference);
+                try {
+                    Configuration cfg = service.getConfiguration(PID, null);
+                    Dictionary<String, Object> props = new Hashtable<String, Object>();
+                    String zp = System.getProperty(ZOOKEEPER_PORT);
+                    props.put("clientPort", zp);
+                    cfg.update(props);
+                    LOG.debug("Set ZooKeeper client port to {}", zp);
+                } catch (IOException e) {
+                    LOG.error("Failed to configure ZooKeeper server!", e);
                 }
-                return svc;
+                return service;
             }
         };
         st.open();

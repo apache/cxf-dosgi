@@ -31,16 +31,14 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {
 
-    private ServiceTracker tracker;
+    private ServiceTracker<GreeterService, GreeterService> tracker;
 
     public void start(final BundleContext bc) {
-        tracker = new ServiceTracker(bc, GreeterService.class.getName(), null) {
+        tracker = new ServiceTracker<GreeterService, GreeterService>(bc, GreeterService.class, null) {
             @Override
-            public Object addingService(ServiceReference reference) {
-                Object service = super.addingService(reference);
-                if (service instanceof GreeterService) {
-                    useService((GreeterService) service);
-                }
+            public GreeterService addingService(ServiceReference<GreeterService> reference) {
+                GreeterService service = super.addingService(reference);
+                useService(service);
                 return service;
             }
         };

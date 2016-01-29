@@ -32,29 +32,25 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {
 
-    private ServiceTracker tracker;
-    private ServiceTracker tracker2;
+    private ServiceTracker<GreeterService, GreeterService> tracker;
+    private ServiceTracker<GreeterService2, GreeterService2> tracker2;
 
     public void start(final BundleContext bc) {
-        tracker = new ServiceTracker(bc, GreeterService.class.getName(), null) {
+        tracker = new ServiceTracker<GreeterService, GreeterService>(bc, GreeterService.class, null) {
             @Override
-            public Object addingService(ServiceReference reference) {
-                Object service = super.addingService(reference);
-                if (service instanceof GreeterService) {
-                    useGreeterService((GreeterService) service);
-                }
+            public GreeterService addingService(ServiceReference<GreeterService> reference) {
+                GreeterService service = super.addingService(reference);
+                useGreeterService(service);
                 return service;
             }
         };
         tracker.open();
 
-        tracker2 = new ServiceTracker(bc, GreeterService2.class.getName(), null) {
+        tracker2 = new ServiceTracker<GreeterService2, GreeterService2>(bc, GreeterService2.class, null) {
             @Override
-            public Object addingService(ServiceReference reference) {
-                Object service = super.addingService(reference);
-                if (service instanceof GreeterService2) {
-                    useGreeterService2((GreeterService2) service);
-                }
+            public GreeterService2 addingService(ServiceReference<GreeterService2> reference) {
+                GreeterService2 service = super.addingService(reference);
+                useGreeterService2(service);
                 return service;
             }
         };

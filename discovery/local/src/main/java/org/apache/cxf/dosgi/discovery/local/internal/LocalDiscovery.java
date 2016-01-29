@@ -62,9 +62,9 @@ public class LocalDiscovery implements BundleListener {
 
             @Override
             public EndpointListener addingService(ServiceReference<EndpointListener> reference) {
-                EndpointListener svc = super.addingService(reference);
-                addListener(reference, svc);
-                return svc;
+                EndpointListener service = super.addingService(reference);
+                addListener(reference, service);
+                return service;
             }
 
             @Override

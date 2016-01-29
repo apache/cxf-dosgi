@@ -92,7 +92,7 @@ public class SimpleServiceTracker<T> extends ServiceTracker<T, T> {
 
     @Override
     public T addingService(ServiceReference<T> reference) {
-        T service = (T) super.addingService(reference);
+        T service = super.addingService(reference);
         services.put(reference, service);
         for (SimpleServiceTrackerListener<T> listener : listeners) {
             listener.added(reference, service);

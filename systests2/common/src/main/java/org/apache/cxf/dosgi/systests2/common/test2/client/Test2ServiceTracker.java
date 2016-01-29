@@ -28,7 +28,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class Test2ServiceTracker extends ServiceTracker {
+public class Test2ServiceTracker extends ServiceTracker<Test2Service, Test2Service> {
 
     public Test2ServiceTracker(BundleContext context) {
         super(context, getFilter(context), null);
@@ -48,21 +48,19 @@ public class Test2ServiceTracker extends ServiceTracker {
     }
 
     @Override
-    public Object addingService(ServiceReference reference) {
-        Object svc = super.addingService(reference);
-        if (svc instanceof Test2Service) {
-            System.out.println("*** Ref: " + reference);
-            for (String key : reference.getPropertyKeys()) {
-                System.out.println("  " + key + "-" + reference.getProperty(key));
-            }
-
-            invokeRemoteTestService(context, (Test2Service) svc);
+    public Test2Service addingService(ServiceReference<Test2Service> reference) {
+        Test2Service service = super.addingService(reference);
+        System.out.println("*** Ref: " + reference);
+        for (String key : reference.getPropertyKeys()) {
+            System.out.println("  " + key + "-" + reference.getProperty(key));
         }
-        return svc;
+
+        invokeRemoteTestService(context, service);
+        return service;
     }
 
-    private void invokeRemoteTestService(BundleContext bc, Test2Service svc) {
-        String res = svc.getRemoteStackTrace();
+    private void invokeRemoteTestService(BundleContext bc, Test2Service service) {
+        String res = service.getRemoteStackTrace();
 
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         props.put("result", res);

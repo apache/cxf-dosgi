@@ -29,21 +29,20 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class MyServiceTracker extends ServiceTracker {
+public class MyServiceTracker extends ServiceTracker<GreeterService, GreeterService> {
 
     private static StringBuffer invocationResult = new StringBuffer();
 
     public MyServiceTracker(BundleContext context) {
-        super(context, GreeterService.class.getName(), null);
+        super(context, GreeterService.class, null);
     }
 
-    public Object addingService(ServiceReference reference) {
-        Object svc = super.addingService(reference);
-        if (svc instanceof GreeterService) {
-            System.out.println("[client] Got a GreeterService...");
-            invokeGreeter((GreeterService) svc);
-        }
-        return svc;
+    @Override
+    public GreeterService addingService(ServiceReference<GreeterService> reference) {
+        GreeterService service = super.addingService(reference);
+        System.out.println("[client] Got a GreeterService...");
+        invokeGreeter(service);
+        return service;
     }
 
     public static String getResult() {

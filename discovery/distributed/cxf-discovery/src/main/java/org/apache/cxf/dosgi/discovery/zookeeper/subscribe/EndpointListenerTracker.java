@@ -35,17 +35,20 @@ public class EndpointListenerTracker extends ServiceTracker<EndpointListener, En
         this.imManager = imManager;
     }
 
+    @Override
     public EndpointListener addingService(ServiceReference<EndpointListener> endpointListener) {
         imManager.addInterest(endpointListener);
         return null;
     }
 
+    @Override
     public void modifiedService(ServiceReference<EndpointListener> endpointListener, EndpointListener service) {
         // called when an EndpointListener updates its service properties,
         // e.g. when its interest scope is expanded/reduced
         imManager.addInterest(endpointListener);
     }
 
+    @Override
     public void removedService(ServiceReference<EndpointListener> endpointListener, EndpointListener service) {
         imManager.removeInterest(endpointListener);
     }

@@ -34,25 +34,24 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {
 
-    private ServiceTracker tracker;
+    private ServiceTracker<DisplayService, DisplayService> tracker;
     private Map<DisplayService, String> displays = new ConcurrentHashMap<DisplayService, String>();
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> handle;
 
     public void start(BundleContext bc) throws Exception {
-        tracker = new ServiceTracker(bc, DisplayService.class.getName(), null) {
+        tracker = new ServiceTracker<DisplayService, DisplayService>(bc, DisplayService.class, null) {
 
-            public Object addingService(ServiceReference reference) {
-                Object svc = super.addingService(reference);
-                if (svc instanceof DisplayService) {
-                    DisplayService d = (DisplayService) svc;
-                    System.out.println("Adding display: " + d.getID() + " (" + d + ")");
-                    displays.put(d, d.getID());
-                }
-                return svc;
+            @Override
+            public DisplayService addingService(ServiceReference<DisplayService> reference) {
+                DisplayService service = super.addingService(reference);
+                System.out.println("Adding display: " + service.getID() + " (" + service + ")");
+                displays.put(service, service.getID());
+                return service;
             }
 
-            public void removedService(ServiceReference reference, Object service) {
+            @Override
+            public void removedService(ServiceReference<DisplayService> reference, DisplayService service) {
                 String value = displays.remove(service);
                 System.out.println("Removed display: " + value);
                 super.removedService(reference, service);

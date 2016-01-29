@@ -32,10 +32,10 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class Activator implements BundleActivator {
 
-    private ServiceTracker tracker;
+    private ServiceTracker<AdderService, AdderService> tracker;
 
     public void start(BundleContext context) throws Exception {
-        tracker = new ServiceTracker(context, AdderService.class.getName(), null);
+        tracker = new ServiceTracker<AdderService, AdderService>(context, AdderService.class, null);
         tracker.open();
     }
 
