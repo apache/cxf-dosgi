@@ -40,33 +40,33 @@
 
         <osgi.version>4.3.1</osgi.version>
         <osgi.compendium.version>4.3.1</osgi.compendium.version>
-        <cxf.version>3.1.1</cxf.version>
+        <cxf.version>3.1.4</cxf.version>
         <cxf.build-utils.version>3.1.0</cxf.build-utils.version>
-        <felix.version>4.2.1</felix.version>
-        <spring.version>3.0.6.RELEASE</spring.version>
+        <felix.version>5.4.0</felix.version>
+        <spring.version>4.2.4.RELEASE</spring.version>
         <spring.osgi.version>1.2.1</spring.osgi.version>
-        <zookeeper.version>3.3.2</zookeeper.version>
+        <zookeeper.version>3.4.7</zookeeper.version>
 
         <remote.service.admin.interfaces.version>1.0.0</remote.service.admin.interfaces.version>
 
-        <servicemix.specs.version>2.2.0</servicemix.specs.version>
+        <servicemix.specs.version>2.6.0</servicemix.specs.version>
         <pax.web.version>1.0.11</pax.web.version>
         <pax.logging.version>1.7.0</pax.logging.version>
         <servlet.version>3.0</servlet.version>
         <log4j.version>1.2.17</log4j.version>
-        <jetty.version>7.4.2.v20110526</jetty.version>
-        <xmlschema.bundle.version>2.0.3</xmlschema.bundle.version>
+        <jetty.version>9.3.7.v20160115</jetty.version>
+        <xmlschema.bundle.version>2.2.1</xmlschema.bundle.version>
         <xmlresolver.bundle.version>1.2_5</xmlresolver.bundle.version>
-        <neethi.bundle.version>3.0.2</neethi.bundle.version>
+        <neethi.bundle.version>3.0.3</neethi.bundle.version>
         <wsdl4j.bundle.version>1.6.2_6</wsdl4j.bundle.version>
         <xmlsec.version>1.5.3</xmlsec.version>
         <asm.bundle.version>3.3.1_1</asm.bundle.version>
         <commons.pool.bundle.version>1.5.4_1</commons.pool.bundle.version>
-        <woodstox.bundle.version>4.1.4</woodstox.bundle.version>
+        <woodstox.bundle.version>4.4.1</woodstox.bundle.version>
         <jaxbimpl.bundle.version>2.2.1.1_2</jaxbimpl.bundle.version>
-        <slf4j.version>1.7.0</slf4j.version>
+        <slf4j.version>1.7.14</slf4j.version>
         <felix.plugin.version>2.4.0</felix.plugin.version>
-        <exam.version>3.2.0</exam.version>
+        <exam.version>4.8.0</exam.version>
         <cxf.resources.base.path />
         <cxf.checkstyle.extension />
     </properties>
@@ -96,25 +96,25 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.7</version>
+                <version>4.12</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>2.5.2</version>
+                <version>3.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymockclassextension</artifactId>
-                <version>2.5.2</version>
+                <version>3.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
-                <version>1.4</version>
+                <version>1.6</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -160,7 +160,7 @@
             <dependency>
                 <groupId>org.ops4j.pax.tinybundles</groupId>
                 <artifactId>tinybundles</artifactId>
-                <version>2.0.0</version>
+                <version>2.1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
