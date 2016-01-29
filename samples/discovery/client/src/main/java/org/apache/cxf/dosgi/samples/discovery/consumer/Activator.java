@@ -81,6 +81,7 @@ public class Activator implements BundleActivator {
 
     public void stop(BundleContext bc) throws Exception {
         handle.cancel(true);
+        scheduler.shutdown();
         tracker.close();
     }
 }
