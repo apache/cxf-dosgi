@@ -85,19 +85,18 @@ public class Activator implements BundleActivator {
             String name = JOptionPane.showInputDialog("Enter name:");
             if (name == null) {
                 break;
-            } else {
-                System.out.println("*** Invoking greeter ***");
-                try {
-                    GreeterInfo info = greeter.greetMe(name);
+            }
+            System.out.println("*** Invoking greeter ***");
+            try {
+                GreeterInfo info = greeter.greetMe(name);
 
-                    System.out.println("greetMe(\"" + name + "\") returns:");
-                    for (GreetingPhrase greeting: info.getGreetings()) {
-                        System.out.println("  " + greeting.getPhrase()
-                                + " " + greeting.getName());
-                    }
-                } catch (GreeterException ex) {
-                    System.out.println("GreeterException: " + ex.toString());
+                System.out.println("greetMe(\"" + name + "\") returns:");
+                for (GreetingPhrase greeting: info.getGreetings()) {
+                    System.out.println("  " + greeting.getPhrase()
+                            + " " + greeting.getName());
                 }
+            } catch (GreeterException ex) {
+                System.out.println("GreeterException: " + ex.toString());
             }
         }
     }
@@ -108,19 +107,18 @@ public class Activator implements BundleActivator {
             String name = JOptionPane.showInputDialog("Greeter2: Enter name");
             if (name == null) {
                 break;
-            } else {
-                System.out.println("*** Invoking greeter2 ***");
-                try {
-                    GreeterInfo info = greeter.greetMe(name);
+            }
+            System.out.println("*** Invoking greeter2 ***");
+            try {
+                GreeterInfo info = greeter.greetMe(name);
 
-                    System.out.println("greetMe(\"" + name + "\") returns:");
-                    for (GreetingPhrase greeting: info.getGreetings()) {
-                        System.out.println("  " + greeting.getPhrase()
-                                + " " + greeting.getName());
-                    }
-                } catch (GreeterException ex) {
-                    System.out.println("GreeterException: " + ex.toString());
+                System.out.println("greetMe(\"" + name + "\") returns:");
+                for (GreetingPhrase greeting: info.getGreetings()) {
+                    System.out.println("  " + greeting.getPhrase()
+                            + " " + greeting.getName());
                 }
+            } catch (GreeterException ex) {
+                System.out.println("GreeterException: " + ex.toString());
             }
         }
     }

@@ -50,12 +50,10 @@ public class GreeterServiceImpl implements GreeterService {
         String details = gd.getName() + "(" + gd.getAge() + ")";
         System.out.println("Invoking: greetMe(" + details + ")");
 
-        GreetingPhrase[] greetings = new GreetingPhrase[] {
+        return new GreetingPhrase[] {
             new GreetingPhrase("Howdy " + details),
             new GreetingPhrase("Hallo " + details),
             new GreetingPhrase("Ni hao " + details)
         };
-
-        return greetings;
     }
 }
