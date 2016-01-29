@@ -186,6 +186,10 @@ public class GreeterDialog extends JDialog {
         return complexPanel;
     }
 
+    public void resetSelection() {
+        selection = null;
+    }
+
     public Object getSelection() {
         return selection;
     }

@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.samples.greeter.client;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 import org.apache.cxf.dosgi.samples.greeter.GreeterException;
@@ -32,14 +33,24 @@ import org.osgi.util.tracker.ServiceTracker;
 public class Activator implements BundleActivator {
 
     private ServiceTracker<GreeterService, GreeterService> tracker;
+    private ConcurrentHashMap<GreeterService, GreeterDialog> dialogs =
+                new ConcurrentHashMap<GreeterService, GreeterDialog>();
 
     public void start(final BundleContext bc) {
         tracker = new ServiceTracker<GreeterService, GreeterService>(bc, GreeterService.class, null) {
             @Override
             public GreeterService addingService(ServiceReference<GreeterService> reference) {
                 GreeterService service = super.addingService(reference);
+                dialogs.put(service, new GreeterDialog());
                 useService(service);
                 return service;
+            }
+
+            @Override
+            public void removedService(ServiceReference<GreeterService> reference, GreeterService service) {
+                super.removedService(reference, service);
+                GreeterDialog dialog = dialogs.remove(service);
+                dialog.dispose();
             }
         };
         tracker.open();
@@ -56,8 +67,15 @@ public class Activator implements BundleActivator {
 
     private void greeterUI(final GreeterService greeter) {
         while (true) {
+            GreeterDialog dialog = dialogs.get(greeter);
+            if (dialog == null) {
+                return; // exit thread if service is removed
+            }
             System.out.println("*** Opening greeter client dialog ***");
-            Object gd = getGreeterData();
+            dialog.resetSelection();
+            dialog.setVisible(true); // blocks until dismissed
+            Object gd = dialog.getSelection();
+
             if (gd instanceof String) {
                 System.out.println("*** Invoking greeter ***");
                 Map<GreetingPhrase, String> result = greeter.greetMe((String) gd);
@@ -80,12 +98,6 @@ public class Activator implements BundleActivator {
                 }
             }
         }
-    }
-
-    private static Object getGreeterData() {
-        GreeterDialog gd = new GreeterDialog();
-        gd.setVisible(true);
-        return gd.getSelection();
     }
 
     public void stop(BundleContext bc) throws Exception {
