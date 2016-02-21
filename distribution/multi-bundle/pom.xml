@@ -34,7 +34,7 @@
   <properties>
     <dosgi.version>${project.version}</dosgi.version>
     <topDirectoryLocation>../..</topDirectoryLocation>
-    <karaf.version>3.0.3</karaf.version>
+    <karaf.version>3.0.6</karaf.version>
   </properties>
 
   <build>
