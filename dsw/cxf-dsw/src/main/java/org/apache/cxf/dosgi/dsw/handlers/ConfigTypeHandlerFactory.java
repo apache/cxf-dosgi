@@ -46,9 +46,12 @@ public class ConfigTypeHandlerFactory {
     private PojoConfigurationTypeHandler pojoConfigurationTypeHandler;
     private JaxRSPojoConfigurationTypeHandler jaxRsPojoConfigurationTypeHandler;
     private WsdlConfigurationTypeHandler wsdlConfigurationTypeHandler;
+    private ConfigTypeHandlerTracker handlerTracker;
 
     public ConfigTypeHandlerFactory(BundleContext bc, IntentManager intentManager,
                                     HttpServiceManager httpServiceManager) {
+        this.handlerTracker = new ConfigTypeHandlerTracker(bc);
+        handlerTracker.open(true);
         this.intentManager = intentManager;
         this.pojoConfigurationTypeHandler = new PojoConfigurationTypeHandler(bc, intentManager, httpServiceManager);
         this.jaxRsPojoConfigurationTypeHandler = new JaxRSPojoConfigurationTypeHandler(bc,
@@ -84,6 +87,10 @@ public class ConfigTypeHandlerFactory {
             return jaxrs ? jaxRsPojoConfigurationTypeHandler : pojoConfigurationTypeHandler;
         } else if (configurationTypes.contains(Constants.WSDL_CONFIG_TYPE)) {
             return wsdlConfigurationTypeHandler;
+        }
+        ConfigurationTypeHandler handler = handlerTracker.getConfigTypeHandler(configurationTypes);
+        if (handler != null) {
+            return handler;
         }
         throw new RuntimeException("None of the configuration types in " + configurationTypes + " is supported.");
     }
@@ -130,7 +137,7 @@ public class ConfigTypeHandlerFactory {
 
         List<String> configurationTypes = new ArrayList<String>();
         for (String rct : requestedConfigurationTypes) {
-            if (supportedConfigurationTypes.contains(rct)) {
+            if (getAllSupportedConfigurationTypes().contains(rct)) {
                 configurationTypes.add(rct);
             }
         }
@@ -149,7 +156,7 @@ public class ConfigTypeHandlerFactory {
         }
 
         List<String> usableConfigurationTypes = new ArrayList<String>();
-        for (String ct : supportedConfigurationTypes) {
+        for (String ct : getAllSupportedConfigurationTypes()) {
             if (remoteConfigurationTypes.contains(ct)) {
                 usableConfigurationTypes.add(ct);
             }
@@ -165,5 +172,16 @@ public class ConfigTypeHandlerFactory {
 
     public List<String> getSupportedConfigurationTypes() {
         return supportedConfigurationTypes;
+    }
+
+    /**
+     * returns a list of all supported configuration types.
+     * The list includes the built-in and contributed types.
+     * @return the supported configuration types
+     */
+    public List<String> getAllSupportedConfigurationTypes() {
+        List<String> knownTypes = new ArrayList<String>(supportedConfigurationTypes);
+        knownTypes.addAll(handlerTracker.getSupportedTypes());
+        return knownTypes;
     }
 }

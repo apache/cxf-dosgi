@@ -124,7 +124,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            !*
+                            org.apache.cxf.dosgi.dsw*,!*
                         </Export-Package>
                         <Bundle-Activator>org.apache.cxf.dosgi.dsw.Activator</Bundle-Activator>
                         
