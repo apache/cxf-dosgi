@@ -100,7 +100,7 @@ public class HttpServiceManagerTest extends TestCase {
 
         private ServletConfig config;
 
-        public DummyHttpService(ServletConfig config) {
+        DummyHttpService(ServletConfig config) {
             this.config = config;
         }
 

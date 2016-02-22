@@ -146,7 +146,7 @@ public class OsgiUtilsTest extends TestCase {
         Package package1;
         String version;
 
-        public MyExportedPackage(Package package1, String version) {
+        MyExportedPackage(Package package1, String version) {
             this.package1 = package1;
             this.version = version;
         }

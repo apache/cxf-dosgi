@@ -98,7 +98,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     public void testGetDefaultPojoAddress() {
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
         PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(null,
-                                                                                intentManager ,
+                                                                                intentManager,
                                                                                 dummyHttpServiceManager());
         Map<String, Object> sd = new HashMap<String, Object>();
         assertEquals("/java/lang/String", handler.getServerAddress(sd, String.class));
