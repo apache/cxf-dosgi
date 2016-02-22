@@ -101,7 +101,7 @@ public class RemoteServiceAdminCoreTest {
     }
 
     @Test
-    public void testImport() {
+    public void testImport() throws InvalidSyntaxException {
         IMocksControl c = EasyMock.createNiceControl();
         Bundle b = c.createMock(Bundle.class);
         BundleContext bc = c.createMock(BundleContext.class);
@@ -111,6 +111,8 @@ public class RemoteServiceAdminCoreTest {
 
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(b.getSymbolicName()).andReturn("BundleName").anyTimes();
+        String serviceFilter = "(objectClass=org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler)";
+        EasyMock.expect(bc.createFilter(serviceFilter)).andReturn(FrameworkUtil.createFilter(serviceFilter));
 
         Map<String, Object> p = new HashMap<String, Object>();
         p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
@@ -122,10 +124,10 @@ public class RemoteServiceAdminCoreTest {
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
         HttpServiceManager httpServiceManager = c.createMock(HttpServiceManager.class);
+        c.replay();
         ConfigTypeHandlerFactory configTypeHandlerFactory
             = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
 
-        c.replay();
 
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory) {
             @Override
