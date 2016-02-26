@@ -18,11 +18,12 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cxf.endpoint.Server;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
@@ -36,7 +37,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
 
     private final RemoteServiceAdminCore rsaCore;
     private final ExportReferenceImpl exportReference;
-    private final Server server;
+    private final Closeable server;
     private final Throwable exception;
 
     private final ExportRegistrationImpl parent;
@@ -44,7 +45,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
     private volatile boolean closed;
 
     private ExportRegistrationImpl(ExportRegistrationImpl parent, RemoteServiceAdminCore rsaCore,
-            ExportReferenceImpl exportReference, Server server, Throwable exception) {
+            ExportReferenceImpl exportReference, Closeable server, Throwable exception) {
         this.parent = parent != null ? parent.parent : this; // a parent points to itself
         this.parent.addInstance();
         this.rsaCore = rsaCore;
@@ -61,7 +62,7 @@ public class ExportRegistrationImpl implements ExportRegistration {
 
     // create a new (parent) instance which was exported successfully with the given server
     public ExportRegistrationImpl(ServiceReference sref, EndpointDescription endpoint,
-            RemoteServiceAdminCore rsaCore, Server server) {
+            RemoteServiceAdminCore rsaCore, Closeable server) {
         this(null, rsaCore, new ExportReferenceImpl(sref, endpoint), server, null);
     }
 
@@ -113,7 +114,11 @@ public class ExportRegistrationImpl implements ExportRegistration {
                 LOG.debug("really closing ExportRegistration now!");
 
                 if (server != null) {
-                    server.destroy();
+                    try {
+                        server.close();
+                    } catch (IOException e) {
+                        LOG.warn("Error closing ExportRegistration", e);
+                    }
                 }
             }
         }

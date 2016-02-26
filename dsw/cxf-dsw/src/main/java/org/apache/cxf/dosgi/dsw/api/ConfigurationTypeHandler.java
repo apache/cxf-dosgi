@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.dsw.handlers;
+package org.apache.cxf.dosgi.dsw.api;
 
 import java.util.Map;
 
-import org.apache.cxf.dosgi.dsw.qos.IntentUnsatisfiedException;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -29,15 +28,16 @@ public interface ConfigurationTypeHandler {
 
     String[] getSupportedTypes();
 
-    ExportResult createServer(ServiceReference serviceReference,
+    ExportResult createServer(ServiceReference<?> serviceReference,
                         BundleContext dswContext,
                         BundleContext callingContext,
                         Map<String, Object> sd,
                         Class<?> iClass,
                         Object serviceBean);
 
-    Object createProxy(ServiceReference serviceReference,
+    Object createProxy(ServiceReference<?> serviceReference,
                        BundleContext dswContext,
                        BundleContext callingContext,
-                       Class<?> iClass, EndpointDescription endpoint) throws IntentUnsatisfiedException;
+                       Class<?> iClass, 
+                       EndpointDescription endpoint) throws IntentUnsatisfiedException;
 }

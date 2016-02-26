@@ -37,6 +37,7 @@ import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.qos.IntentTracker;
+import org.apache.cxf.dosgi.dsw.service.ConfigTypeHandlerFinder;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
 import org.apache.cxf.dosgi.dsw.util.Utils;
@@ -57,8 +58,8 @@ public class Activator implements ManagedService, BundleActivator {
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
     private static final int DEFAULT_INTENT_TIMEOUT = 30000;
     private static final String CONFIG_SERVICE_PID = "cxf-dsw";
-    private ServiceRegistration rsaFactoryReg;
-    private ServiceRegistration decoratorReg;
+    private ServiceRegistration<?> rsaFactoryReg;
+    private ServiceRegistration<?> decoratorReg;
     private IntentTracker intentTracker;
     private HttpServiceManager httpServiceManager;
     private BundleContext bc;
@@ -91,7 +92,7 @@ public class Activator implements ManagedService, BundleActivator {
         intentTracker.open();
         IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
         httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlias);
-        ConfigTypeHandlerFactory configTypeHandlerFactory
+        ConfigTypeHandlerFinder configTypeHandlerFactory
             = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
         RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(rsaCore);

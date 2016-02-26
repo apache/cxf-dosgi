@@ -31,6 +31,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.api.ExportResult;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.ClassUtils;
@@ -209,7 +211,7 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         try {
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            return new ExportResult(endpointProps, server);
+            return new ExportResult(endpointProps, new ServerWrapper(server));
         } catch (Exception e) {
             return new ExportResult(endpointProps, e);
         } finally {

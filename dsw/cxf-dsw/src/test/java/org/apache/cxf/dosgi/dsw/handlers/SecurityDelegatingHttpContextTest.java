@@ -38,6 +38,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 
+@SuppressWarnings({
+    "unchecked", "rawtypes"
+   })
 public class SecurityDelegatingHttpContextTest extends TestCase {
 
     protected HttpContext defaultHttpContext;

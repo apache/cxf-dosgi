@@ -32,9 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
-import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.handlers.ExportResult;
+import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.api.ExportResult;
 import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
@@ -69,13 +68,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     private final BundleContext bctx;
     private final EventProducer eventProducer;
-    private final ConfigTypeHandlerFactory configTypeHandlerFactory;
+    private final ConfigTypeHandlerFinder configTypeHandlerFinder;
     private final ServiceListener exportedServiceListener;
 
-    public RemoteServiceAdminCore(BundleContext bc, ConfigTypeHandlerFactory configTypeHandlerFactory) {
+    public RemoteServiceAdminCore(BundleContext bc, ConfigTypeHandlerFinder configTypeHandlerFinder) {
         this.bctx = bc;
         this.eventProducer = new EventProducer(bctx);
-        this.configTypeHandlerFactory = configTypeHandlerFactory;
+        this.configTypeHandlerFinder = configTypeHandlerFinder;
         // listen for exported services being unregistered so we can close the export
         this.exportedServiceListener = new ServiceListener() {
             public void serviceChanged(ServiceEvent event) {
@@ -157,11 +156,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     }
 
     private List<ExportRegistration> exportInterfaces(List<String> interfaces,
-            ServiceReference serviceReference, Map<String, Object> serviceProperties) {
+            ServiceReference<?> serviceReference, Map<String, Object> serviceProperties) {
         LOG.info("interfaces selected for export: " + interfaces);
         ConfigurationTypeHandler handler;
         try {
-            handler = configTypeHandlerFactory.getHandler(bctx, serviceProperties);
+            handler = findHandler(serviceProperties);
         } catch (RuntimeException e) {
             LOG.error(e.getMessage(), e);
             return Collections.emptyList();
@@ -287,7 +286,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         return copy;
     }
 
-    private boolean isCreatedByThisRSA(ServiceReference sref) {
+    private boolean isCreatedByThisRSA(ServiceReference<?> sref) {
         return bctx.getBundle().equals(sref.getBundle()); // sref bundle can be null
     }
 
@@ -335,22 +334,14 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return ir;
             }
 
-            ConfigurationTypeHandler handler;
-            try {
-                handler = configTypeHandlerFactory.getHandler(bctx, endpoint);
-            } catch (RuntimeException e) {
-                LOG.error("no handler found: " + e.getMessage(), e);
-                return null;
-            }
-
-            LOG.debug("Handler: {}", handler);
+            ConfigurationTypeHandler handler = findHandler(endpoint);
 
             // TODO: somehow select the interfaces that should be imported ---> job of the TopologyManager?
             List<String> matchingInterfaces = endpoint.getInterfaces();
 
             LOG.info("Matching Interfaces for import: " + matchingInterfaces);
 
-            if (matchingInterfaces.size() == 1) {
+            if (handler != null && matchingInterfaces.size() == 1) {
                 LOG.info("Proxifying interface: " + matchingInterfaces.get(0));
 
                 ImportRegistrationImpl imReg = new ImportRegistrationImpl(endpoint, this);
@@ -395,7 +386,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
             ClientServiceFactory csf = new ClientServiceFactory(actualContext, iClass, endpoint, handler, imReg);
             imReg.setClientServiceFactory(csf);
-            ServiceRegistration proxyReg = actualContext.registerService(interfaceName, csf, serviceProps);
+            ServiceRegistration<?> proxyReg = actualContext.registerService(interfaceName, csf, serviceProps);
             imReg.setImportedServiceRegistration(proxyReg);
         } catch (Exception ex) {
             // Only logging at debug level as this might be written to the log at the TopologyManager
@@ -410,7 +401,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
      *
      * @param sref the service whose exports should be removed and closed
      */
-    protected void removeServiceExports(ServiceReference sref) {
+    protected void removeServiceExports(ServiceReference<?> sref) {
         List<ExportRegistration> regs = new ArrayList<ExportRegistration>(1);
         synchronized (exportedServices) {
             for (Iterator<Collection<ExportRegistration>> it = exportedServices.values().iterator(); it.hasNext();) {
@@ -511,5 +502,18 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     public void close() {
         removeImportRegistrations();
         bctx.removeServiceListener(exportedServiceListener);
+    }
+    
+    private ConfigurationTypeHandler findHandler(EndpointDescription endpoint) {
+        try {
+            return configTypeHandlerFinder.getHandler(bctx, endpoint);
+        } catch (RuntimeException e) {
+            LOG.error("No handler found: " + e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private ConfigurationTypeHandler findHandler(Map<String, Object> serviceProperties) {
+        return configTypeHandlerFinder.getHandler(bctx, serviceProperties);
     }
 }

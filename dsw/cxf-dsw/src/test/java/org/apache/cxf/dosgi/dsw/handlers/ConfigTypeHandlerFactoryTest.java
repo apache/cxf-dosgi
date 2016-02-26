@@ -22,10 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
+import org.apache.cxf.dosgi.dsw.service.ConfigTypeHandlerFinder;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
@@ -93,7 +95,7 @@ public class ConfigTypeHandlerFactoryTest {
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap);
         HttpServiceManager httpServiceManager = new HttpServiceManager(bc, null, null);
-        ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
+        ConfigTypeHandlerFinder f = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
         return f.getHandler(bc, serviceProps);
     }
 
@@ -106,7 +108,7 @@ public class ConfigTypeHandlerFactoryTest {
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap);
         HttpServiceManager httpServiceManager = new HttpServiceManager(bc, null, null);
-        ConfigTypeHandlerFactory f = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
+        ConfigTypeHandlerFinder f = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
         return f.getHandler(bc, serviceProps);
     }
 }

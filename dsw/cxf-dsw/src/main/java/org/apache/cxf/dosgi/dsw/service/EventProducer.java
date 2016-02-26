@@ -83,6 +83,9 @@ public class EventProducer {
         }
     }
 
+    @SuppressWarnings({
+     "rawtypes", "unchecked"
+    })
     private void notifyListeners(RemoteServiceAdminEvent rsae) {
         try {
             ServiceReference[] listenerRefs = bctx.getServiceReferences(

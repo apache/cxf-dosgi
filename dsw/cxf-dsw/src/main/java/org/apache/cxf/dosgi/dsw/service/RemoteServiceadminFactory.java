@@ -21,10 +21,11 @@ package org.apache.cxf.dosgi.dsw.service;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RemoteServiceadminFactory implements ServiceFactory {
+public class RemoteServiceadminFactory implements ServiceFactory<RemoteServiceAdmin> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteServiceadminFactory.class);
 
@@ -35,13 +36,14 @@ public class RemoteServiceadminFactory implements ServiceFactory {
         this.rsaCore = rsaCore;
     }
 
-    public synchronized Object getService(Bundle b, ServiceRegistration sreg) {
+    public synchronized RemoteServiceAdmin getService(Bundle b, ServiceRegistration<RemoteServiceAdmin> sreg) {
         LOG.debug("new RemoteServiceAdmin ServiceInstance created for Bundle {}", b.getSymbolicName());
         instances++;
         return new RemoteServiceAdminInstance(b.getBundleContext(), rsaCore);
     }
 
-    public synchronized void ungetService(Bundle b, ServiceRegistration sreg, Object serviceObject) {
+    public synchronized void ungetService(Bundle b, ServiceRegistration<RemoteServiceAdmin> sreg,
+                                          RemoteServiceAdmin serviceObject) {
         LOG.debug("RemoteServiceAdmin ServiceInstance removed for Bundle {}", b.getSymbolicName());
         instances--;
         ((RemoteServiceAdminInstance)serviceObject).close(instances == 0);

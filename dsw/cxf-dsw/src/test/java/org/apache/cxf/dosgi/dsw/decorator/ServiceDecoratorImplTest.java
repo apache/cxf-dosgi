@@ -24,11 +24,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import org.junit.Assert;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
@@ -41,6 +41,7 @@ public class ServiceDecoratorImplTest extends TestCase {
     private static final URL RES_SD0 = getResource("/test-resources/sd0.xml");
     private static final URL RES_SD_1 = getResource("/test-resources/sd-1.xml");
 
+    @SuppressWarnings("rawtypes")
     public void testAddRemoveDecorations() {
         final Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.acme.foo.Bar"});
@@ -149,6 +150,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertEquals(expected, actual);
     }
 
+    @SuppressWarnings("rawtypes")
     private Map<String, Object> testDecorate(final Map<String, Object> serviceProps, URL ... resources) {
         Bundle b = createBundleContaining(resources);
 

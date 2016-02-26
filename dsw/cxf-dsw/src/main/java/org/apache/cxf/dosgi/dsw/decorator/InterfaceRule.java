@@ -66,7 +66,7 @@ public class InterfaceRule implements Rule {
         addProps.put(name, obj);
     }
 
-    public synchronized void apply(ServiceReference sref, Map<String, Object> target) {
+    public synchronized void apply(ServiceReference<?> sref, Map<String, Object> target) {
         String[] objectClass = (String[]) sref.getProperty(Constants.OBJECTCLASS);
         boolean matches = false;
         for (String cls : objectClass) {

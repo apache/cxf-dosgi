@@ -29,6 +29,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.api.ExportResult;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -53,7 +54,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return new String[] {Constants.WSDL_CONFIG_TYPE};
     }
 
-    public Object createProxy(ServiceReference serviceReference,
+    public Object createProxy(ServiceReference<?> serviceReference,
                               BundleContext dswContext,
                               BundleContext callingContext,
                               Class<?> iClass,
@@ -100,7 +101,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return Service.create(wsdlAddress, serviceQname);
     }
 
-    public ExportResult createServer(ServiceReference sref,
+    public ExportResult createServer(ServiceReference<?> sref,
                                BundleContext dswContext,
                                BundleContext callingContext,
                                Map<String, Object> sd,

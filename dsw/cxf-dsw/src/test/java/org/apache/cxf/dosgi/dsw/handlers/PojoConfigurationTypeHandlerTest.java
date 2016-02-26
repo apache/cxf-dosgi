@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import java.io.Closeable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,10 +26,10 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.api.ExportResult;
 import org.apache.cxf.dosgi.dsw.handlers.jaxws.MyJaxWsEchoService;
 import org.apache.cxf.dosgi.dsw.handlers.jaxws.MyJaxWsEchoServiceImpl;
 import org.apache.cxf.dosgi.dsw.handlers.simple.MySimpleEchoService;
@@ -48,9 +49,10 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
+import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.IMocksControl;
+import org.junit.Assert;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -226,7 +228,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
             @Override
             protected ExportResult createServerFromFactory(ServerFactoryBean factory,
                                                            Map<String, Object> endpointProps) {
-                return new ExportResult(endpointProps, (Server) null);
+                return new ExportResult(endpointProps, (Closeable) null);
             }
         };
 
@@ -374,8 +376,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         ExportResult exportResult = handler.createServer(sref, dswBC, null, sd, MyJaxWsEchoService.class, serviceBean);
         c.verify();
 
-        Server server = exportResult.getServer();
-        Endpoint ep = server.getEndpoint();
+        ServerWrapper serverWrapper = (ServerWrapper)exportResult.getServer();
+        Endpoint ep = serverWrapper.getServer().getEndpoint();
         QName bindingName = ep.getEndpointInfo().getBinding().getName();
         Assert.assertEquals(JaxWsEndpointImpl.class, ep.getClass());
         Assert.assertEquals(new QName("http://jaxws.handlers.dsw.dosgi.cxf.apache.org/",
@@ -396,10 +398,10 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         c.replay();
         ExportResult exportResult = handler.createServer(sref, dswBC, null, sd, MySimpleEchoService.class, serviceBean);
-        Server server = exportResult.getServer();
+        ServerWrapper serverWrapper = (ServerWrapper)exportResult.getServer();
         c.verify();
 
-        Endpoint ep = server.getEndpoint();
+        Endpoint ep = serverWrapper.getServer().getEndpoint();
         QName bindingName = ep.getEndpointInfo().getBinding().getName();
         Assert.assertEquals(EndpointImpl.class, ep.getClass());
         Assert.assertEquals(new QName("http://simple.handlers.dsw.dosgi.cxf.apache.org/",

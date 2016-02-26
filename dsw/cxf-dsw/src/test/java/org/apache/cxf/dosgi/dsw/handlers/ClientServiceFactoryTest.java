@@ -23,6 +23,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.service.ClientServiceFactory;
 import org.apache.cxf.dosgi.dsw.service.ImportRegistrationImpl;
 import org.easymock.EasyMock;
@@ -37,6 +38,7 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class ClientServiceFactoryTest extends TestCase {
 
+    @SuppressWarnings("rawtypes")
     public void testGetService() {
         Object myTestProxyObject = new Object();
 

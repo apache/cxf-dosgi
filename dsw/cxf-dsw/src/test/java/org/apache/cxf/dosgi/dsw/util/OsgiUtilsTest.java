@@ -39,6 +39,7 @@ import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
+@SuppressWarnings("deprecation")
 public class OsgiUtilsTest extends TestCase {
 
     public void testMultiValuePropertyAsString() {
@@ -75,6 +76,9 @@ public class OsgiUtilsTest extends TestCase {
         EasyMock.verify(bc);
     }
 
+    @SuppressWarnings({
+     "rawtypes", "unchecked"
+    })
     public void testGetVersion() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext bc = c.createMock(BundleContext.class);
@@ -82,7 +86,7 @@ public class OsgiUtilsTest extends TestCase {
         PackageAdmin pa = c.createMock(PackageAdmin.class);
         Bundle b = c.createMock(Bundle.class);
 
-        EasyMock.expect(bc.getServiceReference(EasyMock.eq(PackageAdmin.class.getName()))).andReturn(sref);
+        EasyMock.expect(bc.getServiceReference(EasyMock.eq(PackageAdmin.class))).andReturn(sref);
         EasyMock.expect(bc.getService(EasyMock.eq(sref))).andReturn(pa);
 
         Class<?> iClass = CharSequence.class;
@@ -96,7 +100,7 @@ public class OsgiUtilsTest extends TestCase {
         c.reset();
         // version 1.2.3
 
-        EasyMock.expect(bc.getServiceReference(EasyMock.eq(PackageAdmin.class.getName()))).andReturn(sref);
+        EasyMock.expect(bc.getServiceReference(EasyMock.eq(PackageAdmin.class))).andReturn(sref);
         EasyMock.expect(bc.getService(EasyMock.eq(sref))).andReturn(pa);
         EasyMock.expect(pa.getBundle(EasyMock.eq(iClass))).andReturn(b);
 

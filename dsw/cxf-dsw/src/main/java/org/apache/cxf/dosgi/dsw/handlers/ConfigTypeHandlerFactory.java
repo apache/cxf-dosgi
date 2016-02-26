@@ -25,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.service.ConfigTypeHandlerFinder;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.BundleContext;
@@ -34,7 +36,7 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ConfigTypeHandlerFactory {
+public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
 
     protected static final String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
     private static final Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
@@ -62,12 +64,14 @@ public class ConfigTypeHandlerFactory {
         supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
     }
 
+    @Override
     public ConfigurationTypeHandler getHandler(BundleContext dswBC,
             Map<String, Object> serviceProperties) {
         List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
         return getHandler(dswBC, configurationTypes, serviceProperties);
     }
 
+    @Override
     public ConfigurationTypeHandler getHandler(BundleContext dswBC, EndpointDescription endpoint) {
         List<String> configurationTypes = determineConfigTypesForImport(endpoint);
         return getHandler(dswBC, configurationTypes, endpoint.getProperties());
@@ -163,6 +167,10 @@ public class ConfigTypeHandlerFactory {
         return usableConfigurationTypes;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFinder#getSupportedConfigurationTypes()
+     */
+    @Override
     public List<String> getSupportedConfigurationTypes() {
         return supportedConfigurationTypes;
     }

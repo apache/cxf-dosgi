@@ -18,13 +18,12 @@
  */
 package org.apache.cxf.dosgi.dsw.qos;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.feature.AbstractFeature;
 import org.easymock.Capture;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -45,7 +44,7 @@ public class IntentTrackerTest {
         BundleContext bc = c.createMock(BundleContext.class);
         Filter filter = c.createMock(Filter.class);
         expect(bc.createFilter(EasyMock.<String>anyObject())).andReturn(filter);
-        final Capture<ServiceListener> capturedListener = new Capture<ServiceListener>();
+        final Capture<ServiceListener> capturedListener = EasyMock.newCapture();
         bc.addServiceListener(EasyMock.capture(capturedListener), EasyMock.<String>anyObject());
         EasyMock.expectLastCall().atLeastOnce();
         expect(bc.getServiceReferences(EasyMock.<String>anyObject(),

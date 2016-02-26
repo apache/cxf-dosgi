@@ -25,8 +25,9 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.api.ExportResult;
+import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -54,7 +55,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         return new String[] {Constants.RS_CONFIG_TYPE};
     }
 
-    public Object createProxy(ServiceReference serviceReference, BundleContext dswContext,
+    public Object createProxy(ServiceReference<?> serviceReference, BundleContext dswContext,
                               BundleContext callingContext, Class<?> iClass,
                               EndpointDescription endpoint) throws IntentUnsatisfiedException {
         String address = getPojoAddress(endpoint, iClass);
@@ -109,7 +110,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         return getProxy(bean.create(), iClass);
     }
 
-    public ExportResult createServer(ServiceReference sref,
+    public ExportResult createServer(ServiceReference<?> sref,
                                      BundleContext dswContext,
                                      BundleContext callingContext,
                                      Map<String, Object> sd, Class<?> iClass,
@@ -146,7 +147,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         try {
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            return new ExportResult(endpointProps, server);
+            return new ExportResult(endpointProps, new ServerWrapper(server));
         } catch (Exception e) {
             return new ExportResult(endpointProps, e);
         } finally {

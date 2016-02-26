@@ -16,20 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.dsw.qos;
+package org.apache.cxf.dosgi.dsw.service;
 
-public class IntentUnsatisfiedException extends RuntimeException {
+import java.util.List;
+import java.util.Map;
 
-    private static final long serialVersionUID = 1L;
+import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-    private final String intent;
+public interface ConfigTypeHandlerFinder {
 
-    public IntentUnsatisfiedException(String intent) {
-        super(intent);
-        this.intent = intent;
-    }
+    ConfigurationTypeHandler getHandler(BundleContext dswBC, Map<String, Object> serviceProperties);
 
-    public String getIntent() {
-        return intent;
-    }
+    ConfigurationTypeHandler getHandler(BundleContext dswBC, EndpointDescription endpoint);
+
+    List<String> getSupportedConfigurationTypes();
+
 }

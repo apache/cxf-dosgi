@@ -25,7 +25,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.cxf.Bus;
@@ -33,6 +32,7 @@ import org.apache.cxf.BusFactory;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.junit.Assert;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
@@ -68,7 +68,7 @@ public class HttpServiceManagerTest extends TestCase {
         BundleContext dswContext = c.createMock(BundleContext.class);
         Filter filter = c.createMock(Filter.class);
         expect(dswContext.createFilter(EasyMock.eq("(service.id=12345)"))).andReturn(filter).once();
-        Capture<ServiceListener> captured = new Capture<ServiceListener>();
+        Capture<ServiceListener> captured = EasyMock.newCapture();
         dswContext.addServiceListener(EasyMock.capture(captured), EasyMock.<String>anyObject());
         expectLastCall().atLeastOnce();
         expect(dswContext.getProperty("org.apache.cxf.httpservice.requirefilter")).andReturn(null).atLeastOnce();
@@ -77,7 +77,7 @@ public class HttpServiceManagerTest extends TestCase {
         ServletContext servletContext = c.createMock(ServletContext.class);
         expect(config.getServletContext()).andReturn(servletContext);
         final HttpService httpService = new DummyHttpService(config);
-        ServiceReference sr = c.createMock(ServiceReference.class);
+        ServiceReference<?> sr = c.createMock(ServiceReference.class);
         expect(sr.getProperty(EasyMock.eq("service.id"))).andReturn(12345L).atLeastOnce();
         expect(servletContext.getResourceAsStream((String)EasyMock.anyObject())).andReturn(null).anyTimes();
         c.replay();

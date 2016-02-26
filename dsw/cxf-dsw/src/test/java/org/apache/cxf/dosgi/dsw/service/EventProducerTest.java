@@ -18,15 +18,15 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
+import java.io.Closeable;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.cxf.endpoint.Server;
+import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.easymock.classextension.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
@@ -114,7 +114,8 @@ public class EventProducerTest {
         EasyMock.replay(bc);
         EventProducer eventProducer = new EventProducer(bc);
 
-        ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore, (Server)null);
+        ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore, 
+                                                                 (Closeable)null);
         eventProducer.publishNotification(ereg);
     }
 

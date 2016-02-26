@@ -23,8 +23,8 @@ import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.cxf.dosgi.dsw.handlers.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.qos.IntentUnsatisfiedException;
+import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
@@ -33,6 +33,7 @@ import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("rawtypes")
 public class ClientServiceFactory implements ServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientServiceFactory.class);

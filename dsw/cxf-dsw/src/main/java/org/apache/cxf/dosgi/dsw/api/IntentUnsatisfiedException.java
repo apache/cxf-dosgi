@@ -16,26 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.dsw.qos;
+package org.apache.cxf.dosgi.dsw.api;
 
-import java.util.HashMap;
-import java.util.Map;
+public class IntentUnsatisfiedException extends RuntimeException {
 
-import org.junit.Assert;
-import org.junit.Test;
+    private static final long serialVersionUID = 1L;
 
-public class IntentMapTest {
+    private final String intent;
 
-    @Test
-    public void inheritanceTest() {
-        Map<String, Object> defaultMap = new HashMap<String, Object>();
-        defaultMap.put("key1", "defaultValue");
-        IntentMap intentMap = new IntentMap(defaultMap);
-        Assert.assertEquals("defaultValue", intentMap.get("key1"));
-        intentMap.put("key1", "overridden");
-        Assert.assertEquals("overridden", intentMap.get("key1"));
-        Object curValue = intentMap.remove("key1");
-        Assert.assertEquals("overridden", curValue);
-        Assert.assertEquals("defaultValue", intentMap.get("key1"));
+    public IntentUnsatisfiedException(String intent) {
+        super(intent);
+        this.intent = intent;
+    }
+
+    public String getIntent() {
+        return intent;
     }
 }

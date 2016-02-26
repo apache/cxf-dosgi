@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
+import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.easymock.classextension.EasyMock;
 import org.junit.Test;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;

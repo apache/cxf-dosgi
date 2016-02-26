@@ -16,26 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.dsw.qos;
+package org.apache.cxf.dosgi.dsw.api;
 
-import java.util.HashMap;
+import java.io.Closeable;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+public class ExportResult {
 
-public class IntentMapTest {
+    private final Map<String, Object> endpointProps;
+    private final Closeable server;
+    private final Exception exception;
 
-    @Test
-    public void inheritanceTest() {
-        Map<String, Object> defaultMap = new HashMap<String, Object>();
-        defaultMap.put("key1", "defaultValue");
-        IntentMap intentMap = new IntentMap(defaultMap);
-        Assert.assertEquals("defaultValue", intentMap.get("key1"));
-        intentMap.put("key1", "overridden");
-        Assert.assertEquals("overridden", intentMap.get("key1"));
-        Object curValue = intentMap.remove("key1");
-        Assert.assertEquals("overridden", curValue);
-        Assert.assertEquals("defaultValue", intentMap.get("key1"));
+    public ExportResult(Map<String, Object> endpointProps, Closeable server) {
+        this.endpointProps = endpointProps;
+        this.server = server;
+        this.exception = null;
+    }
+
+    public ExportResult(Map<String, Object> endpointProps, Exception ex) {
+        this.endpointProps = endpointProps;
+        this.server = null;
+        this.exception = ex;
+    }
+
+    public Map<String, Object> getEndpointProps() {
+        return endpointProps;
+    }
+
+    public Closeable getServer() {
+        return server;
+    }
+
+    public Exception getException() {
+        return exception;
     }
 }

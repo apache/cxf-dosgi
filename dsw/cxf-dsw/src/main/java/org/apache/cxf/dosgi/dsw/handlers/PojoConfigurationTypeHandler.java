@@ -26,8 +26,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.api.ExportResult;
+import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentUnsatisfiedException;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -53,7 +54,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return new String[] {Constants.WS_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
     }
 
-    public Object createProxy(ServiceReference sref, BundleContext dswContext, BundleContext callingContext,
+    public Object createProxy(ServiceReference<?> sref, BundleContext dswContext, BundleContext callingContext,
                               Class<?> iClass, EndpointDescription endpoint) throws IntentUnsatisfiedException {
         Map<String, Object> sd = endpoint.getProperties();
         String address = getClientAddress(sd);
@@ -86,7 +87,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return null;
     }
 
-    public ExportResult createServer(ServiceReference sref,
+    public ExportResult createServer(ServiceReference<?> sref,
                                      BundleContext dswContext,
                                      BundleContext callingContext,
                                      Map<String, Object> sd,

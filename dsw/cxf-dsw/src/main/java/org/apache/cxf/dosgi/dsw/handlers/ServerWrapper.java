@@ -18,37 +18,27 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.util.Map;
+import java.io.Closeable;
+import java.io.IOException;
 
 import org.apache.cxf.endpoint.Server;
 
-public class ExportResult {
+public class ServerWrapper implements Closeable {
+    private Server server;
 
-    private final Map<String, Object> endpointProps;
-    private final Server server;
-    private final Exception exception;
-
-    public ExportResult(Map<String, Object> endpointProps, Server server) {
-        this.endpointProps = endpointProps;
+    public ServerWrapper(Server server) {
         this.server = server;
-        this.exception = null;
     }
-
-    public ExportResult(Map<String, Object> endpointProps, Exception ex) {
-        this.endpointProps = endpointProps;
-        this.server = null;
-        this.exception = ex;
-    }
-
-    public Map<String, Object> getEndpointProps() {
-        return endpointProps;
-    }
-
+    
     public Server getServer() {
         return server;
     }
 
-    public Exception getException() {
-        return exception;
+    @Override
+    public void close() throws IOException {
+        server.stop();
+        server.destroy();
     }
+    
+    
 }

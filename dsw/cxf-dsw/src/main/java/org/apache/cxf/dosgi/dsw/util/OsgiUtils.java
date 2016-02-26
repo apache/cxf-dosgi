@@ -35,6 +35,7 @@ import org.osgi.service.remoteserviceadmin.EndpointPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("deprecation")
 public final class OsgiUtils {
 
     public static final Logger LOG = LoggerFactory.getLogger(OsgiUtils.class);
@@ -92,9 +93,9 @@ public final class OsgiUtils {
      *         occurred during the retrieval
      */
     public static String getVersion(Class<?> iClass, BundleContext bc) {
-        ServiceReference paRef = bc.getServiceReference(PackageAdmin.class.getName());
+        ServiceReference<PackageAdmin> paRef = bc.getServiceReference(PackageAdmin.class);
         if (paRef != null) {
-            PackageAdmin pa = (PackageAdmin)bc.getService(paRef);
+            PackageAdmin pa = bc.getService(paRef);
             try {
                 Bundle b = pa.getBundle(iClass);
                 if (b == null) {
@@ -105,7 +106,7 @@ public final class OsgiUtils {
                 LOG.debug("Interface source bundle: {}", b.getSymbolicName());
 
                 ExportedPackage[] ep = pa.getExportedPackages(b);
-                LOG.debug("Exported Packages of the source bundle: {}", ep);
+                LOG.debug("Exported Packages of the source bundle: {}", (Object)ep);
 
                 String pack = iClass.getPackage().getName();
                 LOG.debug("Looking for Package: {}", pack);
@@ -177,7 +178,7 @@ public final class OsgiUtils {
      * @param serviceReference a service reference
      * @return the service's properties as a map
      */
-    public static Map<String, Object> getProperties(ServiceReference serviceReference) {
+    public static Map<String, Object> getProperties(ServiceReference<?> serviceReference) {
         String[] keys = serviceReference.getPropertyKeys();
         Map<String, Object> props = new HashMap<String, Object>(keys.length);
         for (String key : keys) {

@@ -31,7 +31,7 @@ public interface Rule {
      * @param sref The Service Reference to be checked.
      * @param target Any additional properties are to be set in this map.
      */
-    void apply(ServiceReference sref, Map<String, Object> target);
+    void apply(ServiceReference<?> sref, Map<String, Object> target);
 
     /**
      * Returns the bundle that provided this rule.
