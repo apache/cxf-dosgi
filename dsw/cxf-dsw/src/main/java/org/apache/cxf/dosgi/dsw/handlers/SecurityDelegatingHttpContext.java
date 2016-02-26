@@ -72,6 +72,9 @@ public class SecurityDelegatingHttpContext implements HttpContext {
         return delegate.getResource(name);
     }
 
+    @SuppressWarnings({
+     "unchecked", "rawtypes"
+    })
     public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ServiceReference[] refs;
         try {

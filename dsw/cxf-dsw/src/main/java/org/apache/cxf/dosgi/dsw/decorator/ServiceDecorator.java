@@ -24,5 +24,5 @@ import org.osgi.framework.ServiceReference;
 
 public interface ServiceDecorator {
 
-    void decorate(ServiceReference sref, Map<String, Object> properties);
+    void decorate(ServiceReference<?> sref, Map<String, Object> properties);
 }

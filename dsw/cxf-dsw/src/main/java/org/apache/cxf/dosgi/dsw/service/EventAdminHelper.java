@@ -86,6 +86,9 @@ public class EventAdminHelper {
         notifyEventAdmins(topic, event);
     }
 
+    @SuppressWarnings({
+     "rawtypes", "unchecked"
+    })
     private void notifyEventAdmins(String topic, Event event) {
         ServiceReference[] refs = null;
         try {

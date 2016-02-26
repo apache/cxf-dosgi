@@ -31,6 +31,7 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("rawtypes")
 public class ExportRegistrationImpl implements ExportRegistration {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExportRegistrationImpl.class);

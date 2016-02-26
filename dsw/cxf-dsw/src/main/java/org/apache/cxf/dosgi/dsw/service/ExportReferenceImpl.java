@@ -22,6 +22,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 
+@SuppressWarnings("rawtypes")
 public class ExportReferenceImpl implements ExportReference {
 
     private ServiceReference serviceReference;

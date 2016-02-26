@@ -44,7 +44,7 @@ public class HttpServiceManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpServiceManager.class);
     private static final long SERVICE_LOOKUP_TIMEOUT = 10000;
-    private ServiceTracker tracker;
+    private ServiceTracker<HttpService, HttpService> tracker;
     private BundleContext bundleContext;
     private Map<Long, String> exportedAliases = Collections.synchronizedMap(new HashMap<Long, String>());
     private String httpBase;
@@ -52,14 +52,14 @@ public class HttpServiceManager {
 
     public HttpServiceManager(BundleContext bundleContext, String httpBase, String cxfServletAlias) {
         this(bundleContext, httpBase, cxfServletAlias,
-             new ServiceTracker(bundleContext, HttpService.class.getName(), null));
+             new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null));
         this.tracker.open();
     }
 
     // Only for tests
     public HttpServiceManager(BundleContext bundleContext,
                               String httpBase, String cxfServletAlias,
-                              ServiceTracker tracker) {
+                              ServiceTracker<HttpService, HttpService> tracker) {
         this.bundleContext = bundleContext;
         this.tracker = tracker;
         this.httpBase = getWithDefault(httpBase, "http://" + LocalHostUtil.getLocalIp() + ":8181");
@@ -71,7 +71,7 @@ public class HttpServiceManager {
     }
 
     public Bus registerServlet(Bus bus, String contextRoot, BundleContext callingContext,
-            ServiceReference sref) {
+            ServiceReference<?> sref) {
         bus.setExtension(new DestinationRegistryImpl(), DestinationRegistry.class);
         CXFNonSpringServlet cxf = new CXFNonSpringServlet();
         cxf.setBus(bus);
@@ -89,7 +89,7 @@ public class HttpServiceManager {
     }
 
     protected HttpService getHttpService() {
-        Object service = null;
+        HttpService service = null;
         try {
             service = tracker.waitForService(SERVICE_LOOKUP_TIMEOUT);
         } catch (InterruptedException ex) {
@@ -98,7 +98,7 @@ public class HttpServiceManager {
         if (service == null) {
             throw new RuntimeException("No HTTPService found");
         }
-        return (HttpService) service;
+        return service;
     }
 
     private HttpContext getHttpContext(BundleContext bc, HttpService httpService) {
@@ -113,7 +113,7 @@ public class HttpServiceManager {
      * @param sref the service reference to track
      * @param alias the HTTP servlet context alias
      */
-    private void registerUnexportHook(ServiceReference sref, String alias) {
+    private void registerUnexportHook(ServiceReference<?> sref, String alias) {
         final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
         LOG.debug("Registering service listener for service with ID {}", sid);
 
@@ -156,7 +156,7 @@ public class HttpServiceManager {
             if (!(event.getType() == ServiceEvent.UNREGISTERING)) {
                 return;
             }
-            final ServiceReference sref = event.getServiceReference();
+            final ServiceReference<?> sref = event.getServiceReference();
             final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
             final String alias = exportedAliases.remove(sid);
             if (alias == null) {

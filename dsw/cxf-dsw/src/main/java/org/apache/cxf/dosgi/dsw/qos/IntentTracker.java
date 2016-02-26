@@ -25,10 +25,12 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class IntentTracker extends ServiceTracker {
 
     private final IntentMap intentMap;
 
+    
     public IntentTracker(BundleContext context, IntentMap intentMap) {
         super(context, getFilter(context), null);
         this.intentMap = intentMap;
