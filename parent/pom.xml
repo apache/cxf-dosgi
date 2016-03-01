@@ -59,7 +59,7 @@
         <xmlresolver.bundle.version>1.2_5</xmlresolver.bundle.version>
         <neethi.bundle.version>3.0.3</neethi.bundle.version>
         <wsdl4j.bundle.version>1.6.2_6</wsdl4j.bundle.version>
-        <xmlsec.version>1.5.3</xmlsec.version>
+        <xmlsec.version>2.0.5</xmlsec.version>
         <asm.bundle.version>3.3.1_1</asm.bundle.version>
         <commons.pool.bundle.version>1.5.4_1</commons.pool.bundle.version>
         <woodstox.bundle.version>4.4.1</woodstox.bundle.version>
