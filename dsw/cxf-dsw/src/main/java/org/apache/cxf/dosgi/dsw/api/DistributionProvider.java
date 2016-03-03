@@ -20,24 +20,33 @@ package org.apache.cxf.dosgi.dsw.api;
 
 import java.util.Map;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-public interface ConfigurationTypeHandler {
+public interface DistributionProvider {
 
     String[] getSupportedTypes();
 
-    ExportResult createServer(ServiceReference<?> serviceReference,
-                        BundleContext dswContext,
-                        BundleContext callingContext,
-                        Map<String, Object> sd,
-                        Class<?> iClass,
-                        Object serviceBean);
+    /**
+     * 
+     * @param sref reference of the service to be exported
+     * @param effectiveProperties combined properties of the service and additional properties from rsa
+     * @param exportedInterface name of the interface to be exported
+     * @return
+     */
+    Endpoint createServer(ServiceReference<?> sref,
+                          Map<String, Object> effectiveProperties,
+                          String exportedInterface);
 
-    Object createProxy(ServiceReference<?> serviceReference,
-                       BundleContext dswContext,
-                       BundleContext callingContext,
+    /**
+     * 
+     * @param sref reference of the service offered to the requesting bundle
+     * @param iClass
+     * @param endpoint description of the remote endpoint
+     * @return service proxy to be given to the requesting bundle
+     * @throws IntentUnsatisfiedException
+     */
+    Object createProxy(ServiceReference<?> sref,
                        Class<?> iClass, 
                        EndpointDescription endpoint) throws IntentUnsatisfiedException;
 }

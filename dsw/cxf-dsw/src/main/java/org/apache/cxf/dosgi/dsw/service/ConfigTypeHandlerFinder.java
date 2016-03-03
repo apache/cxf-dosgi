@@ -21,15 +21,15 @@ package org.apache.cxf.dosgi.dsw.service;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 public interface ConfigTypeHandlerFinder {
 
-    ConfigurationTypeHandler getHandler(BundleContext dswBC, Map<String, Object> serviceProperties);
+    DistributionProvider getHandler(BundleContext dswBC, Map<String, Object> serviceProperties);
 
-    ConfigurationTypeHandler getHandler(BundleContext dswBC, EndpointDescription endpoint);
+    DistributionProvider getHandler(BundleContext dswBC, EndpointDescription endpoint);
 
     List<String> getSupportedConfigurationTypes();
 

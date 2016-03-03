@@ -22,13 +22,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.service.ConfigTypeHandlerFinder;
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
@@ -39,54 +40,55 @@ public class ConfigTypeHandlerFactoryTest {
 
     @Test
     public void testGetDefaultHandlerNoIntents() {
-        ConfigurationTypeHandler handler = getHandlerWith(null, null);
+        DistributionProvider handler = getHandlerWith(null, null);
         assertTrue(handler instanceof PojoConfigurationTypeHandler);
     }
 
     @Test
     public void testGetJaxrsHandlerNoIntents() {
-        ConfigurationTypeHandler handler = getHandlerWith(Constants.RS_CONFIG_TYPE, null);
+        DistributionProvider handler = getHandlerWith(Constants.RS_CONFIG_TYPE, null);
         assertTrue(handler instanceof JaxRSPojoConfigurationTypeHandler);
     }
 
     @Test
     public void testGetJaxrsHandlerHttpIntents() {
-        ConfigurationTypeHandler handler = getHandlerWith(Constants.RS_CONFIG_TYPE, "HTTP");
+        DistributionProvider handler = getHandlerWith(Constants.RS_CONFIG_TYPE, "HTTP");
         assertTrue(handler instanceof JaxRSPojoConfigurationTypeHandler);
     }
 
     @Test
     public void testJaxrsPropertyIgnored() {
-        ConfigurationTypeHandler handler = getHandlerWith(Constants.RS_CONFIG_TYPE, "SOAP HTTP");
+        DistributionProvider handler = getHandlerWith(Constants.RS_CONFIG_TYPE, "SOAP HTTP");
         assertTrue(handler instanceof PojoConfigurationTypeHandler);
         assertTrue(!(handler instanceof JaxRSPojoConfigurationTypeHandler));
     }
 
     @Test
     public void testJaxrsPropertyIgnored2() {
-        ConfigurationTypeHandler handler = getHandlerWith2(Constants.RS_CONFIG_TYPE, new String[] {"HTTP", "SOAP"});
+        DistributionProvider handler = getHandlerWith2(Constants.RS_CONFIG_TYPE, new String[] {"HTTP", "SOAP"});
         assertTrue(handler instanceof PojoConfigurationTypeHandler);
         assertTrue(!(handler instanceof JaxRSPojoConfigurationTypeHandler));
     }
 
     @Test
     public void testGetPojoHandler() {
-        ConfigurationTypeHandler handler = getHandlerWith(Constants.WS_CONFIG_TYPE, null);
+        DistributionProvider handler = getHandlerWith(Constants.WS_CONFIG_TYPE, null);
         assertTrue(handler instanceof PojoConfigurationTypeHandler);
     }
 
     @Test
     public void testGetWSDLHandler() {
-        ConfigurationTypeHandler handler = getHandlerWith(Constants.WSDL_CONFIG_TYPE, null);
+        DistributionProvider handler = getHandlerWith(Constants.WSDL_CONFIG_TYPE, null);
         assertTrue(handler instanceof WsdlConfigurationTypeHandler);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testUnsupportedConfiguration() {
-        getHandlerWith("notSupportedConfig", null);
+        DistributionProvider handler = getHandlerWith("notSupportedConfig", null);
+        Assert.assertNull(handler);
     }
 
-    private ConfigurationTypeHandler getHandlerWith(String configType, String intents) {
+    private DistributionProvider getHandlerWith(String configType, String intents) {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bc);
         Map<String, Object> serviceProps = new HashMap<String, Object>();
@@ -99,7 +101,7 @@ public class ConfigTypeHandlerFactoryTest {
         return f.getHandler(bc, serviceProps);
     }
 
-    private ConfigurationTypeHandler getHandlerWith2(String configType, String[] intents) {
+    private DistributionProvider getHandlerWith2(String configType, String[] intents) {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bc);
         Map<String, Object> serviceProps = new HashMap<String, Object>();

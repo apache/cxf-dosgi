@@ -32,8 +32,11 @@ import org.apache.cxf.xmlns.service_decoration._1_0.MatchType;
 import org.apache.cxf.xmlns.service_decoration._1_0.ServiceDecorationType;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServiceDecoratorImpl implements ServiceDecorator {
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceDecoratorImpl.class);
     final List<Rule> decorations = new CopyOnWriteArrayList<Rule>();
 
     private DecorationParser parser;
@@ -75,7 +78,11 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         }
         List<ServiceDecorationType> elements = new ArrayList<ServiceDecorationType>();
         while (entries.hasMoreElements()) {
-            elements.addAll(parser.getDecorations((URL)entries.nextElement()));
+            try {
+                elements.addAll(parser.getDecorations((URL)entries.nextElement()));
+            } catch (Exception e) {
+                LOG.warn("Error parsing remote-service descriptions in bundle" + bundle.getSymbolicName(), e);
+            }
         }
         return elements;
     }

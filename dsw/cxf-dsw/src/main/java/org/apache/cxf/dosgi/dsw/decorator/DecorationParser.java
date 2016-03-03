@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.decorator;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,19 +29,17 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.xml.sax.SAXException;
 import org.apache.cxf.xmlns.service_decoration._1_0.ServiceDecorationType;
 import org.apache.cxf.xmlns.service_decoration._1_0.ServiceDecorationsType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class DecorationParser {
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceDecoratorImpl.class);
     private JAXBContext jaxbContext;
     private Schema schema;
 
@@ -51,29 +50,36 @@ class DecorationParser {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             URL resource = getClass().getResource("/service-decoration.xsd");
             schema = schemaFactory.newSchema(resource);
-        } catch (JAXBException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (SAXException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Error loading decorations schema", e);
         }
 
     }
 
-    List<ServiceDecorationType> getDecorations(URL resourceURL) {
-        if (resourceURL == null) {
+    List<ServiceDecorationType> getDecorations(URL resourceURL) throws JAXBException, IOException {
+        if (resourceURL == null || !decorationType(resourceURL)) {
             return new ArrayList<ServiceDecorationType>();
         }
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        unmarshaller.setSchema(schema);
+        InputStream is = resourceURL.openStream();
+        Source source = new StreamSource(is);
+        JAXBElement<ServiceDecorationsType> jaxb = unmarshaller.unmarshal(source, ServiceDecorationsType.class);
+        ServiceDecorationsType decorations = jaxb.getValue();
+        return decorations.getServiceDecoration();
+    }
+
+    private boolean decorationType(URL resourceURL) {
         try {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            unmarshaller.setSchema(schema);
             InputStream is = resourceURL.openStream();
-            Source source = new StreamSource(is);
-            JAXBElement<ServiceDecorationsType> jaxb = unmarshaller.unmarshal(source, ServiceDecorationsType.class);
-            ServiceDecorationsType decorations = jaxb.getValue();
-            return decorations.getServiceDecoration();
-        } catch (Exception ex) {
-            LOG.warn("Problem parsing: " + resourceURL, ex);
-            return new ArrayList<ServiceDecorationType>();
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            XMLStreamReader reader = factory.createXMLStreamReader(is);
+            reader.next();
+            String ns = reader.getNamespaceURI();
+            reader.close();
+            return ns.equals("http://cxf.apache.org/xmlns/service-decoration/1.0.0");
+        } catch (Exception e) {
+            return false;
         }
     }
 }

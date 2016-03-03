@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportReference;
@@ -62,15 +63,13 @@ public class ExportRegistrationImpl implements ExportRegistration {
     }
 
     // create a new (parent) instance which was exported successfully with the given server
-    public ExportRegistrationImpl(ServiceReference sref, EndpointDescription endpoint,
-            RemoteServiceAdminCore rsaCore, Closeable server) {
-        this(null, rsaCore, new ExportReferenceImpl(sref, endpoint), server, null);
+    public ExportRegistrationImpl(ServiceReference sref, Endpoint endpoint, RemoteServiceAdminCore rsaCore) {
+        this(null, rsaCore, new ExportReferenceImpl(sref, endpoint.description()), endpoint, null);
     }
 
     // create a new (parent) instance which failed to be exported with the given exception
-    public ExportRegistrationImpl(ServiceReference sref, EndpointDescription endpoint,
-            RemoteServiceAdminCore rsaCore, Throwable exception) {
-        this(null, rsaCore, new ExportReferenceImpl(sref, endpoint), null, exception);
+    public ExportRegistrationImpl(RemoteServiceAdminCore rsaCore, Throwable exception) {
+        this(null, rsaCore, null, null, exception);
     }
 
     private void ensureParent() {
@@ -80,6 +79,9 @@ public class ExportRegistrationImpl implements ExportRegistration {
     }
 
     public ExportReference getExportReference() {
+        if (exportReference == null) {
+            throw new IllegalStateException(getException());
+        }
         return closed ? null : exportReference;
     }
 

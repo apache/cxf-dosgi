@@ -31,8 +31,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.api.ExportResult;
+import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.ClassUtils;
@@ -47,11 +47,12 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractPojoConfigurationTypeHandler implements ConfigurationTypeHandler {
+public abstract class AbstractPojoConfigurationTypeHandler implements DistributionProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPojoConfigurationTypeHandler.class);
     protected BundleContext bundleContext;
@@ -206,14 +207,13 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Configurat
         return bus;
     }
 
-    protected ExportResult createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {
+    protected Endpoint createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            return new ExportResult(endpointProps, new ServerWrapper(server));
-        } catch (Exception e) {
-            return new ExportResult(endpointProps, e);
+            EndpointDescription epd = new EndpointDescription(endpointProps);
+            return new ServerWrapper(epd, server);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }

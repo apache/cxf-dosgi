@@ -23,10 +23,9 @@ import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -38,19 +37,15 @@ public class ClientServiceFactory implements ServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientServiceFactory.class);
 
-    private BundleContext dswContext;
-    private Class<?> iClass;
     private EndpointDescription endpoint;
-    private ConfigurationTypeHandler handler;
+    private DistributionProvider handler;
     private ImportRegistrationImpl importRegistration;
 
     private boolean closeable;
     private int serviceCounter;
 
-    public ClientServiceFactory(BundleContext dswContext, Class<?> iClass, EndpointDescription endpoint,
-                                ConfigurationTypeHandler handler, ImportRegistrationImpl ir) {
-        this.dswContext = dswContext;
-        this.iClass = iClass;
+    public ClientServiceFactory(EndpointDescription endpoint,
+                                DistributionProvider handler, ImportRegistrationImpl ir) {
         this.endpoint = endpoint;
         this.handler = handler;
         this.importRegistration = ir;
@@ -61,10 +56,10 @@ public class ClientServiceFactory implements ServiceFactory {
         String interfaceName = interfaces == null || interfaces.isEmpty() ? null : interfaces.get(0);
         LOG.debug("getService() from serviceFactory for {}", interfaceName);
         try {
+            final Class<?> iClass = requestingBundle.loadClass(interfaceName);
             Object proxy = AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
-                    return handler.createProxy(sreg.getReference(), dswContext,
-                            requestingBundle.getBundleContext(), iClass, endpoint);
+                    return handler.createProxy(sreg.getReference(), iClass, endpoint);
                 }
             });
 

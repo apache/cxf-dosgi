@@ -26,9 +26,10 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.api.ExportResult;
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -54,8 +55,9 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return new String[] {Constants.WS_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
     }
 
-    public Object createProxy(ServiceReference<?> sref, BundleContext dswContext, BundleContext callingContext,
-                              Class<?> iClass, EndpointDescription endpoint) throws IntentUnsatisfiedException {
+    public Object createProxy(ServiceReference<?> sref,
+                              Class<?> iClass,
+                              EndpointDescription endpoint) throws IntentUnsatisfiedException {
         Map<String, Object> sd = endpoint.getProperties();
         String address = getClientAddress(sd);
         if (address == null) {
@@ -72,8 +74,9 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             factory.getServiceFactory().setDataBinding(getDataBinding(sd, iClass));
             factory.setServiceClass(iClass);
             factory.setAddress(address);
+            BundleContext callingContext = sref.getBundle().getBundleContext();
             addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd);
-            setClientWsdlProperties(factory.getClientFactoryBean(), dswContext, sd, false);
+            setClientWsdlProperties(factory.getClientFactoryBean(), bundleContext, sd, false);
 
             intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd);
 
@@ -87,37 +90,35 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return null;
     }
 
-    public ExportResult createServer(ServiceReference<?> sref,
-                                     BundleContext dswContext,
-                                     BundleContext callingContext,
+    public Endpoint createServer(ServiceReference<?> sref,
                                      Map<String, Object> sd,
-                                     Class<?> iClass,
-                                     Object serviceBean) throws IntentUnsatisfiedException {
-        try {
-            String address = getPojoAddress(sd, iClass);
-            ServerFactoryBean factory = createServerFactoryBean(sd, iClass);
-            factory.setDataBinding(getDataBinding(sd, iClass));
-            String contextRoot = getServletContextRoot(sd);
-            Bus bus = createBus(sref, callingContext, contextRoot);
-            factory.setBus(bus);
-            factory.setServiceClass(iClass);
-            factory.setAddress(address);
-            factory.setServiceBean(serviceBean);
-            addWsInterceptorsFeaturesProps(factory, callingContext, sd);
-            setWsdlProperties(factory, callingContext, sd, false);
-            String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
+                                     String exportedInterface) throws IntentUnsatisfiedException {
+        BundleContext callingContext = sref.getBundle().getBundleContext();
+        Object serviceBean = callingContext.getService(sref);
+        Class<?> iClass = ClassUtils.getInterfaceClass(serviceBean, exportedInterface);
+        String address = getPojoAddress(sd, iClass);
+        ServerFactoryBean factory = createServerFactoryBean(sd, iClass);
+        factory.setDataBinding(getDataBinding(sd, iClass));
+        String contextRoot = getServletContextRoot(sd);
 
-            String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
+        Bus bus = createBus(sref, callingContext, contextRoot);
+        factory.setBus(bus);
+        factory.setServiceClass(iClass);
+        factory.setAddress(address);
+        
+        factory.setServiceBean(serviceBean);
+        addWsInterceptorsFeaturesProps(factory, callingContext, sd);
+        setWsdlProperties(factory, callingContext, sd, false);
+        String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
+
+        String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
 
             // The properties for the EndpointDescription
-            Map<String, Object> endpointProps = createEndpointProps(sd, iClass,
+        Map<String, Object> endpointProps = createEndpointProps(sd, iClass,
                                                                     new String[]{Constants.WS_CONFIG_TYPE},
                                                                     completeEndpointAddress, intents);
 
-            return createServerFromFactory(factory, endpointProps);
-        } catch (RuntimeException re) {
-            return new ExportResult(sd, re);
-        }
+        return createServerFromFactory(factory, endpointProps);
     }
 
     private String getPojoAddress(Map<String, Object> sd, Class<?> iClass) {

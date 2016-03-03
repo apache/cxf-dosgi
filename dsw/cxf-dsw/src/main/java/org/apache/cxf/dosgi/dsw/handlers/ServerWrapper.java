@@ -18,27 +18,32 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.io.Closeable;
 import java.io.IOException;
 
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.endpoint.Server;
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-public class ServerWrapper implements Closeable {
+public class ServerWrapper implements Endpoint {
+    private EndpointDescription desc;
     private Server server;
 
-    public ServerWrapper(Server server) {
+    public ServerWrapper(EndpointDescription desc, Server server) {
+        this.desc = desc;
         this.server = server;
     }
     
     public Server getServer() {
-        return server;
+        return this.server;
     }
 
     @Override
     public void close() throws IOException {
-        server.stop();
-        server.destroy();
+        this.server.destroy();
     }
-    
-    
+
+    @Override
+    public EndpointDescription description() {
+        return this.desc;
+    }
 }

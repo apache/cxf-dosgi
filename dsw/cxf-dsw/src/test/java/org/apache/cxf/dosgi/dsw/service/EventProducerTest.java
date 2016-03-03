@@ -18,13 +18,13 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.io.Closeable;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.cxf.dosgi.dsw.handlers.ServerWrapper;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Assert;
@@ -40,22 +40,24 @@ import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class EventProducerTest {
-
+    
+    
     @Test
     public void testPublishNotification() throws Exception {
         RemoteServiceAdminCore remoteServiceAdminCore = EasyMock.createNiceMock(RemoteServiceAdminCore.class);
         EasyMock.replay(remoteServiceAdminCore);
 
-        final EndpointDescription endpoint = EasyMock.createNiceMock(EndpointDescription.class);
-        EasyMock.expect(endpoint.getServiceId()).andReturn(Long.MAX_VALUE).anyTimes();
+        final EndpointDescription epd = EasyMock.createNiceMock(EndpointDescription.class);
+        EasyMock.expect(epd.getServiceId()).andReturn(Long.MAX_VALUE).anyTimes();
         final String uuid = UUID.randomUUID().toString();
-        EasyMock.expect(endpoint.getFrameworkUUID()).andReturn(uuid).anyTimes();
-        EasyMock.expect(endpoint.getId()).andReturn("foo://bar").anyTimes();
+        EasyMock.expect(epd.getFrameworkUUID()).andReturn(uuid).anyTimes();
+        EasyMock.expect(epd.getId()).andReturn("foo://bar").anyTimes();
         final List<String> interfaces = Arrays.asList("org.foo.Bar", "org.boo.Far");
-        EasyMock.expect(endpoint.getInterfaces()).andReturn(interfaces).anyTimes();
-        EasyMock.expect(endpoint.getConfigurationTypes()).andReturn(Arrays.asList("org.apache.cxf.ws")).anyTimes();
-        EasyMock.replay(endpoint);
+        EasyMock.expect(epd.getInterfaces()).andReturn(interfaces).anyTimes();
+        EasyMock.expect(epd.getConfigurationTypes()).andReturn(Arrays.asList("org.apache.cxf.ws")).anyTimes();
+        EasyMock.replay(epd);
         final ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         EasyMock.replay(sref);
 
@@ -80,7 +82,7 @@ public class EventProducerTest {
                 Assert.assertEquals("test.bundle", event.getProperty("bundle.symbolicname"));
                 Assert.assertEquals(new Version(1, 2, 3, "test"), event.getProperty("bundle.version"));
                 Assert.assertNull(event.getProperty("cause"));
-                Assert.assertEquals(endpoint, event.getProperty("export.registration"));
+                Assert.assertEquals(epd, event.getProperty("export.registration"));
 
                 Assert.assertEquals(Long.MAX_VALUE, event.getProperty("service.remote.id"));
                 Assert.assertEquals(uuid, event.getProperty("service.remote.uuid"));
@@ -95,7 +97,7 @@ public class EventProducerTest {
                 Assert.assertEquals(RemoteServiceAdminEvent.EXPORT_REGISTRATION, rsae.getType());
                 Assert.assertSame(bundle, rsae.getSource());
                 ExportReference er = rsae.getExportReference();
-                Assert.assertSame(endpoint, er.getExportedEndpoint());
+                Assert.assertSame(epd, er.getExportedEndpoint());
                 Assert.assertSame(sref, er.getExportedService());
 
                 return null;
@@ -113,9 +115,8 @@ public class EventProducerTest {
         EasyMock.expect(bc.getService(eaSref)).andReturn(ea).anyTimes();
         EasyMock.replay(bc);
         EventProducer eventProducer = new EventProducer(bc);
-
-        ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore, 
-                                                                 (Closeable)null);
+        ServerWrapper endpoint = new ServerWrapper(epd, null);
+        ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore);
         eventProducer.publishNotification(ereg);
     }
 
@@ -179,7 +180,7 @@ public class EventProducerTest {
         EasyMock.replay(bc);
         EventProducer eventProducer = new EventProducer(bc);
 
-        ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, rsaCore, exportException);
+        ExportRegistrationImpl ereg = new ExportRegistrationImpl(rsaCore, exportException);
         eventProducer.publishNotification(Arrays.<ExportRegistration>asList(ereg));
     }
 }

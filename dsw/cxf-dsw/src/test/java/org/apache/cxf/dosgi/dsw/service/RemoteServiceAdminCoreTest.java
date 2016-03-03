@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.io.Closeable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,10 +27,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.api.ExportResult;
+import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
 import org.apache.cxf.dosgi.dsw.handlers.HttpServiceManager;
+import org.apache.cxf.dosgi.dsw.handlers.ServerWrapper;
 import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
@@ -58,6 +58,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings({
+    "rawtypes", "unchecked"
+   })
 public class RemoteServiceAdminCoreTest {
 
     @Test
@@ -129,9 +132,10 @@ public class RemoteServiceAdminCoreTest {
 
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory) {
             @Override
-            protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
-                                                    ConfigurationTypeHandler handler,
-                                                    BundleContext requestingContext) {
+            protected ImportRegistrationImpl exposeServiceFactory(String interfaceName, 
+                                                                      EndpointDescription epd,
+                                                                      DistributionProvider handler) {
+                return new ImportRegistrationImpl(epd, this);
             }
         };
 
@@ -205,13 +209,10 @@ public class RemoteServiceAdminCoreTest {
         Map<String, Object> eProps = new HashMap<String, Object>(sProps);
         eProps.put("endpoint.id", "http://something");
         eProps.put("service.imported.configs", new String[] {"org.apache.cxf.ws"});
-        ExportResult er = new ExportResult(eProps, (Closeable) null);
+        Endpoint er = new ServerWrapper(new EndpointDescription(eProps), null);
 
-        ConfigurationTypeHandler handler = EasyMock.createNiceMock(ConfigurationTypeHandler.class);
-        EasyMock.expect(handler.createServer(sref,
-                                             bc,
-                                             sref.getBundle().getBundleContext(),
-                                             sProps, Runnable.class, svcObject)).andReturn(er).once();
+        DistributionProvider handler = EasyMock.createNiceMock(DistributionProvider.class);
+        EasyMock.expect(handler.createServer(sref, sProps, Runnable.class.getName())).andReturn(er).once();
         EasyMock.replay(handler);
 
         ConfigTypeHandlerFinder handlerFactory = EasyMock.createNiceMock(ConfigTypeHandlerFactory.class);
@@ -254,7 +255,6 @@ public class RemoteServiceAdminCoreTest {
         // Look at the exportedServices data structure
         Field field = RemoteServiceAdminCore.class.getDeclaredField("exportedServices");
         field.setAccessible(true);
-        @SuppressWarnings("unchecked")
         Map<Map<String, Object>, Collection<ExportRegistration>> exportedServices =
                 (Map<Map<String, Object>, Collection<ExportRegistration>>) field.get(rsaCore);
 
@@ -304,27 +304,23 @@ public class RemoteServiceAdminCoreTest {
         Map<String, Object> eProps = new HashMap<String, Object>(sProps);
         eProps.put("endpoint.id", "http://something");
         eProps.put("service.imported.configs", new String[] {"org.apache.cxf.ws"});
-        ExportResult er = new ExportResult(eProps, new TestException());
 
-        ConfigurationTypeHandler handler = EasyMock.createNiceMock(ConfigurationTypeHandler.class);
-        EasyMock.expect(handler.createServer(sref, bc, sref.getBundle().getBundleContext(),
-                                             sProps, Runnable.class, svcObject)).andReturn(er);
+        DistributionProvider handler = EasyMock.createMock(DistributionProvider.class);
+        EasyMock.expect(handler.createServer(sref, sProps, Runnable.class.getName())).andThrow(new TestException());
         EasyMock.replay(handler);
 
-        ConfigTypeHandlerFinder handlerFactory = EasyMock.createNiceMock(ConfigTypeHandlerFactory.class);
+        ConfigTypeHandlerFinder handlerFactory = EasyMock.createMock(ConfigTypeHandlerFactory.class);
         EasyMock.expect(handlerFactory.getHandler(bc, sProps)).andReturn(handler).anyTimes();
         EasyMock.replay(handlerFactory);
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handlerFactory);
 
-        List<ExportRegistration> ereg = rsaCore.exportService(sref, null);
+        List<ExportRegistration> ereg = rsaCore.exportService(sref, sProps);
         assertEquals(1, ereg.size());
         assertTrue(ereg.get(0).getException() instanceof TestException);
-        assertSame(sref, ereg.get(0).getExportReference().getExportedService());
 
         // Look at the exportedServices data structure
         Field field = RemoteServiceAdminCore.class.getDeclaredField("exportedServices");
         field.setAccessible(true);
-        @SuppressWarnings("unchecked")
         Map<Map<String, Object>, Collection<ExportRegistration>> exportedServices =
                 (Map<Map<String, Object>, Collection<ExportRegistration>>) field.get(rsaCore);
 
@@ -332,9 +328,6 @@ public class RemoteServiceAdminCoreTest {
         assertEquals("There is 1 export registration",
                 1, exportedServices.values().iterator().next().size());
 
-        // Remove all export registrations from the service bundle
-        rsaCore.removeExportRegistrations(sref.getBundle());
-        assertEquals("No more exported services", 0, exportedServices.size());
     }
 
     private ServiceReference mockServiceReference(final Map<String, Object> sProps) {
@@ -361,6 +354,6 @@ public class RemoteServiceAdminCoreTest {
     }
 
     @SuppressWarnings("serial")
-    private static class TestException extends Exception {
+    private static class TestException extends RuntimeException {
     }
 }

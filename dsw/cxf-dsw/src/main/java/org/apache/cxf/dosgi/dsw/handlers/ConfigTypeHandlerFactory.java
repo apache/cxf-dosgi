@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.service.ConfigTypeHandlerFinder;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
@@ -65,19 +65,19 @@ public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
     }
 
     @Override
-    public ConfigurationTypeHandler getHandler(BundleContext dswBC,
+    public DistributionProvider getHandler(BundleContext dswBC,
             Map<String, Object> serviceProperties) {
         List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
         return getHandler(dswBC, configurationTypes, serviceProperties);
     }
 
     @Override
-    public ConfigurationTypeHandler getHandler(BundleContext dswBC, EndpointDescription endpoint) {
+    public DistributionProvider getHandler(BundleContext dswBC, EndpointDescription endpoint) {
         List<String> configurationTypes = determineConfigTypesForImport(endpoint);
         return getHandler(dswBC, configurationTypes, endpoint.getProperties());
     }
 
-    private ConfigurationTypeHandler getHandler(BundleContext dswBC,
+    private DistributionProvider getHandler(BundleContext dswBC,
                                                List<String> configurationTypes,
                                                Map<String, Object> serviceProperties) {
         intentManager.assertAllIntentsSupported(serviceProperties);
@@ -89,7 +89,8 @@ public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
         } else if (configurationTypes.contains(Constants.WSDL_CONFIG_TYPE)) {
             return wsdlConfigurationTypeHandler;
         }
-        throw new RuntimeException("None of the configuration types in " + configurationTypes + " is supported.");
+        LOG.info("None of the configuration types in " + configurationTypes + " is supported.");
+        return null;
     }
 
     private boolean isJaxrsRequested(Collection<String> types, Map<String, Object> serviceProperties) {
@@ -138,19 +139,12 @@ public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
                 configurationTypes.add(rct);
             }
         }
-        LOG.info("configuration types selected for export: " + configurationTypes);
-        if (configurationTypes.isEmpty()) {
-            throw new RuntimeException("the requested configuration types are not supported");
-        }
+        LOG.info("Configuration types selected for export: {}.", configurationTypes);
         return configurationTypes;
     }
 
     private List<String> determineConfigTypesForImport(EndpointDescription endpoint) {
         List<String> remoteConfigurationTypes = endpoint.getConfigurationTypes();
-
-        if (remoteConfigurationTypes == null) {
-            throw new RuntimeException("The supplied endpoint has no configuration type");
-        }
 
         List<String> usableConfigurationTypes = new ArrayList<String>();
         for (String ct : supportedConfigurationTypes) {
@@ -159,11 +153,8 @@ public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
             }
         }
 
-        if (usableConfigurationTypes.isEmpty()) {
-            throw new RuntimeException("The supplied endpoint has no compatible configuration type. "
-                    + "Supported types are: " + supportedConfigurationTypes
-                    + "    Types needed by the endpoint: " + remoteConfigurationTypes);
-        }
+        LOG.info("Ignoring endpoint {} as it has no compatible configuration types: {}.", 
+                 endpoint.getId(), remoteConfigurationTypes);
         return usableConfigurationTypes;
     }
 

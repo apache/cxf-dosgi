@@ -32,9 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.api.ExportResult;
-import org.apache.cxf.dosgi.dsw.util.ClassUtils;
+import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.Bundle;
@@ -158,43 +157,28 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private List<ExportRegistration> exportInterfaces(List<String> interfaces,
             ServiceReference<?> serviceReference, Map<String, Object> serviceProperties) {
         LOG.info("interfaces selected for export: " + interfaces);
-        ConfigurationTypeHandler handler;
+        DistributionProvider handler;
         try {
-            handler = findHandler(serviceProperties);
+            handler = configTypeHandlerFinder.getHandler(bctx, serviceProperties);
         } catch (RuntimeException e) {
             LOG.error(e.getMessage(), e);
             return Collections.emptyList();
         }
         List<ExportRegistration> exportRegs = new ArrayList<ExportRegistration>(1);
-        Object service = bctx.getService(serviceReference);
-        Bundle bundle = serviceReference.getBundle();
-
-        // if service has been unregistered in the meantime
-        if (service == null || bundle == null) {
-            LOG.info("service has been unregistered, aborting export");
-            return exportRegs;
-        }
-
         for (String iface : interfaces) {
-            LOG.info("creating server for interface " + iface);
-            // this is an extra sanity check, but do we really need it now?
-            Class<?> interfaceClass = ClassUtils.getInterfaceClass(service, iface);
-            if (interfaceClass != null) {
-                ExportResult exportResult = handler.createServer(serviceReference, bctx, bundle.getBundleContext(),
-                    serviceProperties, interfaceClass, service);
-                EndpointDescription endpoint = new EndpointDescription(exportResult.getEndpointProps());
-                ExportRegistrationImpl exportRegistration;
-                if (exportResult.getException() == null) {
-                    LOG.info("created server for interface " + iface);
-                    exportRegistration = new ExportRegistrationImpl(serviceReference, endpoint, this,
-                            exportResult.getServer());
-                } else {
-                    LOG.error("failed to create server for interface " + iface, exportResult.getException());
-                    exportRegistration = new ExportRegistrationImpl(serviceReference, endpoint, this,
-                            exportResult.getException());
-                }
-                exportRegs.add(exportRegistration);
+            ExportRegistrationImpl exportRegistration;
+            try {
+                LOG.info("creating server for interface " + iface);
+                Endpoint endpoint = handler.createServer(serviceReference, serviceProperties, iface);
+                exportRegistration = new ExportRegistrationImpl(serviceReference, endpoint, this);
+                LOG.info("created server for interface " + iface);
+            } catch (Exception e) {
+                LOG.debug("failed to create server for interface " + iface, e);
+                serviceProperties.put(RemoteConstants.ENDPOINT_ID, "failed");
+                serviceProperties.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "none");
+                exportRegistration = new ExportRegistrationImpl(this, e);
             }
+            exportRegs.add(exportRegistration);
         }
         return exportRegs;
     }
@@ -334,65 +318,64 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return ir;
             }
 
-            ConfigurationTypeHandler handler = findHandler(endpoint);
+            DistributionProvider handler = configTypeHandlerFinder.getHandler(bctx, endpoint);
 
             // TODO: somehow select the interfaces that should be imported ---> job of the TopologyManager?
             List<String> matchingInterfaces = endpoint.getInterfaces();
-
-            LOG.info("Matching Interfaces for import: " + matchingInterfaces);
-
-            if (handler != null && matchingInterfaces.size() == 1) {
-                LOG.info("Proxifying interface: " + matchingInterfaces.get(0));
-
-                ImportRegistrationImpl imReg = new ImportRegistrationImpl(endpoint, this);
-
-                proxifyMatchingInterface(matchingInterfaces.get(0), imReg, handler, bctx);
-                if (imRegs == null) {
-                    imRegs = new ArrayList<ImportRegistrationImpl>();
-                    importedServices.put(endpoint, imRegs);
-                }
-                imRegs.add(imReg);
-                eventProducer.publishNotification(imReg);
-                return imReg;
+            
+            if (handler == null) {
+                LOG.info("No matching handler can be found for remote endpoint {}.", endpoint.getId());
+                return null;
             }
-            return null;
+            if (matchingInterfaces.size() == 0) {
+                LOG.info("No matching interfaces found for remote endpoint {}.", endpoint.getId());
+                return null;
+            }
+            if (matchingInterfaces.size() > 1) {
+                LOG.info("More than one interface {} found for remote endpoint {}. This is not supported.", 
+                         endpoint.getInterfaces(),
+                         endpoint.getId());
+                return null;
+            }
+
+            LOG.info("Importing service {} with interfaces {} using handler {}.", 
+                     endpoint.getId(), endpoint.getInterfaces(), handler.getClass());
+
+            ImportRegistrationImpl imReg = exposeServiceFactory(matchingInterfaces.get(0), endpoint, handler);
+            if (imRegs == null) {
+                imRegs = new ArrayList<ImportRegistrationImpl>();
+                importedServices.put(endpoint, imRegs);
+            }
+            imRegs.add(imReg);
+            eventProducer.publishNotification(imReg);
+            return imReg;
         }
     }
 
-    protected void proxifyMatchingInterface(String interfaceName, ImportRegistrationImpl imReg,
-                                            ConfigurationTypeHandler handler, BundleContext requestingContext) {
+    protected ImportRegistrationImpl exposeServiceFactory(String interfaceName,
+                                            EndpointDescription epd,
+                                            DistributionProvider handler) {
+        ImportRegistrationImpl imReg = new ImportRegistrationImpl(epd, this);
         try {
-            // MARC: relies on dynamic imports?
-            Class<?> iClass = bctx.getBundle().loadClass(interfaceName);
-            if (iClass == null) {
-                throw new ClassNotFoundException("Cannot load interface class");
-            }
-
-            BundleContext actualContext = bctx;
-            Class<?> actualClass = requestingContext.getBundle().loadClass(interfaceName);
-            if (actualClass != iClass) {
-                LOG.info("Class " + interfaceName + " loaded by DSW's bundle context is not "
-                             + "equal to the one loaded by the requesting bundle context, "
-                             + "DSW will use the requesting bundle context to register a proxy service");
-                iClass = actualClass;
-                actualContext = requestingContext;
-            }
-
+            // FIXME This should not be done here but without it the service factory
+            // does not seem to be picked up by the consumers
+            bctx.getBundle().loadClass(interfaceName);
+            
             EndpointDescription endpoint = imReg.getImportedEndpointDescription();
-            /* TODO: add additional local params... */
             Dictionary<String, Object> serviceProps = new Hashtable<String, Object>(endpoint.getProperties());
             serviceProps.put(RemoteConstants.SERVICE_IMPORTED, true);
             serviceProps.remove(RemoteConstants.SERVICE_EXPORTED_INTERFACES);
 
-            ClientServiceFactory csf = new ClientServiceFactory(actualContext, iClass, endpoint, handler, imReg);
+            ClientServiceFactory csf = new ClientServiceFactory(endpoint, handler, imReg);
             imReg.setClientServiceFactory(csf);
-            ServiceRegistration<?> proxyReg = actualContext.registerService(interfaceName, csf, serviceProps);
-            imReg.setImportedServiceRegistration(proxyReg);
+            ServiceRegistration<?> csfReg = bctx.registerService(interfaceName, csf, serviceProps);
+            imReg.setImportedServiceRegistration(csfReg);
         } catch (Exception ex) {
             // Only logging at debug level as this might be written to the log at the TopologyManager
             LOG.debug("Can not proxy service with interface " + interfaceName + ": " + ex.getMessage(), ex);
             imReg.setException(ex);
         }
+        return imReg;
     }
 
     /**
@@ -474,9 +457,12 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             List<ExportRegistration> bundleRegs = new ArrayList<ExportRegistration>();
             for (Collection<ExportRegistration> regs : exportedServices.values()) {
                 if (!regs.isEmpty()) {
-                    Bundle regBundle = regs.iterator().next().getExportReference().getExportedService().getBundle();
-                    if (exportingBundle.equals(regBundle)) {
-                        bundleRegs.addAll(regs);
+                    ExportRegistration exportRegistration = regs.iterator().next();
+                    if (exportRegistration.getException() == null) {
+                        Bundle regBundle = exportRegistration.getExportReference().getExportedService().getBundle();
+                        if (exportingBundle.equals(regBundle)) {
+                            bundleRegs.addAll(regs);
+                        }
                     }
                 }
             }
@@ -502,18 +488,5 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     public void close() {
         removeImportRegistrations();
         bctx.removeServiceListener(exportedServiceListener);
-    }
-    
-    private ConfigurationTypeHandler findHandler(EndpointDescription endpoint) {
-        try {
-            return configTypeHandlerFinder.getHandler(bctx, endpoint);
-        } catch (RuntimeException e) {
-            LOG.error("No handler found: " + e.getMessage(), e);
-            return null;
-        }
-    }
-
-    private ConfigurationTypeHandler findHandler(Map<String, Object> serviceProperties) {
-        return configTypeHandlerFinder.getHandler(bctx, serviceProperties);
     }
 }

@@ -73,7 +73,7 @@ public class TestImportService extends AbstractDosgiTest {
                 provision(createServiceConsumerBundle()),
                 // increase for debugging
                 systemProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout").value(
-                        System.getProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout", "20")),
+                        System.getProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout", "200")),
                 frameworkStartLevel(100),
                 //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
@@ -110,17 +110,9 @@ public class TestImportService extends AbstractDosgiTest {
         //    a service property.
 
         // Set up a Server in the test
-        ServerFactoryBean factory = new ServerFactoryBean();
-        factory.setServiceClass(GreeterService.class);
-        factory.setAddress("http://localhost:9191/grrr");
-        factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-        factory.setServiceBean(new TestGreeter());
-
         Server server = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
-            server = factory.create();
+            server = publishTestGreeter();
 
             Dictionary<String, Object> props = new Hashtable<String, Object>();
             props.put("testName", "test1");
@@ -134,6 +126,21 @@ public class TestImportService extends AbstractDosgiTest {
             if (server != null) {
                 server.stop();
             }
+            
+        }
+    }
+
+    private Server publishTestGreeter() {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
+            ServerFactoryBean factory = new ServerFactoryBean();
+            factory.setServiceClass(GreeterService.class);
+            factory.setAddress("http://localhost:9191/grrr");
+            factory.getServiceFactory().setDataBinding(new AegisDatabinding());
+            factory.setServiceBean(new TestGreeter());
+            return factory.create();
+        } finally {
             Thread.currentThread().setContextClassLoader(cl);
         }
     }

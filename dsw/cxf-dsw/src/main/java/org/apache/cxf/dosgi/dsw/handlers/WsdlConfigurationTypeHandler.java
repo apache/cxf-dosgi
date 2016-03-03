@@ -29,8 +29,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
-import org.apache.cxf.dosgi.dsw.api.ExportResult;
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
+import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -55,8 +56,6 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     public Object createProxy(ServiceReference<?> serviceReference,
-                              BundleContext dswContext,
-                              BundleContext callingContext,
                               Class<?> iClass,
                               EndpointDescription endpoint) {
         String wsdlAddressProp = getWsdlAddress(endpoint, iClass);
@@ -101,17 +100,17 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return Service.create(wsdlAddress, serviceQname);
     }
 
-    public ExportResult createServer(ServiceReference<?> sref,
-                               BundleContext dswContext,
-                               BundleContext callingContext,
+    public Endpoint createServer(ServiceReference<?> sref,
                                Map<String, Object> sd,
-                               Class<?> iClass,
-                               Object serviceBean) {
+                               String exportedInterface) {
+        BundleContext callingContext = sref.getBundle().getBundleContext();
+        Object serviceBean = callingContext.getService(sref);
+        Class<?> iClass = ClassUtils.getInterfaceClass(serviceBean, exportedInterface);
         String location = OsgiUtils.getProperty(sd, Constants.WSDL_LOCATION);
         if (location == null) {
             throw new RuntimeException("WSDL location property is unavailable");
         }
-        URL wsdlURL = dswContext.getBundle().getResource(location);
+        URL wsdlURL = callingContext.getBundle().getResource(location);
         if (wsdlURL == null) {
             throw new RuntimeException("WSDL resource at " + location + " is unavailable");
         }
@@ -132,7 +131,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         factory.setServiceClass(iClass);
         factory.setAddress(address != null ? address : "/");
         factory.getServiceFactory().setDataBinding(databinding);
-        factory.setServiceBean(serviceBean);
+        factory.setServiceBean(callingContext.getService(sref));
 
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
 

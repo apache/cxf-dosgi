@@ -173,6 +173,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         Bundle b = EasyMock.createMock(Bundle.class);
         EasyMock.expect(b.findEntries("OSGI-INF/remote-service", "*.xml", false)).andReturn(
             Collections.enumeration(Arrays.asList(resources))).anyTimes();
+        EasyMock.expect(b.getSymbolicName()).andReturn("bundlename");
         EasyMock.replay(b);
         return b;
     }

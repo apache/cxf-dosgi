@@ -29,6 +29,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
+@SuppressWarnings("rawtypes")
 public class InterfaceRuleTest extends TestCase {
 
     public void testDUMMY() {

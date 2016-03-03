@@ -23,7 +23,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.dosgi.dsw.api.ConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.service.ClientServiceFactory;
 import org.apache.cxf.dosgi.dsw.service.ImportRegistrationImpl;
 import org.easymock.EasyMock;
@@ -38,35 +38,39 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class ClientServiceFactoryTest extends TestCase {
 
-    @SuppressWarnings("rawtypes")
-    public void testGetService() {
+    @SuppressWarnings({
+     "rawtypes", "unchecked"
+    })
+    public void testGetService() throws ClassNotFoundException {
         Object myTestProxyObject = new Object();
 
-        IMocksControl control = EasyMock.createNiceControl();
-        BundleContext dswContext = control.createMock(BundleContext.class);
+        IMocksControl control = EasyMock.createControl();
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
         map.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myGreatConfiguration");
-        map.put(Constants.OBJECTCLASS, new String[]{"my.class"});
+        map.put(Constants.OBJECTCLASS, new String[]{String.class.getName()});
 
         EndpointDescription endpoint = new EndpointDescription(map);
-        ConfigurationTypeHandler handler = control.createMock(ConfigurationTypeHandler.class);
+        
 
         ImportRegistrationImpl iri = new ImportRegistrationImpl(endpoint, null);
 
         BundleContext requestingContext = control.createMock(BundleContext.class);
         Bundle requestingBundle = control.createMock(Bundle.class);
+        EasyMock.expect(requestingBundle.loadClass(String.class.getName())).andReturn((Class)String.class);
         EasyMock.expect(requestingBundle.getBundleContext()).andReturn(requestingContext);
 
-        ServiceReference sr = control.createMock(ServiceReference.class);
+        ServiceReference sref = control.createMock(ServiceReference.class);
+        EasyMock.expect(sref.getBundle()).andReturn(requestingBundle);
         ServiceRegistration sreg = control.createMock(ServiceRegistration.class);
-        EasyMock.expect(sreg.getReference()).andReturn(sr);
+        EasyMock.expect(sreg.getReference()).andReturn(sref);
 
-        handler.createProxy(sr, dswContext, requestingContext, String.class, endpoint);
+        DistributionProvider handler = control.createMock(DistributionProvider.class);
+        handler.createProxy(sref, String.class, endpoint);
         EasyMock.expectLastCall().andReturn(myTestProxyObject);
         control.replay();
 
-        ClientServiceFactory csf = new ClientServiceFactory(dswContext, String.class, endpoint, handler, iri);
+        ClientServiceFactory csf = new ClientServiceFactory(endpoint, handler, iri);
         assertSame(myTestProxyObject, csf.getService(requestingBundle, sreg));
     }
 }

@@ -19,35 +19,9 @@
 package org.apache.cxf.dosgi.dsw.api;
 
 import java.io.Closeable;
-import java.util.Map;
 
-public class ExportResult {
+import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-    private final Map<String, Object> endpointProps;
-    private final Closeable server;
-    private final Exception exception;
-
-    public ExportResult(Map<String, Object> endpointProps, Closeable server) {
-        this.endpointProps = endpointProps;
-        this.server = server;
-        this.exception = null;
-    }
-
-    public ExportResult(Map<String, Object> endpointProps, Exception ex) {
-        this.endpointProps = endpointProps;
-        this.server = null;
-        this.exception = ex;
-    }
-
-    public Map<String, Object> getEndpointProps() {
-        return endpointProps;
-    }
-
-    public Closeable getServer() {
-        return server;
-    }
-
-    public Exception getException() {
-        return exception;
-    }
+public interface Endpoint extends Closeable {
+    EndpointDescription description();
 }

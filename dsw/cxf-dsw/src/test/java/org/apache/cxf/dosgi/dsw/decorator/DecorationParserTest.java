@@ -18,8 +18,11 @@
  */
 package org.apache.cxf.dosgi.dsw.decorator;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import org.apache.cxf.xmlns.service_decoration._1_0.AddPropertyType;
 import org.apache.cxf.xmlns.service_decoration._1_0.MatchPropertyType;
@@ -33,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 public class DecorationParserTest {
 
     @Test
-    public void testGetDecoratorForSD() {
+    public void testGetDecoratorForSD() throws JAXBException, IOException {
         URL resource = getClass().getResource("/test-resources/sd.xml");
         List<ServiceDecorationType> elements = new DecorationParser().getDecorations(resource);
         assertEquals(1, elements.size());
@@ -53,7 +56,7 @@ public class DecorationParserTest {
     }
 
     @Test
-    public void testGetDecorationForNull() {
+    public void testGetDecorationForNull() throws JAXBException, IOException {
         List<ServiceDecorationType> elements = new DecorationParser().getDecorations(null);
         Assert.assertEquals(0, elements.size());
     }

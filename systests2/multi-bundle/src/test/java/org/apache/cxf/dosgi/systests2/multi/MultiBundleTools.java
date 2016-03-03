@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-import java.util.jar.Attributes;
-import java.util.jar.JarInputStream;
-import java.util.jar.Manifest;
 
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
@@ -94,18 +91,8 @@ public final class MultiBundleTools {
 
         for (Map.Entry<Integer, String> entry : bundles.entrySet()) {
             String bundleUri = entry.getValue();
-            URL bundleURL = new URL(bundleUri);
-            JarInputStream bundleJar = new JarInputStream(bundleURL.openStream());
-            Manifest manifest = bundleJar.getManifest();
-            Attributes host = manifest.getAttributes("Fragment-Host");
-            if (host != null) {
-                System.out.println(bundleUri);
-            }
-            bundleJar.close();
-            
             opts.add(CoreOptions.bundle(bundleUri));
         }
-        System.out.println(opts);
         return opts.toArray(new Option[opts.size()]);
     }
 
