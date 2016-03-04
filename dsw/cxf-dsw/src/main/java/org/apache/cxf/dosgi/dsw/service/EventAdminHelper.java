@@ -32,8 +32,6 @@ import org.osgi.service.remoteserviceadmin.RemoteServiceAdminEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.cxf.dosgi.dsw.util.Utils.setIfNotNull;
-
 public class EventAdminHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventAdminHelper.class);
@@ -109,6 +107,12 @@ public class EventAdminHelper {
                     }
                 }
             }
+        }
+    }
+
+    private <K, V> void setIfNotNull(Map<K, V> map, K key, V val) {
+        if (val != null) {
+            map.put(key, val);
         }
     }
 

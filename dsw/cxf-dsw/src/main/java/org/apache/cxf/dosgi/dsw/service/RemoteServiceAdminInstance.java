@@ -25,8 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointPermission;
@@ -35,8 +35,6 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportReference;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
-
-import static org.apache.cxf.dosgi.dsw.util.OsgiUtils.checkPermission;
 
 public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
@@ -75,7 +73,8 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
 
     @Override
     public ImportRegistration importService(final EndpointDescription endpoint) {
-        checkPermission(new EndpointPermission(endpoint, OsgiUtils.getUUID(bctx), EndpointPermission.IMPORT));
+        String frameworkUUID = bctx.getProperty(Constants.FRAMEWORK_UUID);
+        checkPermission(new EndpointPermission(endpoint, frameworkUUID, EndpointPermission.IMPORT));
         return AccessController.doPrivileged(new PrivilegedAction<ImportRegistration>() {
             public ImportRegistration run() {
                 return closed ? null : rsaCore.importService(endpoint);
@@ -88,6 +87,13 @@ public class RemoteServiceAdminInstance implements RemoteServiceAdmin {
         rsaCore.removeExportRegistrations(bctx.getBundle());
         if (closeAll) {
             rsaCore.close();
+        }
+    }
+
+    private void checkPermission(EndpointPermission permission) {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(permission);
         }
     }
 }

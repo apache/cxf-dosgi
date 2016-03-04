@@ -23,8 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.util.Utils;
+import org.apache.cxf.dosgi.dsw.util.StringPlus;
 import org.junit.Test;
 import org.osgi.framework.Constants;
 
@@ -36,7 +35,7 @@ public class UtilsTest {
 
     @Test
     public void testSplitString() {
-        String[] values = Utils.normalizeStringPlus("1, 2");
+        String[] values = StringPlus.normalize("1, 2");
         assertEquals(2, values.length);
         assertEquals(values[0], "1");
         assertEquals(values[1], "2");
@@ -58,12 +57,12 @@ public class UtilsTest {
         sl.add(s3);
         sl.add(new Object()); // must be skipped
 
-        assertArrayEquals(null, Utils.normalizeStringPlus(new Object()));
+        assertArrayEquals(null, StringPlus.normalize(new Object()));
         assertArrayEquals(new String[] {
             s1
-        }, Utils.normalizeStringPlus(s1));
-        assertArrayEquals(sa, Utils.normalizeStringPlus(sa));
-        assertArrayEquals(sa, Utils.normalizeStringPlus(sl));
+        }, StringPlus.normalize(s1));
+        assertArrayEquals(sa, StringPlus.normalize(sa));
+        assertArrayEquals(sa, StringPlus.normalize(sl));
     }
 
     @Test
@@ -78,7 +77,7 @@ public class UtilsTest {
 
         // nothing should change here
         Map<String, Object> overload = new HashMap<String, Object>();
-        OsgiUtils.overlayProperties(copy, overload);
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
 
         assertEquals(original.size(), copy.size());
         for (Object key : original.keySet()) {
@@ -92,7 +91,7 @@ public class UtilsTest {
         overload = new HashMap<String, Object>();
         overload.put("new", "prop");
 
-        OsgiUtils.overlayProperties(copy, overload);
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
 
         assertEquals(original.size() + 1, copy.size());
         for (Object key : original.keySet()) {
@@ -109,7 +108,7 @@ public class UtilsTest {
         overload.put("new", "prop");
         overload.put("NEW", "prop");
 
-        OsgiUtils.overlayProperties(copy, overload);
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
 
         assertEquals(original.size() + 1, copy.size());
         for (Object key : original.keySet()) {
@@ -125,7 +124,7 @@ public class UtilsTest {
         overload = new HashMap<String, Object>();
         overload.put(Constants.OBJECTCLASS, "assd");
         overload.put(Constants.SERVICE_ID, "asasdasd");
-        OsgiUtils.overlayProperties(copy, overload);
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
 
         assertEquals(original.size(), copy.size());
         for (Object key : original.keySet()) {
@@ -138,7 +137,7 @@ public class UtilsTest {
         // overwrite own prop
         overload = new HashMap<String, Object>();
         overload.put("MyProp", "newValue");
-        OsgiUtils.overlayProperties(copy, overload);
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
 
         assertEquals(original.size(), copy.size());
         for (Object key : original.keySet()) {
@@ -154,7 +153,7 @@ public class UtilsTest {
         // overwrite own prop in different case
         overload = new HashMap<String, Object>();
         overload.put("MYPROP", "newValue");
-        OsgiUtils.overlayProperties(copy, overload);
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
 
         assertEquals(original.size(), copy.size());
         for (Object key : original.keySet()) {

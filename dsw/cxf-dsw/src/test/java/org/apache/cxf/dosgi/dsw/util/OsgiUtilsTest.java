@@ -31,7 +31,6 @@ import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.packageadmin.ExportedPackage;
@@ -62,18 +61,6 @@ public class OsgiUtilsTest extends TestCase {
 
     public void testMultiValuePropertyNull() {
         assertNull(OsgiUtils.getMultiValueProperty(null));
-    }
-
-    public void testGetUUID() {
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn(null).atLeastOnce();
-        EasyMock.replay(bc);
-        String uuid = OsgiUtils.getUUID(bc);
-        assertNotNull(uuid);
-
-        assertEquals(System.getProperty("org.osgi.framework.uuid"), uuid);
-
-        EasyMock.verify(bc);
     }
 
     @SuppressWarnings({
@@ -112,37 +99,6 @@ public class OsgiUtilsTest extends TestCase {
         c.replay();
         assertEquals("1.2.3", OsgiUtils.getVersion(iClass, bc));
         c.verify();
-    }
-
-    public void testOverlayProperties() {
-        Map<String, Object> sProps = new HashMap<String, Object>();
-        Map<String, Object> aProps = new HashMap<String, Object>();
-
-        OsgiUtils.overlayProperties(sProps, aProps);
-        assertEquals(0, sProps.size());
-
-        sProps.put("aaa", "aval");
-        sProps.put("bbb", "bval");
-        sProps.put(Constants.OBJECTCLASS, new String[] {"X"});
-        sProps.put(Constants.SERVICE_ID, 17L);
-
-        aProps.put("AAA", "achanged");
-        aProps.put("CCC", "CVAL");
-        aProps.put(Constants.OBJECTCLASS, new String[] {"Y"});
-        aProps.put(Constants.SERVICE_ID.toUpperCase(), 51L);
-
-        Map<String, Object> aPropsOrg = new HashMap<String, Object>(aProps);
-        OsgiUtils.overlayProperties(sProps, aProps);
-        assertEquals("The additional properties should not be modified", aPropsOrg, aProps);
-
-        assertEquals(5, sProps.size());
-        assertEquals("achanged", sProps.get("aaa"));
-        assertEquals("bval", sProps.get("bbb"));
-        assertEquals("CVAL", sProps.get("CCC"));
-        assertTrue("Should not be possible to override the objectClass property",
-                Arrays.equals(new String[] {"X"}, (Object[]) sProps.get(Constants.OBJECTCLASS)));
-        assertEquals("Should not be possible to override the service.id property",
-                17L, sProps.get(Constants.SERVICE_ID));
     }
 
     private static class MyExportedPackage implements ExportedPackage {

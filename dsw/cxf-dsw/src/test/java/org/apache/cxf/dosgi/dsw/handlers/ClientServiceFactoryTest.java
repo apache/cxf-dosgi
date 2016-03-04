@@ -31,7 +31,6 @@ import org.easymock.IMocksControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
@@ -59,14 +58,10 @@ public class ClientServiceFactoryTest extends TestCase {
         Bundle requestingBundle = control.createMock(Bundle.class);
         EasyMock.expect(requestingBundle.loadClass(String.class.getName())).andReturn((Class)String.class);
         EasyMock.expect(requestingBundle.getBundleContext()).andReturn(requestingContext);
-
-        ServiceReference sref = control.createMock(ServiceReference.class);
-        EasyMock.expect(sref.getBundle()).andReturn(requestingBundle);
         ServiceRegistration sreg = control.createMock(ServiceRegistration.class);
-        EasyMock.expect(sreg.getReference()).andReturn(sref);
 
         DistributionProvider handler = control.createMock(DistributionProvider.class);
-        handler.createProxy(sref, String.class, endpoint);
+        handler.importEndpoint(requestingContext, String.class, endpoint);
         EasyMock.expectLastCall().andReturn(myTestProxyObject);
         control.replay();
 

@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.api;
 
 import java.util.Map;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
@@ -28,25 +29,31 @@ public interface DistributionProvider {
     String[] getSupportedTypes();
 
     /**
-     * 
      * @param sref reference of the service to be exported
      * @param effectiveProperties combined properties of the service and additional properties from rsa
      * @param exportedInterface name of the interface to be exported
      * @return
      */
-    Endpoint createServer(ServiceReference<?> sref,
-                          Map<String, Object> effectiveProperties,
-                          String exportedInterface);
+    Endpoint exportService(ServiceReference<?> sref, 
+                           Map<String, Object> effectiveProperties,
+                           String exportedInterface);
 
     /**
-     * 
      * @param sref reference of the service offered to the requesting bundle
-     * @param iClass
+     * @param iClass interface of the service to proxy
      * @param endpoint description of the remote endpoint
      * @return service proxy to be given to the requesting bundle
      * @throws IntentUnsatisfiedException
      */
-    Object createProxy(ServiceReference<?> sref,
-                       Class<?> iClass, 
-                       EndpointDescription endpoint) throws IntentUnsatisfiedException;
+    Object importEndpoint(BundleContext consumerContext, 
+                          Class<?> iClass, 
+                          EndpointDescription endpoint)
+        throws IntentUnsatisfiedException;
+    
+    /**
+     * 
+     * @param endpoint
+     * @return if the provider can handle any of the config types of the endpoint
+     */
+    boolean canHandle(EndpointDescription endpoint);
 }

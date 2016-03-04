@@ -19,37 +19,43 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
+import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.service.ConfigTypeHandlerFinder;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.util.Utils;
+import org.apache.cxf.dosgi.dsw.util.StringPlus;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
+public class CXFDistributionProvider implements DistributionProvider {
 
     protected static final String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
-    private static final Logger LOG = LoggerFactory.getLogger(ConfigTypeHandlerFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CXFDistributionProvider.class);
 
     // protected because of tests
-    protected final List<String> supportedConfigurationTypes;
+    protected final String[] supportedConfigurationTypes;
 
     private IntentManager intentManager;
     private PojoConfigurationTypeHandler pojoConfigurationTypeHandler;
     private JaxRSPojoConfigurationTypeHandler jaxRsPojoConfigurationTypeHandler;
     private WsdlConfigurationTypeHandler wsdlConfigurationTypeHandler;
+    private Set<String> configTypesSet;
 
-    public ConfigTypeHandlerFactory(BundleContext bc, IntentManager intentManager,
+    public CXFDistributionProvider(BundleContext bc, IntentManager intentManager,
                                     HttpServiceManager httpServiceManager) {
         this.intentManager = intentManager;
         this.pojoConfigurationTypeHandler = new PojoConfigurationTypeHandler(bc, intentManager, httpServiceManager);
@@ -57,29 +63,31 @@ public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
                                                                                        intentManager,
                                                                                        httpServiceManager);
         this.wsdlConfigurationTypeHandler = new WsdlConfigurationTypeHandler(bc, intentManager, httpServiceManager);
-        supportedConfigurationTypes = new ArrayList<String>();
-        supportedConfigurationTypes.add(Constants.WSDL_CONFIG_TYPE);
-        supportedConfigurationTypes.add(Constants.RS_CONFIG_TYPE);
-        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE);
-        supportedConfigurationTypes.add(Constants.WS_CONFIG_TYPE_OLD);
+        supportedConfigurationTypes = new String[] {Constants.WS_CONFIG_TYPE,
+                                                    Constants.WSDL_CONFIG_TYPE, 
+                                                    Constants.RS_CONFIG_TYPE, 
+                                                    Constants.WS_CONFIG_TYPE_OLD};
+        configTypesSet = new HashSet<>(Arrays.asList(supportedConfigurationTypes));
+    }
+    
+    @Override
+    public Endpoint exportService(ServiceReference<?> sref, Map<String, Object> effectiveProperties,
+                                  String exportedInterface) {
+        List<String> configurationTypes = determineConfigurationTypes(effectiveProperties);
+        DistributionProvider handler = getHandler(configurationTypes, effectiveProperties);
+        return handler != null ? handler.exportService(sref, effectiveProperties, exportedInterface) : null;
     }
 
     @Override
-    public DistributionProvider getHandler(BundleContext dswBC,
-            Map<String, Object> serviceProperties) {
-        List<String> configurationTypes = determineConfigurationTypes(serviceProperties);
-        return getHandler(dswBC, configurationTypes, serviceProperties);
-    }
-
-    @Override
-    public DistributionProvider getHandler(BundleContext dswBC, EndpointDescription endpoint) {
+    public Object importEndpoint(BundleContext consumerContext, Class<?> iClass, EndpointDescription endpoint)
+        throws IntentUnsatisfiedException {
         List<String> configurationTypes = determineConfigTypesForImport(endpoint);
-        return getHandler(dswBC, configurationTypes, endpoint.getProperties());
+        DistributionProvider handler = getHandler(configurationTypes, endpoint.getProperties());
+        return handler != null ? handler.importEndpoint(consumerContext, iClass, endpoint) : null;
     }
 
-    private DistributionProvider getHandler(BundleContext dswBC,
-                                               List<String> configurationTypes,
-                                               Map<String, Object> serviceProperties) {
+    DistributionProvider getHandler(List<String> configurationTypes,
+                                            Map<String, Object> serviceProperties) {
         intentManager.assertAllIntentsSupported(serviceProperties);
         if (configurationTypes.contains(Constants.WS_CONFIG_TYPE)
             || configurationTypes.contains(Constants.WS_CONFIG_TYPE_OLD)
@@ -126,8 +134,8 @@ public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
      * determine which configuration types should be used / if the requested are
      * supported
      */
-    private List<String> determineConfigurationTypes(Map<String, Object> serviceProperties) {
-        String[] requestedConfigurationTypes = Utils.normalizeStringPlus(serviceProperties
+    List<String> determineConfigurationTypes(Map<String, Object> serviceProperties) {
+        String[] requestedConfigurationTypes = StringPlus.normalize(serviceProperties
                 .get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
         if (requestedConfigurationTypes == null || requestedConfigurationTypes.length == 0) {
             return Collections.singletonList(DEFAULT_CONFIGURATION_TYPE);
@@ -135,7 +143,7 @@ public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
 
         List<String> configurationTypes = new ArrayList<String>();
         for (String rct : requestedConfigurationTypes) {
-            if (supportedConfigurationTypes.contains(rct)) {
+            if (configTypesSet.contains(rct)) {
                 configurationTypes.add(rct);
             }
         }
@@ -158,11 +166,12 @@ public class ConfigTypeHandlerFactory implements ConfigTypeHandlerFinder {
         return usableConfigurationTypes;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFinder#getSupportedConfigurationTypes()
-     */
-    @Override
-    public List<String> getSupportedConfigurationTypes() {
+    public String[] getSupportedTypes() {
         return supportedConfigurationTypes;
+    }
+
+    @Override
+    public boolean canHandle(EndpointDescription endpoint) {
+        return determineConfigTypesForImport(endpoint).size() > 0;
     }
 }

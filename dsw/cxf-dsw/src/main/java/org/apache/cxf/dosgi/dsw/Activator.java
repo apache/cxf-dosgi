@@ -18,29 +18,24 @@
  */
 package org.apache.cxf.dosgi.dsw;
 
-import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorBundleListener;
 import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
-import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
+import org.apache.cxf.dosgi.dsw.handlers.CXFDistributionProvider;
 import org.apache.cxf.dosgi.dsw.handlers.HttpServiceManager;
 import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.qos.IntentTracker;
-import org.apache.cxf.dosgi.dsw.service.ConfigTypeHandlerFinder;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
 import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
-import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleListener;
@@ -64,7 +59,7 @@ public class Activator implements ManagedService, BundleActivator {
     private HttpServiceManager httpServiceManager;
     private BundleContext bc;
     private BundleListener bundleListener;
-    private Map<String, Object> curConfiguration;
+    private Dictionary<String, Object> curConfiguration;
     private Bus bus;
 
     public void start(BundleContext bundlecontext) throws Exception {
@@ -77,11 +72,11 @@ public class Activator implements ManagedService, BundleActivator {
         registerManagedService(bc);
     }
 
-    private Map<String, Object> getDefaultConfig() {
-        return new HashMap<String, Object>();
+    private Dictionary<String, Object> getDefaultConfig() {
+        return new Hashtable<String, Object>();
     }
 
-    private synchronized void init(Map<String, Object> config) {
+    private synchronized void init(Dictionary<String, Object> config) {
         bus = BusFactory.newInstance().createBus();
         
         String httpBase = (String) config.get(org.apache.cxf.dosgi.dsw.Constants.HTTP_BASE);
@@ -92,15 +87,14 @@ public class Activator implements ManagedService, BundleActivator {
         intentTracker.open();
         IntentManager intentManager = new IntentManagerImpl(intentMap, DEFAULT_INTENT_TIMEOUT);
         httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlias);
-        ConfigTypeHandlerFinder configTypeHandlerFactory
-            = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
+        DistributionProvider cxfProvider
+            = new CXFDistributionProvider(bc, intentManager, httpServiceManager);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, cxfProvider);
         RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(rsaCore);
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         String[] supportedIntents = intentMap.keySet().toArray(new String[] {});
         props.put("remote.intents.supported", supportedIntents);
-        props.put("remote.configs.supported",
-                  obtainSupportedConfigTypes(configTypeHandlerFactory.getSupportedConfigurationTypes()));
+        props.put("remote.configs.supported", cxfProvider.getSupportedTypes());
         LOG.info("Registering RemoteServiceAdminFactory...");
         rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
         ServiceDecoratorImpl serviceDecorator = new ServiceDecoratorImpl();
@@ -133,19 +127,6 @@ public class Activator implements ManagedService, BundleActivator {
         }
     }
 
-    // The CT sometimes uses the first element returned to register a service, but
-    // does not provide any additional configuration.
-    // Return the configuration type that works without additional configuration as the first in the list.
-    private String[] obtainSupportedConfigTypes(List<String> types) {
-        List<String> l = new ArrayList<String>(types);
-        if (l.contains(org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE)) {
-            // make sure its the first element...
-            l.remove(org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE);
-            l.add(0, org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE);
-        }
-        return l.toArray(new String[] {});
-    }
-
     private void registerManagedService(BundleContext bundlecontext) {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put(Constants.SERVICE_PID, CONFIG_SERVICE_PID);
@@ -174,7 +155,7 @@ public class Activator implements ManagedService, BundleActivator {
         LOG.debug("RemoteServiceAdmin Implementation configuration is updated with {}", config);
         // config is null if it doesn't exist, is being deleted or has not yet been loaded
         // in which case we run with defaults (just like we do manually when bundle is first started)
-        Map<String, Object> configMap = config == null ? getDefaultConfig() : Utils.toMap(config);
+        Dictionary<String, Object> configMap = config == null ? getDefaultConfig() : config;
         if (!configMap.equals(curConfiguration)) { // only if something actually changed
             curConfiguration = configMap;
             uninit();

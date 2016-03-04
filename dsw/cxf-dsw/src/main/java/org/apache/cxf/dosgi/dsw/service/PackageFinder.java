@@ -19,18 +19,29 @@
 package org.apache.cxf.dosgi.dsw.service;
 
 import java.util.List;
-import java.util.Map;
 
-import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
+import org.osgi.framework.wiring.BundleCapability;
+import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-public interface ConfigTypeHandlerFinder {
+public class PackageFinder {
+    private BundleContext context;
 
-    DistributionProvider getHandler(BundleContext dswBC, Map<String, Object> serviceProperties);
+    public PackageFinder(BundleContext context) {
+        this.context = context;
+    }
 
-    DistributionProvider getHandler(BundleContext dswBC, EndpointDescription endpoint);
+    public void findPackageFor(String interfaceName, EndpointDescription epd) {
+        BundleWiring wiring = context.getBundle().adapt(BundleWiring.class);
+        List<BundleCapability> caps = wiring.getCapabilities("osgi.wiring.package");
+        Version version = epd.getPackageVersion(getPackageName(interfaceName));
+    }
+    
 
-    List<String> getSupportedConfigurationTypes();
+    private String getPackageName(String interfaceName) {
+        return interfaceName.substring(0, interfaceName.lastIndexOf("."));
+    }
 
 }

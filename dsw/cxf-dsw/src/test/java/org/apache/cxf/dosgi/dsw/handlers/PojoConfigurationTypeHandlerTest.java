@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
@@ -110,13 +111,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     public void testCreateProxy() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext bc1 = c.createMock(BundleContext.class);
-
         
-        ServiceReference<?> sref = c.createMock(ServiceReference.class);
-        Bundle requestingBundle = c.createMock(Bundle.class);
         BundleContext requestingContext = c.createMock(BundleContext.class);
-        EasyMock.expect(requestingBundle.getBundleContext()).andReturn(requestingContext);
-        EasyMock.expect(sref.getBundle()).andReturn(requestingBundle);
 
         final ClientProxyFactoryBean cpfb = c.createMock(ClientProxyFactoryBean.class);
         ReflectionServiceFactoryBean sf = c.createMock(ReflectionServiceFactoryBean.class);
@@ -152,7 +148,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.expectLastCall().atLeastOnce();
 
         c.replay();
-        Object proxy = p.createProxy(sref, CharSequence.class, endpoint);
+        Object proxy = p.importEndpoint(requestingContext, CharSequence.class, endpoint);
         assertNotNull(proxy);
         assertTrue("Proxy is not of the requested type! ", proxy instanceof CharSequence);
         c.verify();
@@ -195,7 +191,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.WS_ADDRESS_PROPERTY, "http://alternate_host:80/myString");
 
-        Endpoint exportResult = p.createServer(sref, props, String.class.getName());
+        Endpoint exportResult = p.exportService(sref, props, String.class.getName());
         Map<String, Object> edProps = exportResult.description().getProperties();
 
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
@@ -226,6 +222,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
     private void runAddressingTest(Map<String, Object> properties, String expectedAddress) throws Exception {
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
+        String expectedUUID = UUID.randomUUID().toString();
+        EasyMock.expect(dswContext.getProperty(org.osgi.framework.Constants.FRAMEWORK_UUID)).andReturn(expectedUUID);
         EasyMock.replay(dswContext);
 
         IntentManager intentManager = EasyMock.createNiceMock(IntentManager.class);
@@ -247,6 +245,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bundleContext.getService(sref)).andReturn(myService);
+        
         EasyMock.replay(bundleContext);
         Bundle bundle = EasyMock.createNiceMock(Bundle.class);
         EasyMock.expect(bundle.getBundleContext()).andReturn(bundleContext);
@@ -256,13 +255,13 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.replay(sref);
 
 
-        Endpoint result = handler.createServer(sref, properties, Runnable.class.getName());
+        Endpoint result = handler.exportService(sref, properties, Runnable.class.getName());
         Map<String, Object> props = result.description().getProperties();
         assertEquals(expectedAddress, props.get("org.apache.cxf.ws.address"));
         assertEquals("Version of java. package is always 0", "0.0.0", props.get("endpoint.package.version.java.lang"));
         assertTrue(Arrays.equals(new String[] {"org.apache.cxf.ws"}, (String[]) props.get("service.imported.configs")));
         assertTrue(Arrays.equals(new String[] {"java.lang.Runnable"}, (String[]) props.get("objectClass")));
-        assertNotNull(props.get("endpoint.framework.uuid"));
+        assertEquals(expectedUUID, props.get("endpoint.framework.uuid"));
     }
 
     public void t2estCreateServerException() {
@@ -290,7 +289,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Runnable myService = EasyMock.createMock(Runnable.class);
         EasyMock.replay(myService);
         try {
-            handler.createServer(sref, props, Runnable.class.getName());
+            handler.exportService(sref, props, Runnable.class.getName());
             fail("Expected TestException");
         } catch (TestException e) {
             // Expected
@@ -390,7 +389,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         sd.put(Constants.WS_ADDRESS_PROPERTY, "/somewhere");
 
         c.replay();
-        ServerWrapper serverWrapper = (ServerWrapper)handler.createServer(sref, sd, MyJaxWsEchoService.class.getName());
+        ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(sref, sd, 
+                                                                           MyJaxWsEchoService.class.getName());
         c.verify();
 
         org.apache.cxf.endpoint.Endpoint ep = serverWrapper.getServer().getEndpoint();
@@ -412,7 +412,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         sd.put(Constants.WS_ADDRESS_PROPERTY, "/somewhere_else");
 
         c.replay();
-        ServerWrapper serverWrapper = (ServerWrapper)handler.createServer(sref, sd, 
+        ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(sref, sd, 
                                                                           MySimpleEchoService.class.getName());
         c.verify();
 

@@ -19,6 +19,7 @@
 package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.Constants;
@@ -27,7 +28,6 @@ import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
-import org.apache.cxf.dosgi.dsw.service.ConfigTypeHandlerFinder;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 import static org.junit.Assert.assertTrue;
 
-public class ConfigTypeHandlerFactoryTest {
+public class CXFDistributionProviderTest {
 
     @Test
     public void testGetDefaultHandlerNoIntents() {
@@ -97,8 +97,9 @@ public class ConfigTypeHandlerFactoryTest {
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap);
         HttpServiceManager httpServiceManager = new HttpServiceManager(bc, null, null);
-        ConfigTypeHandlerFinder f = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
-        return f.getHandler(bc, serviceProps);
+        CXFDistributionProvider f = new CXFDistributionProvider(bc, intentManager, httpServiceManager);
+        List<String> configurationTypes = f.determineConfigurationTypes(serviceProps);
+        return f.getHandler(configurationTypes, serviceProps);
     }
 
     private DistributionProvider getHandlerWith2(String configType, String[] intents) {
@@ -110,7 +111,8 @@ public class ConfigTypeHandlerFactoryTest {
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap);
         HttpServiceManager httpServiceManager = new HttpServiceManager(bc, null, null);
-        ConfigTypeHandlerFinder f = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
-        return f.getHandler(bc, serviceProps);
+        CXFDistributionProvider f = new CXFDistributionProvider(bc, intentManager, httpServiceManager);
+        List<String> configurationTypes = f.determineConfigurationTypes(serviceProps);
+        return f.getHandler(configurationTypes, serviceProps);
     }
 }

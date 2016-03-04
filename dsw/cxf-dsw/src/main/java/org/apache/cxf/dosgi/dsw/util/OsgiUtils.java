@@ -21,9 +21,7 @@ package org.apache.cxf.dosgi.dsw.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -31,7 +29,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
-import org.osgi.service.remoteserviceadmin.EndpointPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,67 +128,5 @@ public final class OsgiUtils {
         LOG.info("Unable to find interface version for interface " + iClass.getName()
                  + ". Falling back to 0.0.0");
         return "0.0.0";
-    }
-
-    public static String getUUID(BundleContext bc) {
-        synchronized ("org.osgi.framework.uuid") {
-            String uuid = bc.getProperty("org.osgi.framework.uuid");
-            if (uuid == null) {
-                uuid = UUID.randomUUID().toString();
-                System.setProperty("org.osgi.framework.uuid", uuid);
-            }
-            return uuid;
-        }
-    }
-
-    public static void overlayProperties(Map<String, Object> serviceProperties,
-                                         Map<String, Object> additionalProperties) {
-        Map<String, String> keysLowerCase = new HashMap<String, String>();
-        for (String key : serviceProperties.keySet()) {
-            keysLowerCase.put(key.toLowerCase(), key);
-        }
-
-        for (Map.Entry<String, Object> e : additionalProperties.entrySet()) {
-            String key = e.getKey();
-            String lowerKey = key.toLowerCase();
-            if (org.osgi.framework.Constants.SERVICE_ID.toLowerCase().equals(lowerKey)
-                || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(lowerKey)) {
-                // objectClass and service.id must not be overwritten
-                LOG.info("exportService called with additional properties map that contained illegal key: "
-                          + key + ", the key is ignored");
-            } else {
-                String origKey = keysLowerCase.get(lowerKey);
-                if (origKey != null) {
-                    LOG.debug("Overwriting property [{}] with value [{}]", origKey, e.getValue());
-                } else {
-                    origKey = key;
-                    keysLowerCase.put(lowerKey, origKey);
-                }
-                serviceProperties.put(origKey, e.getValue());
-            }
-        }
-    }
-
-    /**
-     * Returns a service's properties as a map.
-     *
-     * @param serviceReference a service reference
-     * @return the service's properties as a map
-     */
-    public static Map<String, Object> getProperties(ServiceReference<?> serviceReference) {
-        String[] keys = serviceReference.getPropertyKeys();
-        Map<String, Object> props = new HashMap<String, Object>(keys.length);
-        for (String key : keys) {
-            Object val = serviceReference.getProperty(key);
-            props.put(key, val);
-        }
-        return props;
-    }
-
-    public static void checkPermission(EndpointPermission permission) {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(permission);
-        }
     }
 }

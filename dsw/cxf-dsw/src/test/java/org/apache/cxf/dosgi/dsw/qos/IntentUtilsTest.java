@@ -50,6 +50,7 @@ public class IntentUtilsTest {
                 new HashSet<String>(Arrays.asList(IntentUtils.mergeArrays(sa3, sa4))));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testRequestedIntents() {
         Map<String, Object> props = new HashMap<String, Object>();

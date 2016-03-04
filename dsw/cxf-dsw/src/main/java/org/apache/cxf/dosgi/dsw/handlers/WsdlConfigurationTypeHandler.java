@@ -31,7 +31,6 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -55,7 +54,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return new String[] {Constants.WSDL_CONFIG_TYPE};
     }
 
-    public Object createProxy(ServiceReference<?> serviceReference,
+    public Object importEndpoint(BundleContext consumerContext,
                               Class<?> iClass,
                               EndpointDescription endpoint) {
         String wsdlAddressProp = getWsdlAddress(endpoint, iClass);
@@ -100,7 +99,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return Service.create(wsdlAddress, serviceQname);
     }
 
-    public Endpoint createServer(ServiceReference<?> sref,
+    public Endpoint exportService(ServiceReference<?> sref,
                                Map<String, Object> sd,
                                String exportedInterface) {
         BundleContext callingContext = sref.getBundle().getBundleContext();

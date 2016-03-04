@@ -20,25 +20,21 @@ package org.apache.cxf.dosgi.dsw.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class Utils {
+public final class StringPlus {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StringPlus.class);
 
-    private Utils() {
+    private StringPlus() {
         // never constructed
     }
 
     @SuppressWarnings("rawtypes")
-    public static String[] normalizeStringPlus(Object object) {
+    public static String[] normalize(Object object) {
         if (object instanceof String) {
             String s = (String)object;
             String[] values = s.split(",");
@@ -73,29 +69,4 @@ public final class Utils {
         return null;
     }
 
-    /**
-     * Converts the given Dictionary to a Map.
-     *
-     * @param dict a dictionary
-     * @param <K> the key type
-     * @param <V> the value type
-     * @return the converted map, or an empty map if the given dictionary is null
-     */
-    public static <K, V> Map<K, V> toMap(Dictionary<K, V> dict) {
-        Map<K, V> map = new HashMap<K, V>();
-        if (dict != null) {
-            Enumeration<K> keys = dict.keys();
-            while (keys.hasMoreElements()) {
-                K key = keys.nextElement();
-                map.put(key, dict.get(key));
-            }
-        }
-        return map;
-    }
-
-    public static <K, V> void setIfNotNull(Map<K, V> map, K key, V val) {
-        if (val != null) {
-            map.put(key, val);
-        }
-    }
 }

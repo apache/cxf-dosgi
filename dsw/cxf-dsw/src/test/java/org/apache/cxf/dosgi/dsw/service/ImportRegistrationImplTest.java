@@ -60,6 +60,7 @@ public class ImportRegistrationImplTest {
         assertEquals(endpoint, i.getImportedEndpointDescription());
     }
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void testCloneAndClose() {
         IMocksControl c = EasyMock.createControl();

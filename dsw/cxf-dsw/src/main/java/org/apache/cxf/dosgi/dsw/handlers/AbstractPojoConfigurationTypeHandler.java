@@ -35,7 +35,6 @@ import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
-import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
@@ -86,7 +85,8 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Distributi
         props.remove(org.osgi.framework.Constants.SERVICE_ID);
         props.put(org.osgi.framework.Constants.OBJECTCLASS, sa);
         props.put(RemoteConstants.ENDPOINT_SERVICE_ID, sd.get(org.osgi.framework.Constants.SERVICE_ID));
-        props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, OsgiUtils.getUUID(bundleContext));
+        String frameworkUUID = bundleContext.getProperty(org.osgi.framework.Constants.FRAMEWORK_UUID);
+        props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, frameworkUUID);
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
         props.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + pkg, OsgiUtils.getVersion(iClass, bundleContext));
 
@@ -274,5 +274,11 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Distributi
         if (props != null) {
             factory.getProperties(true).putAll(props);
         }
+    }
+    
+    @Override
+    public boolean canHandle(EndpointDescription endpoint) {
+        // Will be handled by CXFDistributionProvider at the moment
+        throw new IllegalStateException();
     }
 }

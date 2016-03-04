@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.dsw.util;
+package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.ArrayList;
 import java.util.Arrays;

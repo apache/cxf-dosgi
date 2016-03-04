@@ -29,7 +29,7 @@ import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
-import org.apache.cxf.dosgi.dsw.handlers.ConfigTypeHandlerFactory;
+import org.apache.cxf.dosgi.dsw.handlers.CXFDistributionProvider;
 import org.apache.cxf.dosgi.dsw.handlers.HttpServiceManager;
 import org.apache.cxf.dosgi.dsw.handlers.ServerWrapper;
 import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
@@ -83,13 +83,14 @@ public class RemoteServiceAdminCoreTest {
         EasyMock.expect(sref.getPropertyKeys())
             .andReturn(new String[]{"objectClass", "service.exported.interfaces"}).anyTimes();
         EasyMock.expect(sref.getProperty("objectClass")).andReturn(new String[] {"a.b.C"}).anyTimes();
+        EasyMock.expect(sref.getProperty(RemoteConstants.SERVICE_IMPORTED)).andReturn(true).anyTimes();
         EasyMock.expect(sref.getProperty("service.exported.interfaces")).andReturn("*").anyTimes();
 
-        ConfigTypeHandlerFinder configTypeHandlerFactory = c.createMock(ConfigTypeHandlerFactory.class);
+        DistributionProvider provider = c.createMock(DistributionProvider.class);
 
         c.replay();
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, provider);
 
         // must return an empty List as sref if from the same bundle
         List<ExportRegistration> exRefs = rsaCore.exportService(sref, null);
@@ -125,12 +126,10 @@ public class RemoteServiceAdminCoreTest {
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
         HttpServiceManager httpServiceManager = c.createMock(HttpServiceManager.class);
-        ConfigTypeHandlerFinder configTypeHandlerFactory
-            = new ConfigTypeHandlerFactory(bc, intentManager, httpServiceManager);
-
+        CXFDistributionProvider provider = new CXFDistributionProvider(bc, intentManager, httpServiceManager);
         c.replay();
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, configTypeHandlerFactory) {
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, provider) {
             @Override
             protected ImportRegistrationImpl exposeServiceFactory(String interfaceName, 
                                                                       EndpointDescription epd,
@@ -212,14 +211,10 @@ public class RemoteServiceAdminCoreTest {
         Endpoint er = new ServerWrapper(new EndpointDescription(eProps), null);
 
         DistributionProvider handler = EasyMock.createNiceMock(DistributionProvider.class);
-        EasyMock.expect(handler.createServer(sref, sProps, Runnable.class.getName())).andReturn(er).once();
+        EasyMock.expect(handler.exportService(sref, sProps, Runnable.class.getName())).andReturn(er).once();
         EasyMock.replay(handler);
 
-        ConfigTypeHandlerFinder handlerFactory = EasyMock.createNiceMock(ConfigTypeHandlerFactory.class);
-        EasyMock.expect(handlerFactory.getHandler(bc, sProps))
-            .andReturn(handler).once(); // Second time shouldn't get there because it should simply copy
-        EasyMock.replay(handlerFactory);
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handlerFactory);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handler);
 
         // Export the service for the first time
         List<ExportRegistration> ereg = rsaCore.exportService(sref, null);
@@ -306,13 +301,10 @@ public class RemoteServiceAdminCoreTest {
         eProps.put("service.imported.configs", new String[] {"org.apache.cxf.ws"});
 
         DistributionProvider handler = EasyMock.createMock(DistributionProvider.class);
-        EasyMock.expect(handler.createServer(sref, sProps, Runnable.class.getName())).andThrow(new TestException());
+        EasyMock.expect(handler.exportService(sref, sProps, Runnable.class.getName())).andThrow(new TestException());
         EasyMock.replay(handler);
 
-        ConfigTypeHandlerFinder handlerFactory = EasyMock.createMock(ConfigTypeHandlerFactory.class);
-        EasyMock.expect(handlerFactory.getHandler(bc, sProps)).andReturn(handler).anyTimes();
-        EasyMock.replay(handlerFactory);
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handlerFactory);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handler);
 
         List<ExportRegistration> ereg = rsaCore.exportService(sref, sProps);
         assertEquals(1, ereg.size());
@@ -355,5 +347,36 @@ public class RemoteServiceAdminCoreTest {
 
     @SuppressWarnings("serial")
     private static class TestException extends RuntimeException {
+    }
+    
+    public void testOverlayProperties() {
+        Map<String, Object> sProps = new HashMap<String, Object>();
+        Map<String, Object> aProps = new HashMap<String, Object>();
+
+        RemoteServiceAdminCore.overlayProperties(sProps, aProps);
+        assertEquals(0, sProps.size());
+
+        sProps.put("aaa", "aval");
+        sProps.put("bbb", "bval");
+        sProps.put(Constants.OBJECTCLASS, new String[] {"X"});
+        sProps.put(Constants.SERVICE_ID, 17L);
+
+        aProps.put("AAA", "achanged");
+        aProps.put("CCC", "CVAL");
+        aProps.put(Constants.OBJECTCLASS, new String[] {"Y"});
+        aProps.put(Constants.SERVICE_ID.toUpperCase(), 51L);
+
+        Map<String, Object> aPropsOrg = new HashMap<String, Object>(aProps);
+        RemoteServiceAdminCore.overlayProperties(sProps, aProps);
+        assertEquals("The additional properties should not be modified", aPropsOrg, aProps);
+
+        assertEquals(5, sProps.size());
+        assertEquals("achanged", sProps.get("aaa"));
+        assertEquals("bval", sProps.get("bbb"));
+        assertEquals("CVAL", sProps.get("CCC"));
+        assertTrue("Should not be possible to override the objectClass property",
+                Arrays.equals(new String[] {"X"}, (Object[]) sProps.get(Constants.OBJECTCLASS)));
+        assertEquals("Should not be possible to override the service.id property",
+                17L, sProps.get(Constants.SERVICE_ID));
     }
 }

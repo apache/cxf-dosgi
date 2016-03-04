@@ -29,7 +29,6 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -55,7 +54,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return new String[] {Constants.WS_CONFIG_TYPE, Constants.WS_CONFIG_TYPE_OLD};
     }
 
-    public Object createProxy(ServiceReference<?> sref,
+    public Object importEndpoint(BundleContext consumerContext,
                               Class<?> iClass,
                               EndpointDescription endpoint) throws IntentUnsatisfiedException {
         Map<String, Object> sd = endpoint.getProperties();
@@ -74,8 +73,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             factory.getServiceFactory().setDataBinding(getDataBinding(sd, iClass));
             factory.setServiceClass(iClass);
             factory.setAddress(address);
-            BundleContext callingContext = sref.getBundle().getBundleContext();
-            addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), callingContext, sd);
+            addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), consumerContext, sd);
             setClientWsdlProperties(factory.getClientFactoryBean(), bundleContext, sd, false);
 
             intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd);
@@ -90,7 +88,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return null;
     }
 
-    public Endpoint createServer(ServiceReference<?> sref,
+    public Endpoint exportService(ServiceReference<?> sref,
                                      Map<String, Object> sd,
                                      String exportedInterface) throws IntentUnsatisfiedException {
         BundleContext callingContext = sref.getBundle().getBundleContext();

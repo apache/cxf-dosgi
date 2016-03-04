@@ -28,7 +28,6 @@ import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -56,10 +55,9 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         return new String[] {Constants.RS_CONFIG_TYPE};
     }
 
-    public Object createProxy(ServiceReference<?> sref,
+    public Object importEndpoint(BundleContext consumerContext,
                               Class<?> iClass,
                               EndpointDescription endpoint) {
-        BundleContext callingContext = sref.getBundle().getBundleContext();
         String address = getPojoAddress(endpoint, iClass);
         if (address == null) {
             LOG.warn("Remote address is unavailable");
@@ -67,7 +65,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         }
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            return createJaxrsProxy(address, callingContext, iClass, null, endpoint);
+            return createJaxrsProxy(address, consumerContext, iClass, null, endpoint);
         } catch (Throwable e) {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
@@ -75,7 +73,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         try {
             ProxyClassLoader cl = new ProxyClassLoader(iClass.getClassLoader());
             cl.addLoader(Client.class.getClassLoader());
-            return createJaxrsProxy(address, callingContext, iClass, cl, endpoint);
+            return createJaxrsProxy(address, consumerContext, iClass, cl, endpoint);
         } catch (Throwable e) {
             LOG.warn("proxy creation failed", e);
         }
@@ -110,7 +108,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         return getProxy(bean.create(), iClass);
     }
 
-    public Endpoint createServer(ServiceReference<?> sref,
+    public Endpoint exportService(ServiceReference<?> sref,
                                      Map<String, Object> sd,
                                      String exportedInterface) throws IntentUnsatisfiedException {
         BundleContext callingContext = sref.getBundle().getBundleContext();

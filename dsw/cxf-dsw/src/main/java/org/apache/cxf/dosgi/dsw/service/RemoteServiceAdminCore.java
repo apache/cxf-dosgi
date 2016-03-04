@@ -34,8 +34,6 @@ import java.util.Set;
 
 import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
-import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.util.Utils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -67,13 +65,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
     private final BundleContext bctx;
     private final EventProducer eventProducer;
-    private final ConfigTypeHandlerFinder configTypeHandlerFinder;
     private final ServiceListener exportedServiceListener;
+    private DistributionProvider provider;
 
-    public RemoteServiceAdminCore(BundleContext bc, ConfigTypeHandlerFinder configTypeHandlerFinder) {
+    public RemoteServiceAdminCore(BundleContext bc, DistributionProvider provider) {
         this.bctx = bc;
         this.eventProducer = new EventProducer(bctx);
-        this.configTypeHandlerFinder = configTypeHandlerFinder;
+        this.provider = provider;
         // listen for exported services being unregistered so we can close the export
         this.exportedServiceListener = new ServiceListener() {
             public void serviceChanged(ServiceEvent event) {
@@ -94,20 +92,45 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<ExportRegistration> exportService(ServiceReference serviceReference, Map additionalProperties)
         throws IllegalArgumentException, UnsupportedOperationException {
-        Map<String, Object> serviceProperties = OsgiUtils.getProperties(serviceReference);
+        Map<String, Object> serviceProperties = getProperties(serviceReference);
         if (additionalProperties != null) {
-            OsgiUtils.overlayProperties(serviceProperties, additionalProperties);
+            overlayProperties(serviceProperties, additionalProperties);
         }
         Map<String, Object> key = makeKey(serviceProperties);
 
         List<String> interfaces = getInterfaces(serviceProperties);
 
-        if (isCreatedByThisRSA(serviceReference)) {
-            LOG.debug("Skipping export of this service as we created it ourselves as a proxy {}", interfaces);
-            // TODO: publish error event? Not sure
+        if (isImportedService(serviceReference)) {
             return Collections.emptyList();
         }
 
+        List<ExportRegistration> exportRegs = getExistingRegs(key, interfaces);
+        if (exportRegs != null) {
+            return exportRegs;
+        }
+
+        try {
+            // do the export
+            exportRegs = exportInterfaces(interfaces, serviceReference, serviceProperties);
+            if (!exportRegs.isEmpty()) {
+                // enlist initial export registrations in global list of exportRegistrations
+                synchronized (exportedServices) {
+                    exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
+                }
+                eventProducer.publishNotification(exportRegs);
+            }
+            return exportRegs;
+        } finally {
+            synchronized (exportedServices) {
+                if (exportedServices.get(key) == exportInProgress) {
+                    exportedServices.remove(key);
+                }
+                exportedServices.notifyAll(); // in any case, always notify waiting threads
+            }
+        }
+    }
+
+    private List<ExportRegistration> getExistingRegs(Map<String, Object> key, List<String> interfaces) {
         synchronized (exportedServices) {
             // check if it is already exported...
             Collection<ExportRegistration> existingRegs = exportedServices.get(key);
@@ -132,44 +155,18 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             // mark export as being in progress
             exportedServices.put(key, exportInProgress);
         }
-
-        try {
-            // do the export
-            List<ExportRegistration> exportRegs = exportInterfaces(interfaces, serviceReference, serviceProperties);
-            if (!exportRegs.isEmpty()) {
-                // enlist initial export registrations in global list of exportRegistrations
-                synchronized (exportedServices) {
-                    exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
-                }
-                eventProducer.publishNotification(exportRegs);
-            }
-            return exportRegs;
-        } finally {
-            synchronized (exportedServices) {
-                if (exportedServices.get(key) == exportInProgress) {
-                    exportedServices.remove(key);
-                }
-                exportedServices.notifyAll(); // in any case, always notify waiting threads
-            }
-        }
+        return null;
     }
 
     private List<ExportRegistration> exportInterfaces(List<String> interfaces,
             ServiceReference<?> serviceReference, Map<String, Object> serviceProperties) {
         LOG.info("interfaces selected for export: " + interfaces);
-        DistributionProvider handler;
-        try {
-            handler = configTypeHandlerFinder.getHandler(bctx, serviceProperties);
-        } catch (RuntimeException e) {
-            LOG.error(e.getMessage(), e);
-            return Collections.emptyList();
-        }
         List<ExportRegistration> exportRegs = new ArrayList<ExportRegistration>(1);
         for (String iface : interfaces) {
             ExportRegistrationImpl exportRegistration;
             try {
                 LOG.info("creating server for interface " + iface);
-                Endpoint endpoint = handler.createServer(serviceReference, serviceProperties, iface);
+                Endpoint endpoint = provider.exportService(serviceReference, serviceProperties, iface);
                 exportRegistration = new ExportRegistrationImpl(serviceReference, endpoint, this);
                 LOG.info("created server for interface " + iface);
             } catch (Exception e) {
@@ -199,27 +196,27 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             throw new IllegalArgumentException("service is missing the objectClass property");
         }
 
-        String[] allowedInterfaces
-            = Utils.normalizeStringPlus(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTERFACES));
-        if (allowedInterfaces == null || allowedInterfaces.length == 0) {
+        String[] exportedInterfaces
+            = StringPlus.normalize(serviceProperties.get(RemoteConstants.SERVICE_EXPORTED_INTERFACES));
+        if (exportedInterfaces == null || exportedInterfaces.length == 0) {
             throw new IllegalArgumentException("service is missing the service.exported.interfaces property");
         }
 
         List<String> interfaces = new ArrayList<String>(1);
-        if (allowedInterfaces.length == 1 && "*".equals(allowedInterfaces[0])) {
+        if (exportedInterfaces.length == 1 && "*".equals(exportedInterfaces[0])) {
             // FIXME: according to the spec, this should only return the interfaces, and not
             // non-interface classes (which are valid OBJECTCLASS values, even if discouraged)
             Collections.addAll(interfaces, providedInterfaces);
         } else {
             List<String> providedList = Arrays.asList(providedInterfaces);
-            List<String> allowedList = Arrays.asList(allowedInterfaces);
+            List<String> allowedList = Arrays.asList(exportedInterfaces);
             if (!providedList.containsAll(allowedList)) {
                 throw new IllegalArgumentException(String.format(
                     "exported interfaces %s must be a subset of the service's registered types %s",
                     allowedList, providedList));
             }
 
-            Collections.addAll(interfaces, allowedInterfaces);
+            Collections.addAll(interfaces, exportedInterfaces);
         }
         return interfaces;
     }
@@ -270,8 +267,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         return copy;
     }
 
-    private boolean isCreatedByThisRSA(ServiceReference<?> sref) {
-        return bctx.getBundle().equals(sref.getBundle()); // sref bundle can be null
+    private boolean isImportedService(ServiceReference<?> sref) {
+        return sref.getProperty(RemoteConstants.SERVICE_IMPORTED) != null;
     }
 
     @Override
@@ -318,15 +315,14 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return ir;
             }
 
-            DistributionProvider handler = configTypeHandlerFinder.getHandler(bctx, endpoint);
-
-            // TODO: somehow select the interfaces that should be imported ---> job of the TopologyManager?
-            List<String> matchingInterfaces = endpoint.getInterfaces();
-            
-            if (handler == null) {
+            if (!provider.canHandle(endpoint)) {
                 LOG.info("No matching handler can be found for remote endpoint {}.", endpoint.getId());
                 return null;
             }
+            
+            // TODO: somehow select the interfaces that should be imported ---> job of the TopologyManager?
+            List<String> matchingInterfaces = endpoint.getInterfaces();
+            
             if (matchingInterfaces.size() == 0) {
                 LOG.info("No matching interfaces found for remote endpoint {}.", endpoint.getId());
                 return null;
@@ -337,11 +333,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                          endpoint.getId());
                 return null;
             }
-
+            
             LOG.info("Importing service {} with interfaces {} using handler {}.", 
-                     endpoint.getId(), endpoint.getInterfaces(), handler.getClass());
+                     endpoint.getId(), endpoint.getInterfaces(), provider.getClass());
 
-            ImportRegistrationImpl imReg = exposeServiceFactory(matchingInterfaces.get(0), endpoint, handler);
+            ImportRegistrationImpl imReg = exposeServiceFactory(matchingInterfaces.get(0), endpoint, provider);
             if (imRegs == null) {
                 imRegs = new ArrayList<ImportRegistrationImpl>();
                 importedServices.put(endpoint, imRegs);
@@ -488,5 +484,49 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     public void close() {
         removeImportRegistrations();
         bctx.removeServiceListener(exportedServiceListener);
+    }
+
+    static void overlayProperties(Map<String, Object> serviceProperties,
+                                         Map<String, Object> additionalProperties) {
+        Map<String, String> keysLowerCase = new HashMap<String, String>();
+        for (String key : serviceProperties.keySet()) {
+            keysLowerCase.put(key.toLowerCase(), key);
+        }
+    
+        for (Map.Entry<String, Object> e : additionalProperties.entrySet()) {
+            String key = e.getKey();
+            String lowerKey = key.toLowerCase();
+            if (org.osgi.framework.Constants.SERVICE_ID.toLowerCase().equals(lowerKey)
+                || org.osgi.framework.Constants.OBJECTCLASS.toLowerCase().equals(lowerKey)) {
+                // objectClass and service.id must not be overwritten
+                LOG.info("exportService called with additional properties map that contained illegal key: "
+                          + key + ", the key is ignored");
+            } else {
+                String origKey = keysLowerCase.get(lowerKey);
+                if (origKey != null) {
+                    LOG.debug("Overwriting property [{}] with value [{}]", origKey, e.getValue());
+                } else {
+                    origKey = key;
+                    keysLowerCase.put(lowerKey, origKey);
+                }
+                serviceProperties.put(origKey, e.getValue());
+            }
+        }
+    }
+
+    /**
+     * Returns a service's properties as a map.
+     *
+     * @param serviceReference a service reference
+     * @return the service's properties as a map
+     */
+    private Map<String, Object> getProperties(ServiceReference<?> serviceReference) {
+        String[] keys = serviceReference.getPropertyKeys();
+        Map<String, Object> props = new HashMap<String, Object>(keys.length);
+        for (String key : keys) {
+            Object val = serviceReference.getProperty(key);
+            props.put(key, val);
+        }
+        return props;
     }
 }

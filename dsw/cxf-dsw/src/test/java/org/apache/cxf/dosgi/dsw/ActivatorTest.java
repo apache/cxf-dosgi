@@ -44,6 +44,9 @@ public class ActivatorTest extends TestCase {
         return bc;
     }
 
+    @SuppressWarnings({
+     "rawtypes", "unchecked"
+    })
     public void testCreateAndShutdownRemoteServiceAdminService() throws Exception {
         IMocksControl control = EasyMock.createNiceControl();
         BundleContext bc = getMockBundleContext(control);

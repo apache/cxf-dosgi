@@ -28,6 +28,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.dsw.handlers.ClassUtils;
 import org.easymock.EasyMock;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;

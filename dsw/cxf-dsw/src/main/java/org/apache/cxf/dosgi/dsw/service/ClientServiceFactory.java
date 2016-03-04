@@ -59,7 +59,7 @@ public class ClientServiceFactory implements ServiceFactory {
             final Class<?> iClass = requestingBundle.loadClass(interfaceName);
             Object proxy = AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
-                    return handler.createProxy(sreg.getReference(), iClass, endpoint);
+                    return handler.importEndpoint(requestingBundle.getBundleContext(), iClass, endpoint);
                 }
             });
 
