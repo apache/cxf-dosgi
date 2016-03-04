@@ -315,7 +315,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                 return ir;
             }
 
-            if (!provider.canHandle(endpoint)) {
+            if (determineConfigTypesForImport(endpoint).size() == 0) {
                 LOG.info("No matching handler can be found for remote endpoint {}.", endpoint.getId());
                 return null;
             }
@@ -346,6 +346,21 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             eventProducer.publishNotification(imReg);
             return imReg;
         }
+    }
+    
+    private List<String> determineConfigTypesForImport(EndpointDescription endpoint) {
+        List<String> remoteConfigurationTypes = endpoint.getConfigurationTypes();
+
+        List<String> usableConfigurationTypes = new ArrayList<String>();
+        for (String ct : provider.getSupportedTypes()) {
+            if (remoteConfigurationTypes.contains(ct)) {
+                usableConfigurationTypes.add(ct);
+            }
+        }
+
+        LOG.info("Ignoring endpoint {} as it has no compatible configuration types: {}.", 
+                 endpoint.getId(), remoteConfigurationTypes);
+        return usableConfigurationTypes;
     }
 
     protected ImportRegistrationImpl exposeServiceFactory(String interfaceName,

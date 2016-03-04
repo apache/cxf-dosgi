@@ -50,10 +50,4 @@ public interface DistributionProvider {
                           EndpointDescription endpoint)
         throws IntentUnsatisfiedException;
     
-    /**
-     * 
-     * @param endpoint
-     * @return if the provider can handle any of the config types of the endpoint
-     */
-    boolean canHandle(EndpointDescription endpoint);
 }

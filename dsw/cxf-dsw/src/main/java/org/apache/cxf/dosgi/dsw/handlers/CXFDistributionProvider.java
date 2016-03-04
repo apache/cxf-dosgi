@@ -170,8 +170,4 @@ public class CXFDistributionProvider implements DistributionProvider {
         return supportedConfigurationTypes;
     }
 
-    @Override
-    public boolean canHandle(EndpointDescription endpoint) {
-        return determineConfigTypesForImport(endpoint).size() > 0;
-    }
 }

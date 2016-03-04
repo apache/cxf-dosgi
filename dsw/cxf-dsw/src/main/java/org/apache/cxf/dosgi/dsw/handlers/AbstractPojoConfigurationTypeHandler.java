@@ -276,9 +276,4 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Distributi
         }
     }
     
-    @Override
-    public boolean canHandle(EndpointDescription endpoint) {
-        // Will be handled by CXFDistributionProvider at the moment
-        throw new IllegalStateException();
-    }
 }
