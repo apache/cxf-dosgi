@@ -18,9 +18,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri-parent</artifactId>
-    <version>1.8-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation Parent</name>
@@ -297,7 +295,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>1.2</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.cxf.build-utils</groupId>
