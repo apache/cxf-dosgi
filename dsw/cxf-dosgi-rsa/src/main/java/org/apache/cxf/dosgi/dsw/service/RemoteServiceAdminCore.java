@@ -67,9 +67,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
     private final EventProducer eventProducer;
     private final ServiceListener exportedServiceListener;
     private DistributionProvider provider;
+    private BundleContext apictx;
 
-    public RemoteServiceAdminCore(BundleContext bc, DistributionProvider provider) {
-        this.bctx = bc;
+    public RemoteServiceAdminCore(BundleContext context, BundleContext apiContext, DistributionProvider provider) {
+        this.bctx = context;
+        this.apictx = apiContext;
         this.eventProducer = new EventProducer(bctx);
         this.provider = provider;
         // listen for exported services being unregistered so we can close the export
@@ -82,7 +84,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         };
         try {
             String filter = "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)";
-            bc.addServiceListener(exportedServiceListener, filter);
+            context.addServiceListener(exportedServiceListener, filter);
         } catch (InvalidSyntaxException ise) {
             throw new RuntimeException(ise); // can never happen
         }
@@ -370,10 +372,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
                                             DistributionProvider handler) {
         ImportRegistrationImpl imReg = new ImportRegistrationImpl(epd, this);
         try {
-            // FIXME This should not be done here but without it the service factory
-            // does not seem to be picked up by the consumers
-            bctx.getBundle().loadClass(interfaceName);
-            
             EndpointDescription endpoint = imReg.getImportedEndpointDescription();
             Dictionary<String, Object> serviceProps = new Hashtable<String, Object>(endpoint.getProperties());
             serviceProps.put(RemoteConstants.SERVICE_IMPORTED, true);
@@ -381,7 +379,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
 
             ClientServiceFactory csf = new ClientServiceFactory(endpoint, handler, imReg);
             imReg.setClientServiceFactory(csf);
-            ServiceRegistration<?> csfReg = bctx.registerService(interfaceName, csf, serviceProps);
+            
+            /**
+             *  Export the factory using the api context as it has very few imports.
+             *  If the bundle publishing the factory does not import the service interface
+             *  package then the factory is visible for all consumers which we want.
+             */
+            ServiceRegistration<?> csfReg = apictx.registerService(interfaceName, csf, serviceProps);
             imReg.setImportedServiceRegistration(csfReg);
         } catch (Exception ex) {
             // Only logging at debug level as this might be written to the log at the TopologyManager

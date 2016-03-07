@@ -22,8 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF dOSGi Remote Service Admin Implementation</name>
-    <description>The CXF Remote Service Admin as described in the OSGi Remote Service Admin specification</description>
+    <name>CXF dOSGi Distribution provider</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
@@ -50,6 +49,12 @@
             <artifactId>org.osgi.compendium</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.apache.cxf.dosgi</groupId>
+            <artifactId>cxf-dosgi-provider-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
@@ -132,9 +137,6 @@
                             !*
                         </Export-Package>
                         <Bundle-Activator>org.apache.cxf.dosgi.dsw.Activator</Bundle-Activator>
-                        
-                        <!-- Is currently needed to create a proxy of an interface given in String form -->
-                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>

@@ -41,5 +41,7 @@
     <modules>
       <module>cxf-dsw</module>
       <module>cxf-topology-manager</module>
+      <module>cxf-dosgi-provider-api</module>
+      <module>cxf-dosgi-rsa</module>
     </modules>
 </project>

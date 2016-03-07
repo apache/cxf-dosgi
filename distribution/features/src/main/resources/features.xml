@@ -24,6 +24,8 @@
         <feature>cxf-http</feature>
         <feature>http</feature>
         <bundle start-level="8">mvn:${project.groupId}/cxf-dosgi-ri-osgi-api/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-provider-api/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-rsa/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-topology-manager/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-dsw-cxf/${project.version}</bundle>
     </feature>

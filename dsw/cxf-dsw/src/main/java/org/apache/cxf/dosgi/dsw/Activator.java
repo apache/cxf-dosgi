@@ -34,8 +34,6 @@ import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.apache.cxf.dosgi.dsw.qos.IntentTracker;
-import org.apache.cxf.dosgi.dsw.service.RemoteServiceAdminCore;
-import org.apache.cxf.dosgi.dsw.service.RemoteServiceadminFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleListener;
@@ -43,7 +41,6 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,14 +86,11 @@ public class Activator implements ManagedService, BundleActivator {
         httpServiceManager = new HttpServiceManager(bc, httpBase, cxfServletAlias);
         DistributionProvider cxfProvider
             = new CXFDistributionProvider(bc, intentManager, httpServiceManager);
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, cxfProvider);
-        RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(rsaCore);
         Dictionary<String, Object> props = new Hashtable<String, Object>();
         String[] supportedIntents = intentMap.keySet().toArray(new String[] {});
         props.put("remote.intents.supported", supportedIntents);
         props.put("remote.configs.supported", cxfProvider.getSupportedTypes());
-        LOG.info("Registering RemoteServiceAdminFactory...");
-        rsaFactoryReg = bc.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
+        rsaFactoryReg = bc.registerService(DistributionProvider.class.getName(), cxfProvider, props);
         ServiceDecoratorImpl serviceDecorator = new ServiceDecoratorImpl();
         bundleListener = new ServiceDecoratorBundleListener(serviceDecorator);
         bc.addBundleListener(bundleListener);

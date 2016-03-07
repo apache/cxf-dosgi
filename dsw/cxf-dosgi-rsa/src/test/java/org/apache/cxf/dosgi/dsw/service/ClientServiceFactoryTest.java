@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-
-
 import java.util.HashMap;
 import java.util.Map;
 

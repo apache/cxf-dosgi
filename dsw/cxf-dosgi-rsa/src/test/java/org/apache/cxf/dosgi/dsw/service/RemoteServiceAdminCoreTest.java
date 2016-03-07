@@ -88,7 +88,7 @@ public class RemoteServiceAdminCoreTest {
 
         c.replay();
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, provider);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, bc, provider);
 
         // must return an empty List as sref if from the same bundle
         List<ExportRegistration> exRefs = rsaCore.exportService(sref, null);
@@ -121,7 +121,7 @@ public class RemoteServiceAdminCoreTest {
             .andReturn(new String[]{MYCONFIG}).atLeastOnce();
         c.replay();
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, provider);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, bc, provider);
 
         // must be null as the endpoint doesn't contain any usable configurations
         assertNull(rsaCore.importService(endpoint));
@@ -221,7 +221,7 @@ public class RemoteServiceAdminCoreTest {
                                               anyObject(Map.class), isA(Class[].class))).andReturn(er);
         EasyMock.replay(handler);
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handler);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, bc, handler);
 
         // Export the service for the first time
         List<ExportRegistration> ereg = rsaCore.exportService(sref, null);
@@ -312,7 +312,7 @@ public class RemoteServiceAdminCoreTest {
                                               anyObject(Map.class), isA(Class[].class))).andThrow(new TestException());
         EasyMock.replay(handler);
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handler);
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, bc, handler);
 
         List<ExportRegistration> ereg = rsaCore.exportService(sref, sProps);
         assertEquals(1, ereg.size());

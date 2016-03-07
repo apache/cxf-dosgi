@@ -18,30 +18,20 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
-import java.util.List;
-
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Version;
-import org.osgi.framework.wiring.BundleCapability;
-import org.osgi.framework.wiring.BundleWiring;
-import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-public class PackageFinder {
-    private BundleContext context;
+public class Activator implements BundleActivator {
 
-    public PackageFinder(BundleContext context) {
-        this.context = context;
+    private DistributionProviderTracker tracker;
+
+    public void start(BundleContext bundlecontext) throws Exception {
+        tracker = new DistributionProviderTracker(bundlecontext);
+        tracker.open();
     }
 
-    public void findPackageFor(String interfaceName, EndpointDescription epd) {
-        BundleWiring wiring = context.getBundle().adapt(BundleWiring.class);
-        List<BundleCapability> caps = wiring.getCapabilities("osgi.wiring.package");
-        Version version = epd.getPackageVersion(getPackageName(interfaceName));
-    }
-    
-
-    private String getPackageName(String interfaceName) {
-        return interfaceName.substring(0, interfaceName.lastIndexOf("."));
+    public void stop(BundleContext context) throws Exception {
+        tracker.close();
     }
 
 }
