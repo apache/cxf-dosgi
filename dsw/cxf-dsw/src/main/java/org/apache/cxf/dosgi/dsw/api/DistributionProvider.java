@@ -32,7 +32,7 @@ public interface DistributionProvider {
      * @param sref reference of the service to be exported
      * @param effectiveProperties combined properties of the service and additional properties from rsa
      * @param exportedInterface name of the interface to be exported
-     * @return
+     * @return closeable Endpoint that represents the service that is exposed to the outside world
      */
     Endpoint exportService(ServiceReference<?> sref, 
                            Map<String, Object> effectiveProperties,
@@ -40,13 +40,13 @@ public interface DistributionProvider {
 
     /**
      * @param sref reference of the service offered to the requesting bundle
-     * @param iClass interface of the service to proxy
+     * @param interfaces interfaces of the service to proxy
      * @param endpoint description of the remote endpoint
      * @return service proxy to be given to the requesting bundle
      * @throws IntentUnsatisfiedException
      */
     Object importEndpoint(BundleContext consumerContext, 
-                          Class<?> iClass, 
+                          Class<?>[] interfaces, 
                           EndpointDescription endpoint)
         throws IntentUnsatisfiedException;
     

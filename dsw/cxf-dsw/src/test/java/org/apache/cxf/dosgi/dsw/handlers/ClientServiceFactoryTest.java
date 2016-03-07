@@ -18,12 +18,15 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
+import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.dsw.service.ClientServiceFactory;
 import org.apache.cxf.dosgi.dsw.service.ImportRegistrationImpl;
 import org.easymock.EasyMock;
@@ -31,6 +34,7 @@ import org.easymock.IMocksControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
@@ -41,17 +45,10 @@ public class ClientServiceFactoryTest extends TestCase {
      "rawtypes", "unchecked"
     })
     public void testGetService() throws ClassNotFoundException {
-        Object myTestProxyObject = new Object();
+        final Object myTestProxyObject = new Object();
 
         IMocksControl control = EasyMock.createControl();
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
-        map.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myGreatConfiguration");
-        map.put(Constants.OBJECTCLASS, new String[]{String.class.getName()});
-
-        EndpointDescription endpoint = new EndpointDescription(map);
-        
-
+        EndpointDescription endpoint = createTestEndpointDesc();
         ImportRegistrationImpl iri = new ImportRegistrationImpl(endpoint, null);
 
         BundleContext requestingContext = control.createMock(BundleContext.class);
@@ -60,12 +57,47 @@ public class ClientServiceFactoryTest extends TestCase {
         EasyMock.expect(requestingBundle.getBundleContext()).andReturn(requestingContext);
         ServiceRegistration sreg = control.createMock(ServiceRegistration.class);
 
-        DistributionProvider handler = control.createMock(DistributionProvider.class);
-        handler.importEndpoint(requestingContext, String.class, endpoint);
-        EasyMock.expectLastCall().andReturn(myTestProxyObject);
+        DistributionProvider handler = mockDistributionProvider(myTestProxyObject);
         control.replay();
 
         ClientServiceFactory csf = new ClientServiceFactory(endpoint, handler, iri);
         assertSame(myTestProxyObject, csf.getService(requestingBundle, sreg));
+    }
+
+    /**
+     * Creating dummy class as I was not able to really mock it
+     * @param myTestProxyObject
+     * @return
+     */
+    private DistributionProvider mockDistributionProvider(final Object myTestProxyObject) {
+        return new DistributionProvider() {
+            
+            @Override
+            public Object importEndpoint(BundleContext consumerContext, Class<?>[] interfaces,
+                                         EndpointDescription endpoint)
+                throws IntentUnsatisfiedException {
+                return myTestProxyObject;
+            }
+            
+            @Override
+            public String[] getSupportedTypes() {
+                return null;
+            }
+            
+            @Override
+            public Endpoint exportService(ServiceReference<?> sref, Map<String, Object> effectiveProperties,
+                                          String exportedInterface) {
+                return null;
+            }
+        };
+    }
+
+    private EndpointDescription createTestEndpointDesc() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
+        map.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "myGreatConfiguration");
+        map.put(Constants.OBJECTCLASS, new String[]{String.class.getName()});
+        EndpointDescription endpoint = new EndpointDescription(map);
+        return endpoint;
     }
 }

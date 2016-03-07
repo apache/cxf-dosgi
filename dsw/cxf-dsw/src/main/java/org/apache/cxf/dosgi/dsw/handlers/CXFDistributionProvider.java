@@ -79,7 +79,7 @@ public class CXFDistributionProvider implements DistributionProvider {
     }
 
     @Override
-    public Object importEndpoint(BundleContext consumerContext, Class<?> iClass, EndpointDescription endpoint)
+    public Object importEndpoint(BundleContext consumerContext, Class<?>[] iClass, EndpointDescription endpoint)
         throws IntentUnsatisfiedException {
         List<String> configurationTypes = determineConfigTypesForImport(endpoint);
         DistributionProvider handler = getHandler(configurationTypes, endpoint.getProperties());

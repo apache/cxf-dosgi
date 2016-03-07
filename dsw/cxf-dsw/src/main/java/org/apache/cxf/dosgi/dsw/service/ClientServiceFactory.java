@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.dsw.service;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,14 +53,17 @@ public class ClientServiceFactory implements ServiceFactory {
     }
 
     public Object getService(final Bundle requestingBundle, final ServiceRegistration sreg) {
-        List<String> interfaces = endpoint.getInterfaces();
-        String interfaceName = interfaces == null || interfaces.isEmpty() ? null : interfaces.get(0);
-        LOG.debug("getService() from serviceFactory for {}", interfaceName);
+        List<String> interfaceNames = endpoint.getInterfaces();
         try {
-            final Class<?> iClass = requestingBundle.loadClass(interfaceName);
+            LOG.debug("getService() from serviceFactory for {}", interfaceNames);
+            final List<Class<?>> interfaces = new ArrayList<Class<?>>();
+            for (String ifaceName : interfaceNames) {
+                interfaces.add(requestingBundle.loadClass(ifaceName));
+            }
             Object proxy = AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
-                    return handler.importEndpoint(requestingBundle.getBundleContext(), iClass, endpoint);
+                    Class<?>[] ifAr = interfaces.toArray(new Class[]{});
+                    return handler.importEndpoint(requestingBundle.getBundleContext(), ifAr, endpoint);
                 }
             });
 
@@ -69,9 +73,9 @@ public class ClientServiceFactory implements ServiceFactory {
             return proxy;
         } catch (IntentUnsatisfiedException iue) {
             LOG.info("Did not create proxy for {} because intent {} could not be satisfied",
-                    interfaceName, iue.getIntent());
+                    interfaceNames, iue.getIntent());
         } catch (Exception e) {
-            LOG.warn("Problem creating a remote proxy for {}", interfaceName, e);
+            LOG.warn("Problem creating a remote proxy for {}", interfaceNames, e);
         }
         return null;
     }

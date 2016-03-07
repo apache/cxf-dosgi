@@ -55,8 +55,9 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     public Object importEndpoint(BundleContext consumerContext,
-                              Class<?> iClass,
+                              Class<?>[] interfaces,
                               EndpointDescription endpoint) throws IntentUnsatisfiedException {
+        Class<?> iClass = interfaces[0];
         Map<String, Object> sd = endpoint.getProperties();
         String address = getClientAddress(sd);
         if (address == null) {

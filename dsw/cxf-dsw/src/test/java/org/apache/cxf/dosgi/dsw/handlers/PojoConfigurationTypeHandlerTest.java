@@ -148,7 +148,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.expectLastCall().atLeastOnce();
 
         c.replay();
-        Object proxy = p.importEndpoint(requestingContext, CharSequence.class, endpoint);
+        Object proxy = p.importEndpoint(requestingContext, new Class<?>[]{CharSequence.class}, endpoint);
         assertNotNull(proxy);
         assertTrue("Proxy is not of the requested type! ", proxy instanceof CharSequence);
         c.verify();

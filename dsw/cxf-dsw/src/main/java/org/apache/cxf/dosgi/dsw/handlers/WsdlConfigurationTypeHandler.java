@@ -55,8 +55,9 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     public Object importEndpoint(BundleContext consumerContext,
-                              Class<?> iClass,
+                              Class<?>[] interfaces,
                               EndpointDescription endpoint) {
+        Class<?> iClass = interfaces[0];
         String wsdlAddressProp = getWsdlAddress(endpoint, iClass);
         if (wsdlAddressProp == null) {
             LOG.warn("WSDL address is unavailable");
