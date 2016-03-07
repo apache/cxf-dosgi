@@ -24,6 +24,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
+@SuppressWarnings("rawtypes")
 public interface DistributionProvider {
 
     String[] getSupportedTypes();
@@ -36,7 +37,7 @@ public interface DistributionProvider {
      */
     Endpoint exportService(ServiceReference<?> sref, 
                            Map<String, Object> effectiveProperties,
-                           String exportedInterface);
+                           Class[] exportedInterfaces);
 
     /**
      * @param sref reference of the service offered to the requesting bundle
@@ -46,7 +47,7 @@ public interface DistributionProvider {
      * @throws IntentUnsatisfiedException
      */
     Object importEndpoint(BundleContext consumerContext, 
-                          Class<?>[] interfaces, 
+                          Class[] interfaces, 
                           EndpointDescription endpoint)
         throws IntentUnsatisfiedException;
     

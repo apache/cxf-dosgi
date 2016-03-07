@@ -72,14 +72,14 @@ public class CXFDistributionProvider implements DistributionProvider {
     
     @Override
     public Endpoint exportService(ServiceReference<?> sref, Map<String, Object> effectiveProperties,
-                                  String exportedInterface) {
+                                  Class[] exportedInterfaces) {
         List<String> configurationTypes = determineConfigurationTypes(effectiveProperties);
         DistributionProvider handler = getHandler(configurationTypes, effectiveProperties);
-        return handler != null ? handler.exportService(sref, effectiveProperties, exportedInterface) : null;
+        return handler != null ? handler.exportService(sref, effectiveProperties, exportedInterfaces) : null;
     }
 
     @Override
-    public Object importEndpoint(BundleContext consumerContext, Class<?>[] iClass, EndpointDescription endpoint)
+    public Object importEndpoint(BundleContext consumerContext, Class[] iClass, EndpointDescription endpoint)
         throws IntentUnsatisfiedException {
         List<String> configurationTypes = determineConfigTypesForImport(endpoint);
         DistributionProvider handler = getHandler(configurationTypes, endpoint.getProperties());

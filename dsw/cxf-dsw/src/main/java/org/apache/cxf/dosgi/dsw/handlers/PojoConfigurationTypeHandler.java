@@ -55,7 +55,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     public Object importEndpoint(BundleContext consumerContext,
-                              Class<?>[] interfaces,
+                              Class[] interfaces,
                               EndpointDescription endpoint) throws IntentUnsatisfiedException {
         Class<?> iClass = interfaces[0];
         Map<String, Object> sd = endpoint.getProperties();
@@ -91,10 +91,10 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
     public Endpoint exportService(ServiceReference<?> sref,
                                      Map<String, Object> sd,
-                                     String exportedInterface) throws IntentUnsatisfiedException {
+                                     Class[] exportedInterfaces) throws IntentUnsatisfiedException {
         BundleContext callingContext = sref.getBundle().getBundleContext();
         Object serviceBean = callingContext.getService(sref);
-        Class<?> iClass = ClassUtils.getInterfaceClass(serviceBean, exportedInterface);
+        Class<?> iClass = exportedInterfaces[0];
         String address = getPojoAddress(sd, iClass);
         ServerFactoryBean factory = createServerFactoryBean(sd, iClass);
         factory.setDataBinding(getDataBinding(sd, iClass));

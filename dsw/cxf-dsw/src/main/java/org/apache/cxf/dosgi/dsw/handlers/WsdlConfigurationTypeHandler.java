@@ -55,7 +55,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     public Object importEndpoint(BundleContext consumerContext,
-                              Class<?>[] interfaces,
+                              Class[] interfaces,
                               EndpointDescription endpoint) {
         Class<?> iClass = interfaces[0];
         String wsdlAddressProp = getWsdlAddress(endpoint, iClass);
@@ -102,10 +102,10 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
     public Endpoint exportService(ServiceReference<?> sref,
                                Map<String, Object> sd,
-                               String exportedInterface) {
+                               Class[] exportedInterfaces) {
         BundleContext callingContext = sref.getBundle().getBundleContext();
         Object serviceBean = callingContext.getService(sref);
-        Class<?> iClass = ClassUtils.getInterfaceClass(serviceBean, exportedInterface);
+        Class<?> iClass = exportedInterfaces[0];
         String location = OsgiUtils.getProperty(sd, Constants.WSDL_LOCATION);
         if (location == null) {
             throw new RuntimeException("WSDL location property is unavailable");
@@ -131,7 +131,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         factory.setServiceClass(iClass);
         factory.setAddress(address != null ? address : "/");
         factory.getServiceFactory().setDataBinding(databinding);
-        factory.setServiceBean(callingContext.getService(sref));
+        factory.setServiceBean(serviceBean);
 
         addWsInterceptorsFeaturesProps(factory, callingContext, sd);
 

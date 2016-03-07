@@ -191,7 +191,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Constants.WS_ADDRESS_PROPERTY, "http://alternate_host:80/myString");
 
-        Endpoint exportResult = p.exportService(sref, props, String.class.getName());
+        Endpoint exportResult = p.exportService(sref, props, new Class[]{String.class});
         Map<String, Object> edProps = exportResult.description().getProperties();
 
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
@@ -255,7 +255,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.replay(sref);
 
 
-        Endpoint result = handler.exportService(sref, properties, Runnable.class.getName());
+        Endpoint result = handler.exportService(sref, properties, new Class[]{Runnable.class});
         Map<String, Object> props = result.description().getProperties();
         assertEquals(expectedAddress, props.get("org.apache.cxf.ws.address"));
         assertEquals("Version of java. package is always 0", "0.0.0", props.get("endpoint.package.version.java.lang"));
@@ -289,7 +289,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Runnable myService = EasyMock.createMock(Runnable.class);
         EasyMock.replay(myService);
         try {
-            handler.exportService(sref, props, Runnable.class.getName());
+            handler.exportService(sref, props, new Class[]{Runnable.class});
             fail("Expected TestException");
         } catch (TestException e) {
             // Expected
@@ -390,7 +390,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         c.replay();
         ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(sref, sd, 
-                                                                           MyJaxWsEchoService.class.getName());
+                                                                           new Class[]{MyJaxWsEchoService.class});
         c.verify();
 
         org.apache.cxf.endpoint.Endpoint ep = serverWrapper.getServer().getEndpoint();
@@ -413,7 +413,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         c.replay();
         ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(sref, sd, 
-                                                                          MySimpleEchoService.class.getName());
+                                                                          new Class[]{MySimpleEchoService.class});
         c.verify();
 
         org.apache.cxf.endpoint.Endpoint ep = serverWrapper.getServer().getEndpoint();

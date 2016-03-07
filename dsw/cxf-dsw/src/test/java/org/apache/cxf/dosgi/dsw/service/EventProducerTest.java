@@ -24,7 +24,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.cxf.dosgi.dsw.handlers.ServerWrapper;
+import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Assert;
@@ -113,9 +113,12 @@ public class EventProducerTest {
         EasyMock.expect(bc.getAllServiceReferences(EventAdmin.class.getName(), null))
             .andReturn(new ServiceReference[] {eaSref}).anyTimes();
         EasyMock.expect(bc.getService(eaSref)).andReturn(ea).anyTimes();
+        Endpoint endpoint = EasyMock.mock(Endpoint.class);
+        EasyMock.expect(endpoint.description()).andReturn(epd);
+        EasyMock.replay(endpoint);
         EasyMock.replay(bc);
         EventProducer eventProducer = new EventProducer(bc);
-        ServerWrapper endpoint = new ServerWrapper(epd, null);
+
         ExportRegistrationImpl ereg = new ExportRegistrationImpl(sref, endpoint, remoteServiceAdminCore);
         eventProducer.publishNotification(ereg);
     }

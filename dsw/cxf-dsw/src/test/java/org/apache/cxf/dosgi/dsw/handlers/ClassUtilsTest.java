@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.dsw.util;
+package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.cxf.dosgi.dsw.handlers.ClassUtils;
+import org.apache.cxf.dosgi.dsw.util.Provider;
 import org.easymock.EasyMock;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;

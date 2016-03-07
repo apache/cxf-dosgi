@@ -56,7 +56,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
     }
 
     public Object importEndpoint(BundleContext consumerContext,
-                              Class<?>[] interfaces,
+                              Class[] interfaces,
                               EndpointDescription endpoint) {
         Class<?> iClass = interfaces[0];
         String address = getPojoAddress(endpoint, iClass);
@@ -111,12 +111,12 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
 
     public Endpoint exportService(ServiceReference<?> sref,
                                      Map<String, Object> sd,
-                                     String exportedInterface) throws IntentUnsatisfiedException {
+                                     Class[] exportedInterfaces) throws IntentUnsatisfiedException {
         BundleContext callingContext = sref.getBundle().getBundleContext();
         Object serviceBean = callingContext.getService(sref);
-        Class<?> iClass = ClassUtils.getInterfaceClass(serviceBean, exportedInterface);
         String contextRoot = getServletContextRoot(sd);
         String address;
+        Class<?> iClass = exportedInterfaces[0];
         if (contextRoot == null) {
             address = getServerAddress(sd, iClass);
         } else {

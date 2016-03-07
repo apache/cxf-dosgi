@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.dsw.handlers;
+package org.apache.cxf.dosgi.dsw.service;
+
 
 
 import java.util.HashMap;
@@ -25,19 +26,18 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
-import org.apache.cxf.dosgi.dsw.api.Endpoint;
-import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
-import org.apache.cxf.dosgi.dsw.service.ClientServiceFactory;
-import org.apache.cxf.dosgi.dsw.service.ImportRegistrationImpl;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
+
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.isA;
+
 
 public class ClientServiceFactoryTest extends TestCase {
 
@@ -57,6 +57,7 @@ public class ClientServiceFactoryTest extends TestCase {
         EasyMock.expect(requestingBundle.getBundleContext()).andReturn(requestingContext);
         ServiceRegistration sreg = control.createMock(ServiceRegistration.class);
 
+
         DistributionProvider handler = mockDistributionProvider(myTestProxyObject);
         control.replay();
 
@@ -69,27 +70,13 @@ public class ClientServiceFactoryTest extends TestCase {
      * @param myTestProxyObject
      * @return
      */
-    private DistributionProvider mockDistributionProvider(final Object myTestProxyObject) {
-        return new DistributionProvider() {
-            
-            @Override
-            public Object importEndpoint(BundleContext consumerContext, Class<?>[] interfaces,
-                                         EndpointDescription endpoint)
-                throws IntentUnsatisfiedException {
-                return myTestProxyObject;
-            }
-            
-            @Override
-            public String[] getSupportedTypes() {
-                return null;
-            }
-            
-            @Override
-            public Endpoint exportService(ServiceReference<?> sref, Map<String, Object> effectiveProperties,
-                                          String exportedInterface) {
-                return null;
-            }
-        };
+    private DistributionProvider mockDistributionProvider(final Object proxy) {
+        DistributionProvider handler = EasyMock.createMock(DistributionProvider.class);
+        EasyMock.expect(handler.importEndpoint(anyObject(BundleContext.class), 
+                                               isA(Class[].class), 
+                                               anyObject(EndpointDescription.class))).andReturn(proxy);
+        EasyMock.replay(handler);
+        return handler;
     }
 
     private EndpointDescription createTestEndpointDesc() {

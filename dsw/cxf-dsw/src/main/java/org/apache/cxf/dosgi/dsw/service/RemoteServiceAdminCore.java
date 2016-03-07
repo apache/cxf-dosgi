@@ -98,39 +98,48 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         }
         Map<String, Object> key = makeKey(serviceProperties);
 
-        List<String> interfaces = getInterfaces(serviceProperties);
+        List<String> interfaceNames = getInterfaceNames(serviceProperties);
 
         if (isImportedService(serviceReference)) {
             return Collections.emptyList();
         }
 
-        List<ExportRegistration> exportRegs = getExistingRegs(key, interfaces);
+        List<ExportRegistration> exportRegs = getExistingAndLock(key, interfaceNames);
         if (exportRegs != null) {
             return exportRegs;
         }
 
         try {
-            // do the export
-            exportRegs = exportInterfaces(interfaces, serviceReference, serviceProperties);
-            if (!exportRegs.isEmpty()) {
-                // enlist initial export registrations in global list of exportRegistrations
-                synchronized (exportedServices) {
-                    exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
-                }
-                eventProducer.publishNotification(exportRegs);
-            }
+            ExportRegistration exportReg = exportService(interfaceNames, serviceReference, serviceProperties);
+            exportRegs = new ArrayList<>();
+            exportRegs.add(exportReg);
+            store(key, exportRegs);
             return exportRegs;
         } finally {
-            synchronized (exportedServices) {
-                if (exportedServices.get(key) == exportInProgress) {
-                    exportedServices.remove(key);
-                }
-                exportedServices.notifyAll(); // in any case, always notify waiting threads
-            }
+            unlock(key);
         }
     }
 
-    private List<ExportRegistration> getExistingRegs(Map<String, Object> key, List<String> interfaces) {
+    private void store(Map<String, Object> key, List<ExportRegistration> exportRegs) {
+        if (!exportRegs.isEmpty()) {
+            // enlist initial export registrations in global list of exportRegistrations
+            synchronized (exportedServices) {
+                exportedServices.put(key, new ArrayList<ExportRegistration>(exportRegs));
+            }
+            eventProducer.publishNotification(exportRegs);
+        }
+    }
+
+    private void unlock(Map<String, Object> key) {
+        synchronized (exportedServices) {
+            if (exportedServices.get(key) == exportInProgress) {
+                exportedServices.remove(key);
+            }
+            exportedServices.notifyAll(); // in any case, always notify waiting threads
+        }
+    }
+
+    private List<ExportRegistration> getExistingAndLock(Map<String, Object> key, List<String> interfaces) {
         synchronized (exportedServices) {
             // check if it is already exported...
             Collection<ExportRegistration> existingRegs = exportedServices.get(key);
@@ -158,26 +167,25 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         return null;
     }
 
-    private List<ExportRegistration> exportInterfaces(List<String> interfaces,
+    private ExportRegistration exportService(List<String> interfaceNames,
             ServiceReference<?> serviceReference, Map<String, Object> serviceProperties) {
-        LOG.info("interfaces selected for export: " + interfaces);
-        List<ExportRegistration> exportRegs = new ArrayList<ExportRegistration>(1);
-        for (String iface : interfaces) {
-            ExportRegistrationImpl exportRegistration;
-            try {
-                LOG.info("creating server for interface " + iface);
-                Endpoint endpoint = provider.exportService(serviceReference, serviceProperties, iface);
-                exportRegistration = new ExportRegistrationImpl(serviceReference, endpoint, this);
-                LOG.info("created server for interface " + iface);
-            } catch (Exception e) {
-                LOG.debug("failed to create server for interface " + iface, e);
-                serviceProperties.put(RemoteConstants.ENDPOINT_ID, "failed");
-                serviceProperties.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "none");
-                exportRegistration = new ExportRegistrationImpl(this, e);
-            }
-            exportRegs.add(exportRegistration);
+        LOG.info("interfaces selected for export: " + interfaceNames);
+        try {
+            Class<?>[] interfaces = getInterfaces(interfaceNames, serviceReference.getBundle());
+            Endpoint endpoint = provider.exportService(serviceReference, serviceProperties, interfaces);
+            return new ExportRegistrationImpl(serviceReference, endpoint, this);
+        } catch (Exception e) {
+            return new ExportRegistrationImpl(this, e);
         }
-        return exportRegs;
+    }
+    
+    private Class<?>[] getInterfaces(List<String> interfaceNames, 
+                                         Bundle serviceBundle) throws ClassNotFoundException {
+        List<Class<?>> interfaces = new ArrayList<>();
+        for (String interfaceName : interfaceNames) {
+            interfaces.add(serviceBundle.loadClass(interfaceName));
+        }
+        return interfaces.toArray(new Class[]{});
     }
 
     /**
@@ -190,7 +198,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
      * @see org.osgi.framework.Constants#OBJECTCLASS
      * @see RemoteConstants#SERVICE_EXPORTED_INTERFACES
      */
-    private List<String> getInterfaces(Map<String, Object> serviceProperties) {
+    private List<String> getInterfaceNames(Map<String, Object> serviceProperties) {
         String[] providedInterfaces = (String[])serviceProperties.get(org.osgi.framework.Constants.OBJECTCLASS);
         if (providedInterfaces == null || providedInterfaces.length == 0) {
             throw new IllegalArgumentException("service is missing the objectClass property");
@@ -325,12 +333,6 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             
             if (matchingInterfaces.size() == 0) {
                 LOG.info("No matching interfaces found for remote endpoint {}.", endpoint.getId());
-                return null;
-            }
-            if (matchingInterfaces.size() > 1) {
-                LOG.info("More than one interface {} found for remote endpoint {}. This is not supported.", 
-                         endpoint.getInterfaces(),
-                         endpoint.getId());
                 return null;
             }
             

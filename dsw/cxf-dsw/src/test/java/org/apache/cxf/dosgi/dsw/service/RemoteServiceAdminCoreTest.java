@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.service;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,13 +30,6 @@ import java.util.Map;
 
 import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
-import org.apache.cxf.dosgi.dsw.handlers.CXFDistributionProvider;
-import org.apache.cxf.dosgi.dsw.handlers.HttpServiceManager;
-import org.apache.cxf.dosgi.dsw.handlers.ServerWrapper;
-import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
-import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
-import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
@@ -52,6 +46,8 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.isA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -62,6 +58,8 @@ import static org.junit.Assert.assertTrue;
     "rawtypes", "unchecked"
    })
 public class RemoteServiceAdminCoreTest {
+
+    private static final String MYCONFIG = "myconfig";
 
     @Test
     public void testDontExportOwnServiceProxies() throws InvalidSyntaxException {
@@ -116,43 +114,29 @@ public class RemoteServiceAdminCoreTest {
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(b.getSymbolicName()).andReturn("BundleName").anyTimes();
 
-        Map<String, Object> p = new HashMap<String, Object>();
-        p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
-        p.put(Constants.OBJECTCLASS, new String[] {
-            "es.schaaf.my.class"
-        });
-        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "unsupportedConfiguration");
-        EndpointDescription endpoint = new EndpointDescription(p);
-        IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
-        IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
-        HttpServiceManager httpServiceManager = c.createMock(HttpServiceManager.class);
-        CXFDistributionProvider provider = new CXFDistributionProvider(bc, intentManager, httpServiceManager);
+        EndpointDescription endpoint = creatEndpointDesc("unsupportedConfiguration");
+
+        DistributionProvider provider = c.createMock(DistributionProvider.class);
+        EasyMock.expect(provider.getSupportedTypes())
+            .andReturn(new String[]{MYCONFIG}).atLeastOnce();
         c.replay();
 
-        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, provider) {
-            @Override
-            protected ImportRegistrationImpl exposeServiceFactory(String interfaceName, 
-                                                                      EndpointDescription epd,
-                                                                      DistributionProvider handler) {
-                return new ImportRegistrationImpl(epd, this);
-            }
-        };
+        RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, provider);
 
         // must be null as the endpoint doesn't contain any usable configurations
         assertNull(rsaCore.importService(endpoint));
         // must be empty
         assertEquals(0, rsaCore.getImportedEndpoints().size());
 
-        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, org.apache.cxf.dosgi.dsw.Constants.WS_CONFIG_TYPE);
-        endpoint = new EndpointDescription(p);
+        EndpointDescription endpoint2 = creatEndpointDesc(MYCONFIG);
 
-        ImportRegistration ireg = rsaCore.importService(endpoint);
+        ImportRegistration ireg = rsaCore.importService(endpoint2);
         assertNotNull(ireg);
 
         assertEquals(1, rsaCore.getImportedEndpoints().size());
 
         // lets import the same endpoint once more -> should get a copy of the ImportRegistration
-        ImportRegistration ireg2 = rsaCore.importService(endpoint);
+        ImportRegistration ireg2 = rsaCore.importService(endpoint2);
         assertNotNull(ireg2);
         assertEquals(2, rsaCore.getImportedEndpoints().size());
 
@@ -172,6 +156,17 @@ public class RemoteServiceAdminCoreTest {
         assertEquals(0, rsaCore.getImportedEndpoints().size());
 
         c.verify();
+    }
+
+    private EndpointDescription creatEndpointDesc(String configType) {
+        Map<String, Object> p = new HashMap<String, Object>();
+        p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
+        p.put(Constants.OBJECTCLASS, new String[] {
+            "es.schaaf.my.class"
+        });
+        p.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, configType);
+        EndpointDescription endpoint = new EndpointDescription(p);
+        return endpoint;
     }
 
     @Test
@@ -208,10 +203,22 @@ public class RemoteServiceAdminCoreTest {
         Map<String, Object> eProps = new HashMap<String, Object>(sProps);
         eProps.put("endpoint.id", "http://something");
         eProps.put("service.imported.configs", new String[] {"org.apache.cxf.ws"});
-        Endpoint er = new ServerWrapper(new EndpointDescription(eProps), null);
+        final EndpointDescription epd = new EndpointDescription(eProps);
+        Endpoint er = new Endpoint() {
+            
+            @Override
+            public void close() throws IOException {
+            }
+            
+            @Override
+            public EndpointDescription description() {
+                return epd;
+            }
+        };
 
-        DistributionProvider handler = EasyMock.createNiceMock(DistributionProvider.class);
-        EasyMock.expect(handler.exportService(sref, sProps, Runnable.class.getName())).andReturn(er).once();
+        DistributionProvider handler = EasyMock.createMock(DistributionProvider.class);
+        EasyMock.expect(handler.exportService(anyObject(ServiceReference.class), 
+                                              anyObject(Map.class), isA(Class[].class))).andReturn(er);
         EasyMock.replay(handler);
 
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handler);
@@ -301,7 +308,8 @@ public class RemoteServiceAdminCoreTest {
         eProps.put("service.imported.configs", new String[] {"org.apache.cxf.ws"});
 
         DistributionProvider handler = EasyMock.createMock(DistributionProvider.class);
-        EasyMock.expect(handler.exportService(sref, sProps, Runnable.class.getName())).andThrow(new TestException());
+        EasyMock.expect(handler.exportService(anyObject(ServiceReference.class), 
+                                              anyObject(Map.class), isA(Class[].class))).andThrow(new TestException());
         EasyMock.replay(handler);
 
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(bc, handler);
@@ -322,11 +330,12 @@ public class RemoteServiceAdminCoreTest {
 
     }
 
-    private ServiceReference mockServiceReference(final Map<String, Object> sProps) {
+    private ServiceReference mockServiceReference(final Map<String, Object> sProps) throws ClassNotFoundException {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
 
         Bundle b = EasyMock.createNiceMock(Bundle.class);
         EasyMock.expect(b.getBundleContext()).andReturn(bc).anyTimes();
+        EasyMock.expect((Class)b.loadClass(Runnable.class.getName())).andReturn(Runnable.class);
         EasyMock.replay(b);
 
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
@@ -349,6 +358,7 @@ public class RemoteServiceAdminCoreTest {
     private static class TestException extends RuntimeException {
     }
     
+    @Test
     public void testOverlayProperties() {
         Map<String, Object> sProps = new HashMap<String, Object>();
         Map<String, Object> aProps = new HashMap<String, Object>();
@@ -378,5 +388,104 @@ public class RemoteServiceAdminCoreTest {
                 Arrays.equals(new String[] {"X"}, (Object[]) sProps.get(Constants.OBJECTCLASS)));
         assertEquals("Should not be possible to override the service.id property",
                 17L, sProps.get(Constants.SERVICE_ID));
+    }
+    
+    @Test
+    public void testOverlayProperties2() {
+        Map<String, Object> original = new HashMap<String, Object>();
+
+        original.put("MyProp", "my value");
+        original.put(Constants.OBJECTCLASS, "myClass");
+
+        Map<String, Object> copy = new HashMap<String, Object>();
+        copy.putAll(original);
+
+        // nothing should change here
+        Map<String, Object> overload = new HashMap<String, Object>();
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
+
+        assertEquals(original.size(), copy.size());
+        for (Object key : original.keySet()) {
+            assertEquals(original.get(key), copy.get(key));
+        }
+
+        copy.clear();
+        copy.putAll(original);
+
+        // a property should be added
+        overload = new HashMap<String, Object>();
+        overload.put("new", "prop");
+
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
+
+        assertEquals(original.size() + 1, copy.size());
+        for (Object key : original.keySet()) {
+            assertEquals(original.get(key), copy.get(key));
+        }
+        assertNotNull(overload.get("new"));
+        assertEquals("prop", overload.get("new"));
+
+        copy.clear();
+        copy.putAll(original);
+
+        // only one property should be added
+        overload = new HashMap<String, Object>();
+        overload.put("new", "prop");
+        overload.put("NEW", "prop");
+
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
+
+        assertEquals(original.size() + 1, copy.size());
+        for (Object key : original.keySet()) {
+            assertEquals(original.get(key), copy.get(key));
+        }
+        assertNotNull(overload.get("new"));
+        assertEquals("prop", overload.get("new"));
+
+        copy.clear();
+        copy.putAll(original);
+
+        // nothing should change here
+        overload = new HashMap<String, Object>();
+        overload.put(Constants.OBJECTCLASS, "assd");
+        overload.put(Constants.SERVICE_ID, "asasdasd");
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
+
+        assertEquals(original.size(), copy.size());
+        for (Object key : original.keySet()) {
+            assertEquals(original.get(key), copy.get(key));
+        }
+
+        copy.clear();
+        copy.putAll(original);
+
+        // overwrite own prop
+        overload = new HashMap<String, Object>();
+        overload.put("MyProp", "newValue");
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
+
+        assertEquals(original.size(), copy.size());
+        for (Object key : original.keySet()) {
+            if (!"MyProp".equals(key)) {
+                assertEquals(original.get(key), copy.get(key));
+            }
+        }
+        assertEquals("newValue", copy.get("MyProp"));
+
+        copy.clear();
+        copy.putAll(original);
+
+        // overwrite own prop in different case
+        overload = new HashMap<String, Object>();
+        overload.put("MYPROP", "newValue");
+        RemoteServiceAdminCore.overlayProperties(copy, overload);
+
+        assertEquals(original.size(), copy.size());
+        for (Object key : original.keySet()) {
+            if (!"MyProp".equals(key)) {
+                assertEquals(original.get(key), copy.get(key));
+            }
+        }
+        assertEquals("newValue", copy.get("MyProp"));
     }
 }
