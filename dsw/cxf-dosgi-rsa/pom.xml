@@ -31,7 +31,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>
-            <artifactId>cxf-dosgi-provider-api</artifactId>
+            <artifactId>cxf-dosgi-ri-provider-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 
