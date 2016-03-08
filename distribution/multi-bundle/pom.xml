@@ -66,6 +66,8 @@
               </descriptors>
               <features>
                 <feature>cxf-dosgi-base</feature>
+                <feature>cxf-dosgi-core</feature>
+                <feature>cxf-dosgi-provider-cxf</feature>
                 <feature>cxf-dosgi-discovery-distributed</feature>
                 <feature>cxf-dosgi-zookeeper-server</feature>
               </features>

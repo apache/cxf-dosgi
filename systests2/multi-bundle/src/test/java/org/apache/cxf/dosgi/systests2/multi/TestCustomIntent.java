@@ -23,8 +23,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
 import org.apache.cxf.dosgi.systests2.multi.customintent.AddGreetingPhraseInterceptor;
@@ -33,6 +31,7 @@ import org.apache.cxf.dosgi.systests2.multi.customintent.CustomIntentActivator;
 import org.apache.cxf.dosgi.systests2.multi.customintent.service.EmptyGreeterService;
 import org.apache.cxf.dosgi.systests2.multi.customintent.service.GreeterServiceWithCustomIntentActivator;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;

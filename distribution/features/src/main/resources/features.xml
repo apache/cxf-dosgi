@@ -16,6 +16,19 @@
     </feature>
 
     <feature name="cxf-dosgi-core" version="${project.version}">
+        <bundle start-level="8">mvn:${project.groupId}/cxf-dosgi-ri-osgi-api/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-provider-api/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-rsa/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-topology-manager/${project.version}</bundle>
+    </feature>
+    
+    <feature name="cxf-dosgi-provider-tcp" version="${project.version}">
+        <feature>cxf-dosgi-core</feature>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-tcp/${project.version}</bundle>
+    </feature>
+    
+    <feature name="cxf-dosgi-provider-cxf" version="${project.version}">
+        <feature>cxf-dosgi-core</feature>
         <feature>cxf-specs</feature>
         <feature>cxf-jaxws</feature>
         <feature>cxf-jaxrs</feature>
@@ -23,12 +36,9 @@
         <feature>cxf-http-jetty</feature>
         <feature>cxf-http</feature>
         <feature>http</feature>
-        <bundle start-level="8">mvn:${project.groupId}/cxf-dosgi-ri-osgi-api/${project.version}</bundle>
-        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-provider-api/${project.version}</bundle>
-        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-rsa/${project.version}</bundle>
-        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-topology-manager/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-dsw-cxf/${project.version}</bundle>
     </feature>
+    
 
     <feature name="cxf-dosgi-discovery-local" version="${project.version}">
         <feature>cxf-dosgi-core</feature>

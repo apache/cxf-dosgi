@@ -41,5 +41,6 @@
       <module>cxf-dosgi-provider-api</module>
       <module>cxf-dosgi-rsa</module>
       <module>cxf-dsw</module>
+      <module>cxf-dosgi-tcp</module>
     </modules>
 </project>
