@@ -19,7 +19,6 @@
 package org.apache.aries.rsa.provider.tcp;
 
 import java.io.Closeable;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,13 +33,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class TCPServer implements Closeable, Runnable {
+    private Logger log = LoggerFactory.getLogger(TCPServer.class);
     private ServerSocket serverSocket;
     private Object service;
     private boolean running;
     private ExecutorService executor;
 
-    public TCPServer(Object service, String localip, Integer port) {
+    public TCPServer(Object service, String localip, Integer port, int numThreads) {
         this.service = service;
         try {
             this.serverSocket = new ServerSocket(port);
@@ -49,7 +52,7 @@ public class TCPServer implements Closeable, Runnable {
         }
         this.running = true;
         this.executor = Executors.newCachedThreadPool();
-        for (int c = 0; c < 100; c++) {
+        for (int c = 0; c < numThreads; c++) {
             this.executor.execute(this);
         }
     }
@@ -57,8 +60,6 @@ public class TCPServer implements Closeable, Runnable {
     int getPort() {
         return this.serverSocket.getLocalPort();
     }
-    
-    
 
     public void run() {
         ClassLoader serviceCL = service.getClass().getClassLoader();
@@ -74,10 +75,8 @@ public class TCPServer implements Closeable, Runnable {
                 objectOutput.writeObject(result);
             } catch (SocketException e) {
                 running = false;
-            } catch (EOFException e) {
-                // This is normal
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("Error processing service call.", e);
             }
         }
     }

@@ -36,7 +36,7 @@ import org.osgi.framework.Constants;
 
 public class TcpProviderTest {
 
-    private static final int NUM_CALLS = 10000;
+    private static final int NUM_CALLS = 100;
     private MyService myServiceProxy;
     private Endpoint ep;
     
@@ -54,7 +54,7 @@ public class TcpProviderTest {
 
     @Test
     public void testPerf() throws IOException, InterruptedException {
-        //runPerfTest(myServiceProxy);
+        runPerfTest(myServiceProxy);
         String msg = "test";
         String result = myServiceProxy.echo(msg);
         Assert.assertEquals(msg, result);
@@ -81,7 +81,7 @@ public class TcpProviderTest {
             msg.append("testing123");
         }
         final String msg2 = msg.toString();
-        ExecutorService executor = Executors.newFixedThreadPool(100);
+        ExecutorService executor = Executors.newFixedThreadPool(10);
         Runnable task = new Runnable() {
             
             @Override
@@ -97,6 +97,6 @@ public class TcpProviderTest {
         executor.shutdown();
         executor.awaitTermination(100, TimeUnit.SECONDS);
         long tps = NUM_CALLS * 1000 / (System.currentTimeMillis() - start);
-        System.out.println(tps);
+        System.out.println(tps + " tps");
     }
 }
