@@ -95,8 +95,10 @@ public class TCPServer implements Closeable, Runnable {
 
     private Class<?>[] getTypes(Object[] args) {
         List<Class<?>> parameterTypes = new ArrayList<>();
-        for (Object arg : args) {
-            parameterTypes.add(arg.getClass());
+        if (args != null) {
+            for (Object arg : args) {
+                parameterTypes.add(arg.getClass());
+            }
         }
         Class<?>[] parameterTypesAr = parameterTypes.toArray(new Class[]{});
         return parameterTypesAr;

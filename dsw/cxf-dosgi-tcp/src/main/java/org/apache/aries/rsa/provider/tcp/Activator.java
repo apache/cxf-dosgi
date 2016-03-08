@@ -24,13 +24,16 @@ import java.util.Hashtable;
 import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) throws Exception {
         DistributionProvider provider = new TCPProvider();
-        Dictionary<String, ?> props = new Hashtable<>();
+        Dictionary<String, Object> props = new Hashtable<>();
+        props.put(RemoteConstants.REMOTE_INTENTS_SUPPORTED, new String[]{});
+        props.put(RemoteConstants.REMOTE_CONFIGS_SUPPORTED, provider.getSupportedTypes());
         context.registerService(DistributionProvider.class, provider, props);
     }
 

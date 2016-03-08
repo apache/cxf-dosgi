@@ -63,7 +63,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Activator>org.apache.cxf.dosgi.dsw.service.Activator</Bundle-Activator>
+                        <Bundle-Activator>org.apache.aries.rsa.provider.tcp.Activator</Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>

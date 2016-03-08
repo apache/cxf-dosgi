@@ -49,6 +49,8 @@ public class TcpInvocationHandler implements InvocationHandler {
             out.writeObject(args);
             out.flush();
             return parseResult(socket);
+        } catch (Exception  e) {
+            throw new RuntimeException("Error calling " + host + ":" + port + " method: " + method.getName(), e);
         }
     }
 
