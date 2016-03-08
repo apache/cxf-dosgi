@@ -89,7 +89,7 @@ public class HttpServiceManagerTest extends TestCase {
             }
         };
         Bus bus = BusFactory.newInstance().createBus();
-        h.registerServlet(bus, "/myService", dswContext, sr);
+        h.registerServlet(bus, "/myService", dswContext, 12345L);
 
         ServiceEvent event = new ServiceEvent(ServiceEvent.UNREGISTERING, sr);
         captured.getValue().serviceChanged(event);

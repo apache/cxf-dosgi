@@ -54,6 +54,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return new String[] {Constants.WSDL_CONFIG_TYPE};
     }
 
+    @SuppressWarnings("rawtypes")
     public Object importEndpoint(BundleContext consumerContext,
                               Class[] interfaces,
                               EndpointDescription endpoint) {
@@ -100,6 +101,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         return Service.create(wsdlAddress, serviceQname);
     }
 
+    @SuppressWarnings("rawtypes")
     public Endpoint exportService(ServiceReference<?> sref,
                                Map<String, Object> sd,
                                Class[] exportedInterfaces) {
@@ -125,8 +127,8 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         DataBinding databinding = new JAXBDataBinding();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
-        
-        Bus bus = createBus(sref, callingContext, contextRoot);
+        final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
+        Bus bus = createBus(sid, callingContext, contextRoot);
         factory.setBus(bus);
         factory.setServiceClass(iClass);
         factory.setAddress(address != null ? address : "/");
@@ -139,11 +141,10 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
 
-        // The properties for the EndpointDescription
-        Map<String, Object> endpointProps = createEndpointProps(sd, iClass,
-                                                                new String[]{Constants.WS_CONFIG_TYPE},
-                                                                address, intents);
-        return createServerFromFactory(factory, endpointProps);
+        EndpointDescription epd = createEndpointDesc(sd,
+                                                     new String[]{Constants.WS_CONFIG_TYPE},
+                                                     address, intents);
+        return createServerFromFactory(factory, epd);
     }
 
     private String getWsdlAddress(EndpointDescription endpoint, Class<?> iClass) {

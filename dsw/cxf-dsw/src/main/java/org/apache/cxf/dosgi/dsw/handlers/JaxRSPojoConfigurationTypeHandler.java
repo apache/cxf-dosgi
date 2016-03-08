@@ -38,6 +38,7 @@ import org.apache.cxf.jaxrs.model.UserResource;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         return new String[] {Constants.RS_CONFIG_TYPE};
     }
 
+    @SuppressWarnings("rawtypes")
     public Object importEndpoint(BundleContext consumerContext,
                               Class[] interfaces,
                               EndpointDescription endpoint) {
@@ -109,44 +111,45 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
         return getProxy(bean.create(), iClass);
     }
 
+    @SuppressWarnings("rawtypes")
     public Endpoint exportService(ServiceReference<?> sref,
-                                     Map<String, Object> sd,
+                                     Map<String, Object> endpointProps,
                                      Class[] exportedInterfaces) throws IntentUnsatisfiedException {
         BundleContext callingContext = sref.getBundle().getBundleContext();
         Object serviceBean = callingContext.getService(sref);
-        String contextRoot = getServletContextRoot(sd);
+        String contextRoot = getServletContextRoot(endpointProps);
         String address;
         Class<?> iClass = exportedInterfaces[0];
         if (contextRoot == null) {
-            address = getServerAddress(sd, iClass);
+            address = getServerAddress(endpointProps, iClass);
         } else {
-            address = getClientAddress(sd);
+            address = getClientAddress(endpointProps);
             if (address == null) {
                 address = "/";
             }
         }
-        Bus bus = createBus(sref, callingContext, contextRoot);
+        final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
+        Bus bus = createBus(sid, callingContext, contextRoot);
 
         LOG.info("Creating a " + iClass.getName()
                  + " endpoint via JaxRSPojoConfigurationTypeHandler, address is " + address);
 
-        JAXRSServerFactoryBean factory = createServerFactory(callingContext, sd, iClass, serviceBean, address, bus);
+        JAXRSServerFactoryBean factory = createServerFactory(callingContext, endpointProps, 
+                                                             iClass, serviceBean, address, bus);
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
 
-        // The properties for the EndpointDescription
-        Map<String, Object> endpointProps = createEndpointProps(sd, iClass, new String[] {Constants.RS_CONFIG_TYPE},
+        EndpointDescription epd = createEndpointDesc(endpointProps, new String[] {Constants.RS_CONFIG_TYPE},
                 completeEndpointAddress, new String[] {"HTTP"});
 
-        return createServerFromFactory(factory, endpointProps);
+        return createServerFromFactory(factory, epd);
     }
 
     private Endpoint createServerFromFactory(JAXRSServerFactoryBean factory,
-                                                       Map<String, Object> endpointProps) {
+                                                       EndpointDescription epd) {
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            EndpointDescription epd = new EndpointDescription(endpointProps);
             return new ServerWrapper(epd, server);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);

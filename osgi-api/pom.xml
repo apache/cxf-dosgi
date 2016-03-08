@@ -39,6 +39,14 @@
         <!-- the minimal set of OSGi Compendium packages that is required for DOSGi to run -->
         <required-packages>org.osgi.service.remoteserviceadmin,org.osgi.service.event</required-packages>
     </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -58,12 +66,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>

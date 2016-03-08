@@ -70,8 +70,7 @@ public class HttpServiceManager {
         return value == null ? defaultValue : value;
     }
 
-    public Bus registerServlet(Bus bus, String contextRoot, BundleContext callingContext,
-            ServiceReference<?> sref) {
+    public Bus registerServlet(Bus bus, String contextRoot, BundleContext callingContext, Long sid) {
         bus.setExtension(new DestinationRegistryImpl(), DestinationRegistry.class);
         CXFNonSpringServlet cxf = new CXFNonSpringServlet();
         cxf.setBus(bus);
@@ -79,7 +78,8 @@ public class HttpServiceManager {
             HttpService httpService = getHttpService();
             httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(),
                                        getHttpContext(callingContext, httpService));
-            registerUnexportHook(sref, contextRoot);
+
+            registerUnexportHook(sid, contextRoot);
 
             LOG.info("Successfully registered CXF DOSGi servlet at " + contextRoot);
         } catch (Exception e) {
@@ -113,8 +113,7 @@ public class HttpServiceManager {
      * @param sref the service reference to track
      * @param alias the HTTP servlet context alias
      */
-    private void registerUnexportHook(ServiceReference<?> sref, String alias) {
-        final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
+    private void registerUnexportHook(Long sid, String alias) {
         LOG.debug("Registering service listener for service with ID {}", sid);
 
         String previous = exportedAliases.put(sid, alias);

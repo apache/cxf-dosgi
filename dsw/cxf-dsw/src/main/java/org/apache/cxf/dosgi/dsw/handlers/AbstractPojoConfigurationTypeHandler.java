@@ -20,10 +20,8 @@ package org.apache.cxf.dosgi.dsw.handlers;
 
 import java.lang.reflect.Proxy;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -36,6 +34,7 @@ import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
+import org.apache.cxf.dosgi.dsw.util.StringPlus;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
@@ -45,15 +44,10 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPojoConfigurationTypeHandler implements DistributionProvider {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractPojoConfigurationTypeHandler.class);
     protected BundleContext bundleContext;
     protected IntentManager intentManager;
     protected HttpServiceManager httpServiceManager;
@@ -71,25 +65,11 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Distributi
         }, new ServiceInvocationHandler(serviceProxy, iType));
     }
 
-    protected Map<String, Object> createEndpointProps(Map<String, Object> sd, Class<?> iClass,
-                                                      String[] importedConfigs, String address, String[] intents) {
-        Map<String, Object> props = new HashMap<String, Object>();
-
-        copyEndpointProperties(sd, props);
-
-        String[] sa = new String[] {
-            iClass.getName()
-        };
-        String pkg = iClass.getPackage().getName();
-
-        props.remove(org.osgi.framework.Constants.SERVICE_ID);
-        props.put(org.osgi.framework.Constants.OBJECTCLASS, sa);
-        props.put(RemoteConstants.ENDPOINT_SERVICE_ID, sd.get(org.osgi.framework.Constants.SERVICE_ID));
-        String frameworkUUID = bundleContext.getProperty(org.osgi.framework.Constants.FRAMEWORK_UUID);
-        props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, frameworkUUID);
+    protected EndpointDescription createEndpointDesc(Map<String, Object> props, 
+                                                     String[] importedConfigs,
+                                                     String address, 
+                                                     String[] intents) {
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
-        props.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + pkg, OsgiUtils.getVersion(iClass, bundleContext));
-
         for (String configurationType : importedConfigs) {
             if (Constants.WS_CONFIG_TYPE.equals(configurationType)) {
                 props.put(Constants.WS_ADDRESS_PROPERTY, address);
@@ -100,26 +80,11 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Distributi
                 props.put(Constants.WS_ADDRESS_PROPERTY, address);
             }
         }
-
-        String[] allIntents = IntentUtils.mergeArrays(intents, IntentUtils.getIntentsImplementedByTheService(sd));
+        String[] sIntents = StringPlus.normalize(props.get(RemoteConstants.SERVICE_INTENTS));
+        String[] allIntents = IntentUtils.mergeArrays(intents, sIntents);
         props.put(RemoteConstants.SERVICE_INTENTS, allIntents);
         props.put(RemoteConstants.ENDPOINT_ID, address);
-        return props;
-    }
-
-    private void copyEndpointProperties(Map<String, Object> sd, Map<String, Object> endpointProps) {
-        Set<Map.Entry<String, Object>> keys = sd.entrySet();
-        for (Map.Entry<String, Object> entry : keys) {
-            try {
-                String skey = entry.getKey();
-                if (!skey.startsWith(".")) {
-                    endpointProps.put(skey, entry.getValue());
-                }
-            } catch (ClassCastException e) {
-                LOG.warn("ServiceProperties Map contained non String key. Skipped " + entry + "   "
-                         + e.getLocalizedMessage());
-            }
-        }
+        return new EndpointDescription(props);
     }
 
     protected void setCommonWsdlProperties(AbstractWSDLBasedEndpointFactory factory, BundleContext context,
@@ -199,20 +164,19 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Distributi
     }
 
     
-    protected Bus createBus(ServiceReference<?> sref, BundleContext callingContext, String contextRoot) {
+    protected Bus createBus(Long sid, BundleContext callingContext, String contextRoot) {
         Bus bus = BusFactory.newInstance().createBus();
         if (contextRoot != null) {
-            httpServiceManager.registerServlet(bus, contextRoot, callingContext, sref);
+            httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);
         }
         return bus;
     }
 
-    protected Endpoint createServerFromFactory(ServerFactoryBean factory, Map<String, Object> endpointProps) {
+    protected Endpoint createServerFromFactory(ServerFactoryBean factory, EndpointDescription epd) {
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            EndpointDescription epd = new EndpointDescription(endpointProps);
             return new ServerWrapper(epd, server);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);

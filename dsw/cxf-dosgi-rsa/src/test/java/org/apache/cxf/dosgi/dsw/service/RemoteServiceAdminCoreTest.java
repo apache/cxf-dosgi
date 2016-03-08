@@ -33,6 +33,7 @@ import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
+import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -41,6 +42,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.ImportRegistration;
@@ -55,7 +57,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({
-    "rawtypes", "unchecked"
+    "rawtypes", "unchecked", "deprecation"
    })
 public class RemoteServiceAdminCoreTest {
 
@@ -198,6 +200,8 @@ public class RemoteServiceAdminCoreTest {
         EasyMock.expect(bc.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(bc.createFilter("(service.id=51)"))
             .andReturn(FrameworkUtil.createFilter("(service.id=51)")).anyTimes();
+        EasyMock.expect(bc.getProperty(org.osgi.framework.Constants.FRAMEWORK_UUID)).andReturn("1111");
+        EasyMock.expect(bc.getServiceReference(PackageAdmin.class)).andReturn(null);
         EasyMock.replay(bc);
 
         Map<String, Object> eProps = new HashMap<String, Object>(sProps);
@@ -487,5 +491,25 @@ public class RemoteServiceAdminCoreTest {
             }
         }
         assertEquals("newValue", copy.get("MyProp"));
+    }
+    
+    @Test
+    public void testCreateEndpointProps() {
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.expect(bc.getProperty("org.osgi.framework.uuid")).andReturn("some_uuid1");
+        EasyMock.replay(bc);
+
+        Map<String, Object> sd = new HashMap<String, Object>();
+        sd.put(org.osgi.framework.Constants.SERVICE_ID, 42);
+        DistributionProvider provider = null;
+        RemoteServiceAdminCore rsa = new RemoteServiceAdminCore(bc, bc, provider);
+        Map<String, Object> props = rsa.createEndpointProps(sd, new Class[]{String.class});
+
+        Assert.assertFalse(props.containsKey(org.osgi.framework.Constants.SERVICE_ID));
+        assertEquals(42, props.get(RemoteConstants.ENDPOINT_SERVICE_ID));
+        assertEquals("some_uuid1", props.get(RemoteConstants.ENDPOINT_FRAMEWORK_UUID));
+        assertEquals(Arrays.asList("java.lang.String"),
+                     Arrays.asList((Object[]) props.get(org.osgi.framework.Constants.OBJECTCLASS)));
+        assertEquals("0.0.0", props.get("endpoint.package.version.java.lang"));
     }
 }

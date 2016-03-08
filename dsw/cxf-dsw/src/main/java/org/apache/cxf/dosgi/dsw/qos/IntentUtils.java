@@ -29,18 +29,12 @@ import java.util.Set;
 
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.util.StringPlus;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public final class IntentUtils {
 
     private IntentUtils() {
         // never constructed
-    }
-
-    public static String[] getIntentsImplementedByTheService(Map<String, Object> serviceProperties) {
-        // Get the Intents that are implemented by the service
-        return StringPlus.normalize(serviceProperties.get(RemoteConstants.SERVICE_INTENTS));
     }
 
     public static String[] mergeArrays(String[] a1, String[] a2) {

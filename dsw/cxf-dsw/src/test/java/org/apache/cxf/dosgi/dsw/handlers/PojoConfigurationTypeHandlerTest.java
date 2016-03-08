@@ -53,6 +53,7 @@ import org.junit.Assert;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
@@ -189,6 +190,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.replay(sref);
         
         Map<String, Object> props = new HashMap<String, Object>();
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{String.class.getName()});
         props.put(Constants.WS_ADDRESS_PROPERTY, "http://alternate_host:80/myString");
 
         Endpoint exportResult = p.exportService(sref, props, new Class[]{String.class});
@@ -221,6 +223,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     }
 
     private void runAddressingTest(Map<String, Object> properties, String expectedAddress) throws Exception {
+        properties.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{Runnable.class.getName()});
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
         String expectedUUID = UUID.randomUUID().toString();
         EasyMock.expect(dswContext.getProperty(org.osgi.framework.Constants.FRAMEWORK_UUID)).andReturn(expectedUUID);
@@ -234,8 +237,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                                                                                 dummyHttpServiceManager()) {
             @Override
             protected Endpoint createServerFromFactory(ServerFactoryBean factory,
-                                                           Map<String, Object> endpointProps) {
-                EndpointDescription epd = new EndpointDescription(endpointProps);
+                                                       EndpointDescription epd) {
                 return new ServerWrapper(epd, null);
             }
         };
@@ -258,10 +260,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Endpoint result = handler.exportService(sref, properties, new Class[]{Runnable.class});
         Map<String, Object> props = result.description().getProperties();
         assertEquals(expectedAddress, props.get("org.apache.cxf.ws.address"));
-        assertEquals("Version of java. package is always 0", "0.0.0", props.get("endpoint.package.version.java.lang"));
         assertTrue(Arrays.equals(new String[] {"org.apache.cxf.ws"}, (String[]) props.get("service.imported.configs")));
         assertTrue(Arrays.equals(new String[] {"java.lang.Runnable"}, (String[]) props.get("objectClass")));
-        assertEquals(expectedUUID, props.get("endpoint.framework.uuid"));
     }
 
     public void t2estCreateServerException() {
@@ -276,7 +276,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                                                                                 dummyHttpServiceManager()) {
             @Override
             protected Endpoint createServerFromFactory(ServerFactoryBean factory,
-                                                           Map<String, Object> endpointProps) {
+                                                       EndpointDescription epd) {
                 throw new TestException();
             }
         };
@@ -359,20 +359,15 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         Map<String, Object> sd = new HashMap<String, Object>();
         sd.put(org.osgi.framework.Constants.SERVICE_ID, 42);
-        Map<String, Object> props = pch.createEndpointProps(sd, String.class, new String[] {"org.apache.cxf.ws"},
+        sd.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{String.class.getName()});
+        EndpointDescription epd = pch.createEndpointDesc(sd, new String[] {"org.apache.cxf.ws"},
                 "http://localhost:12345", new String[] {"my_intent", "your_intent"});
 
-        assertFalse(props.containsKey(org.osgi.framework.Constants.SERVICE_ID));
-        assertEquals(42, props.get(RemoteConstants.ENDPOINT_SERVICE_ID));
-        assertEquals("some_uuid1", props.get(RemoteConstants.ENDPOINT_FRAMEWORK_UUID));
-        assertEquals("http://localhost:12345", props.get(RemoteConstants.ENDPOINT_ID));
-        assertEquals(Arrays.asList("java.lang.String"),
-                     Arrays.asList((Object[]) props.get(org.osgi.framework.Constants.OBJECTCLASS)));
-        assertEquals(Arrays.asList("org.apache.cxf.ws"),
-                     Arrays.asList((Object[]) props.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS)));
-        assertEquals(Arrays.asList("my_intent", "your_intent"),
-                     Arrays.asList((Object[]) props.get(RemoteConstants.SERVICE_INTENTS)));
-        assertEquals("0.0.0", props.get("endpoint.package.version.java.lang"));
+        assertEquals("http://localhost:12345", epd.getId());
+        assertEquals(Arrays.asList("java.lang.String"), epd.getInterfaces());
+        assertEquals(Arrays.asList("org.apache.cxf.ws"), epd.getConfigurationTypes());
+        assertEquals(Arrays.asList("my_intent", "your_intent"), epd.getIntents());
+        assertEquals(new Version("0.0.0"), epd.getPackageVersion("java.lang"));
     }
 
     public void t2estCreateJaxWsEndpointWithoutIntents() {

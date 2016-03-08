@@ -174,7 +174,8 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         LOG.info("interfaces selected for export: " + interfaceNames);
         try {
             Class<?>[] interfaces = getInterfaces(interfaceNames, serviceReference.getBundle());
-            Endpoint endpoint = provider.exportService(serviceReference, serviceProperties, interfaces);
+            Map<String, Object> eprops = createEndpointProps(serviceProperties, interfaces);
+            Endpoint endpoint = provider.exportService(serviceReference, eprops, interfaces);
             return new ExportRegistrationImpl(serviceReference, endpoint, this);
         } catch (Exception e) {
             return new ExportRegistrationImpl(this, e);
@@ -549,5 +550,39 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
             props.put(key, val);
         }
         return props;
+    }
+    
+    protected Map<String, Object> createEndpointProps(Map<String, Object> sd, 
+                                                      Class<?>[] ifaces) {
+        Map<String, Object> props = new HashMap<String, Object>();
+        copyEndpointProperties(sd, props);
+        props.remove(org.osgi.framework.Constants.SERVICE_ID);
+        props.put(org.osgi.framework.Constants.OBJECTCLASS, getClassNames(ifaces));
+        props.put(RemoteConstants.ENDPOINT_SERVICE_ID, sd.get(org.osgi.framework.Constants.SERVICE_ID));
+        String frameworkUUID = bctx.getProperty(org.osgi.framework.Constants.FRAMEWORK_UUID);
+        props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, frameworkUUID);
+        for (Class<?> iface : ifaces) {
+            String pkg = iface.getPackage().getName();
+            props.put(RemoteConstants.ENDPOINT_PACKAGE_VERSION_ + pkg, PackageUtil.getVersion(iface, bctx));
+        }
+        return props;
+    }
+
+    private String[] getClassNames(Class<?>[] ifaces) {
+        List<String> ifaceNames = new ArrayList<String>();
+        for (Class<?> iface : ifaces) {
+            ifaceNames.add(iface.getName());
+        }
+        return ifaceNames.toArray(new String[]{});
+    }
+
+    private void copyEndpointProperties(Map<String, Object> sd, Map<String, Object> endpointProps) {
+        Set<Map.Entry<String, Object>> keys = sd.entrySet();
+        for (Map.Entry<String, Object> entry : keys) {
+            String skey = entry.getKey();
+            if (!skey.startsWith(".")) {
+                endpointProps.put(skey, entry.getValue());
+            }
+        }
     }
 }
