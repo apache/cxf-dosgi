@@ -21,6 +21,7 @@ package org.apache.cxf.dosgi.topologymanager.exporter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
@@ -129,6 +130,20 @@ public class EndpointListenerNotifier {
         }
     }
 
+    /**
+     * Retrieves an endpoint's properties as a Dictionary.
+     *
+     * @param endpoint an endpoint description
+     * @return endpoint properties (will never return null)
+     */
+    public static Dictionary<String, Object> getEndpointProperties(EndpointDescription endpoint) {
+        if (endpoint == null || endpoint.getProperties() == null) {
+            return new Hashtable<String, Object>();
+        } else {
+            return new Hashtable<String, Object>(endpoint.getProperties());
+        }
+    }
+
     static List<Filter> getFiltersFromEndpointListenerScope(ServiceReference sref, BundleContext bctx) {
         List<Filter> filters = new ArrayList<Filter>();
         String[] scopes = Utils.getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
@@ -144,7 +159,7 @@ public class EndpointListenerNotifier {
 
     private static List<Filter> getMatchingFilters(List<Filter> filters, EndpointDescription endpoint) {
         List<Filter> matchingFilters = new ArrayList<Filter>();
-        Dictionary<String, Object> dict = Utils.getEndpointProperties(endpoint);
+        Dictionary<String, Object> dict = EndpointListenerNotifier.getEndpointProperties(endpoint);
 
         for (Filter filter : filters) {
             if (filter.match(dict)) {

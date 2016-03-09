@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.cxf.dosgi.topologymanager.util.Utils;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.hooks.service.ListenerHook;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
@@ -114,6 +115,7 @@ public class ListenerHookImpl implements ListenerHook {
     }
 
     static String extendFilter(String filter, BundleContext bctx) {
-        return "(&" + filter + "(!(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID + "=" + Utils.getUUID(bctx) + ")))";
+        String uuid = bctx.getProperty(Constants.FRAMEWORK_UUID);
+        return "(&" + filter + "(!(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID + "=" + uuid + ")))";
     }
 }
