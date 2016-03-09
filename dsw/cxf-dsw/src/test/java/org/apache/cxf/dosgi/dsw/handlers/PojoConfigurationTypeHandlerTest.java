@@ -30,6 +30,7 @@ import junit.framework.TestCase;
 
 import org.apache.cxf.dosgi.dsw.Constants;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
+import org.apache.cxf.dosgi.dsw.api.EndpointHelper;
 import org.apache.cxf.dosgi.dsw.handlers.jaxws.MyJaxWsEchoService;
 import org.apache.cxf.dosgi.dsw.handlers.simple.MySimpleEchoService;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
@@ -50,16 +51,11 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-@SuppressWarnings({
-    "unchecked", "rawtypes"
-   })
 public class PojoConfigurationTypeHandlerTest extends TestCase {
 
     public void testGetPojoAddressEndpointURI() {
@@ -135,23 +131,25 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
             }
         };
 
+        Class<?>[] exportedInterfaces = new Class[]{Runnable.class};
+        
         Map<String, Object> props = new HashMap<String, Object>();
-
         props.put(RemoteConstants.ENDPOINT_ID, "http://google.de/");
-        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{"my.class"});
+        EndpointHelper.addObjectClass(props, exportedInterfaces);
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, new String[]{"my.config"});
         EndpointDescription endpoint = new EndpointDescription(props);
 
         cpfb.setAddress((String)EasyMock.eq(props.get(RemoteConstants.ENDPOINT_ID)));
         EasyMock.expectLastCall().atLeastOnce();
 
-        cpfb.setServiceClass(EasyMock.eq(CharSequence.class));
+        cpfb.setServiceClass(EasyMock.eq(Runnable.class));
         EasyMock.expectLastCall().atLeastOnce();
 
         c.replay();
-        Object proxy = p.importEndpoint(requestingContext, new Class<?>[]{CharSequence.class}, endpoint);
+        ClassLoader cl = null;
+        Object proxy = p.importEndpoint(cl, requestingContext, exportedInterfaces, endpoint);
         assertNotNull(proxy);
-        assertTrue("Proxy is not of the requested type! ", proxy instanceof CharSequence);
+        assertTrue("Proxy is not of the requested type! ", proxy instanceof Runnable);
         c.verify();
     }
 
@@ -177,23 +175,15 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                 return sfb;
             }
         };
-        ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
-        
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
-        EasyMock.expect(bundleContext.getService(sref)).andReturn(myService);
         EasyMock.replay(bundleContext);
-        Bundle bundle = EasyMock.createNiceMock(Bundle.class);
-        EasyMock.expect(bundle.getBundleContext()).andReturn(bundleContext);
-        EasyMock.replay(bundle);
-
-        EasyMock.expect(sref.getBundle()).andReturn(bundle);
-        EasyMock.replay(sref);
         
+        Class<?>[] exportedInterface = new Class[]{String.class};
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{String.class.getName()});
+        EndpointHelper.addObjectClass(props, exportedInterface);
         props.put(Constants.WS_ADDRESS_PROPERTY, "http://alternate_host:80/myString");
 
-        Endpoint exportResult = p.exportService(sref, props, new Class[]{String.class});
+        Endpoint exportResult = p.exportService(myService, bundleContext, props, exportedInterface);
         Map<String, Object> edProps = exportResult.description().getProperties();
 
         assertNotNull(edProps.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
@@ -223,7 +213,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     }
 
     private void runAddressingTest(Map<String, Object> properties, String expectedAddress) throws Exception {
-        properties.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{Runnable.class.getName()});
+        Class<?>[] exportedInterface = new Class[]{Runnable.class};
+        EndpointHelper.addObjectClass(properties, exportedInterface);
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
         String expectedUUID = UUID.randomUUID().toString();
         EasyMock.expect(dswContext.getProperty(org.osgi.framework.Constants.FRAMEWORK_UUID)).andReturn(expectedUUID);
@@ -244,24 +235,16 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Runnable myService = EasyMock.createMock(Runnable.class);
         EasyMock.replay(myService);
         
-        ServiceReference sref = EasyMock.createNiceMock(ServiceReference.class);
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
-        EasyMock.expect(bundleContext.getService(sref)).andReturn(myService);
-        
         EasyMock.replay(bundleContext);
-        Bundle bundle = EasyMock.createNiceMock(Bundle.class);
-        EasyMock.expect(bundle.getBundleContext()).andReturn(bundleContext);
-        EasyMock.replay(bundle);
 
-        EasyMock.expect(sref.getBundle()).andReturn(bundle);
-        EasyMock.replay(sref);
-
-
-        Endpoint result = handler.exportService(sref, properties, new Class[]{Runnable.class});
+        Endpoint result = handler.exportService(myService, bundleContext, properties, exportedInterface);
         Map<String, Object> props = result.description().getProperties();
         assertEquals(expectedAddress, props.get("org.apache.cxf.ws.address"));
-        assertTrue(Arrays.equals(new String[] {"org.apache.cxf.ws"}, (String[]) props.get("service.imported.configs")));
-        assertTrue(Arrays.equals(new String[] {"java.lang.Runnable"}, (String[]) props.get("objectClass")));
+        Assert.assertArrayEquals(new String[] {"org.apache.cxf.ws"}, 
+                     (String[]) props.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
+        Assert.assertArrayEquals(new String[] {"java.lang.Runnable"}, 
+                     (String[]) props.get(org.osgi.framework.Constants.OBJECTCLASS));
     }
 
     public void t2estCreateServerException() {
@@ -281,15 +264,12 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
             }
         };
 
-        ServiceReference<?> sref = EasyMock.createNiceMock(ServiceReference.class);
-        EasyMock.replay(sref);
-
         Map<String, Object> props = new HashMap<String, Object>();
 
         Runnable myService = EasyMock.createMock(Runnable.class);
         EasyMock.replay(myService);
         try {
-            handler.exportService(sref, props, new Class[]{Runnable.class});
+            handler.exportService(myService, null, props, new Class[]{Runnable.class});
             fail("Expected TestException");
         } catch (TestException e) {
             // Expected
@@ -356,10 +336,10 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         PojoConfigurationTypeHandler pch = new PojoConfigurationTypeHandler(bc,
                                                                             intentManager,
                                                                             dummyHttpServiceManager());
-
+        Class<?>[] exportedInterfaces = new Class[] {String.class};
         Map<String, Object> sd = new HashMap<String, Object>();
         sd.put(org.osgi.framework.Constants.SERVICE_ID, 42);
-        sd.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{String.class.getName()});
+        EndpointHelper.addObjectClass(sd, exportedInterfaces);
         EndpointDescription epd = pch.createEndpointDesc(sd, new String[] {"org.apache.cxf.ws"},
                 "http://localhost:12345", new String[] {"my_intent", "your_intent"});
 
@@ -373,18 +353,21 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     public void t2estCreateJaxWsEndpointWithoutIntents() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext dswBC = c.createMock(BundleContext.class);
+        
         IntentManager intentManager = new DummyIntentManager();
         PojoConfigurationTypeHandler handler = new PojoConfigurationTypeHandler(dswBC,
                                                                                 intentManager,
                                                                                 dummyHttpServiceManager());
 
-        ServiceReference<?> sref = c.createMock(ServiceReference.class);
-
         Map<String, Object> sd = new HashMap<String, Object>();
         sd.put(Constants.WS_ADDRESS_PROPERTY, "/somewhere");
-
+        BundleContext serviceBC = c.createMock(BundleContext.class);
+        Object myService = null;
         c.replay();
-        ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(sref, sd, 
+
+        ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(myService,
+                                                                           serviceBC, 
+                                                                           sd, 
                                                                            new Class[]{MyJaxWsEchoService.class});
         c.verify();
 
@@ -399,15 +382,15 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     public void t2estCreateSimpleEndpointWithoutIntents() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext dswBC = c.createMock(BundleContext.class);
+
         IntentManager intentManager = new DummyIntentManager();
         PojoConfigurationTypeHandler handler
             = new PojoConfigurationTypeHandler(dswBC, intentManager, dummyHttpServiceManager());
-        ServiceReference<?> sref = c.createMock(ServiceReference.class);
         Map<String, Object> sd = new HashMap<String, Object>();
         sd.put(Constants.WS_ADDRESS_PROPERTY, "/somewhere_else");
-
+        BundleContext serviceBC = c.createMock(BundleContext.class);
         c.replay();
-        ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(sref, sd, 
+        ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(null, serviceBC, sd, 
                                                                           new Class[]{MySimpleEchoService.class});
         c.verify();
 

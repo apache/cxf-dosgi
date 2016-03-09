@@ -35,8 +35,8 @@ import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +55,10 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     @SuppressWarnings("rawtypes")
-    public Object importEndpoint(BundleContext consumerContext,
-                              Class[] interfaces,
-                              EndpointDescription endpoint) {
+    public Object importEndpoint(ClassLoader consumerLoader,
+                                 BundleContext consumerContext,
+                                 Class[] interfaces,
+                                 EndpointDescription endpoint) {
         Class<?> iClass = interfaces[0];
         String wsdlAddressProp = getWsdlAddress(endpoint, iClass);
         if (wsdlAddressProp == null) {
@@ -102,17 +103,16 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     @SuppressWarnings("rawtypes")
-    public Endpoint exportService(ServiceReference<?> sref,
-                               Map<String, Object> sd,
-                               Class[] exportedInterfaces) {
-        BundleContext callingContext = sref.getBundle().getBundleContext();
-        Object serviceBean = callingContext.getService(sref);
+    public Endpoint exportService(Object serviceO,
+                                  BundleContext serviceContext,
+                                  Map<String, Object> sd,
+                                  Class[] exportedInterfaces) {
         Class<?> iClass = exportedInterfaces[0];
         String location = OsgiUtils.getProperty(sd, Constants.WSDL_LOCATION);
         if (location == null) {
             throw new RuntimeException("WSDL location property is unavailable");
         }
-        URL wsdlURL = callingContext.getBundle().getResource(location);
+        URL wsdlURL = serviceContext.getBundle().getResource(location);
         if (wsdlURL == null) {
             throw new RuntimeException("WSDL resource at " + location + " is unavailable");
         }
@@ -127,17 +127,17 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         DataBinding databinding = new JAXBDataBinding();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
-        final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
-        Bus bus = createBus(sid, callingContext, contextRoot);
+        final Long sid = (Long) sd.get(RemoteConstants.ENDPOINT_SERVICE_ID);
+        Bus bus = createBus(sid, serviceContext, contextRoot);
         factory.setBus(bus);
         factory.setServiceClass(iClass);
         factory.setAddress(address != null ? address : "/");
         factory.getServiceFactory().setDataBinding(databinding);
-        factory.setServiceBean(serviceBean);
+        factory.setServiceBean(serviceO);
 
-        addWsInterceptorsFeaturesProps(factory, callingContext, sd);
+        addWsInterceptorsFeaturesProps(factory, serviceContext, sd);
 
-        setWsdlProperties(factory, callingContext, sd, true);
+        setWsdlProperties(factory, serviceContext, sd, true);
 
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
 

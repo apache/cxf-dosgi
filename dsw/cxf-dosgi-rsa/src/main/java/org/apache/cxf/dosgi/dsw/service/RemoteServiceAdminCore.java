@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
+import org.apache.cxf.dosgi.dsw.api.EndpointHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -175,7 +176,11 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         try {
             Class<?>[] interfaces = getInterfaces(interfaceNames, serviceReference.getBundle());
             Map<String, Object> eprops = createEndpointProps(serviceProperties, interfaces);
-            Endpoint endpoint = provider.exportService(serviceReference, eprops, interfaces);
+            BundleContext serviceContext = serviceReference.getBundle().getBundleContext();
+            
+            // TODO unget service when export is destroyed
+            Object serviceO = serviceContext.getService(serviceReference);
+            Endpoint endpoint = provider.exportService(serviceO, serviceContext, eprops, interfaces);
             return new ExportRegistrationImpl(serviceReference, endpoint, this);
         } catch (Exception e) {
             return new ExportRegistrationImpl(this, e);
@@ -552,13 +557,13 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         return props;
     }
     
-    protected Map<String, Object> createEndpointProps(Map<String, Object> sd, 
+    protected Map<String, Object> createEndpointProps(Map<String, Object> effectiveProps, 
                                                       Class<?>[] ifaces) {
         Map<String, Object> props = new HashMap<String, Object>();
-        copyEndpointProperties(sd, props);
+        copyEndpointProperties(effectiveProps, props);
         props.remove(org.osgi.framework.Constants.SERVICE_ID);
-        props.put(org.osgi.framework.Constants.OBJECTCLASS, getClassNames(ifaces));
-        props.put(RemoteConstants.ENDPOINT_SERVICE_ID, sd.get(org.osgi.framework.Constants.SERVICE_ID));
+        EndpointHelper.addObjectClass(props, ifaces);
+        props.put(RemoteConstants.ENDPOINT_SERVICE_ID, effectiveProps.get(org.osgi.framework.Constants.SERVICE_ID));
         String frameworkUUID = bctx.getProperty(org.osgi.framework.Constants.FRAMEWORK_UUID);
         props.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, frameworkUUID);
         for (Class<?> iface : ifaces) {
@@ -568,13 +573,7 @@ public class RemoteServiceAdminCore implements RemoteServiceAdmin {
         return props;
     }
 
-    private String[] getClassNames(Class<?>[] ifaces) {
-        List<String> ifaceNames = new ArrayList<String>();
-        for (Class<?> iface : ifaces) {
-            ifaceNames.add(iface.getName());
-        }
-        return ifaceNames.toArray(new String[]{});
-    }
+
 
     private void copyEndpointProperties(Map<String, Object> sd, Map<String, Object> endpointProps) {
         Set<Map.Entry<String, Object>> keys = sd.entrySet();

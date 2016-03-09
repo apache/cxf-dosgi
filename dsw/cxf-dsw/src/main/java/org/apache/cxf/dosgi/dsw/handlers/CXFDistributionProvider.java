@@ -35,7 +35,6 @@ import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.util.StringPlus;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
@@ -70,20 +69,26 @@ public class CXFDistributionProvider implements DistributionProvider {
         configTypesSet = new HashSet<>(Arrays.asList(supportedConfigurationTypes));
     }
     
+    @SuppressWarnings("rawtypes")
     @Override
-    public Endpoint exportService(ServiceReference<?> sref, Map<String, Object> effectiveProperties,
+    public Endpoint exportService(Object serviceO, 
+                                  BundleContext serviceContext,
+                                  Map<String, Object> effectiveProperties,
                                   Class[] exportedInterfaces) {
         List<String> configurationTypes = determineConfigurationTypes(effectiveProperties);
         DistributionProvider handler = getHandler(configurationTypes, effectiveProperties);
-        return handler != null ? handler.exportService(sref, effectiveProperties, exportedInterfaces) : null;
+        return handler != null ? handler.exportService(serviceO, serviceContext, 
+                                                       effectiveProperties, exportedInterfaces) : null;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
-    public Object importEndpoint(BundleContext consumerContext, Class[] iClass, EndpointDescription endpoint)
+    public Object importEndpoint(ClassLoader consumerLoader, BundleContext consumerContext, 
+                                 Class[] iClass, EndpointDescription endpoint)
         throws IntentUnsatisfiedException {
         List<String> configurationTypes = determineConfigTypesForImport(endpoint);
         DistributionProvider handler = getHandler(configurationTypes, endpoint.getProperties());
-        return handler != null ? handler.importEndpoint(consumerContext, iClass, endpoint) : null;
+        return handler != null ? handler.importEndpoint(consumerLoader, consumerContext, iClass, endpoint) : null;
     }
 
     DistributionProvider getHandler(List<String> configurationTypes,

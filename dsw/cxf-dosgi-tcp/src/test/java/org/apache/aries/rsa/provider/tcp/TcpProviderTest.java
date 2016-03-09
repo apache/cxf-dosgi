@@ -28,11 +28,13 @@ import java.util.concurrent.TimeUnit;
 import org.apache.aries.rsa.provider.tcp.myservice.MyService;
 import org.apache.aries.rsa.provider.tcp.myservice.MyServiceImpl;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
+import org.apache.cxf.dosgi.dsw.api.EndpointHelper;
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.osgi.framework.Constants;
+import org.osgi.framework.BundleContext;
 
 public class TcpProviderTest {
 
@@ -42,14 +44,17 @@ public class TcpProviderTest {
     
     @Before
     public void createServerAndProxy() {
-        TCPProvider provider = new TCPProvider();
-        Map<String, Object> effectiveProperties = new HashMap<String, Object>();
-        effectiveProperties.put(Constants.OBJECTCLASS, new String[] {MyService.class.getName()});
         Class<?>[] exportedInterfaces = new Class[] {MyService.class};
+        TCPProvider provider = new TCPProvider();
+        Map<String, Object> props = new HashMap<String, Object>();
+        EndpointHelper.addObjectClass(props, exportedInterfaces);
         MyService myService = new MyServiceImpl();
-        ep = provider.exportService(myService, effectiveProperties, exportedInterfaces);
+        BundleContext bc = EasyMock.mock(BundleContext.class);
+        ep = provider.exportService(myService, bc, props, exportedInterfaces);
         myServiceProxy = (MyService)provider.importEndpoint(MyService.class.getClassLoader(), 
-                                                                      exportedInterfaces, ep.description());
+                                                            bc,
+                                                            exportedInterfaces, 
+                                                            ep.description());
     }
 
     @Test

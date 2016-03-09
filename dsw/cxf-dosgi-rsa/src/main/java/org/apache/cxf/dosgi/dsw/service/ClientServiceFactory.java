@@ -27,8 +27,10 @@ import java.util.List;
 import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,16 +56,18 @@ public class ClientServiceFactory implements ServiceFactory {
 
     public Object getService(final Bundle requestingBundle, final ServiceRegistration sreg) {
         List<String> interfaceNames = endpoint.getInterfaces();
+        final BundleContext consumerContext = requestingBundle.getBundleContext();
+        final ClassLoader consumerLoader = requestingBundle.adapt(BundleWiring.class).getClassLoader();
         try {
             LOG.debug("getService() from serviceFactory for {}", interfaceNames);
             final List<Class<?>> interfaces = new ArrayList<Class<?>>();
             for (String ifaceName : interfaceNames) {
-                interfaces.add(requestingBundle.loadClass(ifaceName));
+                interfaces.add(consumerLoader.loadClass(ifaceName));
             }
             Object proxy = AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
                     Class<?>[] ifAr = interfaces.toArray(new Class[]{});
-                    return handler.importEndpoint(requestingBundle.getBundleContext(), ifAr, endpoint);
+                    return handler.importEndpoint(consumerLoader, consumerContext, ifAr, endpoint);
                 }
             });
 

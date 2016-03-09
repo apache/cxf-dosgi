@@ -36,7 +36,6 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
@@ -57,9 +56,10 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
     }
 
     @SuppressWarnings("rawtypes")
-    public Object importEndpoint(BundleContext consumerContext,
-                              Class[] interfaces,
-                              EndpointDescription endpoint) {
+    public Object importEndpoint(ClassLoader consumerLoader,
+                                 BundleContext consumerContext,
+                                 Class[] interfaces,
+                                 EndpointDescription endpoint) {
         Class<?> iClass = interfaces[0];
         String address = getPojoAddress(endpoint, iClass);
         if (address == null) {
@@ -112,11 +112,10 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
     }
 
     @SuppressWarnings("rawtypes")
-    public Endpoint exportService(ServiceReference<?> sref,
-                                     Map<String, Object> endpointProps,
-                                     Class[] exportedInterfaces) throws IntentUnsatisfiedException {
-        BundleContext callingContext = sref.getBundle().getBundleContext();
-        Object serviceBean = callingContext.getService(sref);
+    public Endpoint exportService(Object serviceBean,
+                                  BundleContext callingContext,
+                                  Map<String, Object> endpointProps,
+                                  Class[] exportedInterfaces) throws IntentUnsatisfiedException {
         String contextRoot = getServletContextRoot(endpointProps);
         String address;
         Class<?> iClass = exportedInterfaces[0];

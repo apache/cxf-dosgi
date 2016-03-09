@@ -27,8 +27,6 @@ import org.apache.cxf.dosgi.dsw.api.DistributionProvider;
 import org.apache.cxf.dosgi.dsw.api.Endpoint;
 import org.apache.cxf.dosgi.dsw.api.IntentUnsatisfiedException;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
@@ -41,22 +39,20 @@ public class TCPProvider implements DistributionProvider {
     public String[] getSupportedTypes() {
         return new String[] {TCP_CONFIG_TYPE};
     }
-    
-    Endpoint exportService(Object service, Map<String, Object> effectiveProperties,
+
+    @Override
+    public Endpoint exportService(Object serviceO, 
+                                  BundleContext serviceContext,
+                                  Map<String, Object> effectiveProperties,
                                   Class[] exportedInterfaces) {
         effectiveProperties.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, getSupportedTypes());
-        return new TcpEndpoint(service, effectiveProperties);
+        return new TcpEndpoint(serviceO, effectiveProperties);
     }
 
     @Override
-    public Endpoint exportService(ServiceReference<?> sref, Map<String, Object> effectiveProperties,
-                                  Class[] exportedInterfaces) {
-        BundleContext serviceContext = sref.getBundle().getBundleContext();
-        Object service = serviceContext.getService(sref);
-        return exportService(service, effectiveProperties, exportedInterfaces);
-    }
-    
-    public Object importEndpoint(ClassLoader cl, Class[] interfaces,
+    public Object importEndpoint(ClassLoader cl, 
+                                 BundleContext consumerContext, 
+                                 Class[] interfaces,
                                  EndpointDescription endpoint)
         throws IntentUnsatisfiedException {
         try {
@@ -66,14 +62,6 @@ public class TCPProvider implements DistributionProvider {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public Object importEndpoint(BundleContext consumerContext, Class[] interfaces,
-                                 EndpointDescription endpoint)
-        throws IntentUnsatisfiedException {
-        ClassLoader cl = consumerContext.getBundle().adapt(BundleWiring.class).getClassLoader();
-        return importEndpoint(cl, interfaces, endpoint);
     }
 
 }

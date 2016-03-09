@@ -221,7 +221,8 @@ public class RemoteServiceAdminCoreTest {
         };
 
         DistributionProvider handler = EasyMock.createMock(DistributionProvider.class);
-        EasyMock.expect(handler.exportService(anyObject(ServiceReference.class), 
+        EasyMock.expect(handler.exportService(anyObject(),
+                                              anyObject(BundleContext.class), 
                                               anyObject(Map.class), isA(Class[].class))).andReturn(er);
         EasyMock.replay(handler);
 
@@ -312,7 +313,8 @@ public class RemoteServiceAdminCoreTest {
         eProps.put("service.imported.configs", new String[] {"org.apache.cxf.ws"});
 
         DistributionProvider handler = EasyMock.createMock(DistributionProvider.class);
-        EasyMock.expect(handler.exportService(anyObject(ServiceReference.class), 
+        EasyMock.expect(handler.exportService(anyObject(),
+                                              anyObject(BundleContext.class), 
                                               anyObject(Map.class), isA(Class[].class))).andThrow(new TestException());
         EasyMock.replay(handler);
 

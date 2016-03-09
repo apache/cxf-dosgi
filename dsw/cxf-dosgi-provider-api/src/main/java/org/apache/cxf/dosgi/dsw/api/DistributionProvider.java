@@ -21,7 +21,6 @@ package org.apache.cxf.dosgi.dsw.api;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
 @SuppressWarnings("rawtypes")
@@ -30,25 +29,28 @@ public interface DistributionProvider {
     String[] getSupportedTypes();
 
     /**
-     * @param sref reference of the service to be exported
+     * @param serviceO service instance to be exported
+     * @param serviceContext bundle context of the bundle exporting the sevice
      * @param effectiveProperties combined properties of the service and additional properties from rsa
-     * @param exportedInterface name of the interface to be exported
-     * @return closeable Endpoint that represents the service that is exposed to the outside world
+     * @param exportedInterfaces name of the interface to be exported
+     * @return Endpoint that represents the service that is exposed to the outside world
      */
-    Endpoint exportService(ServiceReference<?> sref, 
+    Endpoint exportService(Object serviceO, 
+                           BundleContext serviceContext,
                            Map<String, Object> effectiveProperties,
                            Class[] exportedInterfaces);
 
     /**
-     * @param sref reference of the service offered to the requesting bundle
+     * @param cl classloader of the consumer bundle
+     * @param consumerContext bundle context of the consumer bundle
      * @param interfaces interfaces of the service to proxy
      * @param endpoint description of the remote endpoint
      * @return service proxy to be given to the requesting bundle
      * @throws IntentUnsatisfiedException
      */
-    Object importEndpoint(BundleContext consumerContext, 
+    Object importEndpoint(ClassLoader cl,
+                          BundleContext consumerContext, 
                           Class[] interfaces, 
                           EndpointDescription endpoint)
         throws IntentUnsatisfiedException;
-    
 }

@@ -35,7 +35,6 @@ import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
@@ -56,9 +55,10 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     @SuppressWarnings("rawtypes")
-    public Object importEndpoint(BundleContext consumerContext,
-                              Class[] interfaces,
-                              EndpointDescription endpoint) throws IntentUnsatisfiedException {
+    public Object importEndpoint(ClassLoader consumerLoader,
+                                 BundleContext consumerContext,
+                                 Class[] interfaces,
+                                 EndpointDescription endpoint) throws IntentUnsatisfiedException {
         Class<?> iClass = interfaces[0];
         Map<String, Object> sd = endpoint.getProperties();
         String address = getClientAddress(sd);
@@ -92,11 +92,10 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
     }
 
     @SuppressWarnings("rawtypes")
-    public Endpoint exportService(ServiceReference<?> sref,
-                                     Map<String, Object> endpointProps,
-                                     Class[] exportedInterfaces) throws IntentUnsatisfiedException {
-        BundleContext callingContext = sref.getBundle().getBundleContext();
-        Object serviceBean = callingContext.getService(sref);
+    public Endpoint exportService(Object serviceO,
+                                  BundleContext serviceContext,
+                                  Map<String, Object> endpointProps,
+                                  Class[] exportedInterfaces) throws IntentUnsatisfiedException {
         Class<?> iClass = exportedInterfaces[0];
         String address = getPojoAddress(endpointProps, iClass);
         ServerFactoryBean factory = createServerFactoryBean(endpointProps, iClass);
@@ -104,14 +103,14 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         String contextRoot = getServletContextRoot(endpointProps);
 
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
-        Bus bus = createBus(sid, callingContext, contextRoot);
+        Bus bus = createBus(sid, serviceContext, contextRoot);
         factory.setBus(bus);
         factory.setServiceClass(iClass);
         factory.setAddress(address);
         
-        factory.setServiceBean(serviceBean);
-        addWsInterceptorsFeaturesProps(factory, callingContext, endpointProps);
-        setWsdlProperties(factory, callingContext, endpointProps, false);
+        factory.setServiceBean(serviceO);
+        addWsInterceptorsFeaturesProps(factory, serviceContext, endpointProps);
+        setWsdlProperties(factory, serviceContext, endpointProps, false);
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, endpointProps);
 
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);

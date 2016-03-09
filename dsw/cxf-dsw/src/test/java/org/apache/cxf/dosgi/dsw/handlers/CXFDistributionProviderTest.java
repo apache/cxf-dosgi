@@ -65,7 +65,7 @@ public class CXFDistributionProviderTest {
 
     @Test
     public void testJaxrsPropertyIgnored2() {
-        DistributionProvider handler = getHandlerWith2(Constants.RS_CONFIG_TYPE, new String[] {"HTTP", "SOAP"});
+        DistributionProvider handler = getHandlerWith(Constants.RS_CONFIG_TYPE, new String[] {"HTTP", "SOAP"});
         assertTrue(handler instanceof PojoConfigurationTypeHandler);
         assertTrue(!(handler instanceof JaxRSPojoConfigurationTypeHandler));
     }
@@ -81,28 +81,14 @@ public class CXFDistributionProviderTest {
         DistributionProvider handler = getHandlerWith(Constants.WSDL_CONFIG_TYPE, null);
         assertTrue(handler instanceof WsdlConfigurationTypeHandler);
     }
-
+    
     @Test
     public void testUnsupportedConfiguration() {
         DistributionProvider handler = getHandlerWith("notSupportedConfig", null);
         Assert.assertNull(handler);
     }
 
-    private DistributionProvider getHandlerWith(String configType, String intents) {
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        EasyMock.replay(bc);
-        Map<String, Object> serviceProps = new HashMap<String, Object>();
-        serviceProps.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, configType);
-        serviceProps.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, intents);
-        IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
-        IntentManager intentManager = new IntentManagerImpl(intentMap);
-        HttpServiceManager httpServiceManager = new HttpServiceManager(bc, null, null);
-        CXFDistributionProvider f = new CXFDistributionProvider(bc, intentManager, httpServiceManager);
-        List<String> configurationTypes = f.determineConfigurationTypes(serviceProps);
-        return f.getHandler(configurationTypes, serviceProps);
-    }
-
-    private DistributionProvider getHandlerWith2(String configType, String[] intents) {
+    private DistributionProvider getHandlerWith(String configType, Object intents) {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bc);
         Map<String, Object> serviceProps = new HashMap<String, Object>();
