@@ -21,8 +21,9 @@ package org.apache.cxf.dosgi.topologymanager.importer;
 import java.util.Dictionary;
 import java.util.List;
 
+import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.easymock.classextension.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
@@ -33,15 +34,18 @@ public class EndpointListenerImplTest extends Assert {
 
     int testCase;
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({
+     "rawtypes", "unchecked"
+    })
     @Test
     public void testScopeChange() {
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        TopologyManagerImport tm = EasyMock.createNiceMock(TopologyManagerImport.class);
-        ServiceRegistration sr = EasyMock.createNiceMock(ServiceRegistration.class);
+        IMocksControl c = EasyMock.createNiceControl();
+        BundleContext bc = c.createMock(BundleContext.class);
+        TopologyManagerImport tm = c.createMock(TopologyManagerImport.class);
+        ServiceRegistration sr = c.createMock(ServiceRegistration.class);
 
         // expect Listener registration
-        EasyMock.expect(bc.registerService((String)EasyMock.anyObject(),
+        EasyMock.expect(bc.registerService(EasyMock.anyObject(Class.class),
                                            EasyMock.anyObject(),
                                            (Dictionary)EasyMock.anyObject())).andReturn(sr).atLeastOnce();
 
@@ -53,7 +57,6 @@ public class EndpointListenerImplTest extends Assert {
             public Object answer() throws Throwable {
                 Object[] args = EasyMock.getCurrentArguments();
                 Dictionary props = (Dictionary)args[0];
-                @SuppressWarnings("unchecked")
                 List<String> scope = (List<String>)props.get(EndpointListener.ENDPOINT_LISTENER_SCOPE);
                 switch (testCase) {
                 case 1:
@@ -83,9 +86,7 @@ public class EndpointListenerImplTest extends Assert {
             }
         }).atLeastOnce();
 
-        EasyMock.replay(bc);
-        EasyMock.replay(tm);
-        EasyMock.replay(sr);
+        c.replay();
 
         EndpointListenerManager endpointListener = new EndpointListenerManager(bc, tm);
 
@@ -105,8 +106,6 @@ public class EndpointListenerImplTest extends Assert {
 
         endpointListener.stop();
 
-        EasyMock.verify(bc);
-        EasyMock.verify(tm);
-        EasyMock.verify(sr);
+        c.verify();
     }
 }

@@ -111,8 +111,8 @@ public class TopologyManagerImport implements EndpointListener, RemoteServiceAdm
     }
 
     public void start() {
-        bctx.registerService(RemoteServiceAdminListener.class.getName(), this, null);
-        bctx.registerService(ListenerHook.class.getName(), listenerHook, null);
+        bctx.registerService(RemoteServiceAdminListener.class, this, null);
+        bctx.registerService(ListenerHook.class, listenerHook, null);
         endpointListenerManager.start();
     }
 

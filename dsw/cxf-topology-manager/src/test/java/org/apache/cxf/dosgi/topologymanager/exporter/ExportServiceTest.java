@@ -24,9 +24,9 @@ import java.util.Map;
 
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
+import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -40,6 +40,9 @@ import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
+@SuppressWarnings({
+    "rawtypes", "unchecked"
+   })
 public class ExportServiceTest {
 
     /**

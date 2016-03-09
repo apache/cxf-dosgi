@@ -57,7 +57,7 @@ public class EndpointListenerNotifier {
         } catch (InvalidSyntaxException e) {
             throw new RuntimeException("Unexpected exception creating filter", e);
         }
-        this.endpointListenerTracker = new SimpleServiceTracker(bctx, filter);
+        this.endpointListenerTracker = new SimpleServiceTracker<EndpointListener>(bctx, filter);
         this.endpointListenerTracker.addListener(new SimpleServiceTrackerListener<EndpointListener>() {
             @Override
             public void added(ServiceReference<EndpointListener> reference, EndpointListener service) {
@@ -95,7 +95,7 @@ public class EndpointListenerNotifier {
         if (endpoints.isEmpty()) { // a little optimization to prevent unnecessary processing
             return;
         }
-        for (ServiceReference eplReference : endpointListenerTracker.getAllServiceReferences()) {
+        for (ServiceReference<EndpointListener> eplReference : endpointListenerTracker.getAllServiceReferences()) {
             notifyListener(added, eplReference, endpoints);
         }
     }
@@ -107,10 +107,10 @@ public class EndpointListenerNotifier {
      * @param endpointListenerRef the ServiceReference of an EndpointListener to notify
      * @param endpoints the endpoints the listener should be notified about
      */
-    void notifyListener(boolean added, ServiceReference endpointListenerRef,
+    void notifyListener(boolean added, ServiceReference<EndpointListener> endpointListenerRef,
                                 Collection<EndpointDescription> endpoints) {
         List<Filter> filters = getFiltersFromEndpointListenerScope(endpointListenerRef, bctx);
-        EndpointListener endpointListener = (EndpointListener)bctx.getService(endpointListenerRef);
+        EndpointListener endpointListener = bctx.getService(endpointListenerRef);
         try {
             LOG.debug("notifyListener (added={})", added);
             for (EndpointDescription endpoint : endpoints) {
@@ -144,7 +144,8 @@ public class EndpointListenerNotifier {
         }
     }
 
-    static List<Filter> getFiltersFromEndpointListenerScope(ServiceReference sref, BundleContext bctx) {
+    static List<Filter> getFiltersFromEndpointListenerScope(ServiceReference<EndpointListener> sref, 
+                                                            BundleContext bctx) {
         List<Filter> filters = new ArrayList<Filter>();
         String[] scopes = Utils.getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
         for (String scope : scopes) {

@@ -25,9 +25,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.easymock.Capture;
+import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -65,11 +65,11 @@ public class SimpleServiceTrackerTest {
     
     @Test
     public void testTracker() throws InvalidSyntaxException {
-        IMocksControl c = org.easymock.classextension.EasyMock.createControl();
+        IMocksControl c = EasyMock.createControl();
         // create context mock
         BundleContext context = c.createMock(BundleContext.class);
         // capture service listener so we can invoke it
-        Capture<ServiceListener> capturedListener = new Capture<ServiceListener>();
+        Capture<ServiceListener> capturedListener = EasyMock.newCapture();
         context.addServiceListener(EasyMock.<ServiceListener>capture(capturedListener), (String)anyObject());
         expectLastCall().once();
         context.removeServiceListener((ServiceListener)anyObject());

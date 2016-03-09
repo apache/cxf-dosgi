@@ -25,9 +25,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
 import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
+import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
-import org.easymock.classextension.EasyMock;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -40,7 +40,9 @@ import static org.junit.Assert.assertTrue;
 
 public class TopologyManagerImportTest {
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({
+     "rawtypes", "unchecked"
+    })
     @Test
     public void testImportForNewlyAddedRSA() throws InterruptedException {
         IMocksControl c = EasyMock.createControl();
@@ -54,7 +56,7 @@ public class TopologyManagerImportTest {
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
         sreg.unregister();
         EasyMock.expectLastCall().once();
-        EasyMock.expect(bc.registerService((String)EasyMock.anyObject(),
+        EasyMock.expect(bc.registerService(EasyMock.anyObject(Class.class),
                                            EasyMock.anyObject(),
                                            (Dictionary)EasyMock.anyObject())).andReturn(sreg).anyTimes();
 

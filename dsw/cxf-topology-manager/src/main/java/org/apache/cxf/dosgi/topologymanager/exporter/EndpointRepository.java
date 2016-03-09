@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * map is maintained which contains information on the endpoints for each RemoteAdminService that created the
  * endpoints.
  */
+@SuppressWarnings("rawtypes")
 class EndpointRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(EndpointRepository.class);

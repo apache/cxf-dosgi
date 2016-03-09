@@ -59,11 +59,9 @@ public class ListenerHookImpl implements ListenerHook {
         this.serviceInterestListener = serviceInterestListener;
     }
 
-    @SuppressWarnings("rawtypes")
-    public void added(Collection/* <ListenerInfo> */ listeners) {
+    public void added(Collection<ListenerInfo> listeners) {
         LOG.debug("added listeners {}", listeners);
-        for (Object li : listeners) {
-            ListenerInfo listenerInfo = (ListenerInfo)li;
+        for (ListenerInfo listenerInfo : listeners) {
             LOG.debug("Filter {}", listenerInfo.getFilter());
 
             String className = Utils.getObjectClass(listenerInfo.getFilter());
@@ -87,12 +85,10 @@ public class ListenerHookImpl implements ListenerHook {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    public void removed(Collection/* <ListenerInfo> */ listeners) {
+    public void removed(Collection<ListenerInfo> listeners) {
         LOG.debug("removed listeners {}", listeners);
 
-        for (Object li : listeners) {
-            ListenerInfo listenerInfo = (ListenerInfo)li;
+        for (ListenerInfo listenerInfo : listeners) {
             LOG.debug("Filter {}", listenerInfo.getFilter());
 
             // TODO: determine if service was handled?

@@ -84,7 +84,7 @@ public class TopologyManagerExport {
             public void added(ServiceReference<RemoteServiceAdmin> reference, RemoteServiceAdmin rsa) {
                 LOG.debug("RemoteServiceAdmin added: {}, total {}",
                         rsa, remoteServiceAdminTracker.getAllServices().size());
-                for (ServiceReference serviceRef : endpointRepo.getServicesToBeExportedFor(rsa)) {
+                for (ServiceReference<?> serviceRef : endpointRepo.getServicesToBeExportedFor(rsa)) {
                     triggerExport(serviceRef);
                 }
             }
@@ -105,7 +105,7 @@ public class TopologyManagerExport {
         serviceListener = new ServiceListener() {
 
             public void serviceChanged(ServiceEvent event) {
-                ServiceReference sref = event.getServiceReference();
+                ServiceReference<?> sref = event.getServiceReference();
                 if (event.getType() == ServiceEvent.REGISTERED) {
                     LOG.debug("Received REGISTERED ServiceEvent: {}", event);
                     if (shouldExportService(sref)) {
@@ -123,7 +123,7 @@ public class TopologyManagerExport {
     /**
      * checks if a Service is intended to be exported
      */
-    private boolean shouldExportService(ServiceReference sref) {
+    private boolean shouldExportService(ServiceReference<?> sref) {
         return sref.getProperty(RemoteConstants.SERVICE_EXPORTED_INTERFACES) != null;
     }
 
@@ -139,7 +139,7 @@ public class TopologyManagerExport {
         epListenerNotifier.stop();
     }
 
-    protected void triggerExport(final ServiceReference sref) {
+    protected void triggerExport(final ServiceReference<?> sref) {
         execService.execute(new Runnable() {
             public void run() {
                 try {
@@ -151,7 +151,7 @@ public class TopologyManagerExport {
         });
     }
 
-    protected void doExportService(final ServiceReference sref) {
+    protected void doExportService(final ServiceReference<?> sref) {
         LOG.debug("Exporting service {}", sref);
         endpointRepo.addService(sref); // mark for future export even if there are currently no RSAs
         List<RemoteServiceAdmin> rsaList = remoteServiceAdminTracker.getAllServices();
@@ -173,7 +173,7 @@ public class TopologyManagerExport {
         }
     }
 
-    private void exportServiceUsingRemoteServiceAdmin(final ServiceReference sref,
+    private void exportServiceUsingRemoteServiceAdmin(final ServiceReference<?> sref,
                                                       final RemoteServiceAdmin remoteServiceAdmin) {
         // abort if the service was unregistered by the time we got here
         // (we check again at the end, but this optimization saves unnecessary heavy processing)
@@ -235,9 +235,9 @@ public class TopologyManagerExport {
     private void exportExistingServices() {
         try {
             // cast to String is necessary for compiling against OSGi core version >= 4.3
-            ServiceReference[] references = bctx.getServiceReferences((String)null, DOSGI_SERVICES);
+            ServiceReference<?>[] references = bctx.getServiceReferences((String)null, DOSGI_SERVICES);
             if (references != null) {
-                for (ServiceReference sref : references) {
+                for (ServiceReference<?> sref : references) {
                     triggerExport(sref);
                 }
             }

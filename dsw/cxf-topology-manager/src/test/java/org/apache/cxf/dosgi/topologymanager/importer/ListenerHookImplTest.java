@@ -21,7 +21,7 @@ package org.apache.cxf.dosgi.topologymanager.importer;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;

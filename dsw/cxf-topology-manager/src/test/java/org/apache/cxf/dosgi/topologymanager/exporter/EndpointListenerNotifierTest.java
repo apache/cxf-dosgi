@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
-import org.easymock.classextension.EasyMock;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -38,6 +38,9 @@ import org.osgi.service.remoteserviceadmin.EndpointListener;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings({
+    "rawtypes", "unchecked"
+   })
 public class EndpointListenerNotifierTest {
 
     @Test

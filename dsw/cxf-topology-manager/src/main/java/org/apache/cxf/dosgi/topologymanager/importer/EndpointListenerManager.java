@@ -37,7 +37,7 @@ public class EndpointListenerManager {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerManager.class);
 
     private final BundleContext bctx;
-    private volatile ServiceRegistration serviceRegistration;
+    private volatile ServiceRegistration<EndpointListener> serviceRegistration;
     private final List<String> filters = new ArrayList<String>();
     private final EndpointListener endpointListener;
 
@@ -47,7 +47,7 @@ public class EndpointListenerManager {
     }
 
     protected void start() {
-        serviceRegistration = bctx.registerService(EndpointListener.class.getName(), endpointListener,
+        serviceRegistration = bctx.registerService(EndpointListener.class, endpointListener,
                                                    getRegistrationProperties());
     }
 
