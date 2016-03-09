@@ -23,9 +23,6 @@ import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Map;
 
-import org.apache.cxf.dosgi.discovery.zookeeper.server.util.Utils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.zookeeper.server.ServerConfig;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig;
@@ -33,10 +30,12 @@ import org.apache.zookeeper.server.quorum.QuorumPeerConfig.ConfigException;
 import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
 
-    private static final Logger LOG = Logger.getLogger(ZookeeperStarter.class); //NOPMD - using log4j here
+    private static final Logger LOG = LoggerFactory.getLogger(ZookeeperStarter.class); //NOPMD - using log4j here
 
     protected ZookeeperServer main;
     private final BundleContext bundleContext;
@@ -56,7 +55,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
                     zkMainThread.join();
                 }
             } catch (Throwable e) {
-                LOG.log(Level.ERROR, e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
             main = null;
             zkMainThread = null;
@@ -125,7 +124,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
 
         private QuorumPeerConfig config;
 
-        public MyQuorumPeerMain(QuorumPeerConfig config) {
+        MyQuorumPeerMain(QuorumPeerConfig config) {
             this.config = config;
         }
 
@@ -144,7 +143,7 @@ public class ZookeeperStarter implements org.osgi.service.cm.ManagedService {
 
         private QuorumPeerConfig config;
 
-        public MyZooKeeperServerMain(QuorumPeerConfig config) {
+        MyZooKeeperServerMain(QuorumPeerConfig config) {
             this.config = config;
         }
 

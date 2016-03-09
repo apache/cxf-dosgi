@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.discovery.zookeeper.server.util;
+package org.apache.cxf.dosgi.discovery.zookeeper.server;
 
 import java.util.ArrayList;
 import java.util.Dictionary;

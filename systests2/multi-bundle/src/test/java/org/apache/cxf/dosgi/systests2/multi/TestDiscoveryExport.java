@@ -24,10 +24,9 @@ import java.util.Hashtable;
 
 import javax.inject.Inject;
 
-import junit.framework.Assert;
-
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;

@@ -108,6 +108,7 @@
         <module>samples</module>
         <module>osgi-api</module>
         <module>distribution</module>
+        <module>cxf-dosgi-ri-repository</module>
         <module>systests2</module>
     </modules>
 
