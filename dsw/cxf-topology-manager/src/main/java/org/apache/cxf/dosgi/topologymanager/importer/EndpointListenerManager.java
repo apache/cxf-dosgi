@@ -41,7 +41,7 @@ public class EndpointListenerManager {
     private final List<String> filters = new ArrayList<String>();
     private final EndpointListener endpointListener;
 
-    protected EndpointListenerManager(BundleContext bc, EndpointListener endpointListener) {
+    public EndpointListenerManager(BundleContext bc, EndpointListener endpointListener) {
         this.bctx = bc;
         this.endpointListener = endpointListener;
     }

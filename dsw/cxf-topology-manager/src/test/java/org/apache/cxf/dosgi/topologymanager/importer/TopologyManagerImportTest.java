@@ -18,13 +18,10 @@
  */
 package org.apache.cxf.dosgi.topologymanager.importer;
 
-import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
-import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
@@ -52,7 +49,6 @@ public class TopologyManagerImportTest {
         final Semaphore sema = new Semaphore(0);
 
         BundleContext bc = c.createMock(BundleContext.class);
-        SimpleServiceTracker<RemoteServiceAdmin> rsaTracker = c.createMock(SimpleServiceTracker.class);
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
         sreg.unregister();
         EasyMock.expectLastCall().once();
@@ -65,9 +61,8 @@ public class TopologyManagerImportTest {
         final ImportRegistration ireg = c.createMock(ImportRegistration.class);
         EasyMock.expect(ireg.getException()).andReturn(null).anyTimes();
         ImportReference iref = c.createMock(ImportReference.class);
-
-        rsaTracker.addListener(EasyMock.<SimpleServiceTrackerListener>anyObject());
-        EasyMock.expect(rsaTracker.getAllServices()).andReturn(Arrays.asList(rsa)).anyTimes();
+        EasyMock.expect(ireg.getImportReference()).andReturn(iref).anyTimes();
+        EasyMock.expect(iref.getImportedEndpoint()).andReturn(endpoint).anyTimes();
 
         EasyMock.expect(rsa.importService(EasyMock.eq(endpoint))).andAnswer(new IAnswer<ImportRegistration>() {
             public ImportRegistration answer() throws Throwable {
@@ -75,17 +70,13 @@ public class TopologyManagerImportTest {
                 return ireg;
             }
         }).once();
-        EasyMock.expect(ireg.getImportReference()).andReturn(iref).anyTimes();
-        EasyMock.expect(iref.getImportedEndpoint()).andReturn(endpoint).anyTimes();
         c.replay();
 
-        TopologyManagerImport tm = new TopologyManagerImport(bc, rsaTracker);
-
+        TopologyManagerImport tm = new TopologyManagerImport(bc);
         tm.start();
-        // no RSA available yet so no import...
         tm.endpointAdded(endpoint, "myFilter");
-        tm.triggerImportsForRemoteServiceAdmin(rsa);
-        assertTrue("importService should have been called on RemoteServiceAdmin",
+        tm.add(rsa);
+        assertTrue("rsa.ImportService should have been called",
                    sema.tryAcquire(100, TimeUnit.SECONDS));
         tm.stop();
         c.verify();

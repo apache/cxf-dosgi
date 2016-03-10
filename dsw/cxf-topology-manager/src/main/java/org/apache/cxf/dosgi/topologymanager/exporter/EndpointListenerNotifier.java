@@ -18,18 +18,16 @@
  */
 package org.apache.cxf.dosgi.topologymanager.exporter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTracker;
-import org.apache.cxf.dosgi.topologymanager.util.SimpleServiceTrackerListener;
-import org.apache.cxf.dosgi.topologymanager.util.Utils;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -41,91 +39,60 @@ import org.slf4j.LoggerFactory;
  * Tracks EndpointListeners and allows to notify them of endpoints.
  */
 public class EndpointListenerNotifier {
-
-    private static final String ENDPOINT_LISTENER_FILTER =
-        "(&(" + Constants.OBJECTCLASS + "=" + EndpointListener.class.getName() + ")"
-        + "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*))";
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
-    private BundleContext bctx;
-    private SimpleServiceTracker<EndpointListener> endpointListenerTracker;
+    public enum NotifyType { ADDED, REMOVED };
+    private Map<EndpointListener, Set<Filter>> listeners;
+    private EndpointRepository endpointRepo;
 
-    public EndpointListenerNotifier(BundleContext bctx, final EndpointRepository endpointRepository) {
-        this.bctx = bctx;
-        Filter filter;
-        try {
-            filter = bctx.createFilter(ENDPOINT_LISTENER_FILTER);
-        } catch (InvalidSyntaxException e) {
-            throw new RuntimeException("Unexpected exception creating filter", e);
-        }
-        this.endpointListenerTracker = new SimpleServiceTracker<EndpointListener>(bctx, filter);
-        this.endpointListenerTracker.addListener(new SimpleServiceTrackerListener<EndpointListener>() {
-            @Override
-            public void added(ServiceReference<EndpointListener> reference, EndpointListener service) {
-                LOG.debug("new EndpointListener detected");
-                notifyListener(true, reference, endpointRepository.getAllEndpoints());
-            }
-
-            @Override
-            public void modified(ServiceReference<EndpointListener> reference, EndpointListener service) {
-                LOG.debug("EndpointListener modified");
-                notifyListener(true, reference, endpointRepository.getAllEndpoints());
-            }
-
-            @Override
-            public void removed(ServiceReference<EndpointListener> reference, EndpointListener service) {
-            }
-        });
+    public EndpointListenerNotifier(final EndpointRepository endpointRepo) {
+        this.endpointRepo = endpointRepo;
+        this.listeners = new ConcurrentHashMap<EndpointListener, Set<Filter>>();
     }
 
-    public void start() {
-        endpointListenerTracker.open();
+    public void add(EndpointListener ep, Set<Filter> filters) {
+        LOG.debug("new EndpointListener detected");
+        listeners.put(ep, filters);
+        notifyListener(NotifyType.ADDED, ep, filters, endpointRepo.getAllEndpoints());
     }
-
-    public void stop() {
-        endpointListenerTracker.close();
+    
+    public void remove(EndpointListener ep) {
+        LOG.debug("EndpointListener modified");
+        listeners.remove(ep);
     }
-
+    
     /**
      * Notifies all endpoint listeners about endpoints being added or removed.
      *
      * @param added specifies whether endpoints were added (true) or removed (false)
      * @param endpoints the endpoints the listeners should be notified about
      */
-    void notifyListeners(boolean added, Collection<EndpointDescription> endpoints) {
+    public void notifyListeners(NotifyType type, Collection<EndpointDescription> endpoints) {
         if (endpoints.isEmpty()) { // a little optimization to prevent unnecessary processing
             return;
         }
-        for (ServiceReference<EndpointListener> eplReference : endpointListenerTracker.getAllServiceReferences()) {
-            notifyListener(added, eplReference, endpoints);
+        for (EndpointListener listener : listeners.keySet()) {
+            notifyListener(type, listener, listeners.get(listener), endpoints);
         }
     }
 
     /**
      * Notifies an endpoint listener about endpoints being added or removed.
      *
-     * @param added specifies whether endpoints were added (true) or removed (false)
+     * @param type specifies whether endpoints were added (true) or removed (false)
      * @param endpointListenerRef the ServiceReference of an EndpointListener to notify
      * @param endpoints the endpoints the listener should be notified about
      */
-    void notifyListener(boolean added, ServiceReference<EndpointListener> endpointListenerRef,
-                                Collection<EndpointDescription> endpoints) {
-        List<Filter> filters = getFiltersFromEndpointListenerScope(endpointListenerRef, bctx);
-        EndpointListener endpointListener = bctx.getService(endpointListenerRef);
-        try {
-            LOG.debug("notifyListener (added={})", added);
-            for (EndpointDescription endpoint : endpoints) {
-                List<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
-                for (Filter filter : matchingFilters) {
-                    if (added) {
-                        endpointListener.endpointAdded(endpoint, filter.toString());
-                    } else {
-                        endpointListener.endpointRemoved(endpoint, filter.toString());
-                    }
+    void notifyListener(NotifyType type, EndpointListener listener, Set<Filter> filters, 
+                        Collection<EndpointDescription> endpoints) {
+        LOG.debug("Endpoint {}", type);
+        for (EndpointDescription endpoint : endpoints) {
+            Set<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
+            for (Filter filter : matchingFilters) {
+                if (type == NotifyType.ADDED) {
+                    listener.endpointAdded(endpoint, filter.toString());
+                } else {
+                    listener.endpointRemoved(endpoint, filter.toString());
                 }
-            }
-        } finally {
-            if (endpointListener != null) {
-                bctx.ungetService(endpointListenerRef);
             }
         }
     }
@@ -136,7 +103,7 @@ public class EndpointListenerNotifier {
      * @param endpoint an endpoint description
      * @return endpoint properties (will never return null)
      */
-    public static Dictionary<String, Object> getEndpointProperties(EndpointDescription endpoint) {
+    private static Dictionary<String, Object> getEndpointProperties(EndpointDescription endpoint) {
         if (endpoint == null || endpoint.getProperties() == null) {
             return new Hashtable<String, Object>();
         } else {
@@ -144,13 +111,12 @@ public class EndpointListenerNotifier {
         }
     }
 
-    static List<Filter> getFiltersFromEndpointListenerScope(ServiceReference<EndpointListener> sref, 
-                                                            BundleContext bctx) {
-        List<Filter> filters = new ArrayList<Filter>();
-        String[] scopes = Utils.getStringPlusProperty(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
+    public static Set<Filter> getFiltersFromEndpointListenerScope(ServiceReference<EndpointListener> sref) {
+        Set<Filter> filters = new HashSet<Filter>();
+        String[] scopes = StringPlus.parse(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
         for (String scope : scopes) {
             try {
-                filters.add(bctx.createFilter(scope));
+                filters.add(FrameworkUtil.createFilter(scope));
             } catch (InvalidSyntaxException e) {
                 LOG.error("invalid endpoint listener scope: {}", scope, e);
             }
@@ -158,10 +124,9 @@ public class EndpointListenerNotifier {
         return filters;
     }
 
-    private static List<Filter> getMatchingFilters(List<Filter> filters, EndpointDescription endpoint) {
-        List<Filter> matchingFilters = new ArrayList<Filter>();
+    private static Set<Filter> getMatchingFilters(Set<Filter> filters, EndpointDescription endpoint) {
+        Set<Filter> matchingFilters = new HashSet<Filter>();
         Dictionary<String, Object> dict = EndpointListenerNotifier.getEndpointProperties(endpoint);
-
         for (Filter filter : filters) {
             if (filter.match(dict)) {
                 LOG.debug("Filter {} matches endpoint {}", filter, dict);

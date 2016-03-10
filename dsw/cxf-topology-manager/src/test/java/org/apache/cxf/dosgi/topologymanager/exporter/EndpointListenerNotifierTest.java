@@ -18,25 +18,33 @@
  */
 package org.apache.cxf.dosgi.topologymanager.exporter;
 
-import java.util.ArrayList;
+
+
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.cxf.dosgi.topologymanager.exporter.EndpointListenerNotifier.NotifyType;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.easymock.IMocksControl;
+import org.junit.Assert;
 import org.junit.Test;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 @SuppressWarnings({
     "rawtypes", "unchecked"
@@ -45,142 +53,80 @@ public class EndpointListenerNotifierTest {
 
     @Test
     public void testNotifyListenersOfRemovalIfAppropriate() throws InvalidSyntaxException {
-        IMocksControl c = EasyMock.createNiceControl();
+        EndpointDescription endpoint1 = createEndpoint("myClass");
+        EndpointDescription endpoint2 = createEndpoint("notMyClass");
 
-        BundleContext bc = c.createMock(BundleContext.class);
-        ServiceReference sref = c.createMock(ServiceReference.class);
+        // Expect listener to be called for endpoint1 but not for endpoint2 
         EndpointListener epl = EasyMock.createMock(EndpointListener.class);
-        EndpointDescription endpoint = c.createMock(EndpointDescription.class);
-        EndpointDescription endpoint2 = c.createMock(EndpointDescription.class);
-
-        Map<String, Object> props = new HashMap<String, Object>();
-        String[] oc = new String[1];
-        oc[0] = "myClass";
-        props.put("objectClass", oc);
-
-        Map<String, Object> props2 = new HashMap<String, Object>();
-        oc = new String[1];
-        oc[0] = "notMyClass";
-        props2.put("objectClass", oc);
-
-        EasyMock.expect(bc.getService(EasyMock.eq(sref))).andReturn(epl).anyTimes();
-        EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andAnswer(new IAnswer<Filter>() {
-            public Filter answer() throws Throwable {
-                return FrameworkUtil.createFilter((String)EasyMock.getCurrentArguments()[0]);
-            }
-        }).anyTimes();
-        EasyMock.expect(sref.getProperty(EasyMock.eq(EndpointListener.ENDPOINT_LISTENER_SCOPE)))
-            .andReturn("(objectClass=myClass)").anyTimes();
-
-        EasyMock.expect(endpoint.getProperties()).andReturn(props).anyTimes();
-        EasyMock.expect(endpoint2.getProperties()).andReturn(props2).anyTimes();
-
-        // must only be called for the first EndpointDescription!
-        epl.endpointRemoved(EasyMock.eq(endpoint), EasyMock.eq("(objectClass=myClass)"));
+        epl.endpointRemoved(EasyMock.eq(endpoint1), EasyMock.eq("(objectClass=myClass)"));
         EasyMock.expectLastCall().once();
-
-        EndpointRepository exportRepository = EasyMock.createMock(EndpointRepository.class);
-
-        c.replay();
         EasyMock.replay(epl);
 
-        EndpointListenerNotifier tm = new EndpointListenerNotifier(bc, exportRepository);
+        EndpointRepository exportRepository = new EndpointRepository();
+        EndpointListenerNotifier tm = new EndpointListenerNotifier(exportRepository);
 
-        List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
-        endpoints.add(endpoint);
-        endpoints.add(endpoint2);
+        List<EndpointDescription> endpoints = Arrays.asList(endpoint1, endpoint2);
+        Set<Filter> filters = new HashSet<Filter>();
+        filters.add(FrameworkUtil.createFilter("(objectClass=myClass)"));
+        tm.notifyListener(NotifyType.REMOVED, epl, filters, endpoints);
 
-        tm.notifyListener(false, sref, endpoints);
-
-        c.verify();
         EasyMock.verify(epl);
+    }
+    
+    public EndpointDescription createEndpoint(String iface) {
+        Map<String, Object> props = new Hashtable<String, Object>(); 
+        props.put("objectClass", new String[]{iface});
+        props.put(RemoteConstants.ENDPOINT_ID, iface);
+        props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, "any");
+        return new EndpointDescription(props);
     }
 
     @Test
     public void testNormalizeScopeForSingleString() {
-        try {
-            ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-            EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
-                .andReturn("Filterstring");
-
-            Filter f = EasyMock.createNiceMock(Filter.class);
-
-            BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-            EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f);
-
-            EasyMock.replay(sr);
-            EasyMock.replay(bc);
-
-            List<Filter> res = EndpointListenerNotifier.getFiltersFromEndpointListenerScope(sr, bc);
-
-            assertEquals(1, res.size());
-            assertEquals(f, res.get(0));
-
-            EasyMock.verify(sr);
-            EasyMock.verify(bc);
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
+        ServiceReference sr = createListenerServiceWithFilter("(myProp=A)");
+        Set<Filter> res = EndpointListenerNotifier.getFiltersFromEndpointListenerScope(sr);
+        assertEquals(1, res.size());
+        Filter filter = res.iterator().next();
+        filterMatches(filter);
     }
 
     @Test
     public void testNormalizeScopeForStringArray() {
-        try {
-            String[] filterStrings = {"f1", "f2", "f3"};
-
-            ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-            EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
-                .andReturn(filterStrings);
-
-            Filter f = EasyMock.createNiceMock(Filter.class);
-
-            BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-            EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f).times(filterStrings.length);
-
-            EasyMock.replay(sr);
-            EasyMock.replay(bc);
-
-            List<Filter> res = EndpointListenerNotifier.getFiltersFromEndpointListenerScope(sr, bc);
-
-            assertEquals(filterStrings.length, res.size());
-            assertEquals(f, res.get(0));
-
-            EasyMock.verify(sr);
-            EasyMock.verify(bc);
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
+        String[] filters = {"(myProp=A)", "(otherProp=B)"};
+        ServiceReference sr = createListenerServiceWithFilter(filters); 
+        Set<Filter> res = EndpointListenerNotifier.getFiltersFromEndpointListenerScope(sr);
+        assertEquals(filters.length, res.size());
+        Iterator<Filter> it = res.iterator();
+        Filter filter1 = it.next();
+        Filter filter2 = it.next();
+        Dictionary<String, String> props = new Hashtable();
+        props.put("myProp", "A");
+        assertThat(filter1.match(props) || filter2.match(props), is(true));
     }
 
     @Test
     public void testNormalizeScopeForCollection() {
-        try {
-            Collection<String> collection = new ArrayList<String>();
-            collection.add("f1");
-            collection.add("f2");
-            collection.add("f3");
+        Collection<String> collection = Arrays.asList("(myProp=A)", "(otherProp=B)");
+        ServiceReference sr = createListenerServiceWithFilter(collection);
+        Set<Filter> res = EndpointListenerNotifier.getFiltersFromEndpointListenerScope(sr);
+        Iterator<Filter> it = res.iterator();
+        Filter filter1 = it.next();
+        Filter filter2 = it.next();
+        Dictionary<String, String> props = new Hashtable();
+        props.put("myProp", "A");
+        Assert.assertThat(filter1.match(props) || filter2.match(props), is(true));
+    }
+    
+    private void filterMatches(Filter filter) {
+        Dictionary<String, String> props = new Hashtable();
+        props.put("myProp", "A");
+        Assert.assertTrue("Filter should match", filter.match(props));
+    }
 
-            ServiceReference sr = EasyMock.createMock(ServiceReference.class);
-            EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE))
-                .andReturn(collection);
-
-            Filter f = EasyMock.createNiceMock(Filter.class);
-
-            BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-            EasyMock.expect(bc.createFilter((String)EasyMock.anyObject())).andReturn(f).times(collection.size());
-
-            EasyMock.replay(sr);
-            EasyMock.replay(bc);
-
-            List<Filter> res = EndpointListenerNotifier.getFiltersFromEndpointListenerScope(sr, bc);
-
-            assertEquals(collection.size(), res.size());
-            assertEquals(f, res.get(0));
-
-            EasyMock.verify(sr);
-            EasyMock.verify(bc);
-        } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
-        }
+    private ServiceReference createListenerServiceWithFilter(Object filters) {
+        ServiceReference sr = EasyMock.createMock(ServiceReference.class);
+        EasyMock.expect(sr.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE)).andReturn(filters);
+        EasyMock.replay(sr);
+        return sr;
     }
 }

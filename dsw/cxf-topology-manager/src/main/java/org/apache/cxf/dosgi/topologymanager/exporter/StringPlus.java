@@ -16,33 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.topologymanager.util;
+package org.apache.cxf.dosgi.topologymanager.exporter;
 
 import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
+public final class StringPlus {
 
-public final class Utils {
-
-    private static final String OBJECTCLASS_EXPRESSION = ".*\\(" + Constants.OBJECTCLASS + "=([a-zA-Z_0-9.]+)\\).*";
-    private static final Pattern OBJECTCLASS_PATTERN = Pattern.compile(OBJECTCLASS_EXPRESSION);
-
-    private Utils() {
-        // prevent instantiation
-    }
-
-    public static String getObjectClass(String filter) {
-        if (filter != null) {
-            Matcher matcher = OBJECTCLASS_PATTERN.matcher(filter);
-            if (matcher.matches() && matcher.groupCount() >= 1) {
-                return matcher.group(1);
-            }
-        }
-        return null;
+    private StringPlus() {
     }
 
     /**
@@ -57,7 +37,7 @@ public final class Utils {
      * @param property a "string+" property value
      * @return the property value as an array of strings, or an empty array
      */
-    public static String[] getStringPlusProperty(Object property) {
+    public static String[] parse(Object property) {
         if (property instanceof String) {
             return new String[] {(String)property};
         } else if (property instanceof String[]) {
@@ -74,8 +54,4 @@ public final class Utils {
         return new String[0];
     }
 
-    public static String getBundleName(ServiceReference<?> sref) {
-        Bundle bundle = sref.getBundle();
-        return bundle == null ? "<unregistered>" : bundle.getSymbolicName();
-    }
 }

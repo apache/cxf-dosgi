@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.cxf.dosgi.topologymanager.util.Utils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.hooks.service.ListenerHook;
@@ -64,7 +63,7 @@ public class ListenerHookImpl implements ListenerHook {
         for (ListenerInfo listenerInfo : listeners) {
             LOG.debug("Filter {}", listenerInfo.getFilter());
 
-            String className = Utils.getObjectClass(listenerInfo.getFilter());
+            String className = FilterHelper.getObjectClass(listenerInfo.getFilter());
 
             if (listenerInfo.getBundleContext().getBundle().equals(bctx.getBundle())) {
                 LOG.debug("ListenerHookImpl: skipping request from myself");

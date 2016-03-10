@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cxf.dosgi.topologymanager.util.Utils;
+import org.apache.cxf.dosgi.topologymanager.exporter.EndpointListenerNotifier.NotifyType;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
@@ -39,20 +39,28 @@ import org.slf4j.LoggerFactory;
  * endpoints.
  */
 @SuppressWarnings("rawtypes")
-class EndpointRepository {
+public class EndpointRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(EndpointRepository.class);
 
     private final Map<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>> exportedServices
         = new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>>();
 
+    private EndpointListenerNotifier notifier;
+    
+    public void setNotifier(EndpointListenerNotifier notifier) {
+        this.notifier = notifier;
+    }
+    
+    
     /**
      * Remove all services exported by the given rsa.
      *
      * @param rsa the RemoteServiceAdmin to remove
      * @return list of removed endpoints
      */
-    synchronized List<EndpointDescription> removeRemoteServiceAdmin(RemoteServiceAdmin rsa) {
+    public synchronized List<EndpointDescription> removeRemoteServiceAdmin(RemoteServiceAdmin rsa) {
+        LOG.debug("RemoteServiceAdmin removed: {}", rsa.getClass().getName());
         List<EndpointDescription> removedEndpoints = new ArrayList<EndpointDescription>();
         for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
             Collection<EndpointDescription> endpoints = exports.get(rsa);
@@ -61,10 +69,11 @@ class EndpointRepository {
                 exports.remove(rsa);
             }
         }
+        notifier.notifyListeners(NotifyType.REMOVED, removedEndpoints);
         return removedEndpoints;
     }
 
-    synchronized List<EndpointDescription> removeService(ServiceReference sref) {
+    synchronized void removeService(ServiceReference sref) {
         List<EndpointDescription> removedEndpoints = new ArrayList<EndpointDescription>();
         Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsas = exportedServices.get(sref);
         if (rsas != null) {
@@ -73,12 +82,12 @@ class EndpointRepository {
             }
             exportedServices.remove(sref);
         }
-        return removedEndpoints;
+        notifier.notifyListeners(NotifyType.REMOVED, removedEndpoints);
     }
 
     synchronized void addService(ServiceReference sref) {
         if (!exportedServices.containsKey(sref)) {
-            LOG.info("Marking service from bundle {} for export", Utils.getBundleName(sref));
+            LOG.info("Marking service from bundle {} for export", sref.getBundle().getSymbolicName());
             exportedServices.put(sref, new LinkedHashMap<RemoteServiceAdmin, Collection<EndpointDescription>>());
         }
     }
@@ -91,6 +100,7 @@ class EndpointRepository {
         addService(sref);
         Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = exportedServices.get(sref);
         exports.put(rsa, endpoints);
+        notifier.notifyListeners(NotifyType.ADDED, endpoints);
     }
 
     synchronized boolean isAlreadyExportedForRsa(ServiceReference sref, RemoteServiceAdmin rsa) {
@@ -98,7 +108,7 @@ class EndpointRepository {
         return exports != null && exports.containsKey(rsa);
     }
 
-    synchronized Collection<EndpointDescription> getAllEndpoints() {
+    public synchronized Collection<EndpointDescription> getAllEndpoints() {
         List<EndpointDescription> allEndpoints = new ArrayList<EndpointDescription>();
         for (Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports : exportedServices.values()) {
             for (Collection<EndpointDescription> endpoints : exports.values()) {
@@ -108,7 +118,7 @@ class EndpointRepository {
         return allEndpoints;
     }
 
-    synchronized Set<ServiceReference> getServicesToBeExportedFor(RemoteServiceAdmin rsa) {
+    public synchronized Set<ServiceReference> getServicesToBeExportedFor(RemoteServiceAdmin rsa) {
         Set<ServiceReference> servicesToBeExported = new HashSet<ServiceReference>();
         for (Map.Entry<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>> entry
                 : exportedServices.entrySet()) {
@@ -118,4 +128,5 @@ class EndpointRepository {
         }
         return servicesToBeExported;
     }
+
 }
