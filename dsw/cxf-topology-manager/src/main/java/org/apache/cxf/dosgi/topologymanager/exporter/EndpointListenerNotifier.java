@@ -67,9 +67,6 @@ public class EndpointListenerNotifier {
      * @param endpoints the endpoints the listeners should be notified about
      */
     public void notifyListeners(NotifyType type, Collection<EndpointDescription> endpoints) {
-        if (endpoints.isEmpty()) { // a little optimization to prevent unnecessary processing
-            return;
-        }
         for (EndpointListener listener : listeners.keySet()) {
             notifyListener(type, listener, listeners.get(listener), endpoints);
         }
@@ -97,20 +94,6 @@ public class EndpointListenerNotifier {
         }
     }
 
-    /**
-     * Retrieves an endpoint's properties as a Dictionary.
-     *
-     * @param endpoint an endpoint description
-     * @return endpoint properties (will never return null)
-     */
-    private static Dictionary<String, Object> getEndpointProperties(EndpointDescription endpoint) {
-        if (endpoint == null || endpoint.getProperties() == null) {
-            return new Hashtable<String, Object>();
-        } else {
-            return new Hashtable<String, Object>(endpoint.getProperties());
-        }
-    }
-
     public static Set<Filter> getFiltersFromEndpointListenerScope(ServiceReference<EndpointListener> sref) {
         Set<Filter> filters = new HashSet<Filter>();
         String[] scopes = StringPlus.parse(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
@@ -126,7 +109,7 @@ public class EndpointListenerNotifier {
 
     private static Set<Filter> getMatchingFilters(Set<Filter> filters, EndpointDescription endpoint) {
         Set<Filter> matchingFilters = new HashSet<Filter>();
-        Dictionary<String, Object> dict = EndpointListenerNotifier.getEndpointProperties(endpoint);
+        Dictionary<String, Object> dict = new Hashtable<String, Object>(endpoint.getProperties());
         for (Filter filter : filters) {
             if (filter.match(dict)) {
                 LOG.debug("Filter {} matches endpoint {}", filter, dict);

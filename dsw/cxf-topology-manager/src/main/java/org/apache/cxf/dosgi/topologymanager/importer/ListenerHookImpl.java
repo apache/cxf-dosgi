@@ -52,12 +52,15 @@ public class ListenerHookImpl implements ListenerHook {
 
     private final BundleContext bctx;
     private final ServiceInterestListener serviceInterestListener;
+    private final String frameworkUUID;
 
     public ListenerHookImpl(BundleContext bc, ServiceInterestListener serviceInterestListener) {
         this.bctx = bc;
+        this.frameworkUUID = bctx.getProperty(Constants.FRAMEWORK_UUID);
         this.serviceInterestListener = serviceInterestListener;
     }
 
+    @Override
     public void added(Collection<ListenerInfo> listeners) {
         LOG.debug("added listeners {}", listeners);
         for (ListenerInfo listenerInfo : listeners) {
@@ -65,7 +68,7 @@ public class ListenerHookImpl implements ListenerHook {
 
             String className = FilterHelper.getObjectClass(listenerInfo.getFilter());
 
-            if (listenerInfo.getBundleContext().getBundle().equals(bctx.getBundle())) {
+            if (listenerInfo.getBundleContext().equals(bctx)) {
                 LOG.debug("ListenerHookImpl: skipping request from myself");
                 continue;
             }
@@ -79,11 +82,12 @@ public class ListenerHookImpl implements ListenerHook {
                 LOG.debug("Skipping import request for excluded class [{}]", className);
                 continue;
             }
-            String exFilter = extendFilter(listenerInfo.getFilter(), bctx);
+            String exFilter = extendFilter(listenerInfo.getFilter());
             serviceInterestListener.addServiceInterest(exFilter);
         }
     }
 
+    @Override
     public void removed(Collection<ListenerInfo> listeners) {
         LOG.debug("removed listeners {}", listeners);
 
@@ -91,7 +95,7 @@ public class ListenerHookImpl implements ListenerHook {
             LOG.debug("Filter {}", listenerInfo.getFilter());
 
             // TODO: determine if service was handled?
-            String exFilter = extendFilter(listenerInfo.getFilter(), bctx);
+            String exFilter = extendFilter(listenerInfo.getFilter());
             serviceInterestListener.removeServiceInterest(exFilter);
         }
     }
@@ -109,8 +113,7 @@ public class ListenerHookImpl implements ListenerHook {
         return false;
     }
 
-    static String extendFilter(String filter, BundleContext bctx) {
-        String uuid = bctx.getProperty(Constants.FRAMEWORK_UUID);
-        return "(&" + filter + "(!(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID + "=" + uuid + ")))";
+    String extendFilter(String filter) {
+        return "(&" + filter + "(!(" + RemoteConstants.ENDPOINT_FRAMEWORK_UUID + "=" + frameworkUUID + ")))";
     }
 }

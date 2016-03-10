@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -97,21 +98,17 @@ public class TopologyManagerExport implements ServiceListener {
     public void export(final ServiceReference<?> sref) {
         execService.execute(new Runnable() {
             public void run() {
-                try {
-                    doExportService(sref);
-                } catch (Throwable t) {
-                    LOG.error("export failed", t);
-                }
+                doExport(sref);
             }
         });
     }
 
-    protected void doExportService(final ServiceReference<?> sref) {
+    private void doExport(final ServiceReference<?> sref) {
         LOG.debug("Exporting service {}", sref);
         endpointRepo.addService(sref); // mark for future export even if there are currently no RSAs
         if (rsaSet.size() == 0) {
             LOG.error("No RemoteServiceAdmin available! Unable to export service from bundle {}, interfaces: {}",
-                    sref.getBundle().getSymbolicName(),
+                    getSymbolicName(sref.getBundle()),
                     sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS));
             return;
         }
@@ -125,6 +122,10 @@ public class TopologyManagerExport implements ServiceListener {
                 exportServiceUsingRemoteServiceAdmin(sref, remoteServiceAdmin);
             }
         }
+    }
+
+    private Object getSymbolicName(Bundle bundle) {
+        return bundle == null ? null : bundle.getSymbolicName();
     }
 
     private void exportServiceUsingRemoteServiceAdmin(final ServiceReference<?> sref,

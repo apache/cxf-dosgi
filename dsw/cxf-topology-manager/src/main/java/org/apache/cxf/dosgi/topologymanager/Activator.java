@@ -28,8 +28,6 @@ import org.apache.cxf.dosgi.topologymanager.exporter.TopologyManagerExport;
 import org.apache.cxf.dosgi.topologymanager.importer.TopologyManagerImport;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointListener;
@@ -41,10 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Activator implements BundleActivator {
-    private static final String DOSGI_SERVICES = "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)";
-    private static final String ENDPOINT_LISTENER_FILTER =
-        "(&(" + Constants.OBJECTCLASS + "=" + EndpointListener.class.getName() + ")"
-        + "(" + EndpointListener.ENDPOINT_LISTENER_SCOPE + "=*))";
+    static final String DOSGI_SERVICES = "(" + RemoteConstants.SERVICE_EXPORTED_INTERFACES + "=*)";
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
 
     private TopologyManagerExport exportManager;
@@ -100,15 +95,7 @@ public class Activator implements BundleActivator {
         importManager.stop();
         rsaTracker.close();
     }
-    
-    public static Filter epListenerFilter(BundleContext bctx) {
-        try {
-            return bctx.createFilter(ENDPOINT_LISTENER_FILTER);
-        } catch (InvalidSyntaxException e) {
-            throw new RuntimeException("Unexpected exception creating filter", e);
-        }
-    }
-    
+
     public void exportExistingServices(BundleContext context) {
         try {
             // cast to String is necessary for compiling against OSGi core version >= 4.3

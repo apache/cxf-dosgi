@@ -27,6 +27,7 @@ import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.ImportReference;
@@ -48,13 +49,15 @@ public class TopologyManagerImportTest {
 
         final Semaphore sema = new Semaphore(0);
 
-        BundleContext bc = c.createMock(BundleContext.class);
         ServiceRegistration sreg = c.createMock(ServiceRegistration.class);
         sreg.unregister();
         EasyMock.expectLastCall().once();
+        
+        BundleContext bc = c.createMock(BundleContext.class);
         EasyMock.expect(bc.registerService(EasyMock.anyObject(Class.class),
                                            EasyMock.anyObject(),
                                            (Dictionary)EasyMock.anyObject())).andReturn(sreg).anyTimes();
+        EasyMock.expect(bc.getProperty(Constants.FRAMEWORK_UUID)).andReturn("myid");
 
         EndpointDescription endpoint = c.createMock(EndpointDescription.class);
         RemoteServiceAdmin rsa = c.createMock(RemoteServiceAdmin.class);

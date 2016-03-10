@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.dosgi.topologymanager.exporter;
 
-
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
@@ -29,6 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static java.util.Arrays.asList;
 
 import org.apache.cxf.dosgi.topologymanager.exporter.EndpointListenerNotifier.NotifyType;
 import org.easymock.EasyMock;
@@ -52,24 +52,54 @@ import static org.junit.Assert.assertThat;
 public class EndpointListenerNotifierTest {
 
     @Test
-    public void testNotifyListenersOfRemovalIfAppropriate() throws InvalidSyntaxException {
+    public void testNotifyListener() throws InvalidSyntaxException {
         EndpointDescription endpoint1 = createEndpoint("myClass");
         EndpointDescription endpoint2 = createEndpoint("notMyClass");
 
         // Expect listener to be called for endpoint1 but not for endpoint2 
-        EndpointListener epl = EasyMock.createMock(EndpointListener.class);
-        epl.endpointRemoved(EasyMock.eq(endpoint1), EasyMock.eq("(objectClass=myClass)"));
-        EasyMock.expectLastCall().once();
-        EasyMock.replay(epl);
+        EndpointListener epl = listenerExpects(endpoint1, "(objectClass=myClass)");
 
         EndpointRepository exportRepository = new EndpointRepository();
         EndpointListenerNotifier tm = new EndpointListenerNotifier(exportRepository);
 
+        EasyMock.replay(epl);
         List<EndpointDescription> endpoints = Arrays.asList(endpoint1, endpoint2);
         Set<Filter> filters = new HashSet<Filter>();
         filters.add(FrameworkUtil.createFilter("(objectClass=myClass)"));
+        tm.notifyListener(NotifyType.ADDED, epl, filters, endpoints);
         tm.notifyListener(NotifyType.REMOVED, epl, filters, endpoints);
+        EasyMock.verify(epl);
+    }
 
+    private EndpointListener listenerExpects(EndpointDescription endpoint, String filter) {
+        EndpointListener epl = EasyMock.createStrictMock(EndpointListener.class);
+        epl.endpointAdded(EasyMock.eq(endpoint), EasyMock.eq(filter));
+        EasyMock.expectLastCall().once();
+        epl.endpointRemoved(EasyMock.eq(endpoint), EasyMock.eq(filter));
+        EasyMock.expectLastCall().once();
+        return epl;
+    }
+    
+    @Test
+    public void testNotifyListeners() throws InvalidSyntaxException {
+        EndpointDescription endpoint1 = createEndpoint("myClass");
+        
+        EndpointListener epl = EasyMock.createStrictMock(EndpointListener.class);
+        epl.endpointAdded(EasyMock.eq(endpoint1), EasyMock.eq("(objectClass=myClass)"));
+        EasyMock.expectLastCall().once();
+        epl.endpointRemoved(EasyMock.eq(endpoint1), EasyMock.eq("(objectClass=myClass)"));
+        EasyMock.expectLastCall().once();
+
+        EndpointRepository exportRepository = new EndpointRepository();
+        EndpointListenerNotifier tm = new EndpointListenerNotifier(exportRepository);
+
+        EasyMock.replay(epl);
+        Set<Filter> filters = new HashSet<Filter>();
+        filters.add(FrameworkUtil.createFilter("(objectClass=myClass)"));
+        tm.add(epl, filters);
+        tm.notifyListeners(NotifyType.ADDED, asList(endpoint1));
+        tm.notifyListeners(NotifyType.REMOVED, asList(endpoint1));
+        tm.remove(epl);
         EasyMock.verify(epl);
     }
     

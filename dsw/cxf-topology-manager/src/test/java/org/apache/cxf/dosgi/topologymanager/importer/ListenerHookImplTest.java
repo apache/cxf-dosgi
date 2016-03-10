@@ -18,15 +18,19 @@
  */
 package org.apache.cxf.dosgi.topologymanager.importer;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.hooks.service.ListenerHook.ListenerInfo;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 import static org.junit.Assert.assertFalse;
@@ -35,22 +39,51 @@ import static org.junit.Assert.assertTrue;
 public class ListenerHookImplTest {
 
     @Test
-    public void testUUIDFilterExtension() throws InvalidSyntaxException {
+    public void testExtendFilter() throws InvalidSyntaxException {
         String filter = "(a=b)";
-
-        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-        EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("MyUUID").atLeastOnce();
-        EasyMock.replay(bc);
-
-        filter = ListenerHookImpl.extendFilter(filter, bc);
+        BundleContext bc = createBundleContext();
+        filter = new ListenerHookImpl(bc, null).extendFilter(filter);
 
         Filter f = FrameworkUtil.createFilter(filter);
 
         Dictionary<String, String> m = new Hashtable<String, String>();
         m.put("a", "b");
-
         assertTrue(filter + " filter must match as uuid is missing", f.match(m));
         m.put(RemoteConstants.ENDPOINT_FRAMEWORK_UUID, "MyUUID");
         assertFalse(filter + " filter must NOT match as uuid is the local one", f.match(m));
+    }
+    
+    @Test
+    public void testAddedRemoved() throws InvalidSyntaxException {
+        IMocksControl c = EasyMock.createControl();
+        String filter = "(objectClass=My)";
+        BundleContext bc = createBundleContext();
+        BundleContext listenerBc = createBundleContext();
+        ServiceInterestListener serviceInterestListener = c.createMock(ServiceInterestListener.class);
+        ListenerHookImpl listenerHook = new ListenerHookImpl(bc, serviceInterestListener);
+
+        ListenerInfo listener = c.createMock(ListenerInfo.class);
+        EasyMock.expect(listener.getBundleContext()).andReturn(listenerBc);
+        EasyMock.expect(listener.getFilter()).andReturn(filter).atLeastOnce();
+        
+        // Main assertions
+        serviceInterestListener.addServiceInterest(listenerHook.extendFilter(filter));
+        EasyMock.expectLastCall();
+        serviceInterestListener.removeServiceInterest(listenerHook.extendFilter(filter));
+        EasyMock.expectLastCall();
+
+        Collection<ListenerInfo> listeners = Collections.singletonList(listener);
+        
+        c.replay();
+        listenerHook.added(listeners);
+        listenerHook.removed(listeners);
+        c.verify();
+    }
+
+    private BundleContext createBundleContext() {
+        BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+        EasyMock.expect(bc.getProperty(EasyMock.eq("org.osgi.framework.uuid"))).andReturn("MyUUID").atLeastOnce();
+        EasyMock.replay(bc);
+        return bc;
     }
 }
