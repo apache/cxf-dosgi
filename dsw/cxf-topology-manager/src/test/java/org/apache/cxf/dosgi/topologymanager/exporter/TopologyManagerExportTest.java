@@ -18,16 +18,12 @@
  */
 package org.apache.cxf.dosgi.topologymanager.exporter;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-
-import org.apache.cxf.dosgi.topologymanager.exporter.EndpointListenerNotifier.NotifyType;
+import org.apache.cxf.dosgi.dsw.api.ExportPolicy;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Test;
@@ -36,12 +32,12 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.service.remoteserviceadmin.ExportReference;
 import org.osgi.service.remoteserviceadmin.ExportRegistration;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expectLastCall;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -57,7 +53,7 @@ public class TopologyManagerExportTest {
     public void testServiceExportUnexport() throws Exception {
         IMocksControl c = EasyMock.createControl();
         RemoteServiceAdmin rsa = c.createMock(RemoteServiceAdmin.class);
-        final EndpointListenerNotifier notifier = c.createMock(EndpointListenerNotifier.class);
+        final EndpointListener notifier = c.createMock(EndpointListener.class);
         final ServiceReference sref = createUserService(c);
         EndpointDescription epd = createEndpoint();
         expectServiceExported(c, rsa, notifier, sref, epd);
@@ -66,13 +62,14 @@ public class TopologyManagerExportTest {
         EndpointRepository endpointRepo = new EndpointRepository();
         endpointRepo.setNotifier(notifier);
         Executor executor = syncExecutor();
-        TopologyManagerExport exportManager = new TopologyManagerExport(endpointRepo, executor);
+        ExportPolicy policy = new DefaultExportPolicy();
+        TopologyManagerExport exportManager = new TopologyManagerExport(endpointRepo, executor, policy);
         exportManager.add(rsa);
         exportManager.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, sref));
         c.verify();
         
         c.reset();
-        notifier.notifyListeners(eq(NotifyType.REMOVED), eq(singletonList(epd)));
+        notifier.endpointRemoved(epd, null);
         expectLastCall().once();
         c.replay();
         exportManager.serviceChanged(new ServiceEvent(ServiceEvent.UNREGISTERING, sref));
@@ -84,8 +81,6 @@ public class TopologyManagerExportTest {
         c.verify();
         
         c.reset();
-        notifier.notifyListeners(eq(NotifyType.REMOVED), eq((Collection)emptyList()));
-        expectLastCall().once();
         c.replay();
         exportManager.remove(rsa);
         c.verify();
@@ -102,20 +97,20 @@ public class TopologyManagerExportTest {
 
         EndpointRepository endpointRepo = new EndpointRepository();
         endpointRepo.setNotifier(mockEpListenerNotifier);
-        TopologyManagerExport exportManager = new TopologyManagerExport(endpointRepo, syncExecutor());
-        exportManager.export(sref);
+        ExportPolicy policy = new DefaultExportPolicy();
+        TopologyManagerExport exportManager = new TopologyManagerExport(endpointRepo, syncExecutor(), policy);
+        exportManager.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, sref));
         exportManager.add(rsa);
         c.verify();
     }
 
     private void expectServiceExported(IMocksControl c, RemoteServiceAdmin rsa,
-                                       final EndpointListenerNotifier mockEpListenerNotifier,
+                                       final EndpointListener listener,
                                        final ServiceReference sref, EndpointDescription epd) {
         ExportRegistration exportRegistration = createExportRegistration(c, epd);
         EasyMock.expect(rsa.exportService(EasyMock.same(sref), (Map<String, Object>)EasyMock.anyObject()))
             .andReturn(Collections.singletonList(exportRegistration)).once();
-        mockEpListenerNotifier.notifyListeners(EasyMock.eq(NotifyType.ADDED), 
-                                               EasyMock.eq(Collections.singletonList(epd)));
+        listener.endpointAdded(epd, null); 
         EasyMock.expectLastCall().once();
     }
 

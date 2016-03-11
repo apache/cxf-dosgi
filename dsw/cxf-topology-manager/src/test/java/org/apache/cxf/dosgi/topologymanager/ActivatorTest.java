@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.topologymanager;
 
+import org.apache.cxf.dosgi.topologymanager.exporter.DefaultExportPolicy;
 import org.apache.cxf.dosgi.topologymanager.exporter.TopologyManagerExport;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -55,12 +56,12 @@ public class ActivatorTest {
 
         c.replay();
         Activator activator = new Activator();
-        activator.start(context);
+        activator.doStart(context, new DefaultExportPolicy());
         c.verify();
         
         c.reset();
         c.replay();
-        activator.stop(context);
+        activator.doStop(context);
         c.verify();
     }
 

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.topologymanager.exporter;
 
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -38,9 +37,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Tracks EndpointListeners and allows to notify them of endpoints.
  */
-public class EndpointListenerNotifier {
+public class EndpointListenerNotifier implements EndpointListener {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointListenerNotifier.class);
-    public enum NotifyType { ADDED, REMOVED };
+    private enum NotifyType { ADDED, REMOVED };
     private Map<EndpointListener, Set<Filter>> listeners;
     private EndpointRepository endpointRepo;
 
@@ -48,52 +47,7 @@ public class EndpointListenerNotifier {
         this.endpointRepo = endpointRepo;
         this.listeners = new ConcurrentHashMap<EndpointListener, Set<Filter>>();
     }
-
-    public void add(EndpointListener ep, Set<Filter> filters) {
-        LOG.debug("new EndpointListener detected");
-        listeners.put(ep, filters);
-        notifyListener(NotifyType.ADDED, ep, filters, endpointRepo.getAllEndpoints());
-    }
     
-    public void remove(EndpointListener ep) {
-        LOG.debug("EndpointListener modified");
-        listeners.remove(ep);
-    }
-    
-    /**
-     * Notifies all endpoint listeners about endpoints being added or removed.
-     *
-     * @param added specifies whether endpoints were added (true) or removed (false)
-     * @param endpoints the endpoints the listeners should be notified about
-     */
-    public void notifyListeners(NotifyType type, Collection<EndpointDescription> endpoints) {
-        for (EndpointListener listener : listeners.keySet()) {
-            notifyListener(type, listener, listeners.get(listener), endpoints);
-        }
-    }
-
-    /**
-     * Notifies an endpoint listener about endpoints being added or removed.
-     *
-     * @param type specifies whether endpoints were added (true) or removed (false)
-     * @param endpointListenerRef the ServiceReference of an EndpointListener to notify
-     * @param endpoints the endpoints the listener should be notified about
-     */
-    void notifyListener(NotifyType type, EndpointListener listener, Set<Filter> filters, 
-                        Collection<EndpointDescription> endpoints) {
-        LOG.debug("Endpoint {}", type);
-        for (EndpointDescription endpoint : endpoints) {
-            Set<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
-            for (Filter filter : matchingFilters) {
-                if (type == NotifyType.ADDED) {
-                    listener.endpointAdded(endpoint, filter.toString());
-                } else {
-                    listener.endpointRemoved(endpoint, filter.toString());
-                }
-            }
-        }
-    }
-
     public static Set<Filter> getFiltersFromEndpointListenerScope(ServiceReference<EndpointListener> sref) {
         Set<Filter> filters = new HashSet<Filter>();
         String[] scopes = StringPlus.parse(sref.getProperty(EndpointListener.ENDPOINT_LISTENER_SCOPE));
@@ -107,6 +61,61 @@ public class EndpointListenerNotifier {
         return filters;
     }
 
+    public void add(EndpointListener ep, Set<Filter> filters) {
+        LOG.debug("new EndpointListener detected");
+        listeners.put(ep, filters);
+        for (EndpointDescription endpoint : endpointRepo.getAllEndpoints()) {
+            notifyListener(NotifyType.ADDED, ep, filters, endpoint);
+        }
+    }
+    
+    public void remove(EndpointListener ep) {
+        LOG.debug("EndpointListener modified");
+        listeners.remove(ep);
+    }
+    
+    @Override
+    public void endpointAdded(EndpointDescription endpoint, String matchedFilter) {
+        notifyListeners(NotifyType.ADDED, endpoint);
+    }
+
+    @Override
+    public void endpointRemoved(EndpointDescription endpoint, String matchedFilter) {
+        notifyListeners(NotifyType.REMOVED, endpoint);
+    }
+
+    /**
+     * Notifies all endpoint listeners about endpoints being added or removed.
+     *
+     * @param added specifies whether endpoints were added (true) or removed (false)
+     * @param endpoints the endpoints the listeners should be notified about
+     */
+    private void notifyListeners(NotifyType type, EndpointDescription endpoint) {
+        for (EndpointListener listener : listeners.keySet()) {
+            notifyListener(type, listener, listeners.get(listener), endpoint);
+        }
+    }
+
+    /**
+     * Notifies an endpoint listener about endpoints being added or removed.
+     *
+     * @param type specifies whether endpoints were added (true) or removed (false)
+     * @param endpointListenerRef the ServiceReference of an EndpointListener to notify
+     * @param endpoints the endpoints the listener should be notified about
+     */
+    private void notifyListener(NotifyType type, EndpointListener listener, Set<Filter> filters, 
+                        EndpointDescription endpoint) {
+        LOG.debug("Endpoint {}", type);
+        Set<Filter> matchingFilters = getMatchingFilters(filters, endpoint);
+        for (Filter filter : matchingFilters) {
+            if (type == NotifyType.ADDED) {
+                listener.endpointAdded(endpoint, filter.toString());
+            } else {
+                listener.endpointRemoved(endpoint, filter.toString());
+            }
+        }
+    }
+    
     private static Set<Filter> getMatchingFilters(Set<Filter> filters, EndpointDescription endpoint) {
         Set<Filter> matchingFilters = new HashSet<Filter>();
         Dictionary<String, Object> dict = new Hashtable<String, Object>(endpoint.getProperties());
@@ -120,4 +129,5 @@ public class EndpointListenerNotifier {
         }
         return matchingFilters;
     }
+
 }

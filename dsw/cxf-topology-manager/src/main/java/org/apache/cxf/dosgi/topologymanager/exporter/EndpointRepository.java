@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cxf.dosgi.topologymanager.exporter.EndpointListenerNotifier.NotifyType;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
+import org.osgi.service.remoteserviceadmin.EndpointListener;
 import org.osgi.service.remoteserviceadmin.RemoteServiceAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +46,9 @@ public class EndpointRepository {
     private final Map<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>> exportedServices
         = new LinkedHashMap<ServiceReference, Map<RemoteServiceAdmin, Collection<EndpointDescription>>>();
 
-    private EndpointListenerNotifier notifier;
+    private EndpointListener notifier;
     
-    public void setNotifier(EndpointListenerNotifier notifier) {
+    public void setNotifier(EndpointListener notifier) {
         this.notifier = notifier;
     }
     
@@ -69,38 +69,35 @@ public class EndpointRepository {
                 exports.remove(rsa);
             }
         }
-        notifier.notifyListeners(NotifyType.REMOVED, removedEndpoints);
+        endpointsRemoved(removedEndpoints);
         return removedEndpoints;
     }
 
-    synchronized void removeService(ServiceReference sref) {
+    public synchronized void removeService(ServiceReference sref) {
         List<EndpointDescription> removedEndpoints = new ArrayList<EndpointDescription>();
-        Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsas = exportedServices.get(sref);
-        if (rsas != null) {
-            for (Collection<EndpointDescription> endpoints : rsas.values()) {
+        Map<RemoteServiceAdmin, Collection<EndpointDescription>> rsaToEndpoints = exportedServices.get(sref);
+        if (rsaToEndpoints != null) {
+            for (Collection<EndpointDescription> endpoints : rsaToEndpoints.values()) {
                 removedEndpoints.addAll(endpoints);
             }
             exportedServices.remove(sref);
         }
-        notifier.notifyListeners(NotifyType.REMOVED, removedEndpoints);
+        endpointsRemoved(removedEndpoints);
     }
 
-    synchronized void addService(ServiceReference sref) {
+    public synchronized void addService(ServiceReference sref) {
         if (!exportedServices.containsKey(sref)) {
             LOG.info("Marking service from bundle {} for export", sref.getBundle().getSymbolicName());
             exportedServices.put(sref, new LinkedHashMap<RemoteServiceAdmin, Collection<EndpointDescription>>());
         }
     }
 
-    synchronized void addEndpoints(ServiceReference sref, RemoteServiceAdmin rsa,
+    public synchronized void addEndpoints(ServiceReference sref, RemoteServiceAdmin rsa,
                                    List<EndpointDescription> endpoints) {
-        if (endpoints == null) {
-            throw new NullPointerException();
-        }
         addService(sref);
         Map<RemoteServiceAdmin, Collection<EndpointDescription>> exports = exportedServices.get(sref);
         exports.put(rsa, endpoints);
-        notifier.notifyListeners(NotifyType.ADDED, endpoints);
+        endpointsAdded(endpoints);
     }
 
     synchronized boolean isAlreadyExportedForRsa(ServiceReference sref, RemoteServiceAdmin rsa) {
@@ -129,4 +126,15 @@ public class EndpointRepository {
         return servicesToBeExported;
     }
 
+    private void endpointsAdded(List<EndpointDescription> endpoints) {
+        for (EndpointDescription epd : endpoints) {
+            notifier.endpointAdded(epd, null);
+        }
+    }
+    
+    private void endpointsRemoved(List<EndpointDescription> endpoints) {
+        for (EndpointDescription epd : endpoints) {
+            notifier.endpointRemoved(epd, null);
+        }
+    }
 }

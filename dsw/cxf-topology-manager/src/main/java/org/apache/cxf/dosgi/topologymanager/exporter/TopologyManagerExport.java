@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
+import org.apache.cxf.dosgi.dsw.api.ExportPolicy;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
@@ -53,10 +55,13 @@ public class TopologyManagerExport implements ServiceListener {
 
     private final Executor execService;
     private final EndpointRepository endpointRepo;
+    private ExportPolicy policy;
     private final Set<RemoteServiceAdmin> rsaSet;
 
-    public TopologyManagerExport(final EndpointRepository endpointRepo, Executor executor) {
+
+    public TopologyManagerExport(final EndpointRepository endpointRepo, Executor executor, ExportPolicy policy) {
         this.endpointRepo = endpointRepo;
+        this.policy = policy;
         this.rsaSet = new HashSet<RemoteServiceAdmin>();
         this.execService = executor;
     }
@@ -67,20 +72,11 @@ public class TopologyManagerExport implements ServiceListener {
         ServiceReference<?> sref = event.getServiceReference();
         if (event.getType() == ServiceEvent.REGISTERED) {
             LOG.debug("Received REGISTERED ServiceEvent: {}", event);
-            if (shouldExportService(sref)) {
-                export(sref);
-            }
+            export(sref);
         } else if (event.getType() == ServiceEvent.UNREGISTERING) {
             LOG.debug("Received UNREGISTERING ServiceEvent: {}", event);
             endpointRepo.removeService(sref);
         }
-    }
-
-    /**
-     * checks if a Service is intended to be exported
-     */
-    private boolean shouldExportService(ServiceReference<?> sref) {
-        return sref.getProperty(RemoteConstants.SERVICE_EXPORTED_INTERFACES) != null;
     }
 
     public void add(RemoteServiceAdmin rsa) {
@@ -95,7 +91,7 @@ public class TopologyManagerExport implements ServiceListener {
         endpointRepo.removeRemoteServiceAdmin(rsa);
     };
 
-    public void export(final ServiceReference<?> sref) {
+    private void export(final ServiceReference<?> sref) {
         execService.execute(new Runnable() {
             public void run() {
                 doExport(sref);
@@ -104,6 +100,11 @@ public class TopologyManagerExport implements ServiceListener {
     }
 
     private void doExport(final ServiceReference<?> sref) {
+        Map<String, ?> addProps = policy.additionalParameters(sref);
+        if (!shouldExport(sref, addProps)) {
+            LOG.debug("Skipping service {}", sref);
+            return;
+        }
         LOG.debug("Exporting service {}", sref);
         endpointRepo.addService(sref); // mark for future export even if there are currently no RSAs
         if (rsaSet.size() == 0) {
@@ -119,9 +120,17 @@ public class TopologyManagerExport implements ServiceListener {
                 // already handled by this remoteServiceAdmin
                 LOG.debug("already handled by this remoteServiceAdmin -> skipping");
             } else {
-                exportServiceUsingRemoteServiceAdmin(sref, remoteServiceAdmin);
+                
+                exportServiceUsingRemoteServiceAdmin(sref, remoteServiceAdmin, addProps);
             }
         }
+    }
+
+    private boolean shouldExport(ServiceReference<?> sref, Map<String, ?> addProps) {
+        String exported = (String)sref.getProperty(RemoteConstants.SERVICE_EXPORTED_INTERFACES);
+        String addExported = (String)addProps.get(RemoteConstants.SERVICE_EXPORTED_INTERFACES);
+        String effectiveExported = addExported != null ? addExported : exported;
+        return (effectiveExported != null) && !effectiveExported.isEmpty();
     }
 
     private Object getSymbolicName(Bundle bundle) {
@@ -129,7 +138,8 @@ public class TopologyManagerExport implements ServiceListener {
     }
 
     private void exportServiceUsingRemoteServiceAdmin(final ServiceReference<?> sref,
-                                                      final RemoteServiceAdmin remoteServiceAdmin) {
+                                                      final RemoteServiceAdmin remoteServiceAdmin, 
+                                                      Map<String, ?> addProps) {
         // abort if the service was unregistered by the time we got here
         // (we check again at the end, but this optimization saves unnecessary heavy processing)
         if (sref.getBundle() == null) {
@@ -140,7 +150,7 @@ public class TopologyManagerExport implements ServiceListener {
         // do the export
         LOG.debug("exporting {}...", sref);
         // TODO: additional parameter Map?
-        Collection<ExportRegistration> exportRegs = remoteServiceAdmin.exportService(sref, null);
+        Collection<ExportRegistration> exportRegs = remoteServiceAdmin.exportService(sref, addProps);
         // process successful/failed registrations
         List<EndpointDescription> endpoints = new ArrayList<EndpointDescription>();
         for (ExportRegistration reg : exportRegs) {

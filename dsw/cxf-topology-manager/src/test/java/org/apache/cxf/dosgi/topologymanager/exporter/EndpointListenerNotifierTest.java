@@ -24,13 +24,9 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.Arrays.asList;
-
-import org.apache.cxf.dosgi.topologymanager.exporter.EndpointListenerNotifier.NotifyType;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -63,11 +59,13 @@ public class EndpointListenerNotifierTest {
         EndpointListenerNotifier tm = new EndpointListenerNotifier(exportRepository);
 
         EasyMock.replay(epl);
-        List<EndpointDescription> endpoints = Arrays.asList(endpoint1, endpoint2);
         Set<Filter> filters = new HashSet<Filter>();
         filters.add(FrameworkUtil.createFilter("(objectClass=myClass)"));
-        tm.notifyListener(NotifyType.ADDED, epl, filters, endpoints);
-        tm.notifyListener(NotifyType.REMOVED, epl, filters, endpoints);
+        tm.add(epl, filters);
+        tm.endpointAdded(endpoint1, null);
+        tm.endpointAdded(endpoint2, null);
+        tm.endpointRemoved(endpoint1, null);
+        tm.endpointRemoved(endpoint2, null);
         EasyMock.verify(epl);
     }
 
@@ -97,8 +95,8 @@ public class EndpointListenerNotifierTest {
         Set<Filter> filters = new HashSet<Filter>();
         filters.add(FrameworkUtil.createFilter("(objectClass=myClass)"));
         tm.add(epl, filters);
-        tm.notifyListeners(NotifyType.ADDED, asList(endpoint1));
-        tm.notifyListeners(NotifyType.REMOVED, asList(endpoint1));
+        tm.endpointAdded(endpoint1, null);
+        tm.endpointRemoved(endpoint1, null);
         tm.remove(epl);
         EasyMock.verify(epl);
     }
