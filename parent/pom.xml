@@ -173,6 +173,9 @@
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>${felix.plugin.version}</version>
                     <extensions>true</extensions>
+                    <configuration>
+                        <obrRepository>NONE</obrRepository>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

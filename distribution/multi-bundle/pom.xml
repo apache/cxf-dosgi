@@ -66,10 +66,9 @@
               </descriptors>
               <features>
                 <feature>cxf-dosgi-base</feature>
-                <feature>cxf-dosgi-core</feature>
+                <feature>aries-rsa-discovery-zookeeper</feature>
+                <feature>aries-rsa-zookeeper-server</feature>
                 <feature>cxf-dosgi-provider-cxf</feature>
-                <feature>cxf-dosgi-discovery-distributed</feature>
-                <feature>cxf-dosgi-zookeeper-server</feature>
               </features>
               <repository>target/distribution_bundles</repository>
               <resolveDefinedRepositoriesRecursively>true</resolveDefinedRepositoriesRecursively>
