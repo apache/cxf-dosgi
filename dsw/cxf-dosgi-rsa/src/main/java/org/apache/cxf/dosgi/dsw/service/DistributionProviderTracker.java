@@ -44,9 +44,9 @@ public class DistributionProviderTracker extends ServiceTracker<DistributionProv
     public ServiceRegistration addingService(ServiceReference<DistributionProvider> reference) {
         LOG.debug("RemoteServiceAdmin Implementation is starting up");
         DistributionProvider provider = context.getService(reference);
-        Bundle apiBundle = FrameworkUtil.getBundle(DistributionProvider.class);
+        BundleContext apiContext = getAPIContext();
         RemoteServiceAdminCore rsaCore = new RemoteServiceAdminCore(context, 
-                                                                    apiBundle.getBundleContext(), 
+                                                                    apiContext, 
                                                                     provider);
         RemoteServiceadminFactory rsaf = new RemoteServiceadminFactory(rsaCore);
         Dictionary<String, Object> props = new Hashtable<String, Object>();
@@ -54,6 +54,12 @@ public class DistributionProviderTracker extends ServiceTracker<DistributionProv
         props.put("remote.configs.supported", reference.getProperty("remote.configs.supported"));
         LOG.info("Registering RemoteServiceAdmin for provider " + provider.getClass().getName());
         return context.registerService(RemoteServiceAdmin.class.getName(), rsaf, props);
+    }
+
+    protected BundleContext getAPIContext() {
+        Bundle apiBundle = FrameworkUtil.getBundle(DistributionProvider.class);
+        BundleContext apiContext = apiBundle.getBundleContext();
+        return apiContext;
     }
     
     @Override
