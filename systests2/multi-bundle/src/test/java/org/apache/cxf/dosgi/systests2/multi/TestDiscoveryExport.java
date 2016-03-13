@@ -98,12 +98,12 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
         Dictionary<String, Object> cliProps = new Hashtable<String, Object>();
         cliProps.put("zookeeper.host", "127.0.0.1");
         cliProps.put("zookeeper.port", "" + zkPort);
-        cadmin.getConfiguration("org.apache.cxf.dosgi.discovery.zookeeper", null).update(cliProps);
+        cadmin.getConfiguration("org.apache.aries.rsa.discovery.zookeeper", null).update(cliProps);
     }
 
     protected void updateZkServerConfig(final int zkPort, ConfigurationAdmin cadmin) throws IOException {
         Dictionary<String, Object> svrProps = new Hashtable<String, Object>();
         svrProps.put("clientPort", zkPort);
-        cadmin.getConfiguration("org.apache.cxf.dosgi.discovery.zookeeper.server", null).update(svrProps);
+        cadmin.getConfiguration("org.apache.aries.rsa.discovery.zookeeper.server", null).update(svrProps);
     }
 }
