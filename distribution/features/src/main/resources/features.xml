@@ -3,7 +3,7 @@
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
     <repository>mvn:org.apache.aries.rsa/rsa-features/1.8-SNAPSHOT/xml/features</repository>
 
-	<feature name="cxf-dosgi-base" description="base libs needed outside karaf" version="${project.version}" resolver="(obr)">
+    <feature name="cxf-dosgi-base" description="base libs needed outside karaf" version="${project.version}" resolver="(obr)">
         <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-api/1.8.5</bundle>
         <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-service/1.8.5</bundle>
         <bundle start-level="10">mvn:org.apache.felix/org.apache.felix.configadmin/1.8.8</bundle>
