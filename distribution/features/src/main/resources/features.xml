@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-dosgi-${project.version}">
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
-    <repository>mvn:org.apache.aries.rsa/rsa-features/1.8-SNAPSHOT/xml/features</repository>
+    <repository>mvn:org.apache.aries.rsa/rsa-features/${aries.rsa.version}/xml/features</repository>
 
     <feature name="cxf-dosgi-base" description="base libs needed outside karaf" version="${project.version}" resolver="(obr)">
         <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-api/1.8.5</bundle>

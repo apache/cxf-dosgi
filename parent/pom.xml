@@ -38,7 +38,8 @@
 
         <osgi.version>4.3.1</osgi.version>
         <osgi.compendium.version>4.3.1</osgi.compendium.version>
-        <cxf.version>3.1.5</cxf.version>
+        <aries.rsa.version>1.8.0</aries.rsa.version>
+        <cxf.version>3.1.6</cxf.version>
         <cxf.build-utils.version>3.1.0</cxf.build-utils.version>
         <felix.version>5.4.0</felix.version>
         <spring.version>4.2.4.RELEASE</spring.version>

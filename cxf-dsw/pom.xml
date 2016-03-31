@@ -43,17 +43,18 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
         </dependency>
-
 
         <dependency>
             <groupId>org.apache.aries.rsa</groupId>
-            <artifactId>spi</artifactId>
-            <version>${project.version}</version>
+            <artifactId>org.apache.aries.rsa.spi</artifactId>
+            <version>${aries.rsa.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -106,6 +107,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.7.14</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
