@@ -24,12 +24,12 @@
     <artifactId>cxf-dosgi-ri-samples-spring-dm-parent</artifactId>
     <packaging>pom</packaging>
     <name>Distributed OSGI Spring-DM Sample</name>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8.0</version>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
       <artifactId>cxf-dosgi-ri-parent</artifactId>
-      <version>1.8-SNAPSHOT</version>
+      <version>1.8.0</version>
       <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
