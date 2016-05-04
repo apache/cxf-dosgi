@@ -370,18 +370,6 @@
 
     <repositories>
         <repository>
-            <id>aries.rsa.1.8.0</id>
-            <name>aries.rsa.1.8.0</name>
-            <url>https://repository.apache.org/content/repositories/orgapachearies-1064</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    
-        <repository>
             <id>apache.snapshots</id>
             <name>Apache Maven Snapshot Repository</name>
             <url>http://repository.apache.org/content/groups/snapshots/</url>
