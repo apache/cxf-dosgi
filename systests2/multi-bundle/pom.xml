@@ -31,8 +31,11 @@
     <groupId>org.apache.cxf.dosgi.systests</groupId>
     <artifactId>cxf-dosgi-ri-systests2-multibundle</artifactId>
     <packaging>jar</packaging>
-
     <name>Distributed OSGi System Tests Multi-Bundle</name>
+    
+    <properties>
+        <topDirectoryLocation>../..</topDirectoryLocation>
+    </properties>
     
     <!-- 
         When changing code make sure to run the distro before testing

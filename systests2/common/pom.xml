@@ -26,6 +26,10 @@
         <version>1.9-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
+    
+    <properties>
+        <topDirectoryLocation>../..</topDirectoryLocation>
+    </properties>
 
     <groupId>org.apache.cxf.dosgi.systests</groupId>
     <artifactId>cxf-dosgi-ri-systests2-common</artifactId>

@@ -30,6 +30,11 @@
     <artifactId>cxf-dosgi-ri-samples-ds-parent</artifactId>
     <version>1.9-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <topDirectoryLocation>..</topDirectoryLocation>
+  </properties>
+
 
   <dependencies>
     <dependency>

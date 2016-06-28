@@ -58,8 +58,6 @@
         <slf4j.version>1.7.14</slf4j.version>
         <felix.plugin.version>2.4.0</felix.plugin.version>
         <exam.version>4.8.0</exam.version>
-        <cxf.resources.base.path />
-        <cxf.checkstyle.extension />
     </properties>
 
     <dependencyManagement>
@@ -161,15 +159,7 @@
 
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <version>${felix.plugin.version}</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <obrRepository>NONE</obrRepository>
-                    </configuration>
-                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
@@ -217,14 +207,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-remote-resources-plugin</artifactId>
-                    <version>1.2</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.cxf.build-utils</groupId>
-                            <artifactId>cxf-buildtools</artifactId>
-                            <version>${cxf.build-utils.version}</version>
-                        </dependency>
-                    </dependencies>
+                    <version>1.5</version>
                     <executions>
                         <execution>
                             <goals>
@@ -234,12 +217,6 @@
                                 <resourceBundles>
                                     <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
                                 </resourceBundles>
-                                <supplementalModels>
-                                    <supplementalModel>notice-supplements.xml</supplementalModel>
-                                </supplementalModels>
-                                <properties>
-                                    <projectName>Apache CXF Remote Service Admin provider</projectName>
-                                </properties>
                             </configuration>
                         </execution>
                     </executions>
@@ -249,25 +226,23 @@
 
         <plugins>
             <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>${felix.plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <obrRepository>NONE</obrRepository>
+                    <_include>-bnd.bnd</_include>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-remote-resources-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.15</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.cxf.build-utils</groupId>
-                        <artifactId>cxf-buildtools</artifactId>
-                        <version>${cxf.build-utils.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>6.4.1</version>
-                    </dependency>
-                </dependencies>
+                <version>2.17</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                     <includeResources>false</includeResources>
@@ -277,13 +252,12 @@
                         <id>validate</id>
                         <phase>validate</phase>
                         <configuration>
-                            <configLocation>${cxf.resources.base.path}cxf-checkstyle${cxf.checkstyle.extension}.xml</configLocation>
+                            <configLocation>${topDirectoryLocation}/buildtools/cxf-checkstyle.xml</configLocation>
+                            <suppressionsLocation>${topDirectoryLocation}/buildtools/cxf-checkstyle-suppressions.xml</suppressionsLocation>
+                            <excludes>target/generated-sources/xjc/.*\.java</excludes>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
-                            <linkXRef>false</linkXRef>
-                            <suppressionsLocation>${cxf.resources.base.path}cxf-checkstyle-suppressions.xml</suppressionsLocation>
                             <sourceDirectory>${basedir}/src</sourceDirectory>
-                            <excludes>**/archetype-resources/**/*.java,**/generated-sources/**</excludes>
                         </configuration>
                         <goals>
                             <goal>checkstyle</goal>

@@ -25,6 +25,10 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <topDirectoryLocation>../..</topDirectoryLocation>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>

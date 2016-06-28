@@ -35,6 +35,7 @@
     <properties>
         <bundle.import.package>*</bundle.import.package>
         <bundle.private.package>org.apache.cxf.dosgi.samples.greeter.impl</bundle.private.package>
+        <topDirectoryLocation>..</topDirectoryLocation>
     </properties>
 
     <dependencies>

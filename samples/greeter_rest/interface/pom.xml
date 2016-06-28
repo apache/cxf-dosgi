@@ -35,6 +35,7 @@
     <properties>
         <bundle.import.package>javax.ws.rs,javax.xml.bind.annotation,*</bundle.import.package>
         <bundle.export.package>org.apache.cxf.dosgi.samples.greeter.rest</bundle.export.package>
+        <topDirectoryLocation>..</topDirectoryLocation>
     </properties>
 
     <dependencies>
