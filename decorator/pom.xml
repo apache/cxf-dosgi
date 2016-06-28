@@ -20,9 +20,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
+    <artifactId>cxf-dosgi-ri-decorator</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF dOSGi Distribution provider</name>
+    <name>CXF dOSGi Service decorator support</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
@@ -114,21 +114,38 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Import-Package>
-                            javax.servlet*;version="[0.0,4)",
-                            *
-                        </Import-Package>
                         <Export-Package>
                             !*
                         </Export-Package>
                         <Bundle-Activator>org.apache.cxf.dosgi.dsw.Activator</Bundle-Activator>
                     </instructions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/TestUtils*</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
         </plugins>

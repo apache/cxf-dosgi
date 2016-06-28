@@ -9,7 +9,8 @@
     License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
     OF ANY KIND, either express or implied. See the License for the specific 
     language governing permissions and limitations under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
@@ -22,15 +23,6 @@
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation Parent</name>
-
-    <!-- Some versions of libraries used are different to the ones from CXF, 
-        this is generally caused by the fact that not all versions are available 
-        yet as OSGi bundles. -->
-
-    <!-- Note: the Felix Framework bundle contains the org.osgi core packages, 
-        which may override the standalone org.osgi dependency bundles - so if the 
-        org.osgi bundle versions are modified below, the corresponding Felix Framework 
-        version must be updated as well. -->
 
     <properties>
         <!-- portable text resource processing -->
@@ -149,10 +141,10 @@
                 <artifactId>org.eclipse.osgi</artifactId>
                 <version>3.8.0.v20120529-1548</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.apache.felix</groupId>
-                <artifactId>org.apache.felix.framework</artifactId> 
+                <artifactId>org.apache.felix.framework</artifactId>
                 <version>${felix.version}</version>
             </dependency>
 
@@ -246,51 +238,11 @@
                                     <supplementalModel>notice-supplements.xml</supplementalModel>
                                 </supplementalModels>
                                 <properties>
-                                    <projectName>Apache CXF Distributed
-                                        OSGi DSW Reference
-                                        Implementation</projectName>
+                                    <projectName>Apache CXF Remote Service Admin provider</projectName>
                                 </properties>
                             </configuration>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-eclipse-plugin</artifactId>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.cxf.build-utils</groupId>
-                            <artifactId>cxf-buildtools</artifactId>
-                            <version>${cxf.build-utils.version}</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <buildcommands>
-                            <java.lang.String>org.eclipse.jdt.core.javabuilder</java.lang.String>
-                            <java.lang.String>net.sf.eclipsecs.core.CheckstyleBuilder</java.lang.String>
-                            <java.lang.String>net.sourceforge.pmd.eclipse.plugin.pmdBuilder</java.lang.String>
-                        </buildcommands>
-                        <projectnatures>
-                            <nature>org.eclipse.jdt.core.javanature</nature>
-                            <nature>net.sf.eclipsecs.core.CheckstyleNature</nature>
-                            <nature>net.sourceforge.pmd.eclipse.plugin.pmdNature</nature>
-                        </projectnatures>
-                        <ajdtVersion>none</ajdtVersion>
-                        <additionalConfig>
-                            <file>
-                                <name>.checkstyle</name>
-                                <location>/cxf-eclipse-checkstyle</location>
-                            </file>
-                            <file>
-                                <name>.pmd</name>
-                                <location>/cxf-eclipse-pmd</location>
-                            </file>
-                            <file>
-                                <name>.ruleset</name>
-                                <location>/cxf-pmd-ruleset.xml</location>
-                            </file>
-                        </additionalConfig>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -299,72 +251,46 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-remote-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.15</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.cxf.build-utils</groupId>
                         <artifactId>cxf-buildtools</artifactId>
                         <version>${cxf.build-utils.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>6.4.1</version>
+                    </dependency>
                 </dependencies>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <includeResources>false</includeResources>
+                </configuration>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
+                        <id>validate</id>
+                        <phase>validate</phase>
                         <configuration>
-                            <resourceBundles>
-                                <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
-                            </resourceBundles>
-                            <supplementalModels>
-                                <supplementalModel>notice-supplements.xml</supplementalModel>
-                            </supplementalModels>
-                            <properties>
-                                <projectName>Apache CXF Distributed OSGi
-                                    DSW Reference Implementation</projectName>
-                            </properties>
+                            <configLocation>${cxf.resources.base.path}cxf-checkstyle${cxf.checkstyle.extension}.xml</configLocation>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>true</failsOnError>
+                            <linkXRef>false</linkXRef>
+                            <suppressionsLocation>${cxf.resources.base.path}cxf-checkstyle-suppressions.xml</suppressionsLocation>
+                            <sourceDirectory>${basedir}/src</sourceDirectory>
+                            <excludes>**/archetype-resources/**/*.java,**/generated-sources/**</excludes>
                         </configuration>
+                        <goals>
+                            <goal>checkstyle</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.15</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.cxf.build-utils</groupId>
-                            <artifactId>cxf-buildtools</artifactId>
-                            <version>${cxf.build-utils.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>6.4.1</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <encoding>UTF-8</encoding>
-                        <includeResources>false</includeResources>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>validate</id>
-                            <phase>validate</phase>
-                            <configuration>
-                                <configLocation>${cxf.resources.base.path}cxf-checkstyle${cxf.checkstyle.extension}.xml</configLocation>
-                                <consoleOutput>true</consoleOutput>
-                                <failsOnError>true</failsOnError>
-                                <linkXRef>false</linkXRef>
-                                <suppressionsLocation>${cxf.resources.base.path}cxf-checkstyle-suppressions.xml</suppressionsLocation>
-                                <sourceDirectory>${basedir}/src</sourceDirectory>
-                                <excludes>**/archetype-resources/**/*.java</excludes>
-                            </configuration>
-                            <goals>
-                                <goal>checkstyle</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
         </plugins>
     </build>
 

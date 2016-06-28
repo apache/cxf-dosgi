@@ -24,9 +24,6 @@ import java.util.Hashtable;
 import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.dosgi.dsw.decorator.ServiceDecorator;
-import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorBundleListener;
-import org.apache.cxf.dosgi.dsw.decorator.ServiceDecoratorImpl;
 import org.apache.cxf.dosgi.dsw.handlers.CXFDistributionProvider;
 import org.apache.cxf.dosgi.dsw.handlers.HttpServiceManager;
 import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
@@ -91,10 +88,6 @@ public class Activator implements ManagedService, BundleActivator {
         props.put("remote.intents.supported", supportedIntents);
         props.put("remote.configs.supported", cxfProvider.getSupportedTypes());
         rsaFactoryReg = bc.registerService(DistributionProvider.class.getName(), cxfProvider, props);
-        ServiceDecoratorImpl serviceDecorator = new ServiceDecoratorImpl();
-        bundleListener = new ServiceDecoratorBundleListener(serviceDecorator);
-        bc.addBundleListener(bundleListener);
-        decoratorReg = bc.registerService(ServiceDecorator.class.getName(), serviceDecorator, null);
     }
 
     private synchronized void uninit() {

@@ -106,6 +106,7 @@
         <module>samples</module>
         <module>distribution</module>
         <module>systests2</module>
+        <module>decorator</module>
     </modules>
 
     <profiles>

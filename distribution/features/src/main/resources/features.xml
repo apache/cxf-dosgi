@@ -26,7 +26,7 @@
         <feature>cxf-http</feature>
         <feature>http</feature>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-dsw-cxf/${project.version}</bundle>
-        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-dsw-cxf/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-decorator/${project.version}</bundle>
     </feature>
     
 </features>
