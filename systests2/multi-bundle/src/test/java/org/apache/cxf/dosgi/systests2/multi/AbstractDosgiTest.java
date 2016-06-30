@@ -31,9 +31,6 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.dosgi.samples.greeter.GreeterService;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -106,14 +103,6 @@ public class AbstractDosgiTest {
         }
     }
 
-    protected GreeterService createGreeterServiceProxy(String serviceUri) {
-        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-        factory.setServiceClass(GreeterService.class);
-        factory.setAddress(serviceUri);
-        factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-        return (GreeterService)factory.create();
-    }
-
     protected Bundle getBundleByName(BundleContext bc, String name) {
         for (Bundle bundle : bc.getBundles()) {
             if (bundle.getSymbolicName().equals(name)) {
@@ -163,7 +152,7 @@ public class AbstractDosgiTest {
 
     protected void assertBundlesStarted() {
         for (Bundle bundle : bundleContext.getBundles()) {
-            //System.out.println(bundle.getSymbolicName() + ":" + bundle.getVersion() + ": " + bundle.getState());
+            System.out.println(bundle.getSymbolicName() + ":" + bundle.getVersion() + ": " + bundle.getState());
             if (bundle.getState() != Bundle.ACTIVE) {
                 try {
                     bundle.start();

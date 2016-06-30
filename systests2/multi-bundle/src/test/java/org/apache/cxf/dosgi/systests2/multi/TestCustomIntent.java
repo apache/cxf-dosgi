@@ -41,6 +41,7 @@ import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
+import static org.apache.cxf.dosgi.systests2.multi.GreeterServiceProxyFactory.createGreeterServiceProxy;
 import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.provision;

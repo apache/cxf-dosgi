@@ -10,10 +10,7 @@
         <bundle start-level="11">mvn:org.apache.felix/org.apache.felix.fileinstall/3.5.0</bundle>
         <bundle start-level="20">mvn:org.apache.aries/org.apache.aries.util/1.1.1</bundle>
         <bundle start-level="20">mvn:org.apache.aries.proxy/org.apache.aries.proxy.api/1.0.1</bundle>
-        <bundle start-level="20">mvn:org.apache.aries.proxy/org.apache.aries.proxy.impl/1.0.4</bundle>
-        <bundle start-level="20">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.api/1.0.1</bundle>
-        <bundle start-level="20">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.core/1.5.0</bundle>
-        <bundle start-level="20">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.cm/1.0.7</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.scr/2.0.2</bundle>
     </feature>
 
     <feature name="cxf-dosgi-provider-cxf" version="${project.version}">
@@ -28,5 +25,5 @@
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-dsw-cxf/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-ri-decorator/${project.version}</bundle>
     </feature>
-    
+
 </features>

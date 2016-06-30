@@ -11,11 +11,9 @@
     language governing permissions and limitations under the License. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-samples-ds-client</artifactId>
     <packaging>bundle</packaging>
-    <name>Distributed OSGI Declarative Services Sample Client Bundle</name>
-    <version>1.9-SNAPSHOT</version>
+    <name>Distributed OSGI Declarative Services Sample Client</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi.samples</groupId>
@@ -27,16 +25,7 @@
         <topDirectoryLocation>..</topDirectoryLocation>
     </properties>
 
-
     <dependencies>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
             <artifactId>cxf-dosgi-ri-samples-ds-interface</artifactId>
@@ -44,25 +33,4 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-Name>${project.name}</Bundle-Name>
-                        <Bundle-Description>The client-side
-                            implementation of the Distributed OSGi with
-                            Declarative Services sample</Bundle-Description>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Activator>org.apache.cxf.dosgi.samples.ds.consumer.Activator</Bundle-Activator>
-                        <Import-Package>*</Import-Package>
-                        <Private-Package>org.apache.cxf.dosgi.samples.ds.consumer</Private-Package>
-                        <Service-Component>OSGI-INF/component.xml</Service-Component>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

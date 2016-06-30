@@ -16,34 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.samples.greeter.impl2.rest;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.apache.cxf.dosgi.samples.greeter.client.rest;
 
 import org.apache.cxf.dosgi.samples.greeter.rest.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreeterInfo;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreetingPhrase;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
-public class GreeterServiceImpl2 implements GreeterService {
+@Component
+public class GreeterClient {
+    private GreeterService greeterService;
 
-    private static final String STRANGER_NAME = "Stranger";
-
-    public GreeterInfo greetMe(String name) throws GreeterException {
-        System.out.println("Invoking from GreeterServiceImpl2: greetMe(" + name + ")");
-
-        if (name.equals(STRANGER_NAME)) {
-            throw new GreeterException(name);
+    @Activate
+    public void activate() throws GreeterException {
+        GreeterInfo greetings = greeterService.greetMe("Christian");
+        for (GreetingPhrase phrase : greetings.getGreetings()) {
+            System.out.println(phrase.getPhrase());
         }
 
-        GreeterInfo info = new GreeterInfo();
-        List<GreetingPhrase> list = new ArrayList<GreetingPhrase>();
-        list.add(new GreetingPhrase("Hello", name));
-        list.add(new GreetingPhrase("Hoi", name));
-        list.add(new GreetingPhrase("Hola", name));
-        list.add(new GreetingPhrase("Bonjour", name));
-        info.setGreetings(list);
-        return info;
+    }
+
+    @Reference
+    public void setGreeterService(GreeterService greeterService) {
+        this.greeterService = greeterService;
     }
 }

@@ -62,7 +62,7 @@ public class TestImportService extends AbstractDosgiTest {
     @Configuration
     public static Option[] configure() throws Exception {
         return new Option[] {
-                MultiBundleTools.getDistroWithDiscovery(),
+                MultiBundleTools.getDistro(),
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
                 mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                     .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),

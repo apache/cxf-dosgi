@@ -24,7 +24,6 @@
     <artifactId>cxf-dosgi-ri-samples-greeter-parent</artifactId>
     <packaging>pom</packaging>
     <name>Distributed OSGI Greeter Bundles</name>
-    <version>1.9-SNAPSHOT</version>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
@@ -32,6 +31,19 @@
       <version>1.9-SNAPSHOT</version>
       <relativePath>../../parent/pom.xml</relativePath>
     </parent>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <modules>
       <module>interface</module>

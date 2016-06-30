@@ -25,15 +25,24 @@ import org.apache.cxf.dosgi.samples.greeter.rest.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreeterInfo;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.rest.GreetingPhrase;
+import org.osgi.service.component.annotations.Component;
 
+@Component(//
+    immediate = true, //
+    property = //
+    {
+     "service.exported.interfaces=*", //
+     "service.exported.configs=org.apache.cxf.rs", //
+     "service.exported.intents=HTTP", //
+     "org.apache.cxf.rs.httpservice.context=/greeter" //
+    } //
+)
 public class GreeterServiceImpl implements GreeterService {
-
-    private static final String STRANGER_NAME = "Stranger";
 
     public GreeterInfo greetMe(String name) throws GreeterException {
         System.out.println("Invoking: greetMe(" + name + ")");
 
-        if (name.equals(STRANGER_NAME)) {
+        if (name.equals("Stranger")) {
             throw new GreeterException(name);
         }
 

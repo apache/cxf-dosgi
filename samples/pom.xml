@@ -22,7 +22,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-samples</artifactId>
-    <version>1.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Distributed OSGI RI Sample Bundles</name>
     <url>http://cxf.apache.org/</url>

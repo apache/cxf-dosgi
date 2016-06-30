@@ -19,11 +19,8 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.cxf.dosgi.samples</groupId>
   <artifactId>cxf-dosgi-ri-samples-ds-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Distributed OSGI Declarative Services Sample Implementation Bundle</name>
-  <version>1.9-SNAPSHOT</version>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
@@ -35,7 +32,6 @@
     <topDirectoryLocation>..</topDirectoryLocation>
   </properties>
 
-
   <dependencies>
     <dependency>
       <groupId>org.apache.cxf.dosgi.samples</groupId>
@@ -44,22 +40,5 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Bundle-Name>${project.name}</Bundle-Name>
-            <Bundle-Description>The server-side implementation of the Distributed OSGi with Declarative Services sample</Bundle-Description>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>org.apache.cxf.dosgi.samples.ds</Import-Package>
-            <Private-Package>org.apache.cxf.dosgi.samples.ds.impl</Private-Package>
-            <Service-Component>OSGI-INF/component.xml</Service-Component>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <name>Distributed OSGI Declarative Services Sample Impl</name>
 </project>

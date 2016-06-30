@@ -16,9 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.samples.greeter.rest;
+package org.apache.cxf.dosgi.systests2.multi;
 
-public interface GreeterService2 {
+import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.dosgi.samples.greeter.GreeterService;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
 
-    GreeterInfo greetMe(String name) throws GreeterException;
+public final class GreeterServiceProxyFactory {
+    
+    private GreeterServiceProxyFactory() {
+    }
+
+    protected static GreeterService createGreeterServiceProxy(String serviceUri) {
+        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+        factory.setServiceClass(GreeterService.class);
+        factory.setAddress(serviceUri);
+        factory.getServiceFactory().setDataBinding(new AegisDatabinding());
+        return (GreeterService)factory.create();
+    }
+
 }

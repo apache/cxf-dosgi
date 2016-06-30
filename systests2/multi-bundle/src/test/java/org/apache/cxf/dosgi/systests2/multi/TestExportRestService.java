@@ -56,7 +56,7 @@ public class TestExportRestService extends AbstractDosgiTest {
     @Configuration
     public Option[] configure() throws Exception {
         return new Option[] {
-                MultiBundleTools.getDistroWithDiscovery(),
+                MultiBundleTools.getDistro(),
                 systemProperty("org.osgi.service.http.port").value(webPort),
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
                 mavenBundle().groupId("org.apache.cxf.dosgi.samples")

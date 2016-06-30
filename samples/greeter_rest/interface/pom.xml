@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-samples-greeter-rest-interface</artifactId>
     <packaging>bundle</packaging>
-    <name>Distributed OSGI Greeter Rest Interface Bundle</name>
+    <name>Distributed OSGI Greeter REST Interface</name>
     <version>1.9-SNAPSHOT</version>
 
     <parent>

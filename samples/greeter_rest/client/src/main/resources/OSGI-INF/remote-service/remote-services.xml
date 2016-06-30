@@ -21,11 +21,4 @@
     <property name="service.exported.intents">HTTP</property>
     <property name="org.apache.cxf.rs.address">http://localhost:8080/greeter</property>
   </service-description>
-  <service-description>
-    <provide interface="org.apache.cxf.dosgi.samples.greeter.rest.GreeterService2" />
-    <property name="service.exported.interfaces">*</property>
-    <property name="service.exported.configs">org.apache.cxf.rs</property>
-    <property name="service.exported.intents">HTTP</property>
-    <property name="org.apache.cxf.rs.address">http://localhost:8080/greeter2</property>
-  </service-description>
 </service-descriptions>

@@ -96,10 +96,6 @@ public final class MultiBundleTools {
         return opts.toArray(new Option[opts.size()]);
     }
 
-    public static Option getDistroWithDiscovery() throws Exception {
-        return getDistro();
-    }
-
     public static Option getDistro() throws Exception {
         return CoreOptions.composite(getDistroBundleOptions());
     }

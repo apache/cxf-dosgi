@@ -16,24 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.samples.ds.impl;
+package org.apache.cxf.dosgi.samples.greeter.client;
 
-import org.apache.cxf.dosgi.samples.ds.AdderService;
+import java.util.Map;
+
+import org.apache.cxf.dosgi.samples.greeter.GreeterException;
+import org.apache.cxf.dosgi.samples.greeter.GreeterService;
+import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
-@Component(immediate = true, //
-    property = //
-    {
-     "service.exported.interfaces=*", //
-     "service.exported.configs=org.apache.cxf.ws", //
-     "org.apache.cxf.ws.address=http://localhost:9090/adder" //
-    } //
-)
-public class AdderServiceImpl implements AdderService {
+@Component
+public class GreeterClient {
+    private GreeterService greeterService;
 
-    public int add(int a, int b) {
-        int result = a + b;
-        System.out.println("Adder service invoked: " + a + " + " + b + " = " + result);
-        return result;
+    @Activate
+    public void activate() throws GreeterException {
+        Map<GreetingPhrase, String> greetings = greeterService.greetMe("Christian");
+        for (GreetingPhrase phrase : greetings.keySet()) {
+            System.out.println(phrase.getPhrase());
+        }
+
     }
+
+    @Reference
+    public void setGreeterService(GreeterService greeterService) {
+        this.greeterService = greeterService;
+    }
+
 }

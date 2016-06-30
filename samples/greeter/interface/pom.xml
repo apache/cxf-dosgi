@@ -20,54 +20,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-samples-greeter-interface</artifactId>
     <packaging>bundle</packaging>
     <name>Distributed OSGI Greeter Interface Bundle</name>
-    <version>1.9-SNAPSHOT</version>
 
     <parent>
-      <groupId>org.apache.cxf.dosgi</groupId>
-      <artifactId>cxf-dosgi-ri-parent</artifactId>
+      <groupId>org.apache.cxf.dosgi.samples</groupId>
+      <artifactId>cxf-dosgi-ri-samples-greeter-parent</artifactId>
       <version>1.9-SNAPSHOT</version>
-      <relativePath>../../../parent/pom.xml</relativePath>
+      <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
-        <bundle.import.package>*</bundle.import.package>
-        <bundle.export.package>org.apache.cxf.dosgi.samples.greeter</bundle.export.package>
         <topDirectoryLocation>..</topDirectoryLocation>
     </properties>
-
-    <dependencies>
-        <dependency>
-           <groupId>junit</groupId>
-           <artifactId>junit</artifactId>
-           <scope>test</scope>
-        </dependency>
-        <dependency>
-           <groupId>org.easymock</groupId>
-           <artifactId>easymockclassextension</artifactId>
-           <scope>test</scope>
-         </dependency>
-    </dependencies>
-
-    <build>
-      <plugins>
-        <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-Name>CXF Distributed OSGi Greeter Demo Interface Bundle</Bundle-Name>
-                        <Bundle-Description>The interfaces of the CXF Distributed OSGi Greeter demo</Bundle-Description>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Import-Package>${bundle.import.package}</Import-Package>
-                        <Export-Package>${bundle.export.package}</Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-         </plugins>
-    </build>
 
 </project>

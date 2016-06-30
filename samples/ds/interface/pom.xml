@@ -23,7 +23,7 @@
   <groupId>org.apache.cxf.dosgi.samples</groupId>
   <artifactId>cxf-dosgi-ri-samples-ds-interface</artifactId>
   <packaging>bundle</packaging>
-  <name>Distributed OSGI Declarative Services Sample Interface Bundle</name>
+  <name>Distributed OSGI Declarative Services Sample Interface</name>
   <version>1.9-SNAPSHOT</version>
 
   <parent>

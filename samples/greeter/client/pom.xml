@@ -20,17 +20,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-samples-greeter-client</artifactId>
     <packaging>bundle</packaging>
     <name>Distributed OSGI Greeter Bundle Client</name>
-    <version>1.9-SNAPSHOT</version>
 
     <parent>
-      <groupId>org.apache.cxf.dosgi</groupId>
-      <artifactId>cxf-dosgi-ri-parent</artifactId>
+      <groupId>org.apache.cxf.dosgi.samples</groupId>
+      <artifactId>cxf-dosgi-ri-samples-greeter-parent</artifactId>
       <version>1.9-SNAPSHOT</version>
-      <relativePath>../../../parent/pom.xml</relativePath>
+      <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -45,34 +43,6 @@
             <artifactId>cxf-dosgi-ri-samples-greeter-interface</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
     </dependencies>
-
-    <build>
-      <plugins>
-        <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-Name>CXF Distributed OSGi Greeter Demo Client Bundle</Bundle-Name>
-                        <Bundle-Description>The client-side implementation of the Distributed OSGi Greeter demo</Bundle-Description>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Activator>org.apache.cxf.dosgi.samples.greeter.client.Activator</Bundle-Activator>
-                        <Import-Package>${bundle.import.package}</Import-Package>
-                        <Private-Package>${bundle.private.package}</Private-Package>
-                        <DynamicImport-Package>org.apache.cxf.dosgi.dsw.qos,org.apache.cxf</DynamicImport-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-         </plugins>
-    </build>
 
 </project>

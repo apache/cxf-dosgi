@@ -6,7 +6,9 @@
 
     <!-- Filter out undesired bundles -->
     <xsl:template match="bundle[@artifactId='cxf-karaf-commands']"></xsl:template>
-    <xsl:template match="bundle[@artifactId='org.apache.karaf.http.command']"></xsl:template>
+    <xsl:template match="bundle[@artifactId='org.apache.karaf.http.core']"></xsl:template>
+    <xsl:template match="bundle[@artifactId='org.apache.aries.spifly.dynamic.bundle']"></xsl:template>
+    <xsl:template match="bundle[@groupId='org.eclipse.jetty.websocket']"></xsl:template>
 
     <!-- Copy the rest unachanged -->
     <xsl:template match="@* | node()">

@@ -74,7 +74,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse</groupId>
+            <groupId>org.eclipse.tycho</groupId>
             <artifactId>org.eclipse.osgi</artifactId>
         </dependency>
         <!-- 

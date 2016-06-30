@@ -25,7 +25,17 @@ import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 import org.apache.cxf.dosgi.samples.greeter.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
+import org.osgi.service.component.annotations.Component;
 
+@Component(//
+    immediate = true, //
+    property = //
+    {
+     "service.exported.interfaces=*", //
+     "service.exported.configs=org.apache.cxf.ws", //
+     "org.apache.cxf.ws.address=http://localhost:9090/greeter" //
+    } //
+)
 public class GreeterServiceImpl implements GreeterService {
 
     public Map<GreetingPhrase, String> greetMe(String name) {
@@ -51,8 +61,8 @@ public class GreeterServiceImpl implements GreeterService {
         System.out.println("Invoking: greetMe(" + details + ")");
 
         return new GreetingPhrase[] {
-            new GreetingPhrase("Howdy " + details),
-            new GreetingPhrase("Hallo " + details),
+            new GreetingPhrase("Howdy " + details), //
+            new GreetingPhrase("Hallo " + details), //
             new GreetingPhrase("Ni hao " + details)
         };
     }
