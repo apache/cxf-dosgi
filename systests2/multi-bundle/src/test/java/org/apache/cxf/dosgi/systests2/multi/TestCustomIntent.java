@@ -18,6 +18,13 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
+import static org.apache.cxf.dosgi.systests2.multi.GreeterServiceProxyFactory.createGreeterServiceProxy;
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.provision;
+import static org.ops4j.pax.exam.CoreOptions.streamBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+
 import java.io.InputStream;
 import java.util.Map;
 
@@ -30,7 +37,6 @@ import org.apache.cxf.dosgi.systests2.multi.customintent.CustomFeature;
 import org.apache.cxf.dosgi.systests2.multi.customintent.CustomIntentActivator;
 import org.apache.cxf.dosgi.systests2.multi.customintent.service.EmptyGreeterService;
 import org.apache.cxf.dosgi.systests2.multi.customintent.service.GreeterServiceWithCustomIntentActivator;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,13 +46,6 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-
-import static org.apache.cxf.dosgi.systests2.multi.GreeterServiceProxyFactory.createGreeterServiceProxy;
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.provision;
-import static org.ops4j.pax.exam.CoreOptions.streamBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 @RunWith(PaxExam.class)
 public class TestCustomIntent extends AbstractDosgiTest {
@@ -95,16 +94,10 @@ public class TestCustomIntent extends AbstractDosgiTest {
         getBundleByName(bundleContext, "CustomIntent").start();
         waitPort(9090);
 
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
-        try {
-            GreeterService greeterService = createGreeterServiceProxy("http://localhost:9090/greeter");
-            Map<GreetingPhrase, String> result = greeterService.greetMe("Chris");
-            Assert.assertEquals(1, result.size());
-            GreetingPhrase phrase = result.keySet().iterator().next();
-            Assert.assertEquals("Hi from custom intent", phrase.getPhrase());
-        } finally {
-            Thread.currentThread().setContextClassLoader(cl);
-        }
+        GreeterService greeterService = createGreeterServiceProxy("http://localhost:9090/greeter");
+        Map<GreetingPhrase, String> result = greeterService.greetMe("Chris");
+        Assert.assertEquals(1, result.size());
+        GreetingPhrase phrase = result.keySet().iterator().next();
+        Assert.assertEquals("Hi from custom intent", phrase.getPhrase());
     }
 }

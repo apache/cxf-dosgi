@@ -23,16 +23,22 @@ import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 
 public final class GreeterServiceProxyFactory {
-    
+
     private GreeterServiceProxyFactory() {
     }
 
     protected static GreeterService createGreeterServiceProxy(String serviceUri) {
-        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-        factory.setServiceClass(GreeterService.class);
-        factory.setAddress(serviceUri);
-        factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-        return (GreeterService)factory.create();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
+        try {
+            ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+            factory.setServiceClass(GreeterService.class);
+            factory.setAddress(serviceUri);
+            factory.getServiceFactory().setDataBinding(new AegisDatabinding());
+            return (GreeterService)factory.create();
+        } finally {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
     }
 
 }

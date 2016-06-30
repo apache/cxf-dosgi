@@ -53,8 +53,6 @@ public class TestExportService extends AbstractDosgiTest {
         return new Option[] {
             MultiBundleTools.getDistro(),
             systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
-            mavenBundle().groupId("org.apache.servicemix.bundles")
-                .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
             mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                 .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
             mavenBundle().groupId("org.apache.cxf.dosgi.samples")
