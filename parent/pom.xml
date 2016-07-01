@@ -123,6 +123,11 @@
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-cm</artifactId>
+                <version>${exam.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
                 <artifactId>pax-exam-container-forked</artifactId>
                 <version>${exam.version}</version>
             </dependency>

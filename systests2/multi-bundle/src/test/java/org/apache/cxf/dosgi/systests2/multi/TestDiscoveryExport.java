@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
-import java.io.IOException;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 import javax.inject.Inject;
 
@@ -35,10 +35,6 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-
 @RunWith(PaxExam.class)
 public class TestDiscoveryExport extends AbstractDosgiTest {
 
@@ -50,20 +46,20 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
 
     @Inject
     ConfigurationAdmin configAdmin;
-
+    
     @Configuration
     public static Option[] configure() throws Exception {
         return new Option[] {
                 MultiBundleTools.getDistro(),
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
+                configZKServer(),
+                configZKConsumer(),
                 mavenBundle().groupId("org.apache.servicemix.bundles")
                     .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
                 mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                     .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                     .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf.dosgi.systests")
-                    .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
                 frameworkStartLevel(100),
                 //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
@@ -71,11 +67,7 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
 
     @Test
     public void testDiscoveryExport() throws Exception {
-        final int zkPort = getFreePort();
-        System.out.println("*** Port for ZooKeeper Server: " + zkPort);
-        updateZkServerConfig(zkPort, configAdmin);
-        updateZkClientConfig(zkPort, configAdmin);
-        ZooKeeper zk = new ZooKeeper("localhost:" + zkPort, 1000, null);
+        ZooKeeper zk = new ZooKeeper("localhost:" + ZK_PORT, 1000, null);
         assertNodeExists(zk, GREETER_ZOOKEEPER_NODE, 14000);
         zk.close();
     }
@@ -93,17 +85,6 @@ public class TestDiscoveryExport extends AbstractDosgiTest {
         }
         Assert.assertNotNull("ZooKeeper node " + zNode + " was not found", stat);
     }
+    
 
-    protected void updateZkClientConfig(final int zkPort, ConfigurationAdmin cadmin) throws IOException {
-        Dictionary<String, Object> cliProps = new Hashtable<String, Object>();
-        cliProps.put("zookeeper.host", "127.0.0.1");
-        cliProps.put("zookeeper.port", "" + zkPort);
-        cadmin.getConfiguration("org.apache.aries.rsa.discovery.zookeeper", null).update(cliProps);
-    }
-
-    protected void updateZkServerConfig(final int zkPort, ConfigurationAdmin cadmin) throws IOException {
-        Dictionary<String, Object> svrProps = new Hashtable<String, Object>();
-        svrProps.put("clientPort", zkPort);
-        cadmin.getConfiguration("org.apache.aries.rsa.discovery.zookeeper.server", null).update(svrProps);
-    }
 }

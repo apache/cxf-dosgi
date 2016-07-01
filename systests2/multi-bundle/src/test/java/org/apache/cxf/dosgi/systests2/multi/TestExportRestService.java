@@ -20,6 +20,11 @@ package org.apache.cxf.dosgi.systests2.multi;
 
 
 
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.provision;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+
 import java.io.InputStream;
 
 import javax.inject.Inject;
@@ -38,12 +43,6 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-
-
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.provision;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 @RunWith(PaxExam.class)
 public class TestExportRestService extends AbstractDosgiTest {
@@ -78,9 +77,6 @@ public class TestExportRestService extends AbstractDosgiTest {
                 .build(TinyBundles.withBnd());
     }
 
-    /**
-     * FIXME This test fails.. 
-     */
     @Test
     public void testEndpointAvailable() throws Exception {
         waitWebPage("http://localhost:" + webPort + "/cxf/translate");

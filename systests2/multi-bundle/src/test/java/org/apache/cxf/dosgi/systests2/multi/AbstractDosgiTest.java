@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
+import static org.ops4j.pax.exam.cm.ConfigurationAdminOptions.newConfiguration;
+
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -31,18 +33,21 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
+import org.ops4j.pax.exam.Option;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 
 public class AbstractDosgiTest {
-    
+    static final int ZK_PORT = 35101;
     private static final int TIMEOUT = 20;
     
     @Inject
     BundleContext bundleContext;
-
+    
+    
+    
     /**
      * Sleeps for a short interval, throwing an exception if timeout has been reached.
      * Used to facilitate a retry interval with timeout when used in a loop.
@@ -112,14 +117,13 @@ public class AbstractDosgiTest {
         return null;
     }
 
-    protected int getFreePort() throws IOException {
-        ServerSocket socket = new ServerSocket();
-        try {
+    protected static int getFreePort() {
+        try (ServerSocket socket = new ServerSocket()) {
             socket.setReuseAddress(true); // enables quickly reopening socket on same port
             socket.bind(new InetSocketAddress(0)); // zero finds a free port
             return socket.getLocalPort();
-        } finally {
-            socket.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -162,4 +166,15 @@ public class AbstractDosgiTest {
             }
         }
     }
+    
+    protected static Option configZKConsumer() {
+        return newConfiguration("org.apache.aries.rsa.discovery.zookeeper").put("zookeeper.host", "127.0.0.1")
+            .put("zookeeper.port", "" + ZK_PORT).asOption();
+    }
+
+    protected static Option configZKServer() {
+        return newConfiguration("org.apache.aries.rsa.discovery.zookeeper.server").put("clientPort", "" + ZK_PORT)
+            .asOption();
+    }
+
 }

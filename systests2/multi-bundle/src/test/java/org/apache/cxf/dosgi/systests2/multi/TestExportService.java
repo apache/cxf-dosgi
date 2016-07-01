@@ -33,15 +33,14 @@ import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 import org.apache.cxf.dosgi.samples.greeter.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
@@ -52,13 +51,12 @@ public class TestExportService extends AbstractDosgiTest {
     public static Option[] configure() throws Exception {
         return new Option[] {
             MultiBundleTools.getDistro(),
+            CoreOptions.junitBundles(),
             systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
             mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                 .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
             mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                 .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
-            mavenBundle().groupId("org.apache.cxf.dosgi.systests")
-                .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(), frameworkStartLevel(100),
             //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
     }
@@ -67,16 +65,8 @@ public class TestExportService extends AbstractDosgiTest {
     public void testAccessEndpoint() throws Exception {
         assertBundlesStarted();
         waitPort(9090);
-
         checkWsdl(new URL("http://localhost:9090/greeter?wsdl"));
-
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
-        try {
-            checkServiceCall("http://localhost:9090/greeter");
-        } finally {
-            Thread.currentThread().setContextClassLoader(cl);
-        }
+        checkServiceCall("http://localhost:9090/greeter");
     }
 
     private void checkServiceCall(String serviceUri) {

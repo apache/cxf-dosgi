@@ -36,7 +36,6 @@
     <name>Distributed OSGi System Tests</name>
 
     <modules>
-        <module>common</module>
         <module>multi-bundle</module>
     </modules>
 </project>

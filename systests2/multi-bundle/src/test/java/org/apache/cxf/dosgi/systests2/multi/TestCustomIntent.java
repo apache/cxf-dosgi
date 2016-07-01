@@ -41,6 +41,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
@@ -75,13 +76,10 @@ public class TestCustomIntent extends AbstractDosgiTest {
     public static Option[] configure() throws Exception {
         return new Option[] {
                 MultiBundleTools.getDistro(),
+                CoreOptions.junitBundles(),
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
-                mavenBundle().groupId("org.apache.servicemix.bundles")
-                    .artifactId("org.apache.servicemix.bundles.junit").version("4.9_2"),
                 mavenBundle().groupId("org.apache.cxf.dosgi.samples")
                     .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
-                mavenBundle().groupId("org.apache.cxf.dosgi.systests")
-                    .artifactId("cxf-dosgi-ri-systests2-common").versionAsInProject(),
                 streamBundle(getCustomIntentBundle()).noStart(),
                 provision(getServiceBundle()),
                 frameworkStartLevel(100) };
