@@ -20,24 +20,23 @@ package org.apache.cxf.dosgi.dsw.handlers.pojo;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.TestCase;
-
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.util.EndpointHelper;
+import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
+import org.apache.cxf.dosgi.common.intent.IntentManager;
+import org.apache.cxf.dosgi.common.intent.IntentManagerImpl;
+import org.apache.cxf.dosgi.common.intent.IntentMap;
+import org.apache.cxf.dosgi.common.util.ServerWrapper;
 import org.apache.cxf.dosgi.dsw.handlers.jaxws.MyJaxWsEchoService;
 import org.apache.cxf.dosgi.dsw.handlers.simple.MySimpleEchoService;
-import org.apache.cxf.dosgi.dsw.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.dsw.osgi.Constants;
-import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
-import org.apache.cxf.dosgi.dsw.qos.IntentMap;
-import org.apache.cxf.dosgi.dsw.util.ServerWrapper;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.Server;
@@ -53,12 +52,32 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
+import junit.framework.TestCase;
+
 public class PojoConfigurationTypeHandlerTest extends TestCase {
+    @Test
+    public void testMergeArrays() {
+        Assert.assertNull(AbstractPojoConfigurationTypeHandler.mergeArrays(null, null));
+
+        String[] sa1 = {};
+        Assert.assertEquals(0, AbstractPojoConfigurationTypeHandler.mergeArrays(sa1, null).length);
+
+        String[] sa2 = {"X"};
+        Assert.assertEquals(1, AbstractPojoConfigurationTypeHandler.mergeArrays(null, sa2).length);
+        Assert.assertEquals("X", AbstractPojoConfigurationTypeHandler.mergeArrays(null, sa2)[0]);
+
+        String[] sa3 = {"Y", "Z"};
+        String[] sa4 = {"A", "Z"};
+        Assert.assertEquals(3, AbstractPojoConfigurationTypeHandler.mergeArrays(sa3, sa4).length);
+        Assert.assertEquals(new HashSet<String>(Arrays.asList("A", "Y", "Z")),
+                new HashSet<String>(Arrays.asList(AbstractPojoConfigurationTypeHandler.mergeArrays(sa3, sa4))));
+    }
 
     public void testGetPojoAddressEndpointURI() {
         IntentManager intentManager = new IntentManagerImpl(new IntentMap());
@@ -72,7 +91,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     }
 
     private HttpServiceManager dummyHttpServiceManager() {
-        return new HttpServiceManager(null, null, null, null);
+        return new HttpServiceManager();
     }
 
     public void testGetPojoAddressEndpointCxf() {

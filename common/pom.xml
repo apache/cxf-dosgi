@@ -20,9 +20,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
+    <artifactId>cxf-dosgi-ri-common</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF dOSGi Distribution provider</name>
+    <name>CXF dOSGi Common</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
@@ -36,12 +36,7 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.apache.cxf.dosgi</groupId>
-            <artifactId>cxf-dosgi-ri-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
@@ -78,6 +73,6 @@
             <artifactId>geronimo-servlet_${servlet.version}_spec</artifactId>
             <version>1.0</version>
         </dependency>
-
     </dependencies>
+
 </project>

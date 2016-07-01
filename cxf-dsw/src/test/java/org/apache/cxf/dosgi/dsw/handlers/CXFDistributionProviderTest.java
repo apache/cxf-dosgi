@@ -23,15 +23,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.aries.rsa.spi.DistributionProvider;
+import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
+import org.apache.cxf.dosgi.common.intent.DefaultIntentMapFactory;
+import org.apache.cxf.dosgi.common.intent.IntentManager;
+import org.apache.cxf.dosgi.common.intent.IntentManagerImpl;
+import org.apache.cxf.dosgi.common.intent.IntentMap;
 import org.apache.cxf.dosgi.dsw.handlers.pojo.PojoConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.pojo.WsdlConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.rest.JaxRSPojoConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.dsw.osgi.Constants;
-import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
-import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;
-import org.apache.cxf.dosgi.dsw.qos.IntentMap;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -100,9 +100,13 @@ public class CXFDistributionProviderTest {
         serviceProps.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, intents);
         IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
         IntentManager intentManager = new IntentManagerImpl(intentMap);
-        HttpServiceManager httpServiceManager = new HttpServiceManager(bc, null, null);
-        CXFDistributionProvider f = new CXFDistributionProvider(bc, intentManager, httpServiceManager);
-        List<String> configurationTypes = f.determineConfigurationTypes(serviceProps);
-        return f.getHandler(configurationTypes, serviceProps);
+        HttpServiceManager httpServiceManager = new HttpServiceManager();
+        httpServiceManager.setContext(bc);
+        CXFDistributionProvider provider = new CXFDistributionProvider();
+        provider.setHttpServiceManager(httpServiceManager);
+        provider.setIntentManager(intentManager);
+        provider.init(bc, null);
+        List<String> configurationTypes = provider.determineConfigurationTypes(serviceProps);
+        return provider.getHandler(configurationTypes, serviceProps);
     }
 }

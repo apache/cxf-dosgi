@@ -20,6 +20,8 @@ package org.apache.cxf.dosgi.dsw.handlers.pojo;
 
 import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,14 +32,13 @@ import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.dosgi.dsw.httpservice.HttpServiceManager;
+import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
+import org.apache.cxf.dosgi.common.intent.IntentManager;
+import org.apache.cxf.dosgi.common.util.ClassUtils;
+import org.apache.cxf.dosgi.common.util.OsgiUtils;
+import org.apache.cxf.dosgi.common.util.ServerWrapper;
+import org.apache.cxf.dosgi.common.util.StringPlus;
 import org.apache.cxf.dosgi.dsw.osgi.Constants;
-import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.qos.IntentUtils;
-import org.apache.cxf.dosgi.dsw.util.ClassUtils;
-import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.util.ServerWrapper;
-import org.apache.cxf.dosgi.dsw.util.StringPlus;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
@@ -84,10 +85,29 @@ public abstract class AbstractPojoConfigurationTypeHandler implements Distributi
             }
         }
         String[] sIntents = StringPlus.normalize(props.get(RemoteConstants.SERVICE_INTENTS));
-        String[] allIntents = IntentUtils.mergeArrays(intents, sIntents);
+        String[] allIntents = mergeArrays(intents, sIntents);
         props.put(RemoteConstants.SERVICE_INTENTS, allIntents);
         props.put(RemoteConstants.ENDPOINT_ID, address);
         return new EndpointDescription(props);
+    }
+    
+    public static String[] mergeArrays(String[] a1, String[] a2) {
+        if (a1 == null) {
+            return a2;
+        }
+        if (a2 == null) {
+            return a1;
+        }
+
+        List<String> list = new ArrayList<String>(a1.length + a2.length);
+        Collections.addAll(list, a1);
+        for (String s : a2) {
+            if (!list.contains(s)) {
+                list.add(s);
+            }
+        }
+
+        return list.toArray(new String[list.size()]);
     }
 
     protected void setCommonWsdlProperties(AbstractWSDLBasedEndpointFactory factory, BundleContext context,

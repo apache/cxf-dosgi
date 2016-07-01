@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_CONFIGS_SUPPORTED;
+import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS_SUPPORTED;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,47 +34,84 @@ import java.util.Set;
 import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
+import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
+import org.apache.cxf.dosgi.common.intent.IntentManager;
+import org.apache.cxf.dosgi.common.util.OsgiUtils;
+import org.apache.cxf.dosgi.common.util.StringPlus;
 import org.apache.cxf.dosgi.dsw.handlers.pojo.PojoConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.pojo.WsdlConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.rest.JaxRSPojoConfigurationTypeHandler;
-import org.apache.cxf.dosgi.dsw.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.dsw.osgi.Constants;
-import org.apache.cxf.dosgi.dsw.qos.IntentManager;
-import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
-import org.apache.cxf.dosgi.dsw.util.StringPlus;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+@Component(configurationPid = "cxf-dsw", property = //
+{//
+ REMOTE_CONFIGS_SUPPORTED + "=" + Constants.WS_CONFIG_TYPE,
+ REMOTE_CONFIGS_SUPPORTED + "=" + Constants.WSDL_CONFIG_TYPE,
+ REMOTE_CONFIGS_SUPPORTED + "=" + Constants.RS_CONFIG_TYPE,
+ REMOTE_CONFIGS_SUPPORTED + "=" + Constants.WS_CONFIG_TYPE_OLD,
+ REMOTE_INTENTS_SUPPORTED + "=" 
+})
 public class CXFDistributionProvider implements DistributionProvider {
+    public static final String[] SUPPORTED_CONFIGS = new String[] //
+    {//
+     Constants.WS_CONFIG_TYPE, Constants.WSDL_CONFIG_TYPE, Constants.RS_CONFIG_TYPE,
+     Constants.WS_CONFIG_TYPE_OLD
+    };
 
     protected static final String DEFAULT_CONFIGURATION_TYPE = Constants.WS_CONFIG_TYPE;
     private static final Logger LOG = LoggerFactory.getLogger(CXFDistributionProvider.class);
 
-    // protected because of tests
-    protected final String[] supportedConfigurationTypes;
 
     private IntentManager intentManager;
     private PojoConfigurationTypeHandler pojoConfigurationTypeHandler;
     private JaxRSPojoConfigurationTypeHandler jaxRsPojoConfigurationTypeHandler;
     private WsdlConfigurationTypeHandler wsdlConfigurationTypeHandler;
     private Set<String> configTypesSet;
+    private HttpServiceManager httpServiceManager;
+    
+    public CXFDistributionProvider() {
+        configTypesSet = new HashSet<>(Arrays.asList(SUPPORTED_CONFIGS));
+    }
 
-    public CXFDistributionProvider(BundleContext bc, IntentManager intentManager,
-                                    HttpServiceManager httpServiceManager) {
+    @Reference
+    public void setHttpServiceManager(HttpServiceManager httpServiceManager) {
+        this.httpServiceManager = httpServiceManager;
+    }
+    
+    @Reference
+    public void setIntentManager(IntentManager intentManager) {
         this.intentManager = intentManager;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Activate
+    public synchronized void activate(ComponentContext compContext) {
+        Dictionary<String, Object> config = compContext.getProperties();
+        init(compContext.getBundleContext(), config);
+        // String[] supportedIntents = intentMap.keySet().toArray(new String[] {});
+        // props.put(Constants.REMOTE_INTENTS_SUPPORTED, supportedIntents);
+    }
+
+    void init(BundleContext bc, Dictionary<String, Object> config) {
+        // Disable the fast infoset as it's not compatible (yet) with OSGi
+        System.setProperty("org.apache.cxf.nofastinfoset", "true");
+        LOG.debug("RemoteServiceAdmin Implementation is starting up with {}", config);
+        System.setProperty("org.apache.cxf.nofastinfoset", "true");
         this.pojoConfigurationTypeHandler = new PojoConfigurationTypeHandler(bc, intentManager, httpServiceManager);
         this.jaxRsPojoConfigurationTypeHandler = new JaxRSPojoConfigurationTypeHandler(bc,
                                                                                        intentManager,
                                                                                        httpServiceManager);
         this.wsdlConfigurationTypeHandler = new WsdlConfigurationTypeHandler(bc, intentManager, httpServiceManager);
-        supportedConfigurationTypes = new String[] {Constants.WS_CONFIG_TYPE,
-                                                    Constants.WSDL_CONFIG_TYPE, 
-                                                    Constants.RS_CONFIG_TYPE, 
-                                                    Constants.WS_CONFIG_TYPE_OLD};
-        configTypesSet = new HashSet<>(Arrays.asList(supportedConfigurationTypes));
     }
     
     @SuppressWarnings("rawtypes")
@@ -164,7 +205,7 @@ public class CXFDistributionProvider implements DistributionProvider {
         List<String> remoteConfigurationTypes = endpoint.getConfigurationTypes();
 
         List<String> usableConfigurationTypes = new ArrayList<String>();
-        for (String ct : supportedConfigurationTypes) {
+        for (String ct : SUPPORTED_CONFIGS) {
             if (remoteConfigurationTypes.contains(ct)) {
                 usableConfigurationTypes.add(ct);
             }
@@ -176,7 +217,7 @@ public class CXFDistributionProvider implements DistributionProvider {
     }
 
     public String[] getSupportedTypes() {
-        return supportedConfigurationTypes;
+        return SUPPORTED_CONFIGS;
     }
 
 }
