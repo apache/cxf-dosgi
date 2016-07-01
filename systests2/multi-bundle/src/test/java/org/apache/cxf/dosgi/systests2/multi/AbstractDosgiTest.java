@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.dosgi.systests2.multi;
 
+import static org.ops4j.pax.exam.CoreOptions.composite;
+import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.cm.ConfigurationAdminOptions.newConfiguration;
 
 import java.io.IOException;
@@ -33,7 +37,12 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.Stat;
+import org.junit.Assert;
+import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -42,23 +51,21 @@ import org.osgi.framework.ServiceReference;
 public class AbstractDosgiTest {
     static final int ZK_PORT = 35101;
     private static final int TIMEOUT = 20;
-    
+
     @Inject
     BundleContext bundleContext;
-    
-    
-    
+
     /**
-     * Sleeps for a short interval, throwing an exception if timeout has been reached.
-     * Used to facilitate a retry interval with timeout when used in a loop.
+     * Sleeps for a short interval, throwing an exception if timeout has been reached. Used to facilitate a
+     * retry interval with timeout when used in a loop.
      *
      * @param startTime the start time of the entire operation in milliseconds
      * @param timeout the timeout duration for the entire operation in seconds
      * @param message the error message to use when timeout occurs
      * @throws InterruptedException if interrupted while sleeping
      */
-    private static void sleepOrTimeout(long startTime, long timeout, String message) throws
-            InterruptedException, TimeoutException {
+    private static void sleepOrTimeout(long startTime, long timeout, String message)
+        throws InterruptedException, TimeoutException {
         timeout *= 1000; // seconds to millis
         long elapsed = System.currentTimeMillis() - startTime;
         long remaining = timeout - elapsed;
@@ -70,7 +77,7 @@ public class AbstractDosgiTest {
     }
 
     @SuppressWarnings({
-        "rawtypes", "unchecked"
+                       "rawtypes", "unchecked"
     })
     protected ServiceReference waitService(BundleContext bc, Class cls, String filter, int timeout)
         throws Exception {
@@ -156,7 +163,8 @@ public class AbstractDosgiTest {
 
     protected void assertBundlesStarted() {
         for (Bundle bundle : bundleContext.getBundles()) {
-            System.out.println(bundle.getSymbolicName() + ":" + bundle.getVersion() + ": " + bundle.getState());
+            System.out
+                .println(bundle.getSymbolicName() + ":" + bundle.getVersion() + ": " + bundle.getState());
             if (bundle.getState() != Bundle.ACTIVE) {
                 try {
                     bundle.start();
@@ -166,15 +174,55 @@ public class AbstractDosgiTest {
             }
         }
     }
-    
+
+    protected ZooKeeper createZookeeperClient() throws IOException {
+        return new ZooKeeper("localhost:" + ZK_PORT, 1000, null);
+    }
+
+    protected void assertNodeExists(ZooKeeper zk, String zNode, int timeout) {
+        long endTime = System.currentTimeMillis() + timeout;
+        Stat stat = null;
+        while (stat == null && System.currentTimeMillis() < endTime) {
+            try {
+                stat = zk.exists(zNode, null);
+                Thread.sleep(200);
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+        Assert.assertNotNull("ZooKeeper node " + zNode + " was not found", stat);
+    }
+
     protected static Option configZKConsumer() {
-        return newConfiguration("org.apache.aries.rsa.discovery.zookeeper").put("zookeeper.host", "127.0.0.1")
+        return newConfiguration("org.apache.aries.rsa.discovery.zookeeper") //
+            .put("zookeeper.host", "127.0.0.1") //
             .put("zookeeper.port", "" + ZK_PORT).asOption();
     }
 
     protected static Option configZKServer() {
-        return newConfiguration("org.apache.aries.rsa.discovery.zookeeper.server").put("clientPort", "" + ZK_PORT)
+        return newConfiguration("org.apache.aries.rsa.discovery.zookeeper.server")
+            .put("clientPort", "" + ZK_PORT) //
             .asOption();
+    }
+
+    protected static MavenArtifactProvisionOption greeterImpl() {
+        return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
+            .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject();
+    }
+
+    protected static MavenArtifactProvisionOption greeterInterface() {
+        return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
+            .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject();
+    }
+
+    protected static Option basicTestOptions() throws Exception {
+        return composite(MultiBundleTools.getDistro(), //
+                         CoreOptions.junitBundles(), //
+                         systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"), //
+                         systemProperty("pax.exam.osgi.unresolved.fail").value("true"), //
+                         frameworkStartLevel(100)
+        // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005") //
+        );
     }
 
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.common.test1;
+package org.apache.cxf.dosgi.systests2.multi.importservice;
 
 import java.util.Dictionary;
 import java.util.Hashtable;

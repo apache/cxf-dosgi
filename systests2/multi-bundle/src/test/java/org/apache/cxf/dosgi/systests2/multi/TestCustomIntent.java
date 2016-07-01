@@ -19,16 +19,11 @@
 package org.apache.cxf.dosgi.systests2.multi;
 
 import static org.apache.cxf.dosgi.systests2.multi.GreeterServiceProxyFactory.createGreeterServiceProxy;
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 import java.io.InputStream;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
@@ -41,48 +36,23 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
 @RunWith(PaxExam.class)
 public class TestCustomIntent extends AbstractDosgiTest {
 
-    @Inject
-    BundleContext bundleContext;
-
-    protected static InputStream getCustomIntentBundle() {
-        return TinyBundles.bundle()
-                .add(CustomIntentActivator.class)
-                .add(CustomFeature.class)
-                .add(AddGreetingPhraseInterceptor.class)
-                .set(Constants.BUNDLE_SYMBOLICNAME, "CustomIntent")
-                .set(Constants.BUNDLE_ACTIVATOR, CustomIntentActivator.class.getName()).build(TinyBundles.withBnd());
-    }
-
-    protected static InputStream getServiceBundle() {
-        return TinyBundles.bundle()
-                .add(GreeterServiceWithCustomIntentActivator.class)
-                .add(EmptyGreeterService.class)
-                .set(Constants.BUNDLE_SYMBOLICNAME, "EmptyGreeterService")
-                .set(Constants.BUNDLE_ACTIVATOR, GreeterServiceWithCustomIntentActivator.class.getName())
-                .build(TinyBundles.withBnd());
-    }
-
     @Configuration
     public static Option[] configure() throws Exception {
-        return new Option[] {
-                MultiBundleTools.getDistro(),
-                CoreOptions.junitBundles(),
-                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
-                mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-                    .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
-                streamBundle(getCustomIntentBundle()).noStart(),
-                provision(getServiceBundle()),
-                frameworkStartLevel(100) };
+        return new Option[] //
+        {
+         basicTestOptions(), //
+         greeterInterface(), //
+         streamBundle(getCustomIntentBundle()).noStart(), //
+         provision(getServiceBundle())
+        };
     }
 
     @Test
@@ -97,5 +67,24 @@ public class TestCustomIntent extends AbstractDosgiTest {
         Assert.assertEquals(1, result.size());
         GreetingPhrase phrase = result.keySet().iterator().next();
         Assert.assertEquals("Hi from custom intent", phrase.getPhrase());
+    }
+
+    private static InputStream getCustomIntentBundle() {
+        return TinyBundles.bundle() //
+            .add(CustomIntentActivator.class) //
+            .add(CustomFeature.class) //
+            .add(AddGreetingPhraseInterceptor.class) //
+            .set(Constants.BUNDLE_SYMBOLICNAME, "CustomIntent") //
+            .set(Constants.BUNDLE_ACTIVATOR, CustomIntentActivator.class.getName())
+            .build(TinyBundles.withBnd());
+    }
+
+    private static InputStream getServiceBundle() {
+        return TinyBundles.bundle() //
+            .add(GreeterServiceWithCustomIntentActivator.class) //
+            .add(EmptyGreeterService.class) //
+            .set(Constants.BUNDLE_SYMBOLICNAME, "EmptyGreeterService") //
+            .set(Constants.BUNDLE_ACTIVATOR, GreeterServiceWithCustomIntentActivator.class.getName())
+            .build(TinyBundles.withBnd());
     }
 }

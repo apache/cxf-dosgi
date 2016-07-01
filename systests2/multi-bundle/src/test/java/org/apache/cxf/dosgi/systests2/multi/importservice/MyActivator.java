@@ -16,26 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.common.test1;
+package org.apache.cxf.dosgi.systests2.multi.importservice;
 
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
-import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class StartServiceTracker extends ServiceTracker {
-
+@SuppressWarnings("rawtypes")
+public class MyActivator implements BundleActivator {
+    private ServiceTracker startTracker;
     private ServiceTracker tracker;
 
-    public StartServiceTracker(BundleContext context, Filter filter, ServiceTracker tracker) {
-        super(context, filter, null);
-        this.tracker = tracker;
+    public void start(final BundleContext bc) throws Exception {
+        Filter filter = bc.createFilter("(&(objectClass=java.lang.Object)(testName=test1))");
+        tracker = new MyServiceTracker(bc);
+
+        // The start tracker waits until a service from the test class is set before the
+        // 'MyServiceTracker' is activated.
+        startTracker = new StartServiceTracker(bc, filter, tracker);
+        startTracker.open();
     }
 
-    @Override
-    public Object addingService(ServiceReference reference) {
-        System.out.println("Test object available, so starting the service client tracker...");
-        tracker.open();
-        return super.addingService(reference);
+    public void stop(BundleContext bc) throws Exception {
+        startTracker.close();
+        tracker.close();
     }
 }

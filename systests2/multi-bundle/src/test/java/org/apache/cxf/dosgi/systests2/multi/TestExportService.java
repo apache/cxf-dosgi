@@ -26,9 +26,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterData;
 import org.apache.cxf.dosgi.samples.greeter.GreeterException;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
@@ -37,33 +34,27 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
-
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 @RunWith(PaxExam.class)
 public class TestExportService extends AbstractDosgiTest {
 
     @Configuration
     public static Option[] configure() throws Exception {
-        return new Option[] {
-            MultiBundleTools.getDistro(),
-            CoreOptions.junitBundles(),
-            systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
-            mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-                .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject(),
-            mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-                .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject(),
-            //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
+        return new Option[] //
+        {//
+         basicTestOptions(), //
+         greeterInterface(), //
+         greeterImpl(),
         };
     }
 
     @Test
     public void testAccessEndpoint() throws Exception {
-        assertBundlesStarted();
         waitPort(9090);
         checkWsdl(new URL("http://localhost:9090/greeter?wsdl"));
         checkServiceCall("http://localhost:9090/greeter");
