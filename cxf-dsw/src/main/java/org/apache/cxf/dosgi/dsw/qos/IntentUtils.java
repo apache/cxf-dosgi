@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.osgi.Constants;
 import org.apache.cxf.dosgi.dsw.util.OsgiUtils;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 

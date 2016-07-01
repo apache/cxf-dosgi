@@ -1,0 +1,2 @@
+Private-Package: org.apache.cxf.dosgi.samples.security
+Bundle-Activator: org.apache.cxf.dosgi.samples.security.Activator

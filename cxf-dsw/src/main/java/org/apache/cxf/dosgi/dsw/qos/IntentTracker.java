@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.qos;
 
-import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.osgi.Constants;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;

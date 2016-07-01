@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,29 +26,13 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.cxf.dosgi.dsw.util.ClassUtils;
 import org.apache.cxf.dosgi.dsw.util.Provider;
 import org.easymock.EasyMock;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 public class ClassUtilsTest extends TestCase {
-
-    public void testGetInterfaceClass() {
-        assertEquals(String.class,
-                ClassUtils.getInterfaceClass("Hello", "java.lang.String"));
-        assertNull(ClassUtils.getInterfaceClass("Hello", "java.lang.Integer"));
-        assertEquals(List.class, ClassUtils.getInterfaceClass(
-                new ArrayList<String>(), "java.util.List"));
-        assertEquals(Collection.class, ClassUtils.getInterfaceClass(
-                new ArrayList<String>(), "java.util.Collection"));
-    }
-
-    public void testGetInterfaceClassFromSubclass() {
-        assertEquals(Map.class, ClassUtils.getInterfaceClass(
-                new MySubclassFour(), "java.util.Map"));
-        assertNull(ClassUtils.getInterfaceClass(new MySubclassFour(),
-                "java.util.UnknownType"));
-    }
 
     public void testLoadProvidersAsString() throws Exception {
         BundleContext bc = mockBundleContext();

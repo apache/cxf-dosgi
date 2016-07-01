@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.qos;
 
-import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.osgi.Constants;
 import org.apache.cxf.feature.AbstractFeature;
 import org.easymock.Capture;
 import org.easymock.EasyMock;

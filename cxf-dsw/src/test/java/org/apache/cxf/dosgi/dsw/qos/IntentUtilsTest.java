@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.osgi.Constants;
 import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;

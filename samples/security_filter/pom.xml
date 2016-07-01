@@ -16,7 +16,6 @@
     <artifactId>cxf-dosgi-ri-samples-security</artifactId>
     <packaging>bundle</packaging>
     <name>Distributed OSGI Security Sample Bundle</name>
-    <version>1.9-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
@@ -31,14 +30,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_${servlet.version}_spec</artifactId>
             <version>1.0</version>
@@ -48,30 +39,6 @@
             <artifactId>org.apache.servicemix.specs.jsr311-api-1.0</artifactId>
             <version>${servicemix.specs.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-Name>${project.name}</Bundle-Name>
-                        <Bundle-Description>An example Distributed OSGi
-                            endpoint that passes requests through a
-                            security filter</Bundle-Description>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Private-Package>org.apache.cxf.dosgi.samples.security</Private-Package>
-                        <Bundle-Activator>org.apache.cxf.dosgi.samples.security.Activator</Bundle-Activator>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

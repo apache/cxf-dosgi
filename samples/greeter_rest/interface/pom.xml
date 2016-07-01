@@ -23,7 +23,6 @@
     <artifactId>cxf-dosgi-ri-samples-greeter-rest-interface</artifactId>
     <packaging>bundle</packaging>
     <name>Distributed OSGI Greeter REST Interface</name>
-    <version>1.9-SNAPSHOT</version>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>
@@ -33,22 +32,10 @@
     </parent>
 
     <properties>
-        <bundle.import.package>javax.ws.rs,javax.xml.bind.annotation,*</bundle.import.package>
-        <bundle.export.package>org.apache.cxf.dosgi.samples.greeter.rest</bundle.export.package>
-        <topDirectoryLocation>..</topDirectoryLocation>
+        <topDirectoryLocation>../../..</topDirectoryLocation>
     </properties>
 
     <dependencies>
-        <dependency>
-           <groupId>junit</groupId>
-           <artifactId>junit</artifactId>
-           <scope>test</scope>
-        </dependency>
-        <dependency>
-           <groupId>org.easymock</groupId>
-           <artifactId>easymockclassextension</artifactId>
-           <scope>test</scope>
-        </dependency>
         <dependency>
           <groupId>org.apache.servicemix.specs</groupId>
           <artifactId>org.apache.servicemix.specs.jsr339-api-m10</artifactId>
@@ -60,23 +47,5 @@
           <version>${servicemix.specs.version}</version>
         </dependency>
     </dependencies>
-
-    <build>
-      <plugins>
-        <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-Name>CXF Distributed OSGi Greeter REST Demo Interface Bundle</Bundle-Name>
-                        <Bundle-Description>The interfaces of the CXF Distributed OSGi Greeter REST demo</Bundle-Description>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Import-Package>${bundle.import.package}</Import-Package>
-                        <Export-Package>${bundle.export.package}</Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-         </plugins>
-    </build>
 
 </project>

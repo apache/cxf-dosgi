@@ -23,7 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.aries.rsa.spi.DistributionProvider;
-import org.apache.cxf.dosgi.dsw.Constants;
+import org.apache.cxf.dosgi.dsw.handlers.pojo.PojoConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.handlers.pojo.WsdlConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.handlers.rest.JaxRSPojoConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.httpservice.HttpServiceManager;
+import org.apache.cxf.dosgi.dsw.osgi.Constants;
 import org.apache.cxf.dosgi.dsw.qos.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.dsw.qos.IntentManager;
 import org.apache.cxf.dosgi.dsw.qos.IntentManagerImpl;

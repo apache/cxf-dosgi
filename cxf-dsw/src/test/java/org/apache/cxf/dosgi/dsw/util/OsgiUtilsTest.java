@@ -25,20 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.Version;
-import org.osgi.service.packageadmin.ExportedPackage;
-import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-@SuppressWarnings("deprecation")
+import junit.framework.TestCase;
+
 public class OsgiUtilsTest extends TestCase {
 
     public void testMultiValuePropertyAsString() {
@@ -61,79 +52,6 @@ public class OsgiUtilsTest extends TestCase {
 
     public void testMultiValuePropertyNull() {
         assertNull(OsgiUtils.getMultiValueProperty(null));
-    }
-
-    @SuppressWarnings({
-     "rawtypes", "unchecked"
-    })
-    public void testGetVersion() {
-        IMocksControl c = EasyMock.createNiceControl();
-        BundleContext bc = c.createMock(BundleContext.class);
-        ServiceReference sref = c.createMock(ServiceReference.class);
-        PackageAdmin pa = c.createMock(PackageAdmin.class);
-        Bundle b = c.createMock(Bundle.class);
-
-        EasyMock.expect(bc.getServiceReference(EasyMock.eq(PackageAdmin.class))).andReturn(sref);
-        EasyMock.expect(bc.getService(EasyMock.eq(sref))).andReturn(pa);
-
-        Class<?> iClass = CharSequence.class;
-
-        c.replay();
-        // version 0.0.0 because of missing bundle
-
-        assertEquals("0.0.0", OsgiUtils.getVersion(iClass, bc));
-
-        c.verify();
-        c.reset();
-        // version 1.2.3
-
-        EasyMock.expect(bc.getServiceReference(EasyMock.eq(PackageAdmin.class))).andReturn(sref);
-        EasyMock.expect(bc.getService(EasyMock.eq(sref))).andReturn(pa);
-        EasyMock.expect(pa.getBundle(EasyMock.eq(iClass))).andReturn(b);
-
-        ExportedPackage[] exP = new ExportedPackage[] {new MyExportedPackage(iClass.getPackage(), "1.2.3"),
-                                                       new MyExportedPackage(String.class.getPackage(), "4.5.6") };
-
-        EasyMock.expect(pa.getExportedPackages(EasyMock.eq(b))).andReturn(exP).atLeastOnce();
-
-        c.replay();
-        assertEquals("1.2.3", OsgiUtils.getVersion(iClass, bc));
-        c.verify();
-    }
-
-    private static class MyExportedPackage implements ExportedPackage {
-
-        Package package1;
-        String version;
-
-        MyExportedPackage(Package package1, String version) {
-            this.package1 = package1;
-            this.version = version;
-        }
-
-        public Bundle getExportingBundle() {
-            return null;
-        }
-
-        public Bundle[] getImportingBundles() {
-            return null;
-        }
-
-        public String getName() {
-            return package1.getName();
-        }
-
-        public String getSpecificationVersion() {
-            return null;
-        }
-
-        public Version getVersion() {
-            return new Version(version);
-        }
-
-        public boolean isRemovalPending() {
-            return false;
-        }
     }
 
     public void testGetProperty() {

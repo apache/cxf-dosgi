@@ -24,6 +24,7 @@ import java.util.Hashtable;
 import junit.framework.TestCase;
 
 import org.apache.aries.rsa.spi.DistributionProvider;
+import org.apache.cxf.dosgi.dsw.osgi.Activator;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.osgi.framework.Bundle;

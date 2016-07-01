@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.dosgi.dsw.handlers.pojo.ServiceInvocationHandler;
+
 import junit.framework.TestCase;
 
 public class ServiceInvocationHandlerTest extends TestCase {

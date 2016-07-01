@@ -23,16 +23,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.packageadmin.ExportedPackage;
-import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("deprecation")
 public final class OsgiUtils {
 
     public static final Logger LOG = LoggerFactory.getLogger(OsgiUtils.class);
@@ -81,52 +75,4 @@ public final class OsgiUtils {
         return null;
     }
 
-    /**
-     * Tries to retrieve the version of iClass via the PackageAdmin.
-     *
-     * @param iClass tThe interface for which the version should be found
-     * @param bc any valid BundleContext
-     * @return the version of the interface or "0.0.0" if no version information could be found or an error
-     *         occurred during the retrieval
-     */
-    public static String getVersion(Class<?> iClass, BundleContext bc) {
-        ServiceReference<PackageAdmin> paRef = bc.getServiceReference(PackageAdmin.class);
-        if (paRef != null) {
-            PackageAdmin pa = bc.getService(paRef);
-            try {
-                Bundle b = pa.getBundle(iClass);
-                if (b == null) {
-                    LOG.info("Unable to find interface version for interface " + iClass.getName()
-                            + ". Falling back to 0.0.0");
-                    return "0.0.0";
-                }
-                LOG.debug("Interface source bundle: {}", b.getSymbolicName());
-
-                ExportedPackage[] ep = pa.getExportedPackages(b);
-                LOG.debug("Exported Packages of the source bundle: {}", (Object)ep);
-
-                String pack = iClass.getPackage().getName();
-                LOG.debug("Looking for Package: {}", pack);
-                if (ep != null) {
-                    for (ExportedPackage p : ep) {
-                        if (p != null
-                            && pack.equals(p.getName())) {
-                            LOG.debug("found package -> Version: {}", p.getVersion());
-                            return p.getVersion().toString();
-                        }
-                    }
-                }
-            } finally {
-                if (pa != null) {
-                    bc.ungetService(paRef);
-                }
-            }
-        } else {
-            LOG.error("Was unable to obtain the package admin service -> can't resolve interface versions");
-        }
-
-        LOG.info("Unable to find interface version for interface " + iClass.getName()
-                 + ". Falling back to 0.0.0");
-        return "0.0.0";
-    }
 }

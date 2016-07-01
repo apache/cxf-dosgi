@@ -1,0 +1,3 @@
+Private-Package: org.apache.cxf.dosgi.dsw.decorator
+Bundle-Activator: org.apache.cxf.dosgi.dsw.decorator.Activator
+Export-Package: org.apache.cxf.xmlns.service_decoration._1_0

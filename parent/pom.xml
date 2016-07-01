@@ -32,14 +32,9 @@
         <osgi.compendium.version>4.3.1</osgi.compendium.version>
         <aries.rsa.version>1.8.0</aries.rsa.version>
         <cxf.version>3.1.6</cxf.version>
-        <cxf.build-utils.version>3.1.0</cxf.build-utils.version>
         <felix.version>5.4.0</felix.version>
-        <spring.version>4.2.4.RELEASE</spring.version>
-        <spring.osgi.version>1.2.1</spring.osgi.version>
         <zookeeper.version>3.4.8</zookeeper.version>
-
         <remote.service.admin.interfaces.version>1.0.0</remote.service.admin.interfaces.version>
-
         <servicemix.specs.version>2.6.0</servicemix.specs.version>
         <pax.web.version>1.0.11</pax.web.version>
         <pax.logging.version>1.7.0</pax.logging.version>
@@ -57,6 +52,7 @@
         <jaxbimpl.bundle.version>2.2.1.1_2</jaxbimpl.bundle.version>
         <slf4j.version>1.7.14</slf4j.version>
         <exam.version>4.8.0</exam.version>
+        <baseline.skip>true</baseline.skip>
     </properties>
 
     <dependencyManagement>
@@ -157,6 +153,46 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.aries.rsa</groupId>
+            <artifactId>org.apache.aries.rsa.spi</artifactId>
+            <version>${aries.rsa.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.14</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <defaultGoal>install</defaultGoal>
@@ -236,8 +272,24 @@
                 <extensions>true</extensions>
                 <configuration>
                     <obrRepository>NONE</obrRepository>
-                    <_include>-bnd.bnd</_include>
+                    <instructions>
+                        <Export-Package>!*</Export-Package>
+                        <_include>-bnd.bnd</_include>
+                    </instructions>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>baseline</id>
+                        <goals>
+                            <goal>baseline</goal>
+                        </goals>
+                        <configuration>
+                            <comparisonVersion>${baseline}</comparisonVersion>
+                            <skip>${baseline.skip}</skip>
+                            <failOnError>true</failOnError>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
