@@ -29,11 +29,7 @@ import javax.inject.Inject;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.dosgi.samples.greeter.GreeterService;
 import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
-import org.apache.cxf.dosgi.systests2.multi.importservice.GreeterDataImpl;
-import org.apache.cxf.dosgi.systests2.multi.importservice.MyActivator;
-import org.apache.cxf.dosgi.systests2.multi.importservice.MyServiceTracker;
 import org.apache.cxf.dosgi.systests2.multi.importservice.SimpleGreeter;
-import org.apache.cxf.dosgi.systests2.multi.importservice.StartServiceTracker;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.junit.After;
@@ -68,14 +64,9 @@ public class TestImportService extends AbstractDosgiTest {
 
     protected static InputStream createServiceConsumerBundle() {
         return TinyBundles.bundle() //
-            .add(MyActivator.class) //
-            .add(MyServiceTracker.class) //
-            .add(StartServiceTracker.class) //
-            .add(GreeterDataImpl.class) //
             .add("OSGI-INF/remote-service/remote-services.xml",
                  TestImportService.class.getResource("/rs-test1.xml")) //
-            .set(Constants.BUNDLE_SYMBOLICNAME, "testClientBundle") //
-            .set(Constants.BUNDLE_ACTIVATOR, MyActivator.class.getName()) //
+            .set(Constants.BUNDLE_SYMBOLICNAME, "importConfig") //
             .build(TinyBundles.withBnd());
     }
 
