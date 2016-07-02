@@ -18,16 +18,16 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
-import org.apache.cxf.dosgi.common.intent.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.intent.IntentManagerImpl;
-import org.apache.cxf.dosgi.common.intent.IntentMap;
 import org.apache.cxf.dosgi.dsw.handlers.pojo.PojoConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.pojo.WsdlConfigurationTypeHandler;
 import org.apache.cxf.dosgi.dsw.handlers.rest.JaxRSPojoConfigurationTypeHandler;
@@ -37,8 +37,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
-
-import static org.junit.Assert.assertTrue;
 
 public class CXFDistributionProviderTest {
 
@@ -98,8 +96,7 @@ public class CXFDistributionProviderTest {
         Map<String, Object> serviceProps = new HashMap<String, Object>();
         serviceProps.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, configType);
         serviceProps.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, intents);
-        IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
-        IntentManager intentManager = new IntentManagerImpl(intentMap);
+        IntentManager intentManager = new IntentManagerImpl();
         HttpServiceManager httpServiceManager = new HttpServiceManager();
         httpServiceManager.setContext(bc);
         CXFDistributionProvider provider = new CXFDistributionProvider();

@@ -40,5 +40,5 @@
     </dependency>
   </dependencies>
 
-  <name>Distributed OSGI Declarative Services Sample Impl</name>
+  <name>Distributed OSGI DS Sample Impl</name>
 </project>

@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.binding.BindingConfiguration;
-import org.apache.cxf.dosgi.common.intent.DefaultIntentMapFactory;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.intent.IntentManagerImpl;
 import org.apache.cxf.dosgi.common.intent.IntentMap;
@@ -54,7 +53,7 @@ public class IntentManagerImplTest extends Assert {
         AbstractEndpointFactory factory = control.createMock(AbstractEndpointFactory.class);
         control.replay();
 
-        IntentManager intentManager = new IntentManagerImpl(intentMap, 10000);
+        IntentManager intentManager = new IntentManagerImpl(intentMap);
 
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("osgi.remote.requires.intents", "A");
@@ -65,7 +64,7 @@ public class IntentManagerImplTest extends Assert {
 
     @Test
     public void testMultiIntents() {
-        final IntentMap intentMap = new IntentMap(new DefaultIntentMapFactory().create());
+        final IntentMap intentMap = new IntentMap(IntentManagerImpl.create());
         intentMap.put("confidentiality.message", new TestFeature("confidentiality.message"));
         intentMap.put("transactionality", new TestFeature("transactionality"));
 

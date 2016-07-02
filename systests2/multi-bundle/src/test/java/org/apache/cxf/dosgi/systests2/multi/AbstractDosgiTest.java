@@ -24,6 +24,7 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.cm.ConfigurationAdminOptions.newConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -40,8 +41,10 @@ import javax.inject.Inject;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.cm.ConfigurationAdminOptions;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -51,9 +54,15 @@ import org.osgi.framework.ServiceReference;
 public class AbstractDosgiTest {
     static final int ZK_PORT = 35101;
     private static final int TIMEOUT = 20;
-
+    
     @Inject
     BundleContext bundleContext;
+    
+    @BeforeClass
+    public static void log() {
+        System.out.println("-----------------------------------------------------------------");
+    }
+    
 
     /**
      * Sleeps for a short interval, throwing an exception if timeout has been reached. Used to facilitate a
@@ -204,6 +213,11 @@ public class AbstractDosgiTest {
             .put("clientPort", "" + ZK_PORT) //
             .asOption();
     }
+    
+    protected static Option configLogging() {
+        return ConfigurationAdminOptions.configurationFolder(new File("src/test/resources/cfg"));
+    }
+    
 
     protected static MavenArtifactProvisionOption greeterImpl() {
         return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
@@ -220,6 +234,7 @@ public class AbstractDosgiTest {
                          CoreOptions.junitBundles(), //
                          systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"), //
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"), //
+                         configLogging(),
                          frameworkStartLevel(100)
         // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005") //
         );

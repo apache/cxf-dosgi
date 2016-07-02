@@ -93,7 +93,6 @@ public class CXFDistributionProvider implements DistributionProvider {
         this.intentManager = intentManager;
     }
     
-    @SuppressWarnings("unchecked")
     @Activate
     public synchronized void activate(ComponentContext compContext) {
         Dictionary<String, Object> config = compContext.getProperties();

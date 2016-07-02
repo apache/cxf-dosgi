@@ -22,7 +22,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>cxf-dosgi-ri-samples-ds-interface</artifactId>
   <packaging>bundle</packaging>
-  <name>Distributed OSGI Declarative Services Sample Interface</name>
+  <name>Distributed OSGI DS Sample Interface</name>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.samples</groupId>

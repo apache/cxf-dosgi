@@ -15,7 +15,7 @@
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-samples-ds-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Distributed OSGI Declarative Services Sample</name>
+    <name>Distributed OSGI DS Sample</name>
     <version>1.9-SNAPSHOT</version>
 
     <parent>

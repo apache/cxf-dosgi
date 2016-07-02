@@ -66,24 +66,23 @@ public class HttpServiceManager {
     private HttpService httpService;
     private BundleContext context;
 
-    @SuppressWarnings("unchecked")
     @Activate
     public void activate(ComponentContext compContext) {
-        Dictionary<String, String> config = compContext.getProperties();
+        Dictionary<String, Object> config = compContext.getProperties();
         initFromConfig(config);
         this.context = compContext.getBundleContext();
     }
 
-    void initFromConfig(Dictionary<String, String> config) {
+    void initFromConfig(Dictionary<String, Object> config) {
         if (config == null) {
-            config = new Hashtable<String, String>();
+            config = new Hashtable<String, Object>();
         }
         this.httpBase = getWithDefault(config.get(KEY_HTTP_BASE), "http://" + LocalHostUtil.getLocalIp() + ":8181");
         this.cxfServletAlias = getWithDefault(config.get(KEY_CXF_SERVLET_ALIAS), "/cxf");
     }
 
-    private String getWithDefault(String value, String defaultValue) {
-        return value == null ? defaultValue : value;
+    private String getWithDefault(Object value, String defaultValue) {
+        return value == null ? defaultValue : value.toString();
     }
 
     public Bus registerServlet(Bus bus, String contextRoot, BundleContext callingContext, Long sid) {

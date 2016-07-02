@@ -18,10 +18,13 @@
  */
 package org.apache.cxf.dosgi.common.intent;
 
+import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +32,18 @@ import java.util.Set;
 
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.binding.soap.Soap12;
+import org.apache.cxf.binding.soap.SoapBindingConfiguration;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.Feature;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
+import org.apache.cxf.feature.LoggingFeature;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,41 +56,58 @@ public class IntentManagerImpl implements IntentManager {
     private static final int DEFAULT_INTENT_TIMEOUT = 30000;
 
     private final IntentMap intentMap;
-    private final long maxIntentWaitTime;
-    private IntentTracker tracker;
+    private final long maxIntentWaitTime = DEFAULT_INTENT_TIMEOUT;
 
     public IntentManagerImpl() {
-        this(DEFAULT_INTENT_TIMEOUT);
+        this(new IntentMap(create()));
     }
 
-    public IntentManagerImpl(int maxIntentWaitTime) {
-        this(new IntentMap(new DefaultIntentMapFactory().create()), maxIntentWaitTime);
-    }
-    
     public IntentManagerImpl(IntentMap intentMap) {
-        this(intentMap, DEFAULT_INTENT_TIMEOUT);
-    }
-
-    // For test
-    public IntentManagerImpl(IntentMap intentMap, int maxIntentWaitTime) {
-        this.maxIntentWaitTime = maxIntentWaitTime;
         this.intentMap = intentMap;
     }
-
     
-    @Activate
-    public void activate(BundleContext context) {
-        tracker = new IntentTracker(context, this.intentMap);
-        tracker.open();
+    public static Map<String, Object> create() {
+        Map<String, Object> defaults = new HashMap<String, Object>();
+        defaults.put("logging", getLoggingFeature());
+        Object soap11 = getSoapBinding(Soap11.getInstance());
+        defaults.put("SOAP", soap11);
+        defaults.put("SOAP.1_1", soap11);
+        defaults.put("SOAP.1_2", getSoapBinding(Soap12.getInstance()));
+        defaults.put("HTTP", "PROVIDED");
+        return defaults;
     }
-    
-    @Deactivate
-    public void deactivate() {
-        tracker.close();
+
+    private static Object getLoggingFeature() {
+        return new LoggingFeature();
+    }
+
+    private static Object getSoapBinding(SoapVersion soapVersion) {
+        SoapBindingConfiguration soapBindingConfig = new SoapBindingConfiguration();
+        soapBindingConfig.setVersion(soapVersion);
+        return soapBindingConfig;
+    }
+
+    @Reference //
+    (//
+        cardinality = MULTIPLE, //
+        policy = ReferencePolicy.DYNAMIC, //
+        target = "(" + IntentManager.INTENT_NAME_PROP + "=*)", //
+        policyOption = ReferencePolicyOption.GREEDY
+    )
+    public void addIntent(Object intent, Map<String, ?> props) {
+        String intentName = (String)props.get(INTENT_NAME_PROP);
+        LOG.info("Adding custom intent " + intentName);
+        intentMap.put(intentName, intent);
+    }
+
+    public void removeIntent(Object intent, Map<String, ?> props) {
+        String intentName = (String)props.get(INTENT_NAME_PROP);
+        intentMap.remove(intentName);
     }
 
     public String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory,
-                                 Map<String, Object> props) throws IntentUnsatisfiedException {
+                                 Map<String, Object> props)
+        throws IntentUnsatisfiedException {
         Set<String> requestedIntents = IntentManagerImpl.getRequestedIntents(props);
         Set<String> appliedIntents = new HashSet<String>();
         appliedIntents.addAll(reverseLookup(intentMap, PROVIDED_INTENT_VALUE));
@@ -99,13 +124,15 @@ public class IntentManagerImpl implements IntentManager {
         appliedIntents.addAll(addSynonymIntents(appliedIntents, intentMap));
         return appliedIntents.toArray(new String[appliedIntents.size()]);
     }
-    
+
     private static Set<String> getRequestedIntents(Map<String, Object> sd) {
-        Collection<String> intents = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
-        Collection<String> intents2
-            = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
+        Collection<String> intents = OsgiUtils
+            .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
+        Collection<String> intents2 = OsgiUtils
+            .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
         @SuppressWarnings("deprecation")
-        Collection<String> oldIntents = OsgiUtils.getMultiValueProperty(sd.get(IntentManager.EXPORTED_INTENTS_OLD));
+        Collection<String> oldIntents = OsgiUtils
+            .getMultiValueProperty(sd.get(IntentManager.EXPORTED_INTENTS_OLD));
         Set<String> allIntents = new HashSet<String>();
         if (intents != null) {
             allIntents.addAll(parseIntents(intents));
@@ -128,10 +155,11 @@ public class IntentManagerImpl implements IntentManager {
         return parsed;
     }
 
-    private boolean processIntent(List<Feature> features, AbstractEndpointFactory factory,
-                                  String intentName, Object intent) throws IntentUnsatisfiedException {
+    private boolean processIntent(List<Feature> features, AbstractEndpointFactory factory, String intentName,
+                                  Object intent)
+        throws IntentUnsatisfiedException {
         if (intent instanceof String) {
-            if (PROVIDED_INTENT_VALUE.equalsIgnoreCase((String) intent)) {
+            if (PROVIDED_INTENT_VALUE.equalsIgnoreCase((String)intent)) {
                 return false;
             }
         } else if (intent instanceof BindingConfiguration) {
@@ -140,7 +168,7 @@ public class IntentManagerImpl implements IntentManager {
             factory.setBindingConfig(bindingCfg);
             return true;
         } else if (intent instanceof Feature) {
-            Feature feature = (Feature) intent;
+            Feature feature = (Feature)intent;
             LOG.info("Applying intent: " + intentName + " via feature: " + feature);
             features.add(feature);
             return false;
@@ -151,8 +179,7 @@ public class IntentManagerImpl implements IntentManager {
         return false;
     }
 
-    private static Collection<String> addSynonymIntents(Collection<String> appliedIntents,
-                                                 IntentMap map) {
+    private static Collection<String> addSynonymIntents(Collection<String> appliedIntents, IntentMap map) {
         // E.g. SOAP and SOAP.1_1 are synonyms
         List<Object> values = new ArrayList<Object>();
         for (String key : appliedIntents) {
@@ -195,7 +222,8 @@ public class IntentManagerImpl implements IntentManager {
             }
             long remainingSeconds = (endTime - System.currentTimeMillis()) / 1000;
             if (!unsupportedIntents.isEmpty() && remainingSeconds > 0) {
-                LOG.debug("Waiting for custom intents " + unsupportedIntents + " timeout in " + remainingSeconds);
+                LOG.debug("Waiting for custom intents " + unsupportedIntents + " timeout in "
+                          + remainingSeconds);
                 try {
                     synchronized (intentMap) {
                         intentMap.wait(1000);
