@@ -28,8 +28,8 @@
         <!-- portable text resource processing -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <osgi.version>4.3.1</osgi.version>
-        <osgi.compendium.version>4.3.1</osgi.compendium.version>
+        <osgi.version>5.0.0</osgi.version>
+        <osgi.compendium.version>5.0.0</osgi.compendium.version>
         <aries.rsa.version>1.8.0</aries.rsa.version>
         <cxf.version>3.1.6</cxf.version>
         <felix.version>5.4.0</felix.version>
@@ -184,12 +184,6 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.14</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
