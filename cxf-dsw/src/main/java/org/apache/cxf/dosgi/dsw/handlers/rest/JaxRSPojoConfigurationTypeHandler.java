@@ -22,16 +22,20 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
+import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
 import org.apache.cxf.dosgi.common.util.ServerWrapper;
-import org.apache.cxf.dosgi.dsw.handlers.pojo.AbstractPojoConfigurationTypeHandler;
+import org.apache.cxf.dosgi.dsw.handlers.pojo.InterceptorSupport;
 import org.apache.cxf.dosgi.dsw.osgi.Constants;
+import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.Client;
@@ -44,18 +48,36 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeHandler {
-
+public class JaxRSPojoConfigurationTypeHandler implements DistributionProvider {
     private static final Logger LOG = LoggerFactory.getLogger(JaxRSPojoConfigurationTypeHandler.class);
+    protected BundleContext bundleContext;
+    protected IntentManager intentManager;
+    protected HttpServiceManager httpServiceManager;
 
-    public JaxRSPojoConfigurationTypeHandler(BundleContext dswBC,
-                                             IntentManager intentManager,
+    public JaxRSPojoConfigurationTypeHandler(BundleContext dswBC, IntentManager intentManager,
                                              HttpServiceManager httpServiceManager) {
-        super(dswBC, intentManager, httpServiceManager);
+        this.bundleContext = dswBC;
+        this.intentManager = intentManager;
+        this.httpServiceManager = httpServiceManager;
     }
 
     public String[] getSupportedTypes() {
         return new String[] {Constants.RS_CONFIG_TYPE};
+    }
+    
+    protected EndpointDescription createEndpointDesc(Map<String, Object> props, 
+                                                     String[] importedConfigs,
+                                                     String address, 
+                                                     String[] intents) {
+        props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
+        for (String configurationType : importedConfigs) {
+            if (Constants.RS_CONFIG_TYPE.equals(configurationType)) {
+                props.put(Constants.RS_ADDRESS_PROPERTY, address);
+            }
+        }
+        props.put(RemoteConstants.SERVICE_INTENTS, intents);
+        props.put(RemoteConstants.ENDPOINT_ID, address);
+        return new EndpointDescription(props);
     }
 
     @SuppressWarnings("rawtypes")
@@ -111,7 +133,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
             bean.setProviders(providers);
         }
         Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
-        return getProxy(bean.create(), iClass);
+        return ProxyFactory.create(bean.create(), iClass);
     }
 
     @SuppressWarnings("rawtypes")
@@ -119,7 +141,7 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
                                   BundleContext callingContext,
                                   Map<String, Object> endpointProps,
                                   Class[] exportedInterfaces) throws IntentUnsatisfiedException {
-        String contextRoot = getServletContextRoot(endpointProps);
+        String contextRoot = OsgiUtils.getProperty(endpointProps, Constants.RS_HTTP_SERVICE_CONTEXT);
         String address;
         Class<?> iClass = exportedInterfaces[0];
         if (contextRoot == null) {
@@ -144,6 +166,24 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
                 completeEndpointAddress, new String[] {"HTTP"});
 
         return createServerFromFactory(factory, epd);
+    }
+    
+    protected String getClientAddress(Map<String, Object> sd) {
+        return OsgiUtils.getFirstNonEmptyStringProperty(sd, RemoteConstants.ENDPOINT_ID,
+                                                            Constants.RS_ADDRESS_PROPERTY);
+    }
+
+    protected String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
+        String address = OsgiUtils.getProperty(sd, Constants.RS_ADDRESS_PROPERTY);
+        return address == null ? httpServiceManager.getDefaultAddress(iClass) : address;
+    }
+    
+    protected Bus createBus(Long sid, BundleContext callingContext, String contextRoot) {
+        Bus bus = BusFactory.newInstance().createBus();
+        if (contextRoot != null) {
+            httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);
+        }
+        return bus;
     }
 
     private Endpoint createServerFromFactory(JAXRSServerFactoryBean factory,
@@ -200,5 +240,24 @@ public class JaxRSPojoConfigurationTypeHandler extends AbstractPojoConfiguration
             }
         }
         return address;
+    }
+    
+    protected void addRsInterceptorsFeaturesProps(AbstractEndpointFactory factory,
+                                                         BundleContext callingContext,
+                                                         Map<String, Object> sd) {
+        InterceptorSupport.addInterceptors(factory, callingContext, sd, Constants.RS_IN_INTERCEPTORS_PROP_KEY);
+        InterceptorSupport.addInterceptors(factory, callingContext, sd, Constants.RS_OUT_INTERCEPTORS_PROP_KEY);
+        InterceptorSupport.addInterceptors(factory, callingContext, sd, Constants.RS_OUT_FAULT_INTERCEPTORS_PROP_KEY);
+        InterceptorSupport.addInterceptors(factory, callingContext, sd, Constants.RS_IN_FAULT_INTERCEPTORS_PROP_KEY);
+        InterceptorSupport.addFeatures(factory, callingContext, sd, Constants.RS_FEATURES_PROP_KEY);
+        addContextProperties(factory, sd, Constants.RS_CONTEXT_PROPS_PROP_KEY);
+    }
+    
+    private void addContextProperties(AbstractEndpointFactory factory, Map<String, Object> sd, String propName) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> props = (Map<String, Object>)sd.get(propName);
+        if (props != null) {
+            factory.getProperties(true).putAll(props);
+        }
     }
 }

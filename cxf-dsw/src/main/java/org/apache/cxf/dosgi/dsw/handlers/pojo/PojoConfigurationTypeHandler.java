@@ -29,6 +29,7 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
+import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
 import org.apache.cxf.dosgi.dsw.osgi.Constants;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -78,12 +79,12 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
             factory.setServiceClass(iClass);
             factory.setAddress(address);
             addWsInterceptorsFeaturesProps(factory.getClientFactoryBean(), consumerContext, sd);
-            setClientWsdlProperties(factory.getClientFactoryBean(), bundleContext, sd, false);
+            WsdlSupport.setWsdlProperties(factory.getClientFactoryBean(), bundleContext, sd, false);
 
             intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd);
 
             Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
-            return getProxy(factory.create(), iClass);
+            return ProxyFactory.create(factory.create(), iClass);
         } catch (Exception e) {
             LOG.warn("proxy creation failed", e);
         } finally {
@@ -111,7 +112,7 @@ public class PojoConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         
         factory.setServiceBean(serviceO);
         addWsInterceptorsFeaturesProps(factory, serviceContext, endpointProps);
-        setWsdlProperties(factory, serviceContext, endpointProps, false);
+        WsdlSupport.setWsdlProperties(factory, serviceContext, endpointProps, false);
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, endpointProps);
 
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);

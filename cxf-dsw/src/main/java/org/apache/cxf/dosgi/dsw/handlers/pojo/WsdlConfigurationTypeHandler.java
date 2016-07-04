@@ -31,6 +31,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
+import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
 import org.apache.cxf.dosgi.dsw.osgi.Constants;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -86,14 +87,14 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
         if (serviceName == null) {
             serviceName = iClass.getSimpleName();
         }
-        QName serviceQname = getServiceQName(iClass, endpoint.getProperties(),
+        QName serviceQname = WsdlSupport.getServiceQName(iClass, endpoint.getProperties(),
                                              Constants.WSDL_SERVICE_NAMESPACE,
                                              Constants.WSDL_SERVICE_NAME);
-        QName portQname = getPortQName(serviceQname.getNamespaceURI(),
+        QName portQname = WsdlSupport.getPortQName(serviceQname.getNamespaceURI(),
                 endpoint.getProperties(), Constants.WSDL_PORT_NAME);
         Service service = createWebService(wsdlAddress, serviceQname);
-        Object proxy = getProxy(portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass),
-                                iClass);
+        Object port = portQname == null ? service.getPort(iClass) : service.getPort(portQname, iClass);
+        Object proxy = ProxyFactory.create(port, iClass);
         // MARC: FIXME!!!! getDistributionProvider().addRemoteService(serviceReference);
         return proxy;
     }
@@ -138,7 +139,7 @@ public class WsdlConfigurationTypeHandler extends AbstractPojoConfigurationTypeH
 
         addWsInterceptorsFeaturesProps(factory, serviceContext, sd);
 
-        setWsdlProperties(factory, serviceContext, sd, true);
+        WsdlSupport.setWsdlProperties(factory, serviceContext, sd, true);
 
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, sd);
 

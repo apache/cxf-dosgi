@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.dsw.handlers.pojo;
+package org.apache.cxf.dosgi.common.proxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -40,10 +40,12 @@ public class ServiceInvocationHandler implements InvocationHandler {
     private Map<Method, List<Class<?>>> exceptionsMap = new HashMap<Method, List<Class<?>>>();
     private Object serviceObject;
 
-    public ServiceInvocationHandler(Object serviceObject, Class<?> iType) {
+    ServiceInvocationHandler(Object serviceObject, Class<?> iType) {
         this.serviceObject = serviceObject;
         introspectType(iType);
     }
+    
+
 
     public Object invoke(Object proxy, final Method m, Object[] params) throws Throwable {
         if (OBJECT_METHODS.contains(m)) {

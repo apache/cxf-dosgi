@@ -2,5 +2,6 @@ Import-Package: javax.servlet;version='[2,4)', javax.servlet.http;version='[2,4)
 Export-Package: \
 	org.apache.cxf.dosgi.common.httpservice,\
 	org.apache.cxf.dosgi.common.util,\
-	org.apache.cxf.dosgi.common.intent
+	org.apache.cxf.dosgi.common.intent,\
+	org.apache.cxf.dosgi.common.proxy
 
