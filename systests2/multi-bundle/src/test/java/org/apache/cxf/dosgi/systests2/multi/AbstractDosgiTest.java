@@ -46,6 +46,7 @@ import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.cm.ConfigurationAdminOptions;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
+import org.ops4j.pax.exam.options.extra.VMOption;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -236,8 +237,12 @@ public class AbstractDosgiTest {
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"), //
                          configLogging(),
                          frameworkStartLevel(100)
-        // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005") //
         );
+    }
+
+
+    protected static VMOption debug() {
+        return CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005");
     }
 
 }

@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
         <artifactId>cxf-dosgi-ri</artifactId>
-        <version>1.9-SNAPSHOT</version>
+        <version>2.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -30,8 +30,8 @@
 
         <osgi.version>5.0.0</osgi.version>
         <osgi.compendium.version>5.0.0</osgi.compendium.version>
-        <aries.rsa.version>1.8.0</aries.rsa.version>
-        <cxf.version>3.1.6</cxf.version>
+        <aries.rsa.version>1.9-SNAPSHOT</aries.rsa.version>
+        <cxf.version>3.1.7-SNAPSHOT</cxf.version>
         <felix.version>5.4.0</felix.version>
         <zookeeper.version>3.4.8</zookeeper.version>
         <remote.service.admin.interfaces.version>1.0.0</remote.service.admin.interfaces.version>

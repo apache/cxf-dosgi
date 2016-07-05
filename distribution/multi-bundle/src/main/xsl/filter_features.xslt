@@ -9,6 +9,9 @@
     <xsl:template match="bundle[@artifactId='org.apache.karaf.http.core']"></xsl:template>
     <xsl:template match="bundle[@artifactId='org.apache.aries.spifly.dynamic.bundle']"></xsl:template>
     <xsl:template match="bundle[@groupId='org.eclipse.jetty.websocket']"></xsl:template>
+    <xsl:template match="bundle[@artifactId='org.apache.karaf.scr.command']"></xsl:template>
+    <xsl:template match="bundle[@artifactId='org.apache.felix.webconsole.plugins.ds']"></xsl:template>
+    <xsl:template match="bundle[@artifactId='org.apache.aries.rsa.discovery.command']"></xsl:template>
 
     <!-- Copy the rest unachanged -->
     <xsl:template match="@* | node()">

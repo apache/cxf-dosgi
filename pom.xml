@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi</groupId>
     <artifactId>cxf-dosgi-ri</artifactId>
-    <version>1.9-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>Distributed OSGI Reference Implementation</name>
@@ -104,7 +104,8 @@
         <module>parent</module>
         <module>decorator</module>
         <module>common</module>
-        <module>cxf-dsw</module>
+        <module>provider-ws</module>
+        <module>provider-rs</module>
         <module>samples</module>
         <module>distribution</module>
         <module>systests2</module>

@@ -25,9 +25,6 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.feature.Feature;
 
 public interface IntentManager {
-    @Deprecated
-    String EXPORTED_INTENTS_OLD = "osgi.remote.requires.intents";
-
     String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
 
     String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory, Map<String, Object> props);

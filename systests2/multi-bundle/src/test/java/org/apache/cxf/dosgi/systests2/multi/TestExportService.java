@@ -48,6 +48,7 @@ public class TestExportService extends AbstractDosgiTest {
         return new Option[] //
         {//
          basicTestOptions(), //
+         //debug(),
          greeterInterface(), //
          greeterImpl(),
         };

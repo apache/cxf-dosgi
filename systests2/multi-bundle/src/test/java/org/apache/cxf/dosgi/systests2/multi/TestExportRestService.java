@@ -46,7 +46,8 @@ public class TestExportRestService extends AbstractDosgiTest {
         {//
          basicTestOptions(), //
          systemProperty("org.osgi.service.http.port").value(webPort), //
-         provision(getServiceBundle())
+         provision(getServiceBundle()),
+         //debug()
         };
     }
 

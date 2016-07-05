@@ -21,7 +21,6 @@ package org.apache.cxf.dosgi.samples.greeter;
 import java.util.Map;
 
 public interface GreeterService {
-
     Map<GreetingPhrase, String> greetMe(String name);
     GreetingPhrase[] greetMe(GreeterData name) throws GreeterException;
 }

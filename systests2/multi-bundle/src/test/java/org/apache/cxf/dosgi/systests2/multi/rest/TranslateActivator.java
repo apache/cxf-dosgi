@@ -30,7 +30,6 @@ public class TranslateActivator implements BundleActivator {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put("service.exported.interfaces", "*");
         props.put("service.exported.configs", "org.apache.cxf.rs");
-        props.put("service.exported.intents", "HTTP");
         props.put("org.apache.cxf.rs.address", "/translate");
         context.registerService(RestTranslate.class.getName(), new RestTranslateImpl(), props);
     }

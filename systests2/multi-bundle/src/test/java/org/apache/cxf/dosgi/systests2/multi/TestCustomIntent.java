@@ -51,14 +51,15 @@ public class TestCustomIntent extends AbstractDosgiTest {
          basicTestOptions(), //
          greeterInterface(), //
          streamBundle(getCustomIntentBundle()).noStart(), //
-         provision(getServiceBundle())
+         provision(getServiceBundle()), 
+         //debug()
         };
     }
 
     @Test
     public void testCustomIntent() throws Exception {
         // There should be warnings of unsatisfied intent myIntent in the log at debug level
-        Thread.sleep(2000);
+        //Thread.sleep(2000);
         getBundleByName(bundleContext, "CustomIntent").start();
         waitPort(9090);
 
