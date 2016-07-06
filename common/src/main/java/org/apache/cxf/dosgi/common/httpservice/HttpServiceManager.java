@@ -44,22 +44,21 @@ import org.osgi.service.http.HttpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(
-           configurationPid = "cxf-dsw",
-           service = HttpServiceManager.class
-           )
+@Component //
+(//
+    name = "org.apache.cxf.dosgi.http", //
+    service = HttpServiceManager.class //
+)
 public class HttpServiceManager {
     /**
-     * Prefix to create an absolute URL from a relative URL.
-     * See HttpServiceManager.getAbsoluteAddress
-     *
-     * Defaults to: http://<host name>:8181
+     * Prefix to create an absolute URL from a relative URL. See HttpServiceManager.getAbsoluteAddress
+     * Defaults to: http://localhost:8181
      */
     public static final String KEY_HTTP_BASE = "httpBase";
     public static final String KEY_CXF_SERVLET_ALIAS = "cxfServletAlias";
     public static final String DEFAULT_CXF_SERVLET_ALIAS = "/cxf";
     private static final Logger LOG = LoggerFactory.getLogger(HttpServiceManager.class);
-    
+
     private Map<Long, String> exportedAliases = Collections.synchronizedMap(new HashMap<Long, String>());
     private String httpBase;
     private String cxfServletAlias;
@@ -77,7 +76,7 @@ public class HttpServiceManager {
         if (config == null) {
             config = new Hashtable<String, Object>();
         }
-        this.httpBase = getWithDefault(config.get(KEY_HTTP_BASE), "http://" + LocalHostUtil.getLocalIp() + ":8181");
+        this.httpBase = getWithDefault(config.get(KEY_HTTP_BASE), "http://localhost:8181");
         this.cxfServletAlias = getWithDefault(config.get(KEY_CXF_SERVLET_ALIAS), "/cxf");
     }
 
@@ -92,8 +91,7 @@ public class HttpServiceManager {
         try {
             HttpContext httpContext1 = httpService.createDefaultHttpContext();
             HttpContext httpContext = new SecurityDelegatingHttpContext(callingContext, httpContext1);
-            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(),
-                                       httpContext);
+            httpService.registerServlet(contextRoot, cxf, new Hashtable<String, String>(), httpContext);
 
             registerUnexportHook(sid, contextRoot);
 
@@ -105,8 +103,7 @@ public class HttpServiceManager {
     }
 
     /**
-     * This listens for service removal events and "un-exports" the service
-     * from the HttpService.
+     * This listens for service removal events and "un-exports" the service from the HttpService.
      *
      * @param sref the service reference to track
      * @param alias the HTTP servlet context alias
@@ -127,7 +124,8 @@ public class HttpServiceManager {
                 LOG.warn("Service listener could not be started. The service will not be automatically unexported.");
             }
         } catch (InvalidSyntaxException e) {
-            LOG.warn("Service listener could not be started. The service will not be automatically unexported.", e);
+            LOG.warn("Service listener could not be started. The service will not be automatically unexported.",
+                     e);
         }
     }
 
@@ -150,27 +148,28 @@ public class HttpServiceManager {
                 return;
             }
             final ServiceReference<?> sref = event.getServiceReference();
-            final Long sid = (Long) sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
+            final Long sid = (Long)sref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
             final String alias = exportedAliases.remove(sid);
             if (alias == null) {
                 LOG.error("Unable to unexport HTTP servlet for service class '{}',"
-                        + " service-id {}: no servlet alias found",
-                        sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid);
+                          + " service-id {}: no servlet alias found",
+                          sref.getProperty(org.osgi.framework.Constants.OBJECTCLASS), sid);
                 return;
             }
             LOG.debug("Unexporting HTTP servlet for alias '{}'", alias);
             try {
                 httpService.unregister(alias);
             } catch (Exception e) {
-                LOG.warn("An exception occurred while unregistering service for HTTP servlet alias '{}'", alias, e);
+                LOG.warn("An exception occurred while unregistering service for HTTP servlet alias '{}'",
+                         alias, e);
             }
         }
     }
-    
+
     public void setContext(BundleContext context) {
         this.context = context;
     }
-    
+
     @Reference
     public void setHttpService(HttpService httpService) {
         this.httpService = httpService;

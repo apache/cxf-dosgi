@@ -50,13 +50,12 @@ public class HttpServiceManagerTest extends TestCase {
     public void testGetAbsoluteAddress() {
         HttpServiceManager manager = new HttpServiceManager();
         manager.initFromConfig(null);
-        String localIp = LocalHostUtil.getLocalIp();
 
         String address1 = manager.getAbsoluteAddress(null, "/myservice");
-        assertEquals("http://" + localIp + ":8181/cxf/myservice", address1);
+        assertEquals("http://localhost:8181/cxf/myservice", address1);
 
         String address2 = manager.getAbsoluteAddress("/mycontext", "/myservice");
-        assertEquals("http://" + localIp + ":8181/mycontext/myservice", address2);
+        assertEquals("http://localhost:8181/mycontext/myservice", address2);
     }
 
     public void testRegisterAndUnregisterServlet() throws Exception {
