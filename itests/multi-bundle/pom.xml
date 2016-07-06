@@ -29,7 +29,7 @@
     </parent>
 
     <groupId>org.apache.cxf.dosgi.systests</groupId>
-    <artifactId>cxf-dosgi-ri-systests2-multibundle</artifactId>
+    <artifactId>cxf-dosgi-ri-itests-multibundle</artifactId>
     <packaging>jar</packaging>
     <name>Distributed OSGi System Tests Multi-Bundle</name>
     

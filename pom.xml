@@ -108,7 +108,7 @@
         <module>provider-rs</module>
         <module>samples</module>
         <module>distribution</module>
-        <module>systests2</module>
+        <module>itests</module>
     </modules>
 
     <profiles>
