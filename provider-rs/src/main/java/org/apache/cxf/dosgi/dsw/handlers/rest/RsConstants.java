@@ -23,11 +23,7 @@ public final class RsConstants {
     public static final String RS_CONFIG_TYPE           = "org.apache.cxf.rs";
     public static final String RS_ADDRESS_PROPERTY      = RS_CONFIG_TYPE + ".address";
     public static final String RS_HTTP_SERVICE_CONTEXT  = RS_CONFIG_TYPE + ".httpservice.context";
-    public static final String RS_DATABINDING_PROP_KEY  = RS_CONFIG_TYPE + ".databinding";
     public static final String RS_CONTEXT_PROPS_PROP_KEY = RS_CONFIG_TYPE + ".context.properties";
-    public static final String RS_PROVIDER_PROP_KEY     = RS_CONFIG_TYPE + ".provider";
-    public static final String RS_PROVIDER_EXPECTED_PROP_KEY = RS_PROVIDER_PROP_KEY + ".expected";
-    public static final String RS_PROVIDER_GLOBAL_PROP_KEY = RS_PROVIDER_PROP_KEY + ".globalquery";
     public static final String RS_WADL_LOCATION         = RS_CONFIG_TYPE + ".wadl.location";
 
     private RsConstants() {
