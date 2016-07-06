@@ -19,7 +19,7 @@
 package org.apache.cxf.dosgi.dsw.handlers.ws;
 
 public final class WsConstants {
-    public static final String WS_CONFIG_TYPE = "org.apache.cxf" + ".ws";
+    public static final String WS_CONFIG_TYPE = "org.apache.cxf.ws";
     public static final String WS_ADDRESS_PROPERTY = WS_CONFIG_TYPE + ".address";
     public static final String WS_PORT_PROPERTY = WS_CONFIG_TYPE + ".port";
     public static final String WS_HTTP_SERVICE_CONTEXT = WS_CONFIG_TYPE + ".httpservice.context";

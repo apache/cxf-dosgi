@@ -23,15 +23,16 @@ import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class TranslateActivator implements BundleActivator {
 
     public void start(BundleContext context) throws Exception {
         Dictionary<String, String> props = new Hashtable<String, String>();
-        props.put("service.exported.interfaces", "*");
-        props.put("service.exported.configs", "org.apache.cxf.rs");
+        props.put(RemoteConstants.SERVICE_EXPORTED_INTERFACES, "*");
+        props.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, "org.apache.cxf.rs");
         props.put("org.apache.cxf.rs.address", "/translate");
-        context.registerService(RestTranslate.class.getName(), new RestTranslateImpl(), props);
+        context.registerService(RestTranslate.class, new RestTranslateImpl(), props);
     }
 
     public void stop(BundleContext context) throws Exception {

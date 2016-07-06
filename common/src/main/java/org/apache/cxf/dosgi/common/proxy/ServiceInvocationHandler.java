@@ -44,8 +44,6 @@ public class ServiceInvocationHandler implements InvocationHandler {
         this.serviceObject = serviceObject;
         introspectType(iType);
     }
-    
-
 
     public Object invoke(Object proxy, final Method m, Object[] params) throws Throwable {
         if (OBJECT_METHODS.contains(m)) {

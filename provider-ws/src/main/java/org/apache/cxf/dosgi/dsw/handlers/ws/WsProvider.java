@@ -146,10 +146,14 @@ public class WsProvider implements DistributionProvider {
         String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, endpointProps);
 
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
-        EndpointDescription epd = createEndpointDesc(endpointProps,
-                                                     new String[]{WsConstants.WS_CONFIG_TYPE},
-                                                     completeEndpointAddress, intents);
-        return createServerFromFactory(factory, epd);
+        try {
+            EndpointDescription epd = createEndpointDesc(endpointProps,
+                                                         new String[]{WsConstants.WS_CONFIG_TYPE},
+                                                         completeEndpointAddress, intents);
+            return createServerFromFactory(factory, epd);
+        } catch (Exception e) {
+            throw new RuntimeException("Error exporting service with adress " + completeEndpointAddress, e);
+        }
     }
 
     private boolean configTypeSupported(Map<String, Object> endpointProps, String configType) {
