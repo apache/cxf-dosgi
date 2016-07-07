@@ -24,11 +24,11 @@ import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 
-public class ServerWrapper implements Endpoint {
+public class ServerEndpoint implements Endpoint {
     private EndpointDescription desc;
     private Server server;
 
-    public ServerWrapper(EndpointDescription desc, Server server) {
+    public ServerEndpoint(EndpointDescription desc, Server server) {
         this.desc = desc;
         this.server = server;
     }

@@ -36,7 +36,7 @@ import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
-import org.apache.cxf.dosgi.common.util.ServerWrapper;
+import org.apache.cxf.dosgi.common.util.ServerEndpoint;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -170,7 +170,7 @@ public class RsProvider implements DistributionProvider {
         try {
             Thread.currentThread().setContextClassLoader(JAXRSServerFactoryBean.class.getClassLoader());
             Server server = factory.create();
-            return new ServerWrapper(epd, server);
+            return new ServerEndpoint(epd, server);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }

@@ -31,7 +31,7 @@ import org.apache.aries.rsa.util.EndpointHelper;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.intent.IntentManagerImpl;
-import org.apache.cxf.dosgi.common.util.ServerWrapper;
+import org.apache.cxf.dosgi.common.util.ServerEndpoint;
 import org.apache.cxf.dosgi.dsw.handlers.jaxws.MyJaxWsEchoService;
 import org.apache.cxf.dosgi.dsw.handlers.simple.MySimpleEchoService;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
@@ -214,7 +214,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
             @Override
             protected Endpoint createServerFromFactory(ServerFactoryBean factory,
                                                        EndpointDescription epd) {
-                return new ServerWrapper(epd, null);
+                return new ServerEndpoint(epd, null);
             }
         };
         handler.setIntentManager(intentManager);
@@ -356,7 +356,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Object myService = null;
         c.replay();
 
-        ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(myService,
+        ServerEndpoint serverWrapper = (ServerEndpoint)handler.exportService(myService,
                                                                            serviceBC, 
                                                                            sd, 
                                                                            new Class[]{MyJaxWsEchoService.class});
@@ -383,7 +383,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         sd.put(WsConstants.WS_ADDRESS_PROPERTY, "/somewhere_else");
         BundleContext serviceBC = c.createMock(BundleContext.class);
         c.replay();
-        ServerWrapper serverWrapper = (ServerWrapper)handler.exportService(null, serviceBC, sd, 
+        ServerEndpoint serverWrapper = (ServerEndpoint)handler.exportService(null, serviceBC, sd, 
                                                                           new Class[]{MySimpleEchoService.class});
         c.verify();
 

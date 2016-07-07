@@ -133,12 +133,12 @@ public class HttpServiceManager {
         return "/" + type.getName().replace('.', '/');
     }
 
-    public String getAbsoluteAddress(String contextRoot, String relativeEndpointAddress) {
-        if (relativeEndpointAddress.startsWith("http")) {
-            return relativeEndpointAddress;
+    public String getAbsoluteAddress(String contextRoot, String endpointAddress) {
+        if (endpointAddress.startsWith("http")) {
+            return endpointAddress;
         }
         String effContextRoot = contextRoot == null ? cxfServletAlias : contextRoot;
-        return this.httpBase + effContextRoot + relativeEndpointAddress;
+        return this.httpBase + effContextRoot + endpointAddress;
     }
 
     private final class UnregisterListener implements ServiceListener {
