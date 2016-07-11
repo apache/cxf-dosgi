@@ -33,7 +33,6 @@ import org.osgi.service.component.annotations.Component;
     {
      "service.exported.interfaces=*", //
      "service.exported.configs=org.apache.cxf.rs", //
-     "service.exported.intents=HTTP", //
      "org.apache.cxf.rs.httpservice.context=/greeter" //
     } //
 )

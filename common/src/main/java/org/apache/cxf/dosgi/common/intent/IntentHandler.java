@@ -18,17 +18,10 @@
  */
 package org.apache.cxf.dosgi.common.intent;
 
-import java.util.Set;
-
-import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 
-public interface IntentManager {
-    String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
+public interface IntentHandler {
 
-    String[] assertAllIntentsSupported(Set<String> reuiredIntents);
-    void applyIntents(AbstractEndpointFactory factory, //
-                      Set<String> requiredIntents, //
-                      IntentHandler ... handlers)
-        throws IntentUnsatisfiedException;
+    boolean apply(AbstractEndpointFactory factory, String intentName, Object intent);
+
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.common.intent;
+package org.apache.cxf.dosgi.common.intent.impl;
 
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 
@@ -30,16 +30,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
-import org.apache.cxf.binding.BindingConfiguration;
-import org.apache.cxf.databinding.DataBinding;
-import org.apache.cxf.dosgi.common.util.OsgiUtils;
+import org.apache.cxf.dosgi.common.intent.IntentHandler;
+import org.apache.cxf.dosgi.common.intent.IntentManager;
+import org.apache.cxf.dosgi.common.intent.IntentProvider;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
-import org.apache.cxf.feature.Feature;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
-import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,80 +72,57 @@ public class IntentManagerImpl implements IntentManager {
         intentMap.remove(intentName);
     }
 
-    public synchronized String[] applyIntents(List<Feature> features, AbstractEndpointFactory factory,
-                                 Map<String, Object> props)
+    @Override
+    public synchronized void applyIntents(AbstractEndpointFactory factory,
+                                              Set<String> requiredIntents,
+                                              IntentHandler... handlers)
         throws IntentUnsatisfiedException {
-        Set<String> requiredIntents = IntentManagerImpl.getRequestedIntents(props);
-        List<String> missingIntents = getMissingIntents(requiredIntents);
+        Set<String> missingIntents = getMissingIntents(requiredIntents);
         if (!missingIntents.isEmpty()) {
             throw new IntentUnsatisfiedException(missingIntents.iterator().next()); 
         }
-        Set<String> requestedIntents = IntentManagerImpl.getRequestedIntents(props);
-        Set<String> appliedIntents = new HashSet<String>();
-        for (String intentName : requestedIntents) {
-            processIntent(features, factory, intentName, intentMap.get(intentName));
-            appliedIntents.add(intentName);
-        }
-        return appliedIntents.toArray(new String[appliedIntents.size()]);
-    }
-
-    private static Set<String> getRequestedIntents(Map<String, Object> sd) {
-        Set<String> allIntents = new HashSet<String>();
-        Collection<String> intents = OsgiUtils
-            .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
-        if (intents != null) {
-            allIntents.addAll(parseIntents(intents));
-        }
-        Collection<String> intents2 = OsgiUtils
-            .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
-        if (intents2 != null) {
-            allIntents.addAll(parseIntents(intents2));
-        }
-        return allIntents;
-    }
-
-    private static Collection<String> parseIntents(Collection<String> intents) {
-        List<String> parsed = new ArrayList<String>();
-        for (String intent : intents) {
-            parsed.addAll(Arrays.asList(intent.split("[ ]")));
-        }
-        return parsed;
-    }
-
-    private boolean processIntent(List<Feature> features, AbstractEndpointFactory factory, String intentName,
-                                  Object intent)
-        throws IntentUnsatisfiedException {
-        if (intent instanceof DataBinding) {
-            DataBinding dataBinding = (DataBinding) intent;
-            LOG.info("Applying intent: " + intentName + " via data binding: " + dataBinding);
-            factory.setDataBinding(dataBinding);
-            return false;
-        } else if (intent instanceof BindingConfiguration) {
-            BindingConfiguration bindingCfg = (BindingConfiguration)intent;
-            LOG.info("Applying intent: " + intentName + " via binding config: " + bindingCfg);
-            factory.setBindingConfig(bindingCfg);
-            return true;
-        } else if (intent instanceof Feature) {
-            Feature feature = (Feature)intent;
-            LOG.info("Applying intent: " + intentName + " via feature: " + feature);
-            features.add(feature);
-            return false;
-        } else {
-            LOG.info("No mapping for intent: " + intentName);
-            throw new IntentUnsatisfiedException(intentName);
+        List<IntentHandler> allHandlers = new ArrayList<IntentHandler>();
+        allHandlers.add(new DefaultIntentsHandler());
+        allHandlers.addAll(Arrays.asList(handlers));
+        for (String intentName : requiredIntents) {
+            Object intent = intentMap.get(intentName);
+            if (intent instanceof IntentProvider) {
+                applyIntentProvider(factory, intentName, (IntentProvider)intent, allHandlers);
+            } else {
+                applyIntent(factory, intentName, intent, allHandlers);
+            }
         }
     }
 
-    public synchronized void assertAllIntentsSupported(Map<String, Object> serviceProperties) {
+    private void applyIntentProvider(AbstractEndpointFactory factory, 
+                                     String intentName, 
+                                     IntentProvider intentProvider,
+                                     List<IntentHandler> handlers) {
+        for (Object intent : intentProvider.getIntents()) {
+            applyIntent(factory, intentName, intent, handlers);
+        }
+        
+    }
+
+    private void applyIntent(AbstractEndpointFactory factory, String intentName, Object intent, 
+                             List<IntentHandler> handlers) {
+        for (IntentHandler handler : handlers) {
+            if (handler.apply(factory, intentName, intent)) {
+                return;
+            }
+        }
+        LOG.info("No mapping for intent: " + intentName);
+        throw new IntentUnsatisfiedException(intentName);
+    }
+
+    public synchronized String[] assertAllIntentsSupported(Set<String> requiredIntents) {
         long endTime = System.currentTimeMillis() + maxIntentWaitTime;
-        Set<String> requiredIntents = IntentManagerImpl.getRequestedIntents(serviceProperties);
-
-        List<String> unsupportedIntents;
+        Set<String> unsupportedIntents;
         do {
             unsupportedIntents = getMissingIntents(requiredIntents);
             long remainingSeconds = (endTime - System.currentTimeMillis()) / 1000;
             if (!unsupportedIntents.isEmpty() && remainingSeconds > 0) {
-                LOG.info("Waiting for custom intents " + unsupportedIntents + " timeout in "
+                LOG.info("Waiting for custom intents " + Arrays.toString(unsupportedIntents.toArray()) + " timeout in "
                           + remainingSeconds);
                 try {
                     wait(1000);
@@ -161,10 +136,11 @@ public class IntentManagerImpl implements IntentManager {
             throw new RuntimeException("service cannot be exported because the following "
                                        + "intents are not supported by this RSA: " + unsupportedIntents);
         }
+        return requiredIntents.toArray(new String[]{});
     }
 
-    private synchronized List<String> getMissingIntents(Set<String> requiredIntents) {
-        List<String> unsupportedIntents = new ArrayList<String>();
+    private synchronized Set<String> getMissingIntents(Collection<String> requiredIntents) {
+        Set<String> unsupportedIntents = new HashSet<String>();
         unsupportedIntents.clear();
         for (String ri : requiredIntents) {
             if (!intentMap.containsKey(ri)) {

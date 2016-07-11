@@ -16,19 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.common.intent;
+package org.apache.cxf.dosgi.dsw.handlers.rest;
 
-import java.util.Set;
+import java.util.List;
 
-import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
+import org.apache.cxf.dosgi.common.intent.IntentHandler;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
+import org.apache.cxf.jaxrs.AbstractJAXRSFactoryBean;
 
-public interface IntentManager {
-    String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
+public class ProviderIntentHandler implements IntentHandler {
 
-    String[] assertAllIntentsSupported(Set<String> reuiredIntents);
-    void applyIntents(AbstractEndpointFactory factory, //
-                      Set<String> requiredIntents, //
-                      IntentHandler ... handlers)
-        throws IntentUnsatisfiedException;
+    @SuppressWarnings({
+     "rawtypes", "unchecked"
+    })
+    @Override
+    public boolean apply(AbstractEndpointFactory factory, String intentName, Object intent) {
+        if (!(factory instanceof AbstractJAXRSFactoryBean)) {
+            throw new RuntimeException("RsIntentHandler only works on JAXRS factory");
+        }
+        AbstractJAXRSFactoryBean jaxrsFactory = (AbstractJAXRSFactoryBean)factory;
+        List providers = jaxrsFactory.getProviders();
+        providers.add(intent);
+        return true;
+    }
+
 }

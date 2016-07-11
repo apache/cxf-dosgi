@@ -72,7 +72,7 @@ public class HttpServiceManager {
         this.context = compContext.getBundleContext();
     }
 
-    void initFromConfig(Dictionary<String, Object> config) {
+    public void initFromConfig(Dictionary<String, Object> config) {
         if (config == null) {
             config = new Hashtable<String, Object>();
         }

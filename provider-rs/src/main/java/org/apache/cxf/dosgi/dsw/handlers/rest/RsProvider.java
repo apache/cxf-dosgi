@@ -25,6 +25,7 @@ import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.aries.rsa.spi.Endpoint;
@@ -33,6 +34,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
+import org.apache.cxf.dosgi.common.intent.IntentHelper;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
@@ -81,7 +83,8 @@ public class RsProvider implements DistributionProvider {
                                  BundleContext consumerContext,
                                  Class[] interfaces,
                                  EndpointDescription endpoint) {
-        intentManager.assertAllIntentsSupported(endpoint.getProperties());
+        Set<String> intents = IntentHelper.getImported(endpoint.getProperties());
+        intentManager.assertAllIntentsSupported(intents);
         Class<?> iClass = interfaces[0];
         String address = OsgiUtils.getProperty(endpoint, RsConstants.RS_ADDRESS_PROPERTY);
         if (address == null) {
@@ -91,7 +94,7 @@ public class RsProvider implements DistributionProvider {
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
-            return createJaxrsProxy(address, consumerContext, iClass, null, endpoint);
+            return createJaxrsProxy(address, iClass, null, endpoint);
         } catch (Throwable e) {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
@@ -99,7 +102,7 @@ public class RsProvider implements DistributionProvider {
         try {
             ProxyClassLoader cl = new ProxyClassLoader(iClass.getClassLoader());
             cl.addLoader(Client.class.getClassLoader());
-            return createJaxrsProxy(address, consumerContext, iClass, cl, endpoint);
+            return createJaxrsProxy(address, iClass, cl, endpoint);
         } catch (Throwable e) {
             LOG.warn("proxy creation failed", e);
         }
@@ -107,20 +110,22 @@ public class RsProvider implements DistributionProvider {
         return null;
     }
 
-    protected Object createJaxrsProxy(String address,
-                                      BundleContext callingContext,
+    private Object createJaxrsProxy(String address,
                                       Class<?> iClass,
                                       ClassLoader loader,
                                       EndpointDescription endpoint) {
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(address);
+        JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
+        factory.setAddress(address);
         if (loader != null) {
-            bean.setClassLoader(loader);
+            factory.setClassLoader(loader);
         }
-        addContextProperties(bean, endpoint.getProperties(), RsConstants.RS_CONTEXT_PROPS_PROP_KEY);
-        bean.setServiceClass(iClass);
-        intentManager.applyIntents(bean.getFeatures(), bean, endpoint.getProperties());
-        return ProxyFactory.create(bean.create(), iClass);
+        addContextProperties(factory, endpoint.getProperties(), RsConstants.RS_CONTEXT_PROPS_PROP_KEY);
+        factory.setServiceClass(iClass);
+        Set<String> intents = IntentHelper.getImported(endpoint.getProperties());
+        intentManager.applyIntents(factory, intents, new ProviderIntentHandler());
+        // Apply providers
+        factory.setProviders(factory.getProviders());
+        return ProxyFactory.create(factory.create(), iClass);
     }
 
     @SuppressWarnings("rawtypes")
@@ -143,7 +148,8 @@ public class RsProvider implements DistributionProvider {
             }
         }
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
-        intentManager.assertAllIntentsSupported(endpointProps);
+        Set<String> intents = IntentHelper.getExported(endpointProps);
+        intentManager.assertAllIntentsSupported(intents);
         Bus bus = BusFactory.newInstance().createBus();
         if (contextRoot != null) {
             httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);
@@ -152,10 +158,12 @@ public class RsProvider implements DistributionProvider {
 
         JAXRSServerFactoryBean factory = createServerFactory(callingContext, endpointProps, 
                                                              iClass, serviceBean, address, bus);
-        String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, endpointProps);
+        intentManager.applyIntents(factory, intents, new ProviderIntentHandler());
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
-        EndpointDescription epd = createEndpointDesc(endpointProps, new String[] {RsConstants.RS_CONFIG_TYPE},
-                completeEndpointAddress, intents);
+        EndpointDescription epd = createEndpointDesc(endpointProps, //
+                                                     new String[] {RsConstants.RS_CONFIG_TYPE},
+                                                     completeEndpointAddress,
+                                                     intents);
         return createServerFromFactory(factory, epd);
     }
     
@@ -203,10 +211,10 @@ public class RsProvider implements DistributionProvider {
         }
     }
 
-    protected EndpointDescription createEndpointDesc(Map<String, Object> props, 
+    private EndpointDescription createEndpointDesc(Map<String, Object> props, 
                                                      String[] importedConfigs,
                                                      String address,
-                                                     String[] intents) {
+                                                     Set<String> intents) {
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
         props.put(RsConstants.RS_ADDRESS_PROPERTY, address);
         props.put(RemoteConstants.SERVICE_INTENTS, intents);
@@ -214,7 +222,7 @@ public class RsProvider implements DistributionProvider {
         return new EndpointDescription(props);
     }
     
-    protected String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
+    private String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
         String address = OsgiUtils.getProperty(sd, RsConstants.RS_ADDRESS_PROPERTY);
         return address == null ? httpServiceManager.getDefaultAddress(iClass) : address;
     }

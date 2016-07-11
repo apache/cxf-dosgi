@@ -18,17 +18,11 @@
  */
 package org.apache.cxf.dosgi.common.intent;
 
-import java.util.Set;
+import java.util.List;
 
-import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
-import org.apache.cxf.endpoint.AbstractEndpointFactory;
-
-public interface IntentManager {
-    String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
-
-    String[] assertAllIntentsSupported(Set<String> reuiredIntents);
-    void applyIntents(AbstractEndpointFactory factory, //
-                      Set<String> requiredIntents, //
-                      IntentHandler ... handlers)
-        throws IntentUnsatisfiedException;
+/**
+ * Allows to provide a list of intents under one name
+ */
+public interface IntentProvider {
+    List<Object> getIntents();
 }

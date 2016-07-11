@@ -57,5 +57,23 @@
             <artifactId>cxf-rt-rs-client</artifactId>
             <version>${cxf.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>${cxf.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${cxf.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.21</version>
+        </dependency>
     </dependencies>
 </project>

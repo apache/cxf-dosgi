@@ -24,6 +24,7 @@ import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jws.WebService;
 
@@ -36,6 +37,7 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
+import org.apache.cxf.dosgi.common.intent.IntentHelper;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
@@ -66,7 +68,7 @@ public class WsProvider implements DistributionProvider {
     protected BundleContext bundleContext;
     protected IntentManager intentManager;
     protected HttpServiceManager httpServiceManager;
-
+    
     @Reference
     public void setHttpServiceManager(HttpServiceManager httpServiceManager) {
         this.httpServiceManager = httpServiceManager;
@@ -106,17 +108,17 @@ public class WsProvider implements DistributionProvider {
             addContextProperties(factory.getClientFactoryBean(), sd, WsConstants.WS_CONTEXT_PROPS_PROP_KEY);
             WsdlSupport.setWsdlProperties(factory.getClientFactoryBean(), bundleContext, sd);
 
-            intentManager.assertAllIntentsSupported(sd);
-            intentManager.applyIntents(factory.getFeatures(), factory.getClientFactoryBean(), sd);
+            Set<String> intents = IntentHelper.getImported(sd);
+            intentManager.assertAllIntentsSupported(intents);
+            intentManager.applyIntents(factory.getClientFactoryBean(), intents);
 
             Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
             return ProxyFactory.create(factory.create(), iClass);
         } catch (Exception e) {
-            LOG.warn("proxy creation failed", e);
+            throw new RuntimeException("proxy creation failed", e);
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
-        return null;
     }
 
     @SuppressWarnings("rawtypes")
@@ -133,17 +135,18 @@ public class WsProvider implements DistributionProvider {
         String contextRoot = OsgiUtils.getProperty(endpointProps, WsConstants.WS_HTTP_SERVICE_CONTEXT);
 
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
-        intentManager.assertAllIntentsSupported(endpointProps);
+        Set<String> intents = IntentHelper.getExported(endpointProps);
+        intentManager.assertAllIntentsSupported(intents);
         Bus bus = createBus(sid, serviceContext, contextRoot);
         factory.setDataBinding(getDataBinding(endpointProps, iClass));
         factory.setBindingConfig(new SoapBindingConfiguration());
         factory.setBus(bus);
         factory.setServiceClass(iClass);
-        factory.setAddress(address);
         factory.setServiceBean(serviceO);
+        factory.setAddress(address);
         addContextProperties(factory, endpointProps, WsConstants.WS_CONTEXT_PROPS_PROP_KEY);
         WsdlSupport.setWsdlProperties(factory, serviceContext, endpointProps);
-        String[] intents = intentManager.applyIntents(factory.getFeatures(), factory, endpointProps);
+        intentManager.applyIntents(factory, intents);
 
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
         try {
@@ -164,7 +167,7 @@ public class WsProvider implements DistributionProvider {
     protected EndpointDescription createEndpointDesc(Map<String, Object> props, 
                                                      String[] importedConfigs,
                                                      String address, 
-                                                     String[] intents) {
+                                                     Collection<String> intents) {
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
         props.put(WsConstants.WS_ADDRESS_PROPERTY, address);
         props.put(RemoteConstants.SERVICE_INTENTS, intents);

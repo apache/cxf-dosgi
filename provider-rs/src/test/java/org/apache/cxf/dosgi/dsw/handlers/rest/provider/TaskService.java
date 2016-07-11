@@ -16,19 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.common.intent;
+package org.apache.cxf.dosgi.dsw.handlers.rest.provider;
 
-import java.util.Set;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
-import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
-import org.apache.cxf.endpoint.AbstractEndpointFactory;
-
-public interface IntentManager {
-    String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
-
-    String[] assertAllIntentsSupported(Set<String> reuiredIntents);
-    void applyIntents(AbstractEndpointFactory factory, //
-                      Set<String> requiredIntents, //
-                      IntentHandler ... handlers)
-        throws IntentUnsatisfiedException;
+@Path("/task")
+public interface TaskService {
+    @GET
+    Task getTask();
 }
