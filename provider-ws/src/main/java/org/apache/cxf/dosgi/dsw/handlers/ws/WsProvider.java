@@ -98,7 +98,6 @@ public class WsProvider implements DistributionProvider {
         String address = getClientAddress(sd);
         LOG.info("Creating a " + iClass.getName() + " client, endpoint address is " + address);
 
-        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             ClientProxyFactoryBean factory = createClientProxyFactoryBean(sd, iClass);
             factory.setDataBinding(getDataBinding(sd, iClass));
@@ -112,12 +111,9 @@ public class WsProvider implements DistributionProvider {
             intentManager.assertAllIntentsSupported(intents);
             intentManager.applyIntents(factory.getClientFactoryBean(), intents);
 
-            Thread.currentThread().setContextClassLoader(ClientProxyFactoryBean.class.getClassLoader());
             return ProxyFactory.create(factory.create(), iClass);
         } catch (Exception e) {
             throw new RuntimeException("proxy creation failed", e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
     }
 
@@ -212,14 +208,8 @@ public class WsProvider implements DistributionProvider {
     }
 
     protected Endpoint createServerFromFactory(ServerFactoryBean factory, EndpointDescription epd) {
-        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
-            Server server = factory.create();
-            return new ServerEndpoint(epd, server);
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldClassLoader);
-        }
+        Server server = factory.create();
+        return new ServerEndpoint(epd, server);
     }
 
     protected static void addContextProperties(AbstractEndpointFactory factory, 

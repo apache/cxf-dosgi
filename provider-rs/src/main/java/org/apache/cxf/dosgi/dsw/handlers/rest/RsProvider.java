@@ -32,7 +32,6 @@ import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentHelper;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
@@ -42,7 +41,6 @@ import org.apache.cxf.dosgi.common.util.ServerEndpoint;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.osgi.framework.BundleContext;
@@ -91,23 +89,7 @@ public class RsProvider implements DistributionProvider {
             LOG.warn("Remote address is unavailable");
             return null;
         }
-        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(JAXRSClientFactoryBean.class.getClassLoader());
-            return createJaxrsProxy(address, iClass, null, endpoint);
-        } catch (Throwable e) {
-            Thread.currentThread().setContextClassLoader(oldClassLoader);
-        }
-
-        try {
-            ProxyClassLoader cl = new ProxyClassLoader(iClass.getClassLoader());
-            cl.addLoader(Client.class.getClassLoader());
-            return createJaxrsProxy(address, iClass, cl, endpoint);
-        } catch (Throwable e) {
-            LOG.warn("proxy creation failed", e);
-        }
-
-        return null;
+        return createJaxrsProxy(address, iClass, null, endpoint);
     }
 
     private Object createJaxrsProxy(String address,
