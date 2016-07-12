@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
-import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.intent.IntentProvider;
 import org.apache.cxf.dosgi.common.intent.impl.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.handlers.rest.RsConstants;
@@ -58,7 +57,7 @@ public class RsProviderCustomTest {
         
         Map<String, Object> props = new HashMap<>();
         props.put(Constants.OBJECTCLASS, new String[]{TaskService.class.getName()});
-        String serviceAddress = "http://localhost:8181/";
+        String serviceAddress = "http://localhost:9181/";
         props.put(RsConstants.RS_ADDRESS_PROPERTY, serviceAddress);
         props.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, "my");
         Class<?>[] ifaces = new Class[]{TaskService.class};
@@ -82,7 +81,7 @@ public class RsProviderCustomTest {
 
     private void addIntent(IntentManagerImpl intentManager, String name, Object ... intents) {
         IntentProvider provider = intentProvider(intents);
-        intentManager.addIntent(provider, intentProps(name));
+        intentManager.addIntent(provider, name);
     }
 
     private IntentProvider intentProvider(final Object ... intents) {
@@ -95,9 +94,4 @@ public class RsProviderCustomTest {
         };
     }
 
-    private Map<String, String> intentProps(String name) {
-        Map<String, String> props = new HashMap<>();
-        props.put(IntentManager.INTENT_NAME_PROP, name);
-        return props;
-    }
 }

@@ -29,7 +29,7 @@ public class CustomIntentActivator implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put("org.apache.cxf.dosgi.IntentName", "myIntent");
-        context.registerService(Object.class.getName(), new CustomFeature(), props);
+        context.registerService(CustomFeature.class.getName(), new CustomFeature(), props);
     }
 
     public void stop(BundleContext context) throws Exception {

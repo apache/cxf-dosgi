@@ -52,7 +52,7 @@ public class RsProviderTest {
         
         Map<String, Object> props = new HashMap<>();
         props.put(Constants.OBJECTCLASS, new String[]{TaskService.class.getName()});
-        String serviceAddress = "http://localhost:8181/";
+        String serviceAddress = "http://localhost:9181/";
         props.put(RsConstants.RS_ADDRESS_PROPERTY, serviceAddress);
         Class<?>[] ifaces = new Class[]{TaskService.class};
         Endpoint endpoint = rsProvider.exportService(taskService,
