@@ -37,7 +37,6 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
-import org.apache.cxf.dosgi.common.intent.IntentHelper;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
@@ -107,7 +106,7 @@ public class WsProvider implements DistributionProvider {
             addContextProperties(factory.getClientFactoryBean(), sd, WsConstants.WS_CONTEXT_PROPS_PROP_KEY);
             WsdlSupport.setWsdlProperties(factory.getClientFactoryBean(), bundleContext, sd);
 
-            Set<String> intents = IntentHelper.getImported(sd);
+            Set<String> intents = intentManager.getImported(sd);
             intentManager.assertAllIntentsSupported(intents);
             intentManager.applyIntents(factory.getClientFactoryBean(), intents);
 
@@ -131,7 +130,7 @@ public class WsProvider implements DistributionProvider {
         String contextRoot = OsgiUtils.getProperty(endpointProps, WsConstants.WS_HTTP_SERVICE_CONTEXT);
 
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
-        Set<String> intents = IntentHelper.getExported(endpointProps);
+        Set<String> intents = intentManager.getExported(endpointProps);
         intentManager.assertAllIntentsSupported(intents);
         Bus bus = createBus(sid, serviceContext, contextRoot);
         factory.setDataBinding(getDataBinding(endpointProps, iClass));

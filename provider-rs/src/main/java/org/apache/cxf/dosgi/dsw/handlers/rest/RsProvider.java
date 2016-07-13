@@ -33,7 +33,6 @@ import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
-import org.apache.cxf.dosgi.common.intent.IntentHelper;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
@@ -81,7 +80,7 @@ public class RsProvider implements DistributionProvider {
                                  BundleContext consumerContext,
                                  Class[] interfaces,
                                  EndpointDescription endpoint) {
-        Set<String> intents = IntentHelper.getImported(endpoint.getProperties());
+        Set<String> intents = intentManager.getImported(endpoint.getProperties());
         intentManager.assertAllIntentsSupported(intents);
         Class<?> iClass = interfaces[0];
         String address = OsgiUtils.getProperty(endpoint, RsConstants.RS_ADDRESS_PROPERTY);
@@ -103,7 +102,7 @@ public class RsProvider implements DistributionProvider {
         }
         addContextProperties(factory, endpoint.getProperties(), RsConstants.RS_CONTEXT_PROPS_PROP_KEY);
         factory.setServiceClass(iClass);
-        Set<String> intents = IntentHelper.getImported(endpoint.getProperties());
+        Set<String> intents = intentManager.getImported(endpoint.getProperties());
         intentManager.applyIntents(factory, intents, new ProviderIntentHandler());
         // Apply providers
         factory.setProviders(factory.getProviders());
@@ -130,7 +129,7 @@ public class RsProvider implements DistributionProvider {
             }
         }
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
-        Set<String> intents = IntentHelper.getExported(endpointProps);
+        Set<String> intents = intentManager.getExported(endpointProps);
         intentManager.assertAllIntentsSupported(intents);
         Bus bus = BusFactory.newInstance().createBus();
         if (contextRoot != null) {

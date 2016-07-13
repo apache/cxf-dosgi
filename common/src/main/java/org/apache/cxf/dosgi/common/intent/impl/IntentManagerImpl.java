@@ -26,11 +26,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.common.intent.IntentHandler;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.intent.IntentProvider;
+import org.apache.cxf.dosgi.common.util.OsgiUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -40,6 +42,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +91,7 @@ public class IntentManagerImpl implements IntentManager {
         intentMap.remove(intentName);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public synchronized void applyIntents(AbstractEndpointFactory factory,
                                               Set<String> requiredIntents,
@@ -102,19 +106,26 @@ public class IntentManagerImpl implements IntentManager {
         allHandlers.addAll(Arrays.asList(handlers));
         for (String intentName : requiredIntents) {
             Object intent = intentMap.get(intentName);
-            if (intent instanceof IntentProvider) {
-                applyIntentProvider(factory, intentName, (IntentProvider)intent, allHandlers);
+            if (intent instanceof Callable<?>) {
+                try {
+                    List<Object> intents = ((Callable<List<Object>>)intent).call();
+                    applyIntents(factory, intentName, intents, allHandlers);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (intent instanceof IntentProvider) {
+                applyIntents(factory, intentName, ((IntentProvider)intent).getIntents(), allHandlers);
             } else {
                 applyIntent(factory, intentName, intent, allHandlers);
             }
         }
     }
 
-    private void applyIntentProvider(AbstractEndpointFactory factory, 
+    private void applyIntents(AbstractEndpointFactory factory, 
                                      String intentName, 
-                                     IntentProvider intentProvider,
+                                     List<Object> intents,
                                      List<IntentHandler> handlers) {
-        for (Object intent : intentProvider.getIntents()) {
+        for (Object intent : intents) {
             applyIntent(factory, intentName, intent, handlers);
         }
         
@@ -173,6 +184,34 @@ public class IntentManagerImpl implements IntentManager {
             }
         }
         return unsupportedIntents;
+    }
+    
+    public Set<String> getExported(Map<String, Object> sd) {
+        Set<String> allIntents = new HashSet<String>();
+        Collection<String> intents = OsgiUtils
+            .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
+        if (intents != null) {
+            allIntents.addAll(parseIntents(intents));
+        }
+        Collection<String> intents2 = OsgiUtils
+            .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
+        if (intents2 != null) {
+            allIntents.addAll(parseIntents(intents2));
+        }
+        return allIntents;
+    }
+    
+    public Set<String> getImported(Map<String, Object> sd) {
+        Collection<String> intents = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_INTENTS));
+        return intents == null ? new HashSet<String>() : new HashSet<String>(intents);
+    }
+    
+    private static Collection<String> parseIntents(Collection<String> intents) {
+        List<String> parsed = new ArrayList<String>();
+        for (String intent : intents) {
+            parsed.addAll(Arrays.asList(intent.split("[ ]")));
+        }
+        return parsed;
     }
 
 }
