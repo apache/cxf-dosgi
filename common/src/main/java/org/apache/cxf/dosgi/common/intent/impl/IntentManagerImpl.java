@@ -28,12 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
-import org.apache.cxf.dosgi.common.intent.IntentHandler;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
-import org.apache.cxf.endpoint.AbstractEndpointFactory;
-import org.apache.cxf.feature.Feature;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
@@ -90,67 +86,9 @@ public class IntentManagerImpl implements IntentManager {
     public synchronized void removeIntent(Object intent, String intentName) {
         intentMap.remove(intentName);
     }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    public synchronized void applyIntents(AbstractEndpointFactory factory,
-                                              Set<String> requiredIntents,
-                                              IntentHandler... handlers)
-        throws IntentUnsatisfiedException {
-        Set<String> missingIntents = getMissingIntents(requiredIntents);
-        if (!missingIntents.isEmpty()) {
-            throw new IntentUnsatisfiedException(missingIntents.iterator().next()); 
-        }
-        List<Feature> features = new ArrayList<Feature>();
-        List<IntentHandler> allHandlers = new ArrayList<IntentHandler>();
-        allHandlers.add(new DefaultIntentsHandler());
-        allHandlers.addAll(Arrays.asList(handlers));
-        for (String intentName : requiredIntents) {
-            Object intent = intentMap.get(intentName);
-            if (intent instanceof Callable<?>) {
-                try {
-                    List<Object> intents = ((Callable<List<Object>>)intent).call();
-                    applyIntents(factory, features, intentName, intents, allHandlers);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                applyIntent(factory, features, intentName, intent, allHandlers);
-            }
-        }
-        factory.setFeatures(features);
-    }
 
-    private void applyIntents(AbstractEndpointFactory factory,
-                              List<Feature> features,
-                                     String intentName, 
-                                     List<Object> intents,
-                                     List<IntentHandler> handlers) {
-        for (Object intent : intents) {
-            applyIntent(factory, features, intentName, intent, handlers);
-        }
-        
-    }
-
-    private void applyIntent(AbstractEndpointFactory factory, List<Feature> features, String intentName, Object intent, 
-                             List<IntentHandler> handlers) {
-        if (intent instanceof Feature) {
-            Feature feature = (Feature)intent;
-            LOG.info("Applying intent: " + intentName + " via feature: " + feature);
-            features.add(feature);
-            return;
-        }
-        for (IntentHandler handler : handlers) {
-            if (handler.apply(factory, intentName, intent)) {
-                return;
-            }
-        }
-        LOG.info("No mapping for intent: " + intentName);
-        throw new IntentUnsatisfiedException(intentName);
-    }
-    
     @SuppressWarnings("unchecked")
-    public synchronized List<Object> getIntents(Set<String> requiredIntents) {
+    public synchronized List<Object> getRequiredIntents(Set<String> requiredIntents) {
         String[] intentNames = assertAllIntentsSupported(requiredIntents);
         List<Object> intents = new ArrayList<Object>();
         for (String intentName : intentNames) {

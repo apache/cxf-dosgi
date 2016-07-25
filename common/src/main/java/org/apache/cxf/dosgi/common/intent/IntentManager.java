@@ -22,24 +22,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
-import org.apache.cxf.endpoint.AbstractEndpointFactory;
-
 public interface IntentManager {
     String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
 
     Set<String> getExported(Map<String, Object> sd);
 
     Set<String> getImported(Map<String, Object> sd);
-
-    String[] assertAllIntentsSupported(Set<String> reuiredIntents);
-
-    void applyIntents(AbstractEndpointFactory factory, //
-                      Set<String> requiredIntents, //
-                      IntentHandler ... handlers)
-        throws IntentUnsatisfiedException;
     
+    List<Object> getRequiredIntents(Set<String> requiredIntents);
+
     <T> List<T> getIntents(Class<? extends T> type, List<Object> intents);
+
     <T> T getIntent(Class<? extends T> type, List<Object> intents);
-    List<Object> getIntents(Set<String> requiredIntents);
+
 }

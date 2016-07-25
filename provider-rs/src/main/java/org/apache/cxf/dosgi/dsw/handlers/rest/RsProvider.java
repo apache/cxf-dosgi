@@ -91,7 +91,7 @@ public class RsProvider implements DistributionProvider {
                                  Class[] interfaces,
                                  EndpointDescription endpoint) {
         Set<String> intentNames = intentManager.getImported(endpoint.getProperties());
-        List<Object> intents = intentManager.getIntents(intentNames);
+        List<Object> intents = intentManager.getRequiredIntents(intentNames);
         Class<?> iClass = interfaces[0];
         String address = OsgiUtils.getProperty(endpoint, RsConstants.RS_ADDRESS_PROPERTY);
         if (address == null) {
@@ -138,7 +138,7 @@ public class RsProvider implements DistributionProvider {
         }
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
         Set<String> intentNames = intentManager.getExported(endpointProps);
-        List<Object> intents = intentManager.getIntents(intentNames);
+        List<Object> intents = intentManager.getRequiredIntents(intentNames);
         Bus bus = BusFactory.newInstance().createBus();
         if (contextRoot != null) {
             httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);

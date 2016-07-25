@@ -117,7 +117,7 @@ public class WsProvider implements DistributionProvider {
 
     private void applyIntents(Map<String, Object> sd, ClientProxyFactoryBean factory) {
         Set<String> intentNames = intentManager.getImported(sd);
-        List<Object> intents = intentManager.getIntents(intentNames);
+        List<Object> intents = intentManager.getRequiredIntents(intentNames);
         List<Feature> features = intentManager.getIntents(Feature.class, intents);
         factory.setFeatures(features);
         DataBinding dataBinding = intentManager.getIntent(DataBinding.class, intents);
@@ -144,8 +144,8 @@ public class WsProvider implements DistributionProvider {
         String contextRoot = OsgiUtils.getProperty(endpointProps, WsConstants.WS_HTTP_SERVICE_CONTEXT);
 
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
-        Set<String> intents = intentManager.getExported(endpointProps);
-        intentManager.assertAllIntentsSupported(intents);
+        Set<String> intentNames = intentManager.getExported(endpointProps);
+        List<Object> intents = intentManager.getRequiredIntents(intentNames);
         Bus bus = createBus(sid, serviceContext, contextRoot);
         factory.setDataBinding(getDataBinding(endpointProps, iClass));
         factory.setBindingConfig(new SoapBindingConfiguration());
@@ -155,23 +155,20 @@ public class WsProvider implements DistributionProvider {
         factory.setAddress(address);
         addContextProperties(factory, endpointProps, WsConstants.WS_CONTEXT_PROPS_PROP_KEY);
         WsdlSupport.setWsdlProperties(factory, serviceContext, endpointProps);
-        applyIntents(endpointProps, factory);
-        intentManager.applyIntents(factory, intents);
+        applyIntents(intents, factory);
 
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
         try {
             EndpointDescription epd = createEndpointDesc(endpointProps,
                                                          new String[]{WsConstants.WS_CONFIG_TYPE},
-                                                         completeEndpointAddress, intents);
+                                                         completeEndpointAddress, intentNames);
             return createServerFromFactory(factory, epd);
         } catch (Exception e) {
             throw new RuntimeException("Error exporting service with adress " + completeEndpointAddress, e);
         }
     }
     
-    private void applyIntents(Map<String, Object> sd, AbstractEndpointFactory factory) {
-        Set<String> intentNames = intentManager.getExported(sd);
-        List<Object> intents = intentManager.getIntents(intentNames);
+    private void applyIntents(List<Object> intents, AbstractEndpointFactory factory) {
         List<Feature> features = intentManager.getIntents(Feature.class, intents);
         factory.setFeatures(features);
         DataBinding dataBinding = intentManager.getIntent(DataBinding.class, intents);
