@@ -55,11 +55,11 @@ public class RsProviderTest {
         String serviceAddress = "http://localhost:9181/";
         props.put(RsConstants.RS_ADDRESS_PROPERTY, serviceAddress);
         Class<?>[] ifaces = new Class[]{TaskService.class};
-        Endpoint endpoint = rsProvider.exportService(taskService,
-                                 callingContext,
-                                 props,
-                                 ifaces);
-        try {
+        
+        try (Endpoint endpoint = rsProvider.exportService(taskService,
+                                                          callingContext,
+                                                          props,
+                                                          ifaces)) {
             Assert.assertEquals(serviceAddress, endpoint.description().getId());
             
             Task task1 = WebClient.create(serviceAddress).path("/task").get(Task.class);
@@ -69,8 +69,6 @@ public class RsProviderTest {
                                                                        callingContext, ifaces, endpoint.description());
             Task task = proxy.getTask();
             Assert.assertEquals("test", task.getName());
-        } finally {
-            endpoint.close();
         }
     }
 

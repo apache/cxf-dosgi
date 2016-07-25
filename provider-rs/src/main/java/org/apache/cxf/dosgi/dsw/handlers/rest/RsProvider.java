@@ -23,15 +23,23 @@ import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_CONFIGS
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS_SUPPORTED;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
@@ -39,6 +47,8 @@ import org.apache.cxf.dosgi.common.util.OsgiUtils;
 import org.apache.cxf.dosgi.common.util.ServerEndpoint;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.feature.Feature;
+import org.apache.cxf.jaxrs.AbstractJAXRSFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -80,21 +90,22 @@ public class RsProvider implements DistributionProvider {
                                  BundleContext consumerContext,
                                  Class[] interfaces,
                                  EndpointDescription endpoint) {
-        Set<String> intents = intentManager.getImported(endpoint.getProperties());
-        intentManager.assertAllIntentsSupported(intents);
+        Set<String> intentNames = intentManager.getImported(endpoint.getProperties());
+        List<Object> intents = intentManager.getIntents(intentNames);
         Class<?> iClass = interfaces[0];
         String address = OsgiUtils.getProperty(endpoint, RsConstants.RS_ADDRESS_PROPERTY);
         if (address == null) {
             LOG.warn("Remote address is unavailable");
             return null;
         }
-        return createJaxrsProxy(address, iClass, null, endpoint);
+        return createJaxrsProxy(address, iClass, null, endpoint, intents);
     }
 
     private Object createJaxrsProxy(String address,
                                       Class<?> iClass,
                                       ClassLoader loader,
-                                      EndpointDescription endpoint) {
+                                      EndpointDescription endpoint, 
+                                      List<Object> intents) {
         JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
         factory.setAddress(address);
         if (loader != null) {
@@ -102,10 +113,7 @@ public class RsProvider implements DistributionProvider {
         }
         addContextProperties(factory, endpoint.getProperties(), RsConstants.RS_CONTEXT_PROPS_PROP_KEY);
         factory.setServiceClass(iClass);
-        Set<String> intents = intentManager.getImported(endpoint.getProperties());
-        intentManager.applyIntents(factory, intents, new ProviderIntentHandler());
-        // Apply providers
-        factory.setProviders(factory.getProviders());
+        applyIntents(intents, factory);
         return ProxyFactory.create(factory.create(), iClass);
     }
 
@@ -129,8 +137,8 @@ public class RsProvider implements DistributionProvider {
             }
         }
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
-        Set<String> intents = intentManager.getExported(endpointProps);
-        intentManager.assertAllIntentsSupported(intents);
+        Set<String> intentNames = intentManager.getExported(endpointProps);
+        List<Object> intents = intentManager.getIntents(intentNames);
         Bus bus = BusFactory.newInstance().createBus();
         if (contextRoot != null) {
             httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);
@@ -139,15 +147,42 @@ public class RsProvider implements DistributionProvider {
 
         JAXRSServerFactoryBean factory = createServerFactory(callingContext, endpointProps, 
                                                              iClass, serviceBean, address, bus);
-        intentManager.applyIntents(factory, intents, new ProviderIntentHandler());
+        applyIntents(intents, factory);
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
         EndpointDescription epd = createEndpointDesc(endpointProps, //
                                                      new String[] {RsConstants.RS_CONFIG_TYPE},
                                                      completeEndpointAddress,
-                                                     intents);
+                                                     intentNames);
         return createServerFromFactory(factory, epd);
     }
     
+    private void applyIntents(List<Object> intents, AbstractJAXRSFactoryBean factory) {
+        List<Feature> features = intentManager.getIntents(Feature.class, intents);
+        factory.setFeatures(features);
+        DataBinding dataBinding = intentManager.getIntent(DataBinding.class, intents);
+        if (dataBinding != null) {
+            factory.setDataBinding(dataBinding);
+        }
+        BindingConfiguration binding = intentManager.getIntent(BindingConfiguration.class, intents);
+        if (binding != null) {
+            factory.setBindingConfig(binding);
+        }
+        
+        List<Object> providers = new ArrayList<Object>();
+        for (Object intent : intents) {
+            if (isProvider(intent)) {
+                providers.add(intent);
+            }
+        }
+        factory.setProviders(providers);
+    }
+    
+    private boolean isProvider(Object intent) {
+        return (intent instanceof ExceptionMapper) // 
+            || (intent instanceof MessageBodyReader) //
+            || (intent instanceof MessageBodyWriter);
+    }
+
     private boolean configTypeSupported(Map<String, Object> endpointProps, String configType) {
         Collection<String> configs = getMultiValueProperty(endpointProps.get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
         return configs == null || configs.isEmpty() || configs.contains(configType);

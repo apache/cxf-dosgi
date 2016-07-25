@@ -23,6 +23,7 @@ import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_CONFIGS
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS_SUPPORTED;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
@@ -43,6 +45,7 @@ import org.apache.cxf.dosgi.common.util.OsgiUtils;
 import org.apache.cxf.dosgi.common.util.ServerEndpoint;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -105,14 +108,25 @@ public class WsProvider implements DistributionProvider {
             factory.setAddress(address);
             addContextProperties(factory.getClientFactoryBean(), sd, WsConstants.WS_CONTEXT_PROPS_PROP_KEY);
             WsdlSupport.setWsdlProperties(factory.getClientFactoryBean(), bundleContext, sd);
-
-            Set<String> intents = intentManager.getImported(sd);
-            intentManager.assertAllIntentsSupported(intents);
-            intentManager.applyIntents(factory.getClientFactoryBean(), intents);
-
+            applyIntents(sd, factory);
             return ProxyFactory.create(factory.create(), iClass);
         } catch (Exception e) {
             throw new RuntimeException("proxy creation failed", e);
+        }
+    }
+
+    private void applyIntents(Map<String, Object> sd, ClientProxyFactoryBean factory) {
+        Set<String> intentNames = intentManager.getImported(sd);
+        List<Object> intents = intentManager.getIntents(intentNames);
+        List<Feature> features = intentManager.getIntents(Feature.class, intents);
+        factory.setFeatures(features);
+        DataBinding dataBinding = intentManager.getIntent(DataBinding.class, intents);
+        if (dataBinding != null) {
+            factory.setDataBinding(dataBinding);
+        }
+        BindingConfiguration binding = intentManager.getIntent(BindingConfiguration.class, intents);
+        if (binding != null) {
+            factory.setBindingConfig(binding);
         }
     }
 
@@ -141,6 +155,7 @@ public class WsProvider implements DistributionProvider {
         factory.setAddress(address);
         addContextProperties(factory, endpointProps, WsConstants.WS_CONTEXT_PROPS_PROP_KEY);
         WsdlSupport.setWsdlProperties(factory, serviceContext, endpointProps);
+        applyIntents(endpointProps, factory);
         intentManager.applyIntents(factory, intents);
 
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
@@ -151,6 +166,21 @@ public class WsProvider implements DistributionProvider {
             return createServerFromFactory(factory, epd);
         } catch (Exception e) {
             throw new RuntimeException("Error exporting service with adress " + completeEndpointAddress, e);
+        }
+    }
+    
+    private void applyIntents(Map<String, Object> sd, AbstractEndpointFactory factory) {
+        Set<String> intentNames = intentManager.getExported(sd);
+        List<Object> intents = intentManager.getIntents(intentNames);
+        List<Feature> features = intentManager.getIntents(Feature.class, intents);
+        factory.setFeatures(features);
+        DataBinding dataBinding = intentManager.getIntent(DataBinding.class, intents);
+        if (dataBinding != null) {
+            factory.setDataBinding(dataBinding);
+        }
+        BindingConfiguration binding = intentManager.getIntent(BindingConfiguration.class, intents);
+        if (binding != null) {
+            factory.setBindingConfig(binding);
         }
     }
 

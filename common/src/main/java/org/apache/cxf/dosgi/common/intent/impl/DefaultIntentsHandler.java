@@ -22,7 +22,6 @@ import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.common.intent.IntentHandler;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
-import org.apache.cxf.feature.Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +40,6 @@ public class DefaultIntentsHandler implements IntentHandler {
             BindingConfiguration bindingCfg = (BindingConfiguration)intent;
             LOG.info(prefix + "binding config: " + bindingCfg);
             factory.setBindingConfig(bindingCfg);
-            return true;
-        } else if (intent instanceof Feature) {
-            Feature feature = (Feature)intent;
-            LOG.info(prefix + "feature: " + feature);
-            factory.getFeatures().add(feature);
             return true;
         } else {
             return false;

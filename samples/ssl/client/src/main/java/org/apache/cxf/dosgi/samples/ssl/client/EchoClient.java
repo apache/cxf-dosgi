@@ -16,13 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.common.intent;
+package org.apache.cxf.dosgi.samples.ssl.client;
 
-import java.util.List;
+import org.apache.cxf.dosgi.samples.ssl.EchoService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
-/**
- * Allows to provide a list of intents under one name
- */
-public interface IntentProvider {
-    List<Object> getIntents();
+@Component//
+(//
+ immediate = true //
+)
+public class EchoClient {
+    private EchoService echoService;
+
+    @Activate
+    public void activate() {
+        System.out.println(echoService.echo("Hello"));
+    }
+
+    @Reference(target = "(service.imported=*)")
+    public void setEchoService(EchoService echoService) {
+        this.echoService = echoService;
+    }
 }

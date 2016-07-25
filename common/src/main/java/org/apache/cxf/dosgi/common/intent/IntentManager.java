@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.dosgi.common.intent;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,4 +38,8 @@ public interface IntentManager {
                       Set<String> requiredIntents, //
                       IntentHandler ... handlers)
         throws IntentUnsatisfiedException;
+    
+    <T> List<T> getIntents(Class<? extends T> type, List<Object> intents);
+    <T> T getIntent(Class<? extends T> type, List<Object> intents);
+    List<Object> getIntents(Set<String> requiredIntents);
 }

@@ -36,6 +36,7 @@ import org.apache.cxf.dosgi.dsw.handlers.jaxws.MyJaxWsEchoService;
 import org.apache.cxf.dosgi.dsw.handlers.simple.MySimpleEchoService;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
@@ -102,6 +103,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         final ClientProxyFactoryBean cpfb = c.createMock(ClientProxyFactoryBean.class);
         ReflectionServiceFactoryBean sf = c.createMock(ReflectionServiceFactoryBean.class);
         EasyMock.expect(cpfb.getServiceFactory()).andReturn(sf).anyTimes();
+        ClientFactoryBean cf = c.createMock(ClientFactoryBean.class);
+        EasyMock.expect(cpfb.getClientFactoryBean()).andReturn(cf).anyTimes();
         IntentManager intentManager = new IntentManagerImpl();
         WsProvider p = new WsProvider() {
             @Override

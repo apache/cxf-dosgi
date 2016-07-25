@@ -1,0 +1,40 @@
+# CXF DOSGi ssl example
+
+This example demonstrates how to configure ssl with a custom keystore and required key based client auth using a plain DOSGi service with a custom intent.
+
+## Karaf SSL config
+
+We want the karaf HttpService to be secured by https and require a client certificate for authentication.
+
+
+	mkdir -p etc/keystores
+	# Create server key
+	keytool -genkey -dname CN=localhost -keyalg RSA -validity 100000 -alias serverkey -keypass password -storepass password -keystore etc/keystores/keystore.jks
+	# Create client key and add to keystore as trusted
+	keytool -genkey -dname CN=chris -keyalg RSA -validity 100000 -alias clientkey -keypass password -storepass password -keystore etc/keystores/client.jks
+	keytool -export -rfc -keystore etc/keystores/client.jks -storepass password -alias clientkey -file client.cer
+	keytool -import -trustcacerts -keystore etc/keystores/keystore.jks -storepass password -alias clientkey -file client.cer
+	# Export client cert as pkcs12 for browser
+	keytool -importkeystore -srckeystore etc/keystores/client.jks -destkeystore etc/keystores/client.p12 -deststoretype PKCS12
+	
+	# Export server cert
+	keytool -exportcert -storepass password -keystore etc/keystores/keystore.jks -alias serverKey -file server.cert
+	# Import server cert into client store
+	keytool -importcert -storepass password -keystore etc/keystores/client.jks -alias serverKey -file server.cert
+	
+
+- Copy the file org.ops4j.pax.web.cfg to the karaf etc dir.
+- Copy the keystores (*.jks) into the karaf etc directory.
+
+## Installation
+
+- Copy the server side ssl config org.apache.cxf.http.jetty-ssl.cfg into etc 
+- Install the CXF DOSGi features
+- Install the example
+feature:repo-add cxf-dosgi 2.0-SNAPSHOT
+feature:install cxf-dosgi-provider-ws
+
+install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-ri-samples-ssl-interface/2.0_SNAPSHOT
+install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-ri-samples-ssl-impl/2.0-SNAPSHOT
+
+install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-ri-samples-ssl-client/2.0-SNAPSHOT

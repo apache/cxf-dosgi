@@ -31,9 +31,9 @@ import java.util.concurrent.Callable;
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.dosgi.common.intent.IntentHandler;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
-import org.apache.cxf.dosgi.common.intent.IntentProvider;
 import org.apache.cxf.dosgi.common.util.OsgiUtils;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
+import org.apache.cxf.feature.Feature;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
@@ -90,7 +90,7 @@ public class IntentManagerImpl implements IntentManager {
     public synchronized void removeIntent(Object intent, String intentName) {
         intentMap.remove(intentName);
     }
-
+    
     @SuppressWarnings("unchecked")
     @Override
     public synchronized void applyIntents(AbstractEndpointFactory factory,
@@ -101,6 +101,7 @@ public class IntentManagerImpl implements IntentManager {
         if (!missingIntents.isEmpty()) {
             throw new IntentUnsatisfiedException(missingIntents.iterator().next()); 
         }
+        List<Feature> features = new ArrayList<Feature>();
         List<IntentHandler> allHandlers = new ArrayList<IntentHandler>();
         allHandlers.add(new DefaultIntentsHandler());
         allHandlers.addAll(Arrays.asList(handlers));
@@ -109,30 +110,36 @@ public class IntentManagerImpl implements IntentManager {
             if (intent instanceof Callable<?>) {
                 try {
                     List<Object> intents = ((Callable<List<Object>>)intent).call();
-                    applyIntents(factory, intentName, intents, allHandlers);
+                    applyIntents(factory, features, intentName, intents, allHandlers);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            } else if (intent instanceof IntentProvider) {
-                applyIntents(factory, intentName, ((IntentProvider)intent).getIntents(), allHandlers);
             } else {
-                applyIntent(factory, intentName, intent, allHandlers);
+                applyIntent(factory, features, intentName, intent, allHandlers);
             }
         }
+        factory.setFeatures(features);
     }
 
-    private void applyIntents(AbstractEndpointFactory factory, 
+    private void applyIntents(AbstractEndpointFactory factory,
+                              List<Feature> features,
                                      String intentName, 
                                      List<Object> intents,
                                      List<IntentHandler> handlers) {
         for (Object intent : intents) {
-            applyIntent(factory, intentName, intent, handlers);
+            applyIntent(factory, features, intentName, intent, handlers);
         }
         
     }
 
-    private void applyIntent(AbstractEndpointFactory factory, String intentName, Object intent, 
+    private void applyIntent(AbstractEndpointFactory factory, List<Feature> features, String intentName, Object intent, 
                              List<IntentHandler> handlers) {
+        if (intent instanceof Feature) {
+            Feature feature = (Feature)intent;
+            LOG.info("Applying intent: " + intentName + " via feature: " + feature);
+            features.add(feature);
+            return;
+        }
         for (IntentHandler handler : handlers) {
             if (handler.apply(factory, intentName, intent)) {
                 return;
@@ -140,6 +147,48 @@ public class IntentManagerImpl implements IntentManager {
         }
         LOG.info("No mapping for intent: " + intentName);
         throw new IntentUnsatisfiedException(intentName);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public synchronized List<Object> getIntents(Set<String> requiredIntents) {
+        String[] intentNames = assertAllIntentsSupported(requiredIntents);
+        List<Object> intents = new ArrayList<Object>();
+        for (String intentName : intentNames) {
+            Object intent = intentMap.get(intentName);
+            if (intent instanceof Callable<?>) {
+                try {
+                    List<Object> curIntents = ((Callable<List<Object>>)intent).call();
+                    intents.addAll(curIntents);
+                } catch (Exception e) {
+                    throw new RuntimeException(e); 
+                }
+                
+            } else {
+                intents.add(intent);
+            }
+        }
+        return intents;
+    }
+    
+    public <T> T getIntent(Class<? extends T> type, List<Object> intents) {
+        List<T> selectedIntents = getIntents(type, intents);
+        if (selectedIntents.isEmpty()) {
+            return null;
+        }
+        if (selectedIntents.size() > 1) {
+            LOG.warn("More than one intent of type " + type + " present. Using only the first one.");
+        }
+        return (T)selectedIntents.iterator().next();
+    }
+    
+    public <T> List<T> getIntents(Class<? extends T> type, List<Object> intents) {
+        List<T> result = new ArrayList<T>();
+        for (Object intent : intents) {
+            if (type.isInstance(intent)) {
+                result.add(type.cast(intent));
+            }
+        }
+        return result;
     }
 
     public synchronized String[] assertAllIntentsSupported(Set<String> requiredIntents) {
