@@ -31,7 +31,7 @@
     <groupId>org.apache.cxf.dosgi.systests</groupId>
     <artifactId>cxf-dosgi-ri-itests-multibundle</artifactId>
     <packaging>jar</packaging>
-    <name>Distributed OSGi System Tests Multi-Bundle</name>
+    <name>CXF DOSGi Integration Tests Multi  Bundle</name>
     
     <properties>
         <topDirectoryLocation>../..</topDirectoryLocation>

@@ -33,7 +33,7 @@
     <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Distributed OSGi System Tests</name>
+    <name>CXF DOSGi Integration Tests</name>
 
     <modules>
         <module>multi-bundle</module>

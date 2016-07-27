@@ -38,6 +38,10 @@ import org.apache.cxf.transport.http.HttpConduitConfig;
 import org.apache.cxf.transport.http.HttpConduitFeature;
 import org.osgi.service.component.annotations.Component;
 
+/**
+ * Configures the client side conduit to trust the server certificate and authenticate by using
+ * a client certificate
+ */
 @Component //
 (//
     property = "org.apache.cxf.dosgi.IntentName=ssl" //

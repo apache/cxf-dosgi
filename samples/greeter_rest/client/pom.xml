@@ -14,7 +14,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-dosgi-ri-samples-greeter-rest-client</artifactId>
     <packaging>bundle</packaging>
-    <name>Distributed OSGI Greeter REST Client</name>
+    <name>CXF DOSGi Greeter REST Client</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi.samples</groupId>

@@ -24,7 +24,7 @@
     <version>2.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
-    <name>Distributed OSGI Reference Implementation</name>
+    <name>CXF DOSGi main</name>
  
     <scm>
         <connection>scm:git:http://git-wip-us.apache.org/repos/asf/cxf-dosgi.git</connection>

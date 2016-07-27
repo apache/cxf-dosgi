@@ -40,5 +40,5 @@
     </dependency>
   </dependencies>
 
-  <name>Distributed OSGI DS Sample Impl</name>
+  <name>CXF DOSGi DS Sample Impl</name>
 </project>

@@ -23,7 +23,7 @@
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-samples-greeter-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Distributed OSGI Greeter Bundles</name>
+    <name>CXF DOSGi Greeter Bundles</name>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>

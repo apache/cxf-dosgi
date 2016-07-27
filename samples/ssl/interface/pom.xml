@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-dosgi-ri-samples-ssl-interface</artifactId>
     <packaging>bundle</packaging>
-    <name>Distributed OSGI Greeter Interface Bundle</name>
+    <name>CXF DOSGi Greeter Interface Bundle</name>
 
     <parent>
       <groupId>org.apache.cxf.dosgi.samples</groupId>

@@ -16,7 +16,7 @@
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-samples-greeter-rest-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Distributed OSGI Greeter REST</name>
+    <name>CXF DOSGi Greeter REST</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>

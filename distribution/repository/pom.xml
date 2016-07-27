@@ -28,4 +28,5 @@
         	<version>1.6.3_1</version>
         </dependency>
     </dependencies>
+    <name>CXF DOSGi Distribution Repository</name>
 </project>
