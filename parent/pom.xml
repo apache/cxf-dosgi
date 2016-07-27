@@ -22,7 +22,7 @@
     <artifactId>cxf-dosgi-ri-parent</artifactId>
 
     <packaging>pom</packaging>
-    <name>Distributed OSGI Reference Implementation Parent</name>
+    <name>CXF DOSGi  Parent</name>
 
     <properties>
         <!-- portable text resource processing -->
@@ -31,7 +31,7 @@
         <osgi.version>5.0.0</osgi.version>
         <osgi.compendium.version>5.0.0</osgi.compendium.version>
         <aries.rsa.version>1.9.0</aries.rsa.version>
-        <cxf.version>3.1.7-SNAPSHOT</cxf.version>
+        <cxf.version>3.1.7</cxf.version>
         <felix.version>5.4.0</felix.version>
         <zookeeper.version>3.4.8</zookeeper.version>
         <remote.service.admin.interfaces.version>1.0.0</remote.service.admin.interfaces.version>
@@ -330,8 +330,17 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-
-
+        <repository>
+            <id>cxf.3.1.7</id>
+            <name>CXF 3.1.7</name>
+            <url>https://repository.apache.org/content/repositories/orgapachecxf-1074/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <pluginRepositories>
