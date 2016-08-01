@@ -330,17 +330,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>cxf.3.1.7</id>
-            <name>CXF 3.1.7</name>
-            <url>https://repository.apache.org/content/repositories/orgapachecxf-1074/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
     </repositories>
 
     <pluginRepositories>
