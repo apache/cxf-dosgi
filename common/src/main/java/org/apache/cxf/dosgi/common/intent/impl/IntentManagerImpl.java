@@ -55,19 +55,26 @@ public class IntentManagerImpl implements IntentManager {
 
     @Activate
     public void activate(BundleContext context) throws InvalidSyntaxException {
-        Filter filter = FrameworkUtil.createFilter("(" + IntentManager.INTENT_NAME_PROP + "=*)");
+        String filterSt = String.format("(|(%s=*)(%s=*))",  INTENT_NAME_PROP, INTENT_NAME_PROP2);
+        Filter filter = FrameworkUtil.createFilter(filterSt);
         tracker = new ServiceTracker<Object, Object>(context, filter, null) {
             @Override
             public Object addingService(ServiceReference<Object> reference) {
                 Object intent = super.addingService(reference);
-                addIntent(intent, (String)reference.getProperty(INTENT_NAME_PROP));
+                addIntent(intent, getName(reference));
                 return intent;
             }
-            
+
             @Override
             public void removedService(ServiceReference<Object> reference, Object intent) {
-                removeIntent(intent, (String)reference.getProperty(INTENT_NAME_PROP));
+                removeIntent(intent, getName(reference));
                 super.removedService(reference, intent);
+            }
+
+            private String getName(ServiceReference<Object> reference) {
+                String name = (String)reference.getProperty(INTENT_NAME_PROP);
+                String name2 = (String)reference.getProperty(INTENT_NAME_PROP2);
+                return name != null ? name : name2;
             }
         };
         tracker.open();

@@ -16,7 +16,7 @@ Example
 
 * service.exported.intents=logging
 
-See [](common "common module").
+See [common module](common).
 
 ## Build
 

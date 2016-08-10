@@ -24,6 +24,7 @@ import java.util.Set;
 
 public interface IntentManager {
     String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
+    String INTENT_NAME_PROP2 = "intentName";
 
     Set<String> getExported(Map<String, Object> sd);
 

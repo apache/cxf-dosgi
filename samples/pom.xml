@@ -23,7 +23,7 @@
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-ri-samples</artifactId>
     <packaging>pom</packaging>
-    <name>CXF DOSGi RI Sample Bundles</name>
+    <name>CXF DOSGi Sample Bundles</name>
     <url>http://cxf.apache.org/</url>
 
     <parent>
