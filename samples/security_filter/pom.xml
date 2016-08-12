@@ -13,9 +13,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
-    <artifactId>cxf-dosgi-ri-samples-security</artifactId>
+    <artifactId>cxf-dosgi-ri-samples-security-filter</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF DOSGi Security Sample Bundle</name>
+    <name>CXF DOSGi Samples Security Filter</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>

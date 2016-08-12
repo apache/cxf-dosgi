@@ -29,13 +29,23 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A filter that requires a query string of "secure" to invoke the protected
- * resource.
+ * A filter that requires a query string of "secure" to invoke the protected resource. Pax-Web whiteboard (if
+ * deployed) will attempt to apply this filter to servlets by name or URL, and will complain if neither
+ * servletName or urlPatterns are specified. The felix http service whiteboard may do something similar.
  */
+@Component //
+(//
+    service = javax.servlet.Filter.class,
+    property = //
+    {
+     "org.apache.cxf.httpservice.filter=true", "servletNames=none"
+    }//
+)
 public class SampleSecurityFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleSecurityFilter.class);

@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-dosgi-ri-provider-ws</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF dOSGi provider ws</name>
+    <name>CXF DOSGi provider ws</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>

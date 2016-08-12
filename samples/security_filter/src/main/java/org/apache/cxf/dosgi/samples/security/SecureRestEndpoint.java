@@ -23,6 +23,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.osgi.service.component.annotations.Component;
+
+@Component //
+(//
+  service = SecureRestEndpoint.class,
+  property = //
+  { //
+    "service.exported.interfaces=*",
+    "service.exported.configs=org.apache.cxf.rs",
+    "org.apache.cxf.rs.httpservice.context=/secure"
+  }
+)
 @Path("/")
 public class SecureRestEndpoint {
 

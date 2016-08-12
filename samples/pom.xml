@@ -21,9 +21,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
-    <artifactId>cxf-dosgi-ri-samples</artifactId>
+    <artifactId>cxf-dosgi-samples-parent</artifactId>
     <packaging>pom</packaging>
-    <name>CXF DOSGi Sample Bundles</name>
+    <name>CXF DOSGi Samples Parent</name>
     <url>http://cxf.apache.org/</url>
 
     <parent>
@@ -34,9 +34,9 @@
     </parent>
 
     <modules>
-      <module>greeter</module>
-      <module>greeter_rest</module>
-      <module>ds</module>
+      <module>rest</module>
+      <module>soap</module>
       <module>security_filter</module>
+      <module>features</module>
     </modules>
 </project>

@@ -2,6 +2,10 @@
 
 This example demonstrates how to configure ssl with a custom keystore and required key based client auth using a plain DOSGi service with a custom intent.
 
+The example reuses the soap example code. It then adds the ssl intent to the service impl by using a config. This prevents the service from starting up.
+
+We then install the ssl-intent bundle which implements the intent. This allows the service and client to start up.
+
 ## Karaf SSL config
 
 We want the karaf HttpService to be secured by https and require a client certificate for authentication.
@@ -27,7 +31,7 @@ We want the karaf HttpService to be secured by https and require a client certif
 	keytool -importcert -storepass password -keystore etc/keystores/client.jks -alias serverKey -file server.cert
 	
 
-- Copy the file org.ops4j.pax.web.cfg to the karaf etc dir.
+- Copy thes files in etc to the karaf etc dir
 - Copy the keystores (*.jks) into the karaf etc directory.
 
 ## Installation
@@ -40,9 +44,10 @@ We want the karaf HttpService to be secured by https and require a client certif
 feature:repo-add cxf-dosgi 2.0-SNAPSHOT
 feature:install cxf-dosgi-provider-ws
 
-install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-ri-samples-ssl-interface/2.0_SNAPSHOT
-install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-ri-samples-ssl-impl/2.0-SNAPSHOT
-install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-ri-samples-ssl-client/2.0-SNAPSHOT
+install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-api/2.0_SNAPSHOT
+install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-impl/2.0-SNAPSHOT
+install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-client/2.0-SNAPSHOT
+install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-ssl-intent/2.0-SNAPSHOT
 ```
 
 # Test using browser
