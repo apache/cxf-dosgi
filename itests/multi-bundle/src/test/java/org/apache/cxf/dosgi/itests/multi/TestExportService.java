@@ -18,14 +18,12 @@
  */
 package org.apache.cxf.dosgi.itests.multi;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.Callable;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.cxf.dosgi.samples.soap.Task;
 import org.apache.cxf.dosgi.samples.soap.TaskService;
@@ -41,7 +39,6 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 /**
  * Deploys the sample SOAP service and zookeeper discovery.
@@ -74,17 +71,25 @@ public class TestExportService extends AbstractDosgiTest {
 
     @Test
     public void testSOAPCall() throws Exception {
-        waitPort(8080);
-        Thread.sleep(1000);
         checkWsdl(new URL(SERVICE_URI + "?wsdl"));
-        checkServiceCall(SERVICE_URI);
+        TaskService taskService = TaskServiceProxyFactory.create(SERVICE_URI);
+        Task task = taskService.get(1);
+        Assert.assertEquals("Buy some coffee", task.getTitle());
     }
     
     @Test
     public void testRESTCall() throws Exception {
-        waitPort(8080);
-        Thread.sleep(1000);
-        checkRESTCall(REST_SERVICE_URI);
+        waitWebPage(REST_SERVICE_URI);
+        final WebClient client = WebClient.create(REST_SERVICE_URI + "/1");
+        client.accept(MediaType.APPLICATION_XML_TYPE);
+        org.apache.cxf.dosgi.samples.rest.Task task = tryTo("Call REST Resource", 
+                                                            new Callable<org.apache.cxf.dosgi.samples.rest.Task>() {
+            public org.apache.cxf.dosgi.samples.rest.Task call() throws Exception {
+                return client.get(org.apache.cxf.dosgi.samples.rest.Task.class);
+            }
+        }
+        );
+        Assert.assertEquals("Buy some coffee", task.getTitle());
     }
     
     @Test
@@ -94,30 +99,21 @@ public class TestExportService extends AbstractDosgiTest {
         zk.close();
     }
 
-    private void checkWsdl(URL wsdlURL) throws ParserConfigurationException, SAXException, IOException {
+    private void checkWsdl(final URL wsdlURL) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         dbf.setValidating(false);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(wsdlURL.openStream());
+        final DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = tryTo("Parse WSDL", new Callable<Document>() {
+            public Document call() throws Exception {
+                return db.parse(wsdlURL.openStream());
+            }
+        });
+            
         Element el = doc.getDocumentElement();
         Assert.assertEquals("definitions", el.getLocalName());
         Assert.assertEquals("http://schemas.xmlsoap.org/wsdl/", el.getNamespaceURI());
         Assert.assertEquals("TaskServiceService", el.getAttribute("name"));
-    }
-
-    private void checkServiceCall(String serviceUri) {
-        TaskService taskService = TaskServiceProxyFactory.create(serviceUri);
-        Task task = taskService.get(1);
-        Assert.assertEquals("Buy some coffee", task.getTitle());
-    }
-
-    private void checkRESTCall(String restServiceUri) throws InterruptedException, TimeoutException {
-        waitWebPage(REST_SERVICE_URI);
-        WebClient client = WebClient.create(REST_SERVICE_URI + "/1");
-        client.accept(MediaType.APPLICATION_XML_TYPE);
-        org.apache.cxf.dosgi.samples.rest.Task task = client.get(org.apache.cxf.dosgi.samples.rest.Task.class);
-        Assert.assertEquals("Buy some coffee", task.getTitle());
     }
 
 }

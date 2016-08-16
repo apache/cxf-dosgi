@@ -23,7 +23,7 @@ import java.util.Collection;
 import org.apache.cxf.dosgi.samples.soap.Task;
 import org.apache.cxf.dosgi.samples.soap.TaskService;
 
-public class TestTaskServiceImpl implements TaskService {
+public class DummyTaskServiceImpl implements TaskService {
 
     @Override
     public Task get(Integer id) {

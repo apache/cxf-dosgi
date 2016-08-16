@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import org.apache.cxf.dosgi.samples.soap.Task;
 import org.apache.cxf.dosgi.samples.soap.TaskService;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.junit.After;
 import org.junit.Assert;
@@ -42,9 +41,8 @@ import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.Constants;
 
 /**
- * Creates a service outside OSGi,
- * announces the service via the xml based discovery.
- * Checks that the service proxy is created by CXF DOSGi and can be called.
+ * Creates a service outside OSGi, announces the service via the xml based discovery. Checks that the service
+ * proxy is created by CXF DOSGi and can be called.
  */
 @RunWith(PaxExam.class)
 public class TestImportService extends AbstractDosgiTest {
@@ -92,16 +90,11 @@ public class TestImportService extends AbstractDosgiTest {
 
     private Server publishService() {
         System.out.println("Publishing service");
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
-            JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
-            factory.setServiceClass(TaskService.class);
-            factory.setAddress("http://localhost:9191/taskservice");
-            factory.setServiceBean(new TestTaskServiceImpl());
-            return factory.create();
-        } finally {
-            Thread.currentThread().setContextClassLoader(cl);
-        }
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setServiceClass(TaskService.class);
+        factory.setAddress("http://localhost:9191/taskservice");
+        factory.setServiceBean(new DummyTaskServiceImpl());
+        return factory.create();
+
     }
 }

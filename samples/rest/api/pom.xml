@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-samples-rest-api</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF DOSGi samples REST API</name>
+    <name>CXF DOSGi Samples REST API</name>
 
     <parent>
       <groupId>org.apache.cxf.dosgi</groupId>

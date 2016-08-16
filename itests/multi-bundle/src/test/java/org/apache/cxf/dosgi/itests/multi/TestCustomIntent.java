@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.dosgi.itests.multi;
 
-import static org.apache.cxf.dosgi.itests.multi.TaskServiceProxyFactory.create;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
 
 import java.io.InputStream;
+import java.util.concurrent.Callable;
 
 import org.apache.cxf.dosgi.itests.multi.customintent.ChangeTitleInterceptor;
 import org.apache.cxf.dosgi.itests.multi.customintent.CustomFeature;
@@ -53,9 +53,13 @@ public class TestCustomIntent extends AbstractDosgiTest {
 
     @Test
     public void testCustomIntent() throws Exception {
-        Thread.sleep(1000);
-        TaskService greeterService = create("http://localhost:8080/cxf/taskservice");
-        Task task = greeterService.get(1);
+        final TaskService greeterService = TaskServiceProxyFactory.create("http://localhost:8080/cxf/taskservice");
+        Task task = tryTo("Call TaskService", new Callable<Task>() {
+            public Task call() throws Exception {
+                return greeterService.get(1);
+            }
+        });
+        
         Assert.assertEquals("changed", task.getTitle());
     }
 
@@ -64,7 +68,7 @@ public class TestCustomIntent extends AbstractDosgiTest {
             .add(CustomIntentActivator.class) //
             .add(CustomFeature.class) //
             .add(ChangeTitleInterceptor.class) //
-            .add(TestTaskServiceImpl.class) //
+            .add(DummyTaskServiceImpl.class) //
             .set(Constants.BUNDLE_SYMBOLICNAME, "CustomIntent") //
             .set(Constants.BUNDLE_ACTIVATOR, CustomIntentActivator.class.getName())
             .build(TinyBundles.withBnd());

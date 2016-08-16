@@ -15,7 +15,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-dosgi</artifactId>
     <packaging>pom</packaging>
-    <name>CXF DOSGI Karaf Features</name>
+    <name>CXF DOSGi Karaf Features</name>
     <url>http://cxf.apache.org</url>
 
     <parent>

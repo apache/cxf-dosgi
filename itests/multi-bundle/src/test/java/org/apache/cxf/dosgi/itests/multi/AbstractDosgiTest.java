@@ -81,7 +81,6 @@ public class AbstractDosgiTest {
                 lastException = null;
             } catch (Throwable e) {
                 lastException = e;
-                e.printStackTrace();
             }
             try {
                 Thread.sleep(1000);

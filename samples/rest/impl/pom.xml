@@ -15,7 +15,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-dosgi-samples-rest-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>CXF DOSGi samples REST Impl</name>
+    <name>CXF DOSGi Samples REST Impl</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi.samples</groupId>

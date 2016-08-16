@@ -21,7 +21,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>cxf-dosgi-samples-soap-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>CXF DOSGi samples SOAP Impl</name>
+  <name>CXF DOSGi Samples SOAP Impl</name>
 
   <parent>
     <groupId>org.apache.cxf.dosgi.samples</groupId>

@@ -16,7 +16,7 @@
     <groupId>org.apache.cxf.dosgi.samples</groupId>
     <artifactId>cxf-dosgi-samples-rest-parent</artifactId>
     <packaging>pom</packaging>
-    <name>CXF DOSGi samples REST Parent</name>
+    <name>CXF DOSGi Samples REST Parent</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi.samples</groupId>
