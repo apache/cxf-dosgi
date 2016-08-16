@@ -16,26 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.multi.rest;
+package org.apache.cxf.dosgi.itests.multi;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.cxf.dosgi.samples.soap.TaskService;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
-public class RestTranslateImpl implements RestTranslate {
-    Map<String, String> translation;
-    
-    public RestTranslateImpl() {
-        translation = new HashMap<String, String>();
-        translation.put("hello", "hallo");
+public final class TaskServiceProxyFactory {
+
+    private TaskServiceProxyFactory() {
     }
-    
-    @Override
-    public String englishWords() {
-        return translation.keySet().toString();
+
+    protected static TaskService create(String serviceUri) {
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(TaskService.class);
+        factory.setAddress(serviceUri);
+        return (TaskService)factory.create();
     }
-    
-    @Override
-    public String getTranslation(String word) {
-        return translation.get(word);
-    }
+
 }

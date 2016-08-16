@@ -22,7 +22,7 @@
     <artifactId>cxf-dosgi-ri-parent</artifactId>
 
     <packaging>pom</packaging>
-    <name>CXF DOSGi  Parent</name>
+    <name>CXF DOSGi Parent</name>
 
     <properties>
         <!-- portable text resource processing -->

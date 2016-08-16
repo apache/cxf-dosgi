@@ -110,6 +110,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>${cxf.version}</version>
         </dependency>
@@ -143,29 +148,29 @@
         <!-- Samples -->
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
-            <artifactId>cxf-dosgi-ri-samples-greeter-impl</artifactId>
+            <artifactId>cxf-dosgi-samples-soap-api</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
-            <artifactId>cxf-dosgi-ri-samples-greeter-interface</artifactId>
+            <artifactId>cxf-dosgi-samples-soap-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
-            <artifactId>cxf-dosgi-ri-samples-greeter-rest-impl</artifactId>
+            <artifactId>cxf-dosgi-samples-rest-api</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
-            <artifactId>cxf-dosgi-ri-samples-greeter-rest-interface</artifactId>
+            <artifactId>cxf-dosgi-samples-rest-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -225,6 +230,7 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+            
         </plugins>
     </build>
 </project>

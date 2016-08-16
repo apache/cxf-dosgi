@@ -25,19 +25,21 @@ import org.apache.cxf.dosgi.samples.rest.Task;
 import org.apache.cxf.dosgi.samples.rest.TaskResource;
 import org.osgi.service.component.annotations.Component;
 
-@Component(immediate = true, //
-property = //
-{ //
- "name=TaskResource",
- "service.exported.interfaces=*", //
- "service.exported.configs=org.apache.cxf.rs", //
- "org.apache.cxf.rs.address=/tasks" //
-} //
+@Component//
+(//
+    immediate = true, //
+    name = "TaskResource", //
+    property = //
+    { //
+      "service.exported.interfaces=*", //
+      "service.exported.configs=org.apache.cxf.rs", //
+      "org.apache.cxf.rs.address=/tasks" //
+    } //
 )
-public class TaskServiceImpl implements TaskResource {
+public class TaskResourceImpl implements TaskResource {
     Map<Integer, Task> taskMap;
 
-    public TaskServiceImpl() {
+    public TaskResourceImpl() {
         taskMap = new HashMap<Integer, Task>();
         Task task = new Task();
         task.setId(1);

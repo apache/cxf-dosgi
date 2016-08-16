@@ -8,8 +8,13 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <artifactId>cxf-dosgi-ri-repository</artifactId>
-    <packaging>pom</packaging>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.aries.rsa</groupId>
+            <artifactId>repository</artifactId>
+            <version>1.9.0</version>
+            <type>pom</type>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>
             <artifactId>cxf-dosgi-ri-provider-ws</artifactId>
@@ -21,11 +26,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-        	<groupId>org.apache.servicemix.bundles</groupId>
-        	<artifactId>
-        		org.apache.servicemix.bundles.wsdl4j
-        	</artifactId>
-        	<version>1.6.3_1</version>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>
+                org.apache.servicemix.bundles.wsdl4j
+            </artifactId>
+            <version>1.6.3_1</version>
         </dependency>
     </dependencies>
     <name>CXF DOSGi Distribution Repository</name>

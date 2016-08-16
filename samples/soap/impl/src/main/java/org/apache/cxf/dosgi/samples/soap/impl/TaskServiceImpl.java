@@ -27,14 +27,16 @@ import org.apache.cxf.dosgi.samples.soap.Task;
 import org.apache.cxf.dosgi.samples.soap.TaskService;
 import org.osgi.service.component.annotations.Component;
 
-@Component(immediate = true, //
-property = //
-{ //
- "name=TaskService",
- "service.exported.interfaces=*", //
- "service.exported.configs=org.apache.cxf.ws", //
- "org.apache.cxf.ws.address=/taskservice" //
-} //
+@Component //
+(//
+    immediate = true, //
+    name = "TaskService", //
+    property = //
+    { //
+      "service.exported.interfaces=*", //
+      "service.exported.configs=org.apache.cxf.ws", //
+      "org.apache.cxf.ws.address=/taskservice" //
+    } //
 )
 public class TaskServiceImpl implements TaskService {
     Map<Integer, Task> taskMap;

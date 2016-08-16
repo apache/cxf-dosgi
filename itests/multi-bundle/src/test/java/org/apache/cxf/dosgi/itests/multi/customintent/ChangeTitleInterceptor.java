@@ -16,29 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.multi.customintent;
+package org.apache.cxf.dosgi.itests.multi.customintent;
 
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Method;
 
-import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
-import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.dosgi.samples.soap.Task;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 
-public final class AddGreetingPhraseInterceptor extends AbstractPhaseInterceptor<Message> {
+public final class ChangeTitleInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    AddGreetingPhraseInterceptor(String phase) {
-        super(phase);
+    ChangeTitleInterceptor() {
+        super(Phase.USER_LOGICAL);
     }
 
     public void handleMessage(Message message) throws Fault {
-        MessageContentsList contents = (MessageContentsList) message.getContent(List.class);
-        Map<GreetingPhrase, String> result = CastUtils.cast((Map<?, ?>)contents.get(0));
-        result.put(new GreetingPhrase("Hi from custom intent"), "customintent");
-        //Object content1 = contents.iterator().next();
-        System.out.println(message);
+        MessageContentsList contents = MessageContentsList.getContentsList(message);
+        Object response = contents.get(0);
+        Method method = response.getClass().getMethods()[0];
+        try {
+            Task task = (Task)method.invoke(response);
+            task.setTitle("changed");
+        } catch (Exception e) {
+        }
+
     }
 }

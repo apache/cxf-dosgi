@@ -16,20 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.multi.customintent;
+package org.apache.cxf.dosgi.itests.multi.customintent;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.apache.cxf.dosgi.itests.multi.TestTaskServiceImpl;
+import org.apache.cxf.dosgi.samples.soap.TaskService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class CustomIntentActivator implements BundleActivator {
 
     public void start(BundleContext context) throws Exception {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put("org.apache.cxf.dosgi.IntentName", "myIntent");
-        context.registerService(CustomFeature.class.getName(), new CustomFeature(), props);
+        context.registerService(CustomFeature.class, new CustomFeature(), props);
+        
+        Dictionary<String, String> props2 = new Hashtable<String, String>();
+        props2.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, "org.apache.cxf.ws");
+        props2.put("org.apache.cxf.ws.address", "/taskservice");
+        props2.put(RemoteConstants.SERVICE_EXPORTED_INTERFACES, "*");
+        props2.put(RemoteConstants.SERVICE_EXPORTED_INTENTS, "myIntent");
+        context.registerService(TaskService.class, new TestTaskServiceImpl(), props2);
     }
 
     public void stop(BundleContext context) throws Exception {

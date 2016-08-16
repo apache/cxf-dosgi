@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.multi;
+package org.apache.cxf.dosgi.itests.multi;
 
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
@@ -34,6 +34,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
@@ -62,6 +63,37 @@ public class AbstractDosgiTest {
     @BeforeClass
     public static void log() {
         System.out.println("-----------------------------------------------------------------");
+    }
+    
+    public <T> T tryTo(String message, Callable<T> func) throws TimeoutException {
+        return tryTo(message, func, 5000);
+    }
+    
+    public <T> T tryTo(String message, Callable<T> func, long timeout) throws TimeoutException {
+        Throwable lastException = null;
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < timeout) {
+            try {
+                T result = func.call();
+                if (result != null) {
+                    return result;
+                }
+                lastException = null;
+            } catch (Throwable e) {
+                lastException = e;
+                e.printStackTrace();
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                continue;
+            }
+        }
+        TimeoutException ex = new TimeoutException("Timeout while trying to " + message);
+        if (lastException != null) {
+            ex.addSuppressed(lastException);
+        }
+        throw ex;
     }
     
 
@@ -110,6 +142,7 @@ public class AbstractDosgiTest {
             try {
                 s = new Socket((String)null, port);
                 // yep, its available
+                System.out.println("Port: " + port + " is listening now");
                 return;
             } catch (IOException e) {
                 sleepOrTimeout(startTime, TIMEOUT, "Timeout waiting for port " + port);
@@ -185,7 +218,8 @@ public class AbstractDosgiTest {
         }
     }
 
-    protected ZooKeeper createZookeeperClient() throws IOException {
+    protected ZooKeeper createZookeeperClient() throws Exception {
+        waitPort(ZK_PORT);
         return new ZooKeeper("localhost:" + ZK_PORT, 1000, null);
     }
 
@@ -220,21 +254,42 @@ public class AbstractDosgiTest {
     }
     
 
-    protected static MavenArtifactProvisionOption greeterImpl() {
+    protected static MavenArtifactProvisionOption taskServiceAPI() {
         return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-            .artifactId("cxf-dosgi-ri-samples-greeter-impl").versionAsInProject();
+            .artifactId("cxf-dosgi-samples-soap-api").versionAsInProject();
+    }
+    
+    protected static MavenArtifactProvisionOption taskServiceImpl() {
+        return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
+            .artifactId("cxf-dosgi-samples-soap-impl").versionAsInProject();
     }
 
-    protected static MavenArtifactProvisionOption greeterInterface() {
+
+    protected static MavenArtifactProvisionOption taskRESTAPI() {
         return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
-            .artifactId("cxf-dosgi-ri-samples-greeter-interface").versionAsInProject();
+            .artifactId("cxf-dosgi-samples-rest-api").versionAsInProject();
     }
+
+
+    protected static MavenArtifactProvisionOption taskRESTImpl() {
+        return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
+            .artifactId("cxf-dosgi-samples-rest-impl").versionAsInProject();
+    }
+
 
     protected static Option basicTestOptions() throws Exception {
         return composite(MultiBundleTools.getDistro(), //
                          CoreOptions.junitBundles(), //
+                         
+                         // Enable JAXB from JRE
+                         CoreOptions.bootDelegationPackages("com.sun.*"), 
+                         CoreOptions.systemPackages(
+                                                   "javax.xml.bind.annotation;version=2.2.1",
+                                                   "javax.xml.bind;version=2.2.1"), 
+
                          systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"), //
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"), //
+                         systemProperty("org.apache.cxf.stax.allowInsecureParser").value("true"), //
                          configLogging(),
                          frameworkStartLevel(100)
         );

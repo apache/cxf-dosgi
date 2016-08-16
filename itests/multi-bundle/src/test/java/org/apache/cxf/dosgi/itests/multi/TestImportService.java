@@ -16,22 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.multi;
+package org.apache.cxf.dosgi.itests.multi;
 
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 import java.io.InputStream;
-import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.dosgi.samples.greeter.GreeterService;
-import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
-import org.apache.cxf.dosgi.systests2.multi.importservice.SimpleGreeter;
+import org.apache.cxf.dosgi.samples.soap.Task;
+import org.apache.cxf.dosgi.samples.soap.TaskService;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,10 +41,16 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.Constants;
 
+/**
+ * Creates a service outside OSGi,
+ * announces the service via the xml based discovery.
+ * Checks that the service proxy is created by CXF DOSGi and can be called.
+ */
 @RunWith(PaxExam.class)
 public class TestImportService extends AbstractDosgiTest {
     @Inject
-    GreeterService greeterService;
+    TaskService taskService;
+
     private Server server;
 
     @Configuration
@@ -54,15 +58,15 @@ public class TestImportService extends AbstractDosgiTest {
         return new Option[] //
         {//
          basicTestOptions(), //
-         greeterInterface(), //
-         provision(createServiceConsumerBundle()), //
+         taskServiceAPI(), //
+         provision(importConfigBundle()), //
          // increase for debugging
          systemProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout")
              .value(System.getProperty("org.apache.cxf.dosgi.test.serviceWaitTimeout", "200")),
         };
     }
 
-    protected static InputStream createServiceConsumerBundle() {
+    protected static InputStream importConfigBundle() {
         return TinyBundles.bundle() //
             .add("OSGI-INF/remote-service/remote-services.xml",
                  TestImportService.class.getResource("/rs-test1.xml")) //
@@ -72,14 +76,13 @@ public class TestImportService extends AbstractDosgiTest {
 
     @Before
     public void createCXFService() {
-        server = publishTestGreeter();
+        server = publishService();
     }
 
     @Test
     public void testClientConsumer() throws Exception {
-        Map<GreetingPhrase, String> result = greeterService.greetMe("OSGi");
-        GreetingPhrase phrase = result.keySet().iterator().next();
-        Assert.assertEquals("Hi", phrase.getPhrase());
+        Task task = taskService.get(1);
+        Assert.assertEquals("test", task.getTitle());
     }
 
     @After
@@ -87,15 +90,15 @@ public class TestImportService extends AbstractDosgiTest {
         server.stop();
     }
 
-    private Server publishTestGreeter() {
+    private Server publishService() {
+        System.out.println("Publishing service");
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(ServerFactoryBean.class.getClassLoader());
-            ServerFactoryBean factory = new ServerFactoryBean();
-            factory.setServiceClass(GreeterService.class);
-            factory.setAddress("http://localhost:9191/grrr");
-            factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-            factory.setServiceBean(new SimpleGreeter());
+            JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+            factory.setServiceClass(TaskService.class);
+            factory.setAddress("http://localhost:9191/taskservice");
+            factory.setServiceBean(new TestTaskServiceImpl());
             return factory.create();
         } finally {
             Thread.currentThread().setContextClassLoader(cl);

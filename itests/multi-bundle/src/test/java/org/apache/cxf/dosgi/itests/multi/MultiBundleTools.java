@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.multi;
+package org.apache.cxf.dosgi.itests.multi;
 
 import java.io.File;
 import java.io.FileInputStream;

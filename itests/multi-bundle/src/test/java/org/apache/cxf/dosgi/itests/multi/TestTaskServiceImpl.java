@@ -16,26 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.multi.customintent.service;
+package org.apache.cxf.dosgi.itests.multi;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
 
-import org.apache.cxf.dosgi.samples.greeter.GreeterData;
-import org.apache.cxf.dosgi.samples.greeter.GreeterException;
-import org.apache.cxf.dosgi.samples.greeter.GreeterService;
-import org.apache.cxf.dosgi.samples.greeter.GreetingPhrase;
+import org.apache.cxf.dosgi.samples.soap.Task;
+import org.apache.cxf.dosgi.samples.soap.TaskService;
 
-public final class EmptyGreeterService implements GreeterService {
+public class TestTaskServiceImpl implements TaskService {
 
-    /**
-     * Return an empty array. Our custom intent should add a GreetingPhrase
-     */
-    public GreetingPhrase[] greetMe(GreeterData name) throws GreeterException {
-        return new GreetingPhrase[]{};
+    @Override
+    public Task get(Integer id) {
+        return new Task(1, "test", "");
     }
 
-    public Map<GreetingPhrase, String> greetMe(String name) {
-        return new HashMap<GreetingPhrase, String>();
+    @Override
+    public void addOrUpdate(Task task) {
+        throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void delete(Integer id) {
+        throw new UnsupportedOperationException();
+
+    }
+
+    @Override
+    public Collection<Task> getAll() {
+        throw new UnsupportedOperationException();
+    }
+
 }

@@ -1,7 +1,0 @@
-<model xmlns="http://cxf.apache.org/jaxrs">
- <resource name="org.apache.cxf.dosgi.samples.greeter.rest.GreeterService2" path="greeter">
-    <operation name="greetMe" verb="GET" path="greeting/{name}">
-       <param name="name" type="PATH"/>
-    </operation>
- </resource>
-</model>

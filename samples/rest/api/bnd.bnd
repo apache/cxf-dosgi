@@ -1,1 +1,4 @@
 Export-Package: org.apache.cxf.dosgi.samples.rest
+Import-Package: \
+	javax.xml.bind.annotation,\
+	*

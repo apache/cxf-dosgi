@@ -12,6 +12,10 @@
     <xsl:template match="bundle[@artifactId='org.apache.karaf.scr.command']"></xsl:template>
     <xsl:template match="bundle[@artifactId='org.apache.felix.webconsole.plugins.ds']"></xsl:template>
     <xsl:template match="bundle[@artifactId='org.apache.aries.rsa.discovery.command']"></xsl:template>
+    <xsl:template match="bundle[@artifactId='woodstox-core-asl']"></xsl:template>
+    <xsl:template match="bundle[@artifactId='org.apache.servicemix.specs.jaxb-api']"></xsl:template>
+    <xsl:template match="bundle[@artifactId='org.apache.servicemix.bundles.jaxb-xjc']"></xsl:template>
+    <xsl:template match="bundle[@artifactId='org.apache.servicemix.bundles.jaxb-impl']"></xsl:template>
 
     <!-- Copy the rest unachanged -->
     <xsl:template match="@* | node()">

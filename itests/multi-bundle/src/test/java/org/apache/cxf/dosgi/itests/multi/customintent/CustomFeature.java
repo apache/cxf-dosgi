@@ -16,19 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.systests2.multi.rest;
+package org.apache.cxf.dosgi.itests.multi.customintent;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import org.apache.cxf.Bus;
+import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.interceptor.InterceptorProvider;
 
-public interface RestTranslate {
+public final class CustomFeature extends AbstractFeature {
 
-    @GET
-    String englishWords();
-
-    @GET
-    @Path("/{word}")
-    String getTranslation(@PathParam("word") String word);
-
+    @Override
+    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
+        provider.getOutInterceptors().add(0, new ChangeTitleInterceptor());
+        super.initializeProvider(provider, bus);
+    }
 }
