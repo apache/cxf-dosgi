@@ -19,21 +19,21 @@
         <feature>http</feature>
         <feature>cxf-http-jetty</feature>
         <bundle dependency="true">mvn:org.apache.felix/org.apache.felix.scr/2.0.2</bundle>
-        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-common/${project.version}</bundle>
-        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-decorator/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-common/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-decorator/${project.version}</bundle>
     </feature>
 
     <feature name="cxf-dosgi-provider-ws" version="${project.version}">
         <feature>cxf-dosgi-common</feature>
         <feature>cxf-jaxws</feature>
         <feature>cxf-databinding-aegis</feature>
-        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-provider-ws/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-provider-ws/${project.version}</bundle>
     </feature>
     
     <feature name="cxf-dosgi-provider-rs" version="${project.version}">
         <feature>cxf-dosgi-common</feature>
         <feature>cxf-jaxrs</feature>
-        <bundle>mvn:${project.groupId}/cxf-dosgi-ri-provider-rs/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/cxf-dosgi-provider-rs/${project.version}</bundle>
     </feature>
 
 </features>

@@ -8,3 +8,4 @@
 .settings/
 target/
 velocity.log
+generated/

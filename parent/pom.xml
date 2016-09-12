@@ -14,12 +14,12 @@
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
-        <artifactId>cxf-dosgi-ri</artifactId>
+        <artifactId>cxf-dosgi-main</artifactId>
         <version>2.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-dosgi-ri-parent</artifactId>
+    <artifactId>cxf-dosgi-parent</artifactId>
 
     <packaging>pom</packaging>
     <name>CXF DOSGi Parent</name>
@@ -30,7 +30,7 @@
 
         <osgi.version>5.0.0</osgi.version>
         <osgi.compendium.version>5.0.0</osgi.compendium.version>
-        <aries.rsa.version>1.9.0</aries.rsa.version>
+        <aries.rsa.version>1.10-SNAPSHOT</aries.rsa.version>
         <cxf.version>3.1.7</cxf.version>
         <felix.version>5.4.0</felix.version>
         <zookeeper.version>3.4.8</zookeeper.version>

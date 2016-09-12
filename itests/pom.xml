@@ -23,13 +23,13 @@
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
-        <artifactId>cxf-dosgi-ri-parent</artifactId>
+        <artifactId>cxf-dosgi-parent</artifactId>
         <version>2.0-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <groupId>org.apache.cxf.dosgi.systests</groupId>
-    <artifactId>cxf-dosgi-ri-itests</artifactId>
+    <artifactId>cxf-dosgi-itests</artifactId>
     <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 

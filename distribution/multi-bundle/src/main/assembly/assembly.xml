@@ -29,18 +29,18 @@
   <fileSets>
     <fileSet>
       <directory>target/distribution_bundles</directory>
-      <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}/dosgi_bundles</outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-${dosgi.version}/dosgi_bundles</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/distribution_configs</directory>
-      <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}/conf</outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-${dosgi.version}/conf</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/maven-shared-archive-resources/META-INF</directory>
       <excludes>
           <exclude>DEPENDENCIES</exclude>
       </excludes>
-      <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}</outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-${dosgi.version}</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/release</directory>
@@ -48,7 +48,7 @@
         <include>README</include>
         <include>release_notes.txt</include>
       </includes>
-      <outputDirectory>apache-cxf-dosgi-ri-${dosgi.version}</outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-${dosgi.version}</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

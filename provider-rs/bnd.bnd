@@ -1,3 +1,5 @@
 Import-Package: javax.servlet;version='[2,4)', javax.servlet.http;version='[2,4)', *
 
 Private-Package: org.apache.cxf.dosgi.dsw.*
+Provide-Capability: osgi.remoteserviceadmin.distribution;\
+	configs:List<String>="org.apache.cxf.rs"; version:Version=1.0

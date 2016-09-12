@@ -13,13 +13,13 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.dosgi.samples</groupId>
-    <artifactId>cxf-dosgi-ri-samples-security-filter</artifactId>
+    <artifactId>cxf-dosgi-samples-security-filter</artifactId>
     <packaging>bundle</packaging>
     <name>CXF DOSGi Samples Security Filter</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi</groupId>
-        <artifactId>cxf-dosgi-ri-parent</artifactId>
+        <artifactId>cxf-dosgi-parent</artifactId>
         <version>2.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
