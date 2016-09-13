@@ -2,31 +2,24 @@
 
 Provides CXF based Distribution providers for [Aries Remote Service Admin (RSA)](http://aries.apache.org/modules/rsa.html).
 
-## Distribution Providers
+CXF DOSGi allows to easily publish and consume SOAP and REST services without using the CXF blueprint extensions or publishing the services using java code. So this is the recommended way to use CXF in OSGi with declarative services. Check the examples to see how simple it is to use.
 
-*   cxf-dosgi-provider-ws SOAP transport 
-*   cxf-dosgi.provider-rs REST transport
+## Modules
+
+* [common - Common services like intents and HTTPService support](common).
+* [provider-ws - SOAP transport] (provider-ws) 
+* [provider-rs - REST transport] (provider-rs)
+* [decorator - Support for exporting existing services] (decorator)
+
+* [Examples](samples).
+* [Distributions](distribution).
 
 ## Intents
 
 A service can list the named intents it requires. It will then only be exported / imported 
 once all the intents are available. This allows for example security restrictions or logging.
-
-Example
-
-* service.exported.intents=logging
-
-See [common module](common).
+For more informations see [common module](common).
 
 ## Build
 
 mvn clean install
-
-## Deployment
-
-CXF DOSGi can be deployed in three different ways
-
-*   Multi bundle distro (deprecated)
-*   Karaf feature
-*   Bndtools pom repository
- 

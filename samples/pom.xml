@@ -42,6 +42,7 @@
       <module>rest</module>
       <module>soap</module>
       <module>security_filter</module>
+      <module>repository</module>
       <module>features</module>
     </modules>
 </project>
