@@ -90,6 +90,9 @@ public class RsProvider implements DistributionProvider {
                                  BundleContext consumerContext,
                                  Class[] interfaces,
                                  EndpointDescription endpoint) {
+        if (interfaces.length > 1) {
+            throw new IllegalArgumentException("Multiple interfaces are not supported by this provider");
+        }
         Set<String> intentNames = intentManager.getImported(endpoint.getProperties());
         List<Object> intents = intentManager.getRequiredIntents(intentNames);
         Class<?> iClass = interfaces[0];

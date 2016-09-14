@@ -95,6 +95,9 @@ public class WsProvider implements DistributionProvider {
                                  BundleContext consumerContext,
                                  Class[] interfaces,
                                  EndpointDescription endpoint) throws IntentUnsatisfiedException {
+        if (interfaces.length > 1) {
+            throw new IllegalArgumentException("Multiple interfaces are not supported by this provider");
+        }
         Class<?> iClass = interfaces[0];
         Map<String, Object> sd = endpoint.getProperties();
         String address = getClientAddress(sd);
