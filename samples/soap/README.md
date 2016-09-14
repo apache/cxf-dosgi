@@ -17,7 +17,7 @@ Unpack karaf 4 into a server and client directory.
 Start the server karaf
 
 ```
-feature:repo-add cxf-dosgi-samples 2.0-SNAPSHOT
+feature:repo-add cxf-dosgi-samples 2.0.0
 feature:install cxf-dosgi-sample-soap-impl
 rsa:endpoints
 ```
@@ -29,10 +29,10 @@ The last command should show one endpoint with a URI as id. You should be able t
 Start the client karaf
 
 ```
-feature:repo-add cxf-dosgi-samples 2.0-SNAPSHOT
+feature:repo-add cxf-dosgi-samples 2.0.0
 feature:install cxf-dosgi-sample-soap-client
 ```
-Use commands to test
+Use these commands to test
 
 ```
 rsa:endpoints

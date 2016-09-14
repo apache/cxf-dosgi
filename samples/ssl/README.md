@@ -41,13 +41,9 @@ We want the karaf HttpService to be secured by https and require a client certif
 - Install the example
 
 ``` 
-feature:repo-add cxf-dosgi 2.0-SNAPSHOT
-feature:install cxf-dosgi-provider-ws
-
-install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-api/2.0_SNAPSHOT
-install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-impl/2.0-SNAPSHOT
-install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-client/2.0-SNAPSHOT
-install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-ssl-intent/2.0-SNAPSHOT
+feature:repo-add cxf-dosgi-samples 2.0.0
+feature:install cxf-dosgi-sample-soap-impl cxf-dosgi-sample-soap-client
+install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-ssl-intent/2.0.0
 ```
 
 # Test using browser
