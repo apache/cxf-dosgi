@@ -127,10 +127,30 @@ public class WsProvider implements DistributionProvider {
         if (dataBinding != null) {
             factory.setDataBinding(dataBinding);
         }
-        BindingConfiguration binding = intentManager.getIntent(BindingConfiguration.class, intents);
+        BindingConfiguration binding = copy(intentManager.getIntent(BindingConfiguration.class, intents));
+        
         if (binding != null) {
             factory.setBindingConfig(binding);
         }
+    }
+
+    private BindingConfiguration copy(BindingConfiguration bindingCfg) {
+        return bindingCfg instanceof SoapBindingConfiguration 
+            ? copy((SoapBindingConfiguration)bindingCfg) : bindingCfg;
+    }
+
+    private SoapBindingConfiguration copy(SoapBindingConfiguration intent) {
+        SoapBindingConfiguration bindingCfg = new SoapBindingConfiguration();
+        bindingCfg.setVersion(intent.getVersion());
+        bindingCfg.setTransportURI(intent.getTransportURI());
+        bindingCfg.setUse(intent.getUse());
+        if (intent.isSetStyle()) {
+            bindingCfg.setStyle(intent.getStyle());
+        }
+        bindingCfg.setMtomEnabled(intent.isMtomEnabled());
+        bindingCfg.setBindingName(intent.getBindingName());
+        bindingCfg.setBindingNamePostfix(intent.getBindingNamePostfix());
+        return bindingCfg;
     }
 
     @SuppressWarnings("rawtypes")
