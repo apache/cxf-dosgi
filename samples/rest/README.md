@@ -40,3 +40,20 @@ task:add 4 Mytask
 task:list
 ```
 
+### Add logging intent
+
+Starting with CXF 3.1.8 the CXF logging feature is exported as an intent by
+default this makes it very easy to add logging to the rest example.
+
+```
+feature:install cxf-features-logging
+config:property-set -p TaskResource service.exported.intents logging
+endpoint http://localhost:8181/cxf/tasks
+```
+
+This installs the CXF logging feature and adds the logging intent to the
+rest sample component. The command endpoint should then show that the intent
+logging is applied. 
+
+Any http requests to the service should now show as a logging message in the
+karaf log.
