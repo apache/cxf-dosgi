@@ -42,7 +42,7 @@ task:list
 
 ### Add logging intent
 
-Starting with CXF 3.1.8 the CXF logging feature is exported as an intent by
+Starting with CXF 3.1.9 the CXF logging feature is exported as an intent by
 default this makes it very easy to add logging to the rest example.
 
 ```
