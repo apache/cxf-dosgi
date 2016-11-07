@@ -9,6 +9,7 @@
 
 -runproperties: \
 	org.ops4j.pax.logging.DefaultServiceLog.level=INFO,\
+	rsa.export.policy.filter="(name=rest)",\
 	org.apache.felix.http.jettyEnabled=true,\
 	org.osgi.framework.bootdelegation=com.sun.*,\
 	org.osgi.framework.system.packages.extra='sun.misc,javax.xml.bind.annotation;version=2.2.1,javax.xml.bind;version=2.2.1'
@@ -31,15 +32,14 @@
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
 	osgi.identity;filter:='(osgi.identity=org.ops4j.pax.logging.pax-logging-service)',\
 	osgi.identity;filter:='(osgi.identity=org.objectweb.asm.all)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.cxf.dosgi.samples.cxf-dosgi-samples-soap-impl)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.http.jetty)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.cxf.dosgi.cxf-dosgi-provider-ws)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.aries.rsa.topology-manager)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.aries.rsa.discovery.command)'
+	osgi.identity;filter:='(&(osgi.identity=org.apache.aries.rsa.discovery.command)(version>=1.9.0))',\
+	osgi.identity;filter:='(osgi.identity=org.apache.cxf.dosgi.samples.cxf-dosgi-samples-rest-impl)',\
+	osgi.identity;filter:='(osgi.identity=org.apache.cxf.dosgi.cxf-dosgi-provider-rs)'
 -runbundles: \
-	org.apache.cxf.dosgi.samples.cxf-dosgi-samples-soap-api;version='[2.0.0,2.0.1)',\
-	org.apache.cxf.dosgi.samples.cxf-dosgi-samples-soap-impl;version='[2.0.0,2.0.1)',\
 	org.apache.felix.configadmin;version='[1.8.8,1.8.9)',\
 	org.apache.felix.fileinstall;version='[3.5.2,3.5.3)',\
 	org.objectweb.asm.all;version='[5.0.4,5.0.5)',\
@@ -58,8 +58,6 @@
 	org.apache.cxf.cxf-rt-frontend-simple;version='[3.1.7,3.1.8)',\
 	org.apache.cxf.cxf-rt-transports-http;version='[3.1.7,3.1.8)',\
 	org.apache.cxf.cxf-rt-wsdl;version='[3.1.7,3.1.8)',\
-	org.apache.cxf.dosgi.cxf-dosgi-common;version='[2.0.0,2.0.1)',\
-	org.apache.cxf.dosgi.cxf-dosgi-provider-ws;version='[2.0.0,2.0.1)',\
 	org.apache.servicemix.bundles.wsdl4j;version='[1.6.3,1.6.4)',\
 	org.apache.ws.xmlschema.core;version='[2.2.1,2.2.2)',\
 	org.apache.aries.rsa.core;version='[1.9.0,1.9.1)',\
@@ -70,4 +68,13 @@
 	org.apache.felix.scr;version='[2.0.4,2.0.5)',\
 	org.apache.felix.gogo.runtime;version='[0.10.0,0.10.1)',\
 	org.apache.aries.rsa.discovery.command;version='[1.9.0,1.9.1)',\
-	org.fusesource.jansi;version='[1.13.0,1.13.1)'
+	org.fusesource.jansi;version='[1.13.0,1.13.1)',\
+	javax.annotation-api;version='[1.2.0,1.2.1)',\
+	org.apache.servicemix.specs.jsr339-api-2.0.1;version='[2.6.0,2.6.1)',\
+	org.apache.cxf.cxf-rt-frontend-jaxrs;version='[3.1.7,3.1.8)',\
+	org.apache.cxf.cxf-rt-rs-client;version='[3.1.7,3.1.8)',\
+	org.apache.cxf.dosgi.cxf-dosgi-common;version='[2.1.0,2.1.1)',\
+	org.apache.cxf.dosgi.cxf-dosgi-provider-rs;version='[2.1.0,2.1.1)',\
+	org.apache.cxf.dosgi.cxf-dosgi-provider-ws;version='[2.1.0,2.1.1)',\
+	org.apache.cxf.dosgi.samples.cxf-dosgi-samples-rest-api;version='[2.1.0,2.1.1)',\
+	org.apache.cxf.dosgi.samples.cxf-dosgi-samples-rest-impl;version='[2.1.0,2.1.1)'

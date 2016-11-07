@@ -289,6 +289,7 @@ public class AbstractDosgiTest {
                          systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"), //
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"), //
                          systemProperty("org.apache.cxf.stax.allowInsecureParser").value("true"), //
+                         systemProperty("rsa.export.policy.filter").value("(name=cxf)"), //
                          configLogging(),
                          frameworkStartLevel(100)
         );

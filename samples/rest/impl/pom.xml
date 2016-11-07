@@ -33,6 +33,12 @@
             <artifactId>cxf-dosgi-samples-rest-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+        	<groupId>org.apache.aries.rsa</groupId>
+        	<artifactId>org.apache.aries.rsa.spi</artifactId>
+        	<version>1.9.0</version>
+        	<type>bundle</type>
+        </dependency>
     </dependencies>
 
 </project>
