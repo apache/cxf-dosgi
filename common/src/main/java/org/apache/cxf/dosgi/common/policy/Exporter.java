@@ -28,6 +28,10 @@ import org.apache.aries.rsa.spi.ExportPolicy;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Component;
 
+/**
+ * This export policy allows to export services with just the rs or ws address property.
+ * This policy must be configured in the Aries RSA TopologyManager config to be activated.
+ */
 @Component //
 (//
     immediate = true, //

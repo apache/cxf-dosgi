@@ -30,16 +30,16 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 import junit.framework.TestCase;
 
-public class OsgiUtilsTest extends TestCase {
+public class PropertyHelperTest extends TestCase {
 
     public void testMultiValuePropertyAsString() {
         assertEquals(Collections.singleton("hi"),
-            OsgiUtils.getMultiValueProperty("hi"));
+            PropertyHelper.getMultiValueProperty("hi"));
     }
 
     public void testMultiValuePropertyAsArray() {
         assertEquals(Arrays.asList("a", "b"),
-                OsgiUtils.getMultiValueProperty(new String[] {"a", "b"}));
+                PropertyHelper.getMultiValueProperty(new String[] {"a", "b"}));
     }
 
     public void testMultiValuePropertyAsCollection() {
@@ -47,11 +47,11 @@ public class OsgiUtilsTest extends TestCase {
         list.add("1");
         list.add("2");
         list.add("3");
-        assertEquals(list, OsgiUtils.getMultiValueProperty(list));
+        assertEquals(list, PropertyHelper.getMultiValueProperty(list));
     }
 
     public void testMultiValuePropertyNull() {
-        assertNull(OsgiUtils.getMultiValueProperty(null));
+        assertTrue(PropertyHelper.getMultiValueProperty(null).isEmpty());
     }
 
     public void testGetProperty() {
@@ -63,8 +63,9 @@ public class OsgiUtilsTest extends TestCase {
 
         EndpointDescription endpoint = new EndpointDescription(p);
 
-        assertNull(OsgiUtils.getProperty(endpoint, "unknownProp"));
-        assertEquals(p.get(RemoteConstants.ENDPOINT_ID), OsgiUtils.getProperty(endpoint, RemoteConstants.ENDPOINT_ID));
-        assertEquals(null, OsgiUtils.getProperty(endpoint, "notAString"));
+        assertNull(PropertyHelper.getProperty(endpoint.getProperties(), "unknownProp"));
+        assertEquals(p.get(RemoteConstants.ENDPOINT_ID), 
+                     PropertyHelper.getProperty(endpoint.getProperties(), RemoteConstants.ENDPOINT_ID));
+        assertEquals(null, PropertyHelper.getProperty(endpoint.getProperties(), "notAString"));
     }
 }

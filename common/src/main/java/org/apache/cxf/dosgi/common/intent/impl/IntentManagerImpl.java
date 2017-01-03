@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.cxf.dosgi.common.intent.IntentManager;
-import org.apache.cxf.dosgi.common.util.OsgiUtils;
+import org.apache.cxf.dosgi.common.util.PropertyHelper;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
@@ -182,22 +182,18 @@ public class IntentManagerImpl implements IntentManager {
     
     public Set<String> getExported(Map<String, Object> sd) {
         Set<String> allIntents = new HashSet<String>();
-        Collection<String> intents = OsgiUtils
+        Collection<String> intents = PropertyHelper
             .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
-        if (intents != null) {
-            allIntents.addAll(parseIntents(intents));
-        }
-        Collection<String> intents2 = OsgiUtils
+        allIntents.addAll(parseIntents(intents));
+        Collection<String> intents2 = PropertyHelper
             .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
-        if (intents2 != null) {
-            allIntents.addAll(parseIntents(intents2));
-        }
+        allIntents.addAll(parseIntents(intents2));
         return allIntents;
     }
     
     public Set<String> getImported(Map<String, Object> sd) {
-        Collection<String> intents = OsgiUtils.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_INTENTS));
-        return intents == null ? new HashSet<String>() : new HashSet<String>(intents);
+        Collection<String> intents = PropertyHelper.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_INTENTS));
+        return new HashSet<String>(intents);
     }
     
     private static Collection<String> parseIntents(Collection<String> intents) {

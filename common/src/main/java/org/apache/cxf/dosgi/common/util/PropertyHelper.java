@@ -23,30 +23,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class OsgiUtils {
+public final class PropertyHelper {
 
-    public static final Logger LOG = LoggerFactory.getLogger(OsgiUtils.class);
+    public static final Logger LOG = LoggerFactory.getLogger(PropertyHelper.class);
 
-    private OsgiUtils() {
-    }
-
-    public static boolean getBooleanProperty(Map<String, Object> sd, String name) {
-        return toBoolean(sd.get(name));
-    }
-
-    public static boolean toBoolean(Object value) {
-        return value instanceof Boolean && (Boolean) value
-            || value instanceof String && Boolean.parseBoolean((String)value);
+    private PropertyHelper() {
     }
 
     @SuppressWarnings("unchecked")
     public static Collection<String> getMultiValueProperty(Object property) {
         if (property == null) {
-            return null;
+            return Collections.emptyList();
         } else if (property instanceof Collection) {
             return (Collection<String>)property;
         } else if (property instanceof String[]) {
@@ -54,10 +44,6 @@ public final class OsgiUtils {
         } else {
             return Collections.singleton(property.toString());
         }
-    }
-
-    public static String getProperty(EndpointDescription endpoint, String name) {
-        return getProperty(endpoint.getProperties(), name);
     }
 
     public static String getProperty(Map<String, Object> dict, String name) {

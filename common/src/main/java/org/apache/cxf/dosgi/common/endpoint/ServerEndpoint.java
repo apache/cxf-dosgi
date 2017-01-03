@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.common.util;
+package org.apache.cxf.dosgi.common.endpoint;
 
 import java.io.IOException;
 

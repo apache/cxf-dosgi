@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.dosgi.common.util.OsgiUtils;
+import org.apache.cxf.dosgi.common.util.PropertyHelper;
 import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
 import org.osgi.framework.BundleContext;
 
@@ -36,7 +36,7 @@ public final class WsdlSupport {
     public static void setWsdlProperties(AbstractWSDLBasedEndpointFactory factory, //
                                          BundleContext context, // 
                                          Map<String, Object> sd) {
-        String location = OsgiUtils.getProperty(sd, WsConstants.WS_WSDL_LOCATION);
+        String location = PropertyHelper.getProperty(sd, WsConstants.WS_WSDL_LOCATION);
         if (location != null) {
             URL wsdlURL = context.getBundle().getResource(location);
             if (wsdlURL != null) {
@@ -58,8 +58,8 @@ public final class WsdlSupport {
 
     protected static QName getServiceQName(Class<?> iClass, Map<String, Object> sd, String nsPropName,
                                            String namePropName) {
-        String serviceNs = OsgiUtils.getProperty(sd, nsPropName);
-        String serviceName = OsgiUtils.getProperty(sd, namePropName);
+        String serviceNs = PropertyHelper.getProperty(sd, nsPropName);
+        String serviceName = PropertyHelper.getProperty(sd, namePropName);
         if (iClass == null && (serviceNs == null || serviceName == null)) {
             return null;
         }
@@ -73,7 +73,7 @@ public final class WsdlSupport {
     }
 
     protected static QName getPortQName(String ns, Map<String, Object> sd, String propName) {
-        String portName = OsgiUtils.getProperty(sd, propName);
+        String portName = PropertyHelper.getProperty(sd, propName);
         if (portName == null) {
             return null;
         }

@@ -28,10 +28,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.util.EndpointHelper;
+import org.apache.cxf.dosgi.common.endpoint.ServerEndpoint;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.intent.impl.IntentManagerImpl;
-import org.apache.cxf.dosgi.common.util.ServerEndpoint;
 import org.apache.cxf.dosgi.dsw.handlers.jaxws.MyJaxWsEchoService;
 import org.apache.cxf.dosgi.dsw.handlers.simple.MySimpleEchoService;
 import org.apache.cxf.endpoint.EndpointImpl;

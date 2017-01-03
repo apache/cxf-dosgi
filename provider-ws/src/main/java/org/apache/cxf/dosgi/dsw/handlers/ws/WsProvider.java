@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers.ws;
 
-import static org.apache.cxf.dosgi.common.util.OsgiUtils.getMultiValueProperty;
+import static org.apache.cxf.dosgi.common.util.PropertyHelper.getMultiValueProperty;
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_CONFIGS_SUPPORTED;
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS_SUPPORTED;
 
@@ -38,11 +38,11 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.dosgi.common.endpoint.ServerEndpoint;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
-import org.apache.cxf.dosgi.common.util.OsgiUtils;
-import org.apache.cxf.dosgi.common.util.ServerEndpoint;
+import org.apache.cxf.dosgi.common.util.PropertyHelper;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
@@ -164,7 +164,7 @@ public class WsProvider implements DistributionProvider {
         Class<?> iClass = exportedInterfaces[0];
         String address = getPojoAddress(endpointProps, iClass);
         ServerFactoryBean factory = createServerFactoryBean(endpointProps, iClass);
-        String contextRoot = OsgiUtils.getProperty(endpointProps, WsConstants.WS_HTTP_SERVICE_CONTEXT);
+        String contextRoot = PropertyHelper.getProperty(endpointProps, WsConstants.WS_HTTP_SERVICE_CONTEXT);
 
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
         Set<String> intentNames = intentManager.getExported(endpointProps);
@@ -239,7 +239,7 @@ public class WsProvider implements DistributionProvider {
     }
     
     protected String getClientAddress(Map<String, Object> sd) {
-        return OsgiUtils.getFirstNonEmptyStringProperty(sd, WsConstants.WS_ADDRESS_PROPERTY,
+        return PropertyHelper.getFirstNonEmptyStringProperty(sd, WsConstants.WS_ADDRESS_PROPERTY,
                                                         RemoteConstants.ENDPOINT_ID);
     }
 

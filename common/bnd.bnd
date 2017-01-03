@@ -3,5 +3,6 @@ Export-Package: \
 	org.apache.cxf.dosgi.common.httpservice,\
 	org.apache.cxf.dosgi.common.util,\
 	org.apache.cxf.dosgi.common.intent,\
-	org.apache.cxf.dosgi.common.proxy
+	org.apache.cxf.dosgi.common.proxy,\
+	org.apache.cxf.dosgi.common.endpoint
 

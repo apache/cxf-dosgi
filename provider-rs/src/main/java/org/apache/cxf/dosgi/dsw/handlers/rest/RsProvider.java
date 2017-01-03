@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers.rest;
 
-import static org.apache.cxf.dosgi.common.util.OsgiUtils.getMultiValueProperty;
+import static org.apache.cxf.dosgi.common.util.PropertyHelper.getMultiValueProperty;
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_CONFIGS_SUPPORTED;
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS_SUPPORTED;
 
@@ -40,11 +40,11 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.dosgi.common.endpoint.ServerEndpoint;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
-import org.apache.cxf.dosgi.common.util.OsgiUtils;
-import org.apache.cxf.dosgi.common.util.ServerEndpoint;
+import org.apache.cxf.dosgi.common.util.PropertyHelper;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
@@ -96,7 +96,7 @@ public class RsProvider implements DistributionProvider {
         Set<String> intentNames = intentManager.getImported(endpoint.getProperties());
         List<Object> intents = intentManager.getRequiredIntents(intentNames);
         Class<?> iClass = interfaces[0];
-        String address = OsgiUtils.getProperty(endpoint, RsConstants.RS_ADDRESS_PROPERTY);
+        String address = PropertyHelper.getProperty(endpoint.getProperties(), RsConstants.RS_ADDRESS_PROPERTY);
         if (address == null) {
             LOG.warn("Remote address is unavailable");
             return null;
@@ -128,13 +128,13 @@ public class RsProvider implements DistributionProvider {
         if (!configTypeSupported(endpointProps, RsConstants.RS_CONFIG_TYPE)) {
             return null;
         }
-        String contextRoot = OsgiUtils.getProperty(endpointProps, RsConstants.RS_HTTP_SERVICE_CONTEXT);
+        String contextRoot = PropertyHelper.getProperty(endpointProps, RsConstants.RS_HTTP_SERVICE_CONTEXT);
         String address;
         Class<?> iClass = exportedInterfaces[0];
         if (contextRoot == null) {
             address = getServerAddress(endpointProps, iClass);
         } else {
-            address = OsgiUtils.getProperty(endpointProps, RsConstants.RS_ADDRESS_PROPERTY);
+            address = PropertyHelper.getProperty(endpointProps, RsConstants.RS_ADDRESS_PROPERTY);
             if (address == null) {
                 address = "/";
             }
@@ -215,7 +215,7 @@ public class RsProvider implements DistributionProvider {
         factory.setResourceProvider(iClass, new SingletonResourceProvider(serviceBean));
         factory.setAddress(address);
         addContextProperties(factory, sd, RsConstants.RS_CONTEXT_PROPS_PROP_KEY);
-        String location = OsgiUtils.getProperty(sd, RsConstants.RS_WADL_LOCATION);
+        String location = PropertyHelper.getProperty(sd, RsConstants.RS_WADL_LOCATION);
         setWadlLocation(callingContext, factory, location);
         return factory;
     }
@@ -242,7 +242,7 @@ public class RsProvider implements DistributionProvider {
     }
     
     private String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
-        String address = OsgiUtils.getProperty(sd, RsConstants.RS_ADDRESS_PROPERTY);
+        String address = PropertyHelper.getProperty(sd, RsConstants.RS_ADDRESS_PROPERTY);
         return address == null ? httpServiceManager.getDefaultAddress(iClass) : address;
     }
     
