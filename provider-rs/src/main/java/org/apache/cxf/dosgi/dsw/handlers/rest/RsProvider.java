@@ -129,15 +129,10 @@ public class RsProvider implements DistributionProvider {
             return null;
         }
         String contextRoot = PropertyHelper.getProperty(endpointProps, RsConstants.RS_HTTP_SERVICE_CONTEXT);
-        String address;
         Class<?> iClass = exportedInterfaces[0];
-        if (contextRoot == null) {
-            address = getServerAddress(endpointProps, iClass);
-        } else {
-            address = PropertyHelper.getProperty(endpointProps, RsConstants.RS_ADDRESS_PROPERTY);
-            if (address == null) {
-                address = "/";
-            }
+        String address = PropertyHelper.getProperty(endpointProps, RsConstants.RS_ADDRESS_PROPERTY);
+        if (address == null) {
+            address = httpServiceManager.getDefaultAddress(iClass);
         }
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
         Set<String> intentNames = intentManager.getExported(endpointProps);
@@ -239,11 +234,6 @@ public class RsProvider implements DistributionProvider {
         props.put(RemoteConstants.SERVICE_INTENTS, intents);
         props.put(RemoteConstants.ENDPOINT_ID, address);
         return new EndpointDescription(props);
-    }
-    
-    private String getServerAddress(Map<String, Object> sd, Class<?> iClass) {
-        String address = PropertyHelper.getProperty(sd, RsConstants.RS_ADDRESS_PROPERTY);
-        return address == null ? httpServiceManager.getDefaultAddress(iClass) : address;
     }
     
     private static void addContextProperties(AbstractEndpointFactory factory, Map<String, Object> sd, String propName) {
