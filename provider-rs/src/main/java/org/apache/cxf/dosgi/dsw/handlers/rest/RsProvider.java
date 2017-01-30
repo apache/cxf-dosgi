@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -178,7 +179,8 @@ public class RsProvider implements DistributionProvider {
     private boolean isProvider(Object intent) {
         return (intent instanceof ExceptionMapper) // 
             || (intent instanceof MessageBodyReader) //
-            || (intent instanceof MessageBodyWriter);
+            || (intent instanceof MessageBodyWriter) //
+            || (intent instanceof ContextResolver);
     }
 
     private boolean configTypeSupported(Map<String, Object> endpointProps, String configType) {
