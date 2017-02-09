@@ -138,10 +138,7 @@ public class RsProvider implements DistributionProvider {
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
         Set<String> intentNames = intentManager.getExported(endpointProps);
         List<Object> intents = intentManager.getRequiredIntents(intentNames);
-        Bus bus = BusFactory.newInstance().createBus();
-        if (contextRoot != null) {
-            httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);
-        }
+        Bus bus = createBus(sid, callingContext, contextRoot, endpointProps);
         LOG.info("Creating JAXRS endpoint for " + iClass.getName() + " with address " + address);
 
         JAXRSServerFactoryBean factory = createServerFactory(callingContext, endpointProps, 
@@ -154,7 +151,21 @@ public class RsProvider implements DistributionProvider {
                                                      intentNames);
         return createServerFromFactory(factory, epd);
     }
-    
+
+    protected Bus createBus(Long sid, BundleContext callingContext, String contextRoot,
+                            Map<String, Object> endpointProps) {
+        Bus bus = BusFactory.newInstance().createBus();
+        for (Map.Entry<String, Object> prop : endpointProps.entrySet()) {
+            if (prop.getKey().startsWith("cxf.bus.prop.")) {
+                bus.setProperty(prop.getKey().substring("cxf.bus.prop.".length()), prop.getValue());
+            }
+        }
+        if (contextRoot != null) {
+            httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);
+        }
+        return bus;
+    }
+
     private void applyIntents(List<Object> intents, AbstractJAXRSFactoryBean factory) {
         List<Feature> features = intentManager.getIntents(Feature.class, intents);
         factory.setFeatures(features);

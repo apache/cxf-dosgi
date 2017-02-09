@@ -169,7 +169,7 @@ public class WsProvider implements DistributionProvider {
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
         Set<String> intentNames = intentManager.getExported(endpointProps);
         List<Object> intents = intentManager.getRequiredIntents(intentNames);
-        Bus bus = createBus(sid, serviceContext, contextRoot);
+        Bus bus = createBus(sid, serviceContext, contextRoot, endpointProps);
         factory.setDataBinding(getDataBinding(endpointProps, iClass));
         factory.setBindingConfig(new SoapBindingConfiguration());
         factory.setBus(bus);
@@ -247,9 +247,15 @@ public class WsProvider implements DistributionProvider {
         String address = getClientAddress(sd);
         return address == null ? httpServiceManager.getDefaultAddress(iClass) : address;
     }
-    
-    protected Bus createBus(Long sid, BundleContext callingContext, String contextRoot) {
+
+    protected Bus createBus(Long sid, BundleContext callingContext, String contextRoot,
+                            Map<String, Object> endpointProps) {
         Bus bus = BusFactory.newInstance().createBus();
+        for (Map.Entry<String, Object> prop : endpointProps.entrySet()) {
+            if (prop.getKey().startsWith("cxf.bus.prop.")) {
+                bus.setProperty(prop.getKey().substring("cxf.bus.prop.".length()), prop.getValue());
+            }
+        }
         if (contextRoot != null) {
             httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);
         }
