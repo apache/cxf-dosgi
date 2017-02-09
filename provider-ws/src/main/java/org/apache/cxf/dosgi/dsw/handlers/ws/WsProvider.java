@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers.ws;
 
-import static org.apache.cxf.dosgi.common.util.PropertyHelper.getMultiValueProperty;
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_CONFIGS_SUPPORTED;
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS_SUPPORTED;
 
@@ -33,12 +32,12 @@ import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.common.endpoint.ServerEndpoint;
+import org.apache.cxf.dosgi.common.handlers.BaseDistributionProvider;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
@@ -65,12 +64,11 @@ import org.slf4j.LoggerFactory;
  REMOTE_CONFIGS_SUPPORTED + "=" + WsConstants.WS_CONFIG_TYPE,
  REMOTE_INTENTS_SUPPORTED + "=" 
 })
-public class WsProvider implements DistributionProvider {
+public class WsProvider extends BaseDistributionProvider implements DistributionProvider {
+
     private static final Logger LOG = LoggerFactory.getLogger(WsProvider.class);
     protected BundleContext bundleContext;
-    protected IntentManager intentManager;
-    protected HttpServiceManager httpServiceManager;
-    
+
     @Reference
     public void setHttpServiceManager(HttpServiceManager httpServiceManager) {
         this.httpServiceManager = httpServiceManager;
@@ -203,21 +201,10 @@ public class WsProvider implements DistributionProvider {
             factory.setBindingConfig(binding);
         }
     }
-
-    private boolean configTypeSupported(Map<String, Object> endpointProps, String configType) {
-        Collection<String> configs = getMultiValueProperty(endpointProps.get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
-        return configs == null || configs.isEmpty() || configs.contains(configType);
-    }
     
-    protected EndpointDescription createEndpointDesc(Map<String, Object> props, 
-                                                     String[] importedConfigs,
-                                                     String address, 
-                                                     Collection<String> intents) {
-        props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
-        props.put(WsConstants.WS_ADDRESS_PROPERTY, address);
-        props.put(RemoteConstants.SERVICE_INTENTS, intents);
-        props.put(RemoteConstants.ENDPOINT_ID, address);
-        return new EndpointDescription(props);
+    protected EndpointDescription createEndpointDesc(Map<String, Object> props, String[] importedConfigs,
+                                                     String address, Collection<String> intents) {
+        return super.createEndpointDesc(props, importedConfigs, WsConstants.WS_ADDRESS_PROPERTY, address, intents);
     }
 
     private String getPojoAddress(Map<String, Object> sd, Class<?> iClass) {
@@ -248,34 +235,11 @@ public class WsProvider implements DistributionProvider {
         return address == null ? httpServiceManager.getDefaultAddress(iClass) : address;
     }
 
-    protected Bus createBus(Long sid, BundleContext callingContext, String contextRoot,
-                            Map<String, Object> endpointProps) {
-        Bus bus = BusFactory.newInstance().createBus();
-        for (Map.Entry<String, Object> prop : endpointProps.entrySet()) {
-            if (prop.getKey().startsWith("cxf.bus.prop.")) {
-                bus.setProperty(prop.getKey().substring("cxf.bus.prop.".length()), prop.getValue());
-            }
-        }
-        if (contextRoot != null) {
-            httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);
-        }
-        return bus;
-    }
-
     protected Endpoint createServerFromFactory(ServerFactoryBean factory, EndpointDescription epd) {
         Server server = factory.create();
         return new ServerEndpoint(epd, server);
     }
 
-    protected static void addContextProperties(AbstractEndpointFactory factory, 
-                                               Map<String, Object> sd, String propName) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> props = (Map<String, Object>)sd.get(propName);
-        if (props != null) {
-            factory.getProperties(true).putAll(props);
-        }
-    }
-    
     private DataBinding getDataBinding(Map<String, Object> sd, Class<?> iClass) {
         return isJAXWS(sd, iClass) ? new JAXBDataBinding() : new AegisDatabinding();
     }

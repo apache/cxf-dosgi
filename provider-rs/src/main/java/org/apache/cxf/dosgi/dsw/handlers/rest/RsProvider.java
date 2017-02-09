@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.dosgi.dsw.handlers.rest;
 
-import static org.apache.cxf.dosgi.common.util.PropertyHelper.getMultiValueProperty;
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_CONFIGS_SUPPORTED;
 import static org.osgi.service.remoteserviceadmin.RemoteConstants.REMOTE_INTENTS_SUPPORTED;
 
@@ -38,15 +37,14 @@ import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.aries.rsa.spi.IntentUnsatisfiedException;
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.dosgi.common.endpoint.ServerEndpoint;
+import org.apache.cxf.dosgi.common.handlers.BaseDistributionProvider;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.proxy.ProxyFactory;
 import org.apache.cxf.dosgi.common.util.PropertyHelper;
-import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.AbstractJAXRSFactoryBean;
@@ -66,12 +64,10 @@ import org.slf4j.LoggerFactory;
  REMOTE_CONFIGS_SUPPORTED + "=" + RsConstants.RS_CONFIG_TYPE,
  REMOTE_INTENTS_SUPPORTED + "="
 })
-public class RsProvider implements DistributionProvider {
+public class RsProvider extends BaseDistributionProvider implements DistributionProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(RsProvider.class);
-    private IntentManager intentManager;
-    private HttpServiceManager httpServiceManager;
-    
+
     @Reference
     public void setHttpServiceManager(HttpServiceManager httpServiceManager) {
         this.httpServiceManager = httpServiceManager;
@@ -152,20 +148,6 @@ public class RsProvider implements DistributionProvider {
         return createServerFromFactory(factory, epd);
     }
 
-    protected Bus createBus(Long sid, BundleContext callingContext, String contextRoot,
-                            Map<String, Object> endpointProps) {
-        Bus bus = BusFactory.newInstance().createBus();
-        for (Map.Entry<String, Object> prop : endpointProps.entrySet()) {
-            if (prop.getKey().startsWith("cxf.bus.prop.")) {
-                bus.setProperty(prop.getKey().substring("cxf.bus.prop.".length()), prop.getValue());
-            }
-        }
-        if (contextRoot != null) {
-            httpServiceManager.registerServlet(bus, contextRoot, callingContext, sid);
-        }
-        return bus;
-    }
-
     private void applyIntents(List<Object> intents, AbstractJAXRSFactoryBean factory) {
         List<Feature> features = intentManager.getIntents(Feature.class, intents);
         factory.setFeatures(features);
@@ -192,11 +174,6 @@ public class RsProvider implements DistributionProvider {
             || (intent instanceof MessageBodyReader) //
             || (intent instanceof MessageBodyWriter) //
             || (intent instanceof ContextResolver);
-    }
-
-    private boolean configTypeSupported(Map<String, Object> endpointProps, String configType) {
-        Collection<String> configs = getMultiValueProperty(endpointProps.get(RemoteConstants.SERVICE_EXPORTED_CONFIGS));
-        return configs == null || configs.isEmpty() || configs.contains(configType);
     }
 
     private Endpoint createServerFromFactory(JAXRSServerFactoryBean factory,
@@ -238,22 +215,8 @@ public class RsProvider implements DistributionProvider {
         }
     }
 
-    private EndpointDescription createEndpointDesc(Map<String, Object> props, 
-                                                     String[] importedConfigs,
-                                                     String address,
-                                                     Set<String> intents) {
-        props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, importedConfigs);
-        props.put(RsConstants.RS_ADDRESS_PROPERTY, address);
-        props.put(RemoteConstants.SERVICE_INTENTS, intents);
-        props.put(RemoteConstants.ENDPOINT_ID, address);
-        return new EndpointDescription(props);
-    }
-    
-    private static void addContextProperties(AbstractEndpointFactory factory, Map<String, Object> sd, String propName) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> props = (Map<String, Object>)sd.get(propName);
-        if (props != null) {
-            factory.getProperties(true).putAll(props);
-        }
+    protected EndpointDescription createEndpointDesc(Map<String, Object> props, String[] importedConfigs,
+                                                     String address, Collection<String> intents) {
+        return super.createEndpointDesc(props, importedConfigs, RsConstants.RS_ADDRESS_PROPERTY, address, intents);
     }
 }
