@@ -55,6 +55,9 @@ import org.osgi.framework.ServiceReference;
 
 public class AbstractDosgiTest {
     static final int ZK_PORT = 35101;
+    static final int HTTP_PORT = 8989;
+    static final String HTTP_HOST = "localhost"; // can specify specific bound IP
+    static final String HTTP_BASE_URI = "http://" + HTTP_HOST + ":" + HTTP_PORT;
     private static final int TIMEOUT = 20;
     
     @Inject
@@ -236,6 +239,13 @@ public class AbstractDosgiTest {
         Assert.assertNotNull("ZooKeeper node " + zNode + " was not found", stat);
     }
 
+    protected static Option configHttpService(String host, int port) {
+        return newConfiguration("org.ops4j.pax.web")
+            .put("org.osgi.service.http.port", "" + port)
+            .put("org.ops4j.pax.web.listening.addresses", host)
+            .asOption();
+    }
+
     protected static Option configZKConsumer() {
         return newConfiguration("org.apache.aries.rsa.discovery.zookeeper") //
             .put("zookeeper.host", "127.0.0.1") //
@@ -290,6 +300,7 @@ public class AbstractDosgiTest {
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"), //
                          systemProperty("org.apache.cxf.stax.allowInsecureParser").value("true"), //
                          systemProperty("rsa.export.policy.filter").value("(name=cxf)"), //
+                         configHttpService(HTTP_HOST, HTTP_PORT),
                          configLogging(),
                          frameworkStartLevel(100)
         );

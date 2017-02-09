@@ -53,7 +53,8 @@ public class TestCustomIntent extends AbstractDosgiTest {
 
     @Test
     public void testCustomIntent() throws Exception {
-        final TaskService greeterService = TaskServiceProxyFactory.create("http://localhost:8080/cxf/taskservice");
+        String serviceUri = HTTP_BASE_URI + "/cxf/taskservice";
+        final TaskService greeterService = TaskServiceProxyFactory.create(serviceUri);
         Task task = tryTo("Call TaskService", new Callable<Task>() {
             public Task call() throws Exception {
                 return greeterService.get(1);

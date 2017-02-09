@@ -48,8 +48,8 @@ import org.w3c.dom.Element;
 @ExamReactorStrategy(PerClass.class)
 public class TestExportService extends AbstractDosgiTest {
 
-    private static final String SERVICE_URI = "http://localhost:8080/cxf/taskservice";
-    private static final String REST_SERVICE_URI = "http://localhost:8080/cxf/tasks";
+    private static final String SERVICE_URI = HTTP_BASE_URI + "/cxf/taskservice";
+    private static final String REST_SERVICE_URI = HTTP_BASE_URI + "/cxf/tasks";
     
     private static final String GREETER_ZOOKEEPER_NODE = //
         "/osgi/service_registry/org/apache/cxf/dosgi/samples/soap/TaskService/localhost#8181##cxf#taskservice";
