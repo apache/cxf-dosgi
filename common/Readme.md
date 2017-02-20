@@ -11,7 +11,7 @@ Config pid `org.apache.cxf.dosgi.http`
 
 Key             | Default | Description
 ----------------|---------|------------
-httpBase        |         | Start of the addres like http://myserver:8181
+httpBase        |         | Start of the address like http://myserver:8181
 cxfServletAlias | /cxf    | Name of the cxf servlet alias
 
 The absolute address of a service is determined by :
@@ -34,6 +34,7 @@ An intent can be of the following types.
 * javax.ws.rs.ext.ExceptionMapper
 * javax.ws.rs.ext.MessageBodyReader
 * javax.ws.rs.ext.MessageBodyWriter
-* Callable<List<Object>>
+* javax.ws.rs.ext.ContextResolver
+* Callable\<List\<Object\>\>
 
-The Callable allows to publish a intent service that returns a List of intents. So several intents can be grouped with one name.
+The Callable allows one to publish an intent service that returns a List of intents, so several intents can be grouped with one name.

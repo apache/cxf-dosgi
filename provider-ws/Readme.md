@@ -4,12 +4,12 @@ SOAP based transport for Aries RSA.
 
 # Properties
 
-
 *   service.exported.interfaces Interfaces to be exported or * to export all
-*   service.exported.configs org.apache.cxf.ws  
+*   service.exported.configs org.apache.cxf.ws
 *   org.apache.cxf.ws.address http://localhost:9090/greeter for CXF jetty transport or /greeter for servlet transport
 *   org.apache.cxf.ws.httpservice.context Can be set to use a specific http context
 *   org.apache.cxf.ws.context.properties.* Properties wih this prefix will be set as properties of the factory. They can be used to configure features
+*   cxf.bus.prop.* Properties with this prefix will be set as CXF bus properties (with the prefix removed)
 
 # Modes
 
