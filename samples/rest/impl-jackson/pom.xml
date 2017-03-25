@@ -12,36 +12,47 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.dosgi.samples</groupId>
-    <artifactId>cxf-dosgi-samples-rest-parent</artifactId>
-    <packaging>pom</packaging>
-    <name>CXF DOSGi Samples REST Parent</name>
+    <artifactId>cxf-dosgi-samples-rest-impl-jackson</artifactId>
+    <packaging>bundle</packaging>
+    <name>CXF DOSGi Samples REST Impl</name>
 
     <parent>
         <groupId>org.apache.cxf.dosgi.samples</groupId>
-        <artifactId>cxf-dosgi-samples-parent</artifactId>
+        <artifactId>cxf-dosgi-samples-rest-parent</artifactId>
         <version>2.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <modules>
-        <module>api</module>
-        <module>impl</module>
-        <module>impl-jackson</module>
-        <module>client</module>
-    </modules>
+    <properties>
+        <topDirectoryLocation>..</topDirectoryLocation>
+    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
+            <groupId>org.apache.cxf.dosgi.samples</groupId>
+            <artifactId>cxf-dosgi-samples-rest-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <scope>provided</scope>
+        	<groupId>org.apache.aries.rsa</groupId>
+        	<artifactId>org.apache.aries.rsa.spi</artifactId>
+        	<version>1.9.0</version>
         </dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<version>2.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-core</artifactId>
+			<version>3.1.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-features-logging</artifactId>
+			<version>3.1.10</version>
+		</dependency>
     </dependencies>
 
 </project>
