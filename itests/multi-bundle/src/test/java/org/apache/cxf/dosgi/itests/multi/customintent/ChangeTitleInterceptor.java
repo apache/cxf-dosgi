@@ -26,21 +26,25 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ChangeTitleInterceptor extends AbstractPhaseInterceptor<Message> {
+    Logger log = LoggerFactory.getLogger(ChangeTitleInterceptor.class);
 
     ChangeTitleInterceptor() {
         super(Phase.USER_LOGICAL);
     }
 
     public void handleMessage(Message message) throws Fault {
-        MessageContentsList contents = MessageContentsList.getContentsList(message);
-        Object response = contents.get(0);
-        Method method = response.getClass().getMethods()[0];
         try {
+            MessageContentsList contents = MessageContentsList.getContentsList(message);
+            Object response = contents.get(0);
+            Method method = response.getClass().getMethod("getReturn", new Class[]{});
             Task task = (Task)method.invoke(response);
             task.setTitle("changed");
         } catch (Exception e) {
+            log.warn("Error in interceptor", e);
         }
 
     }

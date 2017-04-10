@@ -21,11 +21,15 @@ package org.apache.cxf.dosgi.itests.multi.customintent;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class CustomFeature extends AbstractFeature {
+    Logger log = LoggerFactory.getLogger(CustomFeature.class);
 
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
+        log.info("Adding interceptor " + ChangeTitleInterceptor.class.getName());
         provider.getOutInterceptors().add(0, new ChangeTitleInterceptor());
         super.initializeProvider(provider, bus);
     }
