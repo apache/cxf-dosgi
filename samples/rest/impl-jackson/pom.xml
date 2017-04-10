@@ -34,6 +34,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf.dosgi</groupId>
+            <artifactId>cxf-dosgi-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
         	<groupId>org.apache.aries.rsa</groupId>
         	<artifactId>org.apache.aries.rsa.spi</artifactId>
         	<version>1.9.0</version>
@@ -46,12 +51,12 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-core</artifactId>
-			<version>3.1.9</version>
+			<version>${cxf.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-features-logging</artifactId>
-			<version>3.1.10</version>
+			<version>${cxf.version}</version>
 		</dependency>
     </dependencies>
 

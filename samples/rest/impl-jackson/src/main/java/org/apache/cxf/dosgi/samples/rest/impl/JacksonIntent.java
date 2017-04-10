@@ -25,6 +25,10 @@ import java.util.concurrent.Callable;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.osgi.service.component.annotations.Component;
 
+
+/**
+ * Only needed if jackson is used thorugh an external intent
+ */
 @Component //
 (//
     property = "org.apache.cxf.dosgi.IntentName=jackson" //

@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.dosgi.samples.rest.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import org.apache.cxf.dosgi.common.api.IntentsProvider;
 import org.apache.cxf.dosgi.samples.rest.Task;
 import org.apache.cxf.dosgi.samples.rest.TaskResource;
 import org.osgi.service.component.annotations.Component;
@@ -33,12 +37,13 @@ import org.osgi.service.component.annotations.Component;
     { //
       "service.exported.interfaces=*", //
       "service.exported.configs=org.apache.cxf.rs", //
-      "service.exported.intents=jackson", //
+      //"service.exported.intents=jackson", // Only needed when defining jackson as external intent
       "org.apache.cxf.rs.address=/tasks", //
+      // By default CXF will favor the default json provider
       "cxf.bus.prop.skip.default.json.provider.registration=true"
     } //
 )
-public class TaskResourceImpl implements TaskResource {
+public class TaskResourceImpl implements TaskResource, IntentsProvider {
     Map<Integer, Task> taskMap;
 
     public TaskResourceImpl() {
@@ -73,6 +78,11 @@ public class TaskResourceImpl implements TaskResource {
     @Override
     public void delete(Integer id) {
         taskMap.remove(id);
+    }
+
+    @Override
+    public List<?> getIntents() {
+        return Arrays.asList(new JacksonJaxbJsonProvider());
     }
 
 }
