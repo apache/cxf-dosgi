@@ -31,6 +31,7 @@ import java.util.concurrent.Callable;
 import org.apache.cxf.dosgi.common.api.IntentsProvider;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.util.PropertyHelper;
+import org.apache.cxf.feature.Features;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
@@ -196,6 +197,16 @@ public class IntentManagerImpl implements IntentManager {
         List<Object> intents = new ArrayList<>();
         if (serviceBean instanceof IntentsProvider) {
             intents.addAll(((IntentsProvider)serviceBean).getIntents());
+        }
+        Features features = serviceBean.getClass().getAnnotation(Features.class);
+        if (features != null && features.classes() != null) {
+            for (Class<?> clazz : features.classes()) {
+                try {
+                    intents.add(clazz.newInstance());
+                } catch (Exception e) {
+                    throw new RuntimeException("Could not instantiate feature from class " + clazz.getName(), e);
+                }
+            }
         }
         return intents;
     }
