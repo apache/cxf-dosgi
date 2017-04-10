@@ -36,6 +36,7 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.dosgi.common.api.IntentsProvider;
 import org.apache.cxf.dosgi.common.endpoint.ServerEndpoint;
 import org.apache.cxf.dosgi.common.handlers.BaseDistributionProvider;
 import org.apache.cxf.dosgi.common.httpservice.HttpServiceManager;
@@ -119,6 +120,7 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
     private void applyIntents(Map<String, Object> sd, ClientProxyFactoryBean factory) {
         Set<String> intentNames = intentManager.getImported(sd);
         List<Object> intents = intentManager.getRequiredIntents(intentNames);
+
         List<Feature> features = intentManager.getIntents(Feature.class, intents);
         factory.setFeatures(features);
         DataBinding dataBinding = intentManager.getIntent(DataBinding.class, intents);
@@ -167,6 +169,7 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
         Set<String> intentNames = intentManager.getExported(endpointProps);
         List<Object> intents = intentManager.getRequiredIntents(intentNames);
+        intents.addAll(intentManager.getIntentsFromService(serviceO));
         Bus bus = createBus(sid, serviceContext, contextRoot, endpointProps);
         factory.setDataBinding(getDataBinding(endpointProps, iClass));
         factory.setBindingConfig(new SoapBindingConfiguration());
@@ -176,6 +179,9 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
         factory.setAddress(address);
         addContextProperties(factory, endpointProps, WsConstants.WS_CONTEXT_PROPS_PROP_KEY);
         WsdlSupport.setWsdlProperties(factory, serviceContext, endpointProps);
+        if (serviceO instanceof IntentsProvider) {
+            intents.addAll(((IntentsProvider)serviceO).getIntents());
+        }
         applyIntents(intents, factory);
 
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);

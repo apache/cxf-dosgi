@@ -134,6 +134,8 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
         final Long sid = (Long) endpointProps.get(RemoteConstants.ENDPOINT_SERVICE_ID);
         Set<String> intentNames = intentManager.getExported(endpointProps);
         List<Object> intents = intentManager.getRequiredIntents(intentNames);
+        intents.addAll(intentManager.getIntentsFromService(serviceBean));
+
         Bus bus = createBus(sid, callingContext, contextRoot, endpointProps);
         LOG.info("Creating JAXRS endpoint for " + iClass.getName() + " with address " + address);
 

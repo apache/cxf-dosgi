@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.apache.cxf.dosgi.common.api.IntentsProvider;
 import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.util.PropertyHelper;
 import org.osgi.framework.BundleContext;
@@ -189,6 +190,14 @@ public class IntentManagerImpl implements IntentManager {
             .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS_EXTRA));
         allIntents.addAll(parseIntents(intents2));
         return allIntents;
+    }
+    
+    public List<Object> getIntentsFromService(Object serviceBean) {
+        List<Object> intents = new ArrayList<>();
+        if (serviceBean instanceof IntentsProvider) {
+            intents.addAll(((IntentsProvider)serviceBean).getIntents());
+        }
+        return intents;
     }
     
     public Set<String> getImported(Map<String, Object> sd) {

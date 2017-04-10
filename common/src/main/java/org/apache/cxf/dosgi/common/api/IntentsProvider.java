@@ -16,25 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.dosgi.common.intent;
+package org.apache.cxf.dosgi.common.api;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-public interface IntentManager {
-    String INTENT_NAME_PROP = "org.apache.cxf.dosgi.IntentName";
-    String INTENT_NAME_PROP2 = "intentName";
-
-    Set<String> getExported(Map<String, Object> sd);
-
-    Set<String> getImported(Map<String, Object> sd);
-    
-    List<Object> getRequiredIntents(Set<String> requiredIntents);
-
-    <T> List<T> getIntents(Class<? extends T> type, List<Object> intents);
-
-    <T> T getIntent(Class<? extends T> type, List<Object> intents);
-
-    List<Object> getIntentsFromService(Object serviceBean);
+/**
+ * Returns a list of CXF extension objects that can define the same things a intents
+ */
+public interface IntentsProvider {
+    List<?> getIntents();
 }

@@ -34,6 +34,7 @@ import org.apache.cxf.dosgi.common.intent.IntentManager;
 import org.apache.cxf.dosgi.common.intent.impl.IntentManagerImpl;
 import org.apache.cxf.dosgi.dsw.handlers.jaxws.MyJaxWsEchoService;
 import org.apache.cxf.dosgi.dsw.handlers.simple.MySimpleEchoService;
+import org.apache.cxf.dosgi.dsw.handlers.simple.MySimpleEchoServiceImpl;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientFactoryBean;
@@ -200,8 +201,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
             .andReturn(expectedUUID);
         EasyMock.replay(dswContext);
 
-        IntentManager intentManager = EasyMock.createNiceMock(IntentManager.class);
-        EasyMock.replay(intentManager);
+        IntentManager intentManager = new IntentManagerImpl();
 
         WsProvider handler = new WsProvider() {
             @Override
@@ -212,8 +212,12 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         handler.setIntentManager(intentManager);
         handler.setHttpServiceManager(dummyHttpServiceManager());
         handler.activate(dswContext);
-        Runnable myService = EasyMock.createMock(Runnable.class);
-        EasyMock.replay(myService);
+        Runnable myService = new Runnable() {
+            
+            @Override
+            public void run() {
+            }
+        };
 
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bundleContext);
@@ -378,7 +382,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         BundleContext serviceBC = c.createMock(BundleContext.class);
         c.replay();
         Class<?>[] ifaces = new Class[] {MySimpleEchoService.class};
-        ServerEndpoint serverWrapper = (ServerEndpoint)handler.exportService(null, serviceBC, sd, ifaces);
+        MySimpleEchoServiceImpl service = new MySimpleEchoServiceImpl();
+        ServerEndpoint serverWrapper = (ServerEndpoint)handler.exportService(service, serviceBC, sd, ifaces);
         c.verify();
 
         org.apache.cxf.endpoint.Endpoint ep = serverWrapper.getServer().getEndpoint();
