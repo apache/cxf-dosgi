@@ -25,6 +25,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.cxf.dosgi.itests.multi.customintent.ChangeTitleInterceptor;
 import org.apache.cxf.dosgi.itests.multi.customintent.CustomFeature;
+import org.apache.cxf.dosgi.itests.multi.customintent.CustomFeatureProvider;
 import org.apache.cxf.dosgi.itests.multi.customintent.CustomIntentActivator;
 import org.apache.cxf.dosgi.samples.soap.Task;
 import org.apache.cxf.dosgi.samples.soap.TaskService;
@@ -68,6 +69,7 @@ public class TestCustomIntent extends AbstractDosgiTest {
         return TinyBundles.bundle() //
             .add(CustomIntentActivator.class) //
             .add(CustomFeature.class) //
+            .add(CustomFeatureProvider.class) //
             .add(ChangeTitleInterceptor.class) //
             .add(DummyTaskServiceImpl.class) //
             .set(Constants.BUNDLE_SYMBOLICNAME, "CustomIntent") //

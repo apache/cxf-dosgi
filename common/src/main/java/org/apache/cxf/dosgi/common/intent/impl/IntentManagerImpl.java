@@ -109,7 +109,14 @@ public class IntentManagerImpl implements IntentManager {
                 } catch (Exception e) {
                     throw new RuntimeException(e); 
                 }
-                
+            } else if (intent instanceof IntentsProvider) {
+                try {
+                    IntentsProvider provider = (IntentsProvider)intent;
+                    List<?> curIntents = provider.getIntents();
+                    intents.addAll(curIntents);
+                } catch (Exception e) {
+                    throw new RuntimeException(e); 
+                }
             } else {
                 intents.add(intent);
             }

@@ -32,7 +32,7 @@ public class CustomIntentActivator implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put("org.apache.cxf.dosgi.IntentName", "myIntent");
-        context.registerService(CustomFeature.class, new CustomFeature(), props);
+        context.registerService(CustomFeatureProvider.class, new CustomFeatureProvider(), props);
         
         Dictionary<String, String> props2 = new Hashtable<String, String>();
         props2.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, "org.apache.cxf.ws");
