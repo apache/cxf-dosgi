@@ -20,23 +20,24 @@ package org.apache.cxf.dosgi.samples.rest.impl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import org.apache.cxf.dosgi.common.api.IntentsProvider;
 import org.osgi.service.component.annotations.Component;
 
 
 /**
- * Only needed if jackson is used thorugh an external intent
+ * Not needed in the current example config.
+ * This shows how to export a custom intent.
  */
 @Component //
 (//
     property = "org.apache.cxf.dosgi.IntentName=jackson" //
 )
-public class JacksonIntent implements Callable<List<Object>> {
+public class JacksonIntent implements IntentsProvider {
 
     @Override
-    public List<Object> call() throws Exception {
+    public List<?> getIntents() {
         return Arrays.asList((Object)new JacksonJaxbJsonProvider());
     }
     

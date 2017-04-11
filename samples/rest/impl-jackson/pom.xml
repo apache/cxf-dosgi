@@ -39,6 +39,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
+            <version>3.1.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
         	<groupId>org.apache.aries.rsa</groupId>
         	<artifactId>org.apache.aries.rsa.spi</artifactId>
         	<version>1.9.0</version>

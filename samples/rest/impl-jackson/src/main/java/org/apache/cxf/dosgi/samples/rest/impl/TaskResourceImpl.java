@@ -18,15 +18,20 @@
  */
 package org.apache.cxf.dosgi.samples.rest.impl;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import io.swagger.annotations.Api;
 import org.apache.cxf.dosgi.common.api.IntentsProvider;
 import org.apache.cxf.dosgi.samples.rest.Task;
 import org.apache.cxf.dosgi.samples.rest.TaskResource;
+import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.feature.Features;
+import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.osgi.service.component.annotations.Component;
 
 @Component//
@@ -37,12 +42,13 @@ import org.osgi.service.component.annotations.Component;
     { //
       "service.exported.interfaces=*", //
       "service.exported.configs=org.apache.cxf.rs", //
-      //"service.exported.intents=jackson", // Only needed when defining jackson as external intent
       "org.apache.cxf.rs.address=/tasks", //
       // By default CXF will favor the default json provider
       "cxf.bus.prop.skip.default.json.provider.registration=true"
     } //
 )
+@Api(value = "mytest")
+@Features(classes = {LoggingFeature.class})
 public class TaskResourceImpl implements TaskResource, IntentsProvider {
     Map<Integer, Task> taskMap;
 
@@ -59,7 +65,7 @@ public class TaskResourceImpl implements TaskResource, IntentsProvider {
         task.setDescription("");
         addOrUpdate(task);
     }
-
+    
     @Override
     public Task get(Integer id) {
         return taskMap.get(id);
@@ -69,6 +75,7 @@ public class TaskResourceImpl implements TaskResource, IntentsProvider {
     public void addOrUpdate(Task task) {
         taskMap.put(task.getId(), task);
     }
+
 
     @Override
     public Task[] getAll() {
@@ -82,7 +89,17 @@ public class TaskResourceImpl implements TaskResource, IntentsProvider {
 
     @Override
     public List<?> getIntents() {
-        return Arrays.asList(new JacksonJaxbJsonProvider());
+        return asList(createSwaggerFeature(), new JacksonJaxbJsonProvider());
+    }
+
+    private Swagger2Feature createSwaggerFeature() {
+        Swagger2Feature swagger = new Swagger2Feature();
+        //swagger2Feature.setBasePath("/cxf/");
+        swagger.setUsePathBasedConfig(true);
+        swagger.setPrettyPrint(true);
+        swagger.setSupportSwaggerUi(true);
+        swagger.setScan(false);
+        return swagger;
     }
 
 }
