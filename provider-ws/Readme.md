@@ -19,7 +19,7 @@ then JAX-WS mode is used else simple mode is used.
 ## Simple
 
 This mode uses the CXF simple frontend and the Aegis Databinding. It can export almost any service but is not much configureable. Aegis is also not very popular anymore. So this
-mode is more for exporting existing services and small tests.
+mode for exporting existing services and small tests. For most cases the JAX-WS mode is recommended.
 
 ## JAX-WS
 
@@ -28,4 +28,5 @@ the CXF JAX-WS frontend and the JAXB databinding. It can be customized using the
 
 # Samples
 
-See sample greeter
+See [sample soap](../samples/soap).
+
