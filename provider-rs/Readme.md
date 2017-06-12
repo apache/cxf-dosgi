@@ -14,4 +14,4 @@ REST based transport for Aries RSA. The exported service must be annotated with 
 
 # Sample
 
-See sample greeter-rest
+See [sample rest](../samples/rest).
