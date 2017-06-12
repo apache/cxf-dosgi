@@ -11,8 +11,8 @@ CXF DOSGi allows to easily publish and consume SOAP and REST services without us
 * [provider-rs - REST transport](provider-rs)
 * [decorator - Support for exporting existing services](decorator)
 
-* [Examples](samples).
-* [Distributions](distribution).
+* [Examples](samples)
+* [Distributions](distribution)
 
 ## Intents
 
