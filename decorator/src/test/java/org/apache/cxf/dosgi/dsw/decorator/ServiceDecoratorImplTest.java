@@ -145,13 +145,13 @@ public class ServiceDecoratorImplTest extends TestCase {
     }
     
     private void assertDecorate(final Map<String, Object> serviceProps, 
-                                Map<String, Object> expected, URL ... resources) {
+                                Map<String, Object> expected, URL... resources) {
         Map<String, Object> actual = testDecorate(serviceProps, resources);
         assertEquals(expected, actual);
     }
 
     @SuppressWarnings("rawtypes")
-    private Map<String, Object> testDecorate(final Map<String, Object> serviceProps, URL ... resources) {
+    private Map<String, Object> testDecorate(final Map<String, Object> serviceProps, URL... resources) {
         Bundle b = createBundleContaining(resources);
 
         ServiceDecoratorImpl sd = new ServiceDecoratorImpl();
