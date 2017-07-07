@@ -51,7 +51,7 @@ public final class PropertyHelper {
         return value instanceof String ? (String) value : null;
     }
 
-    public static String getFirstNonEmptyStringProperty(Map<String, Object> dict, String ... keys) {
+    public static String getFirstNonEmptyStringProperty(Map<String, Object> dict, String... keys) {
         for (String key : keys) {
             String value = getProperty(dict, key);
             if (value != null) {

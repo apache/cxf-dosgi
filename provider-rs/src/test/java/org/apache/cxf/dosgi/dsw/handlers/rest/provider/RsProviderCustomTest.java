@@ -77,12 +77,12 @@ public class RsProviderCustomTest {
         }
     }
 
-    private void addIntent(IntentManagerImpl intentManager, String name, Object ... intents) {
+    private void addIntent(IntentManagerImpl intentManager, String name, Object... intents) {
         Callable<List<Object>> provider = intentProvider(intents);
         intentManager.addIntent(provider, name);
     }
 
-    private Callable<List<Object>> intentProvider(final Object ... intents) {
+    private Callable<List<Object>> intentProvider(final Object... intents) {
         return new Callable<List<Object>>() {
             
             @Override
