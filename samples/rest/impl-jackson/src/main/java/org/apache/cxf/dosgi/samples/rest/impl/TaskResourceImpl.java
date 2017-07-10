@@ -24,15 +24,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import io.swagger.annotations.Api;
 import org.apache.cxf.dosgi.common.api.IntentsProvider;
 import org.apache.cxf.dosgi.samples.rest.Task;
 import org.apache.cxf.dosgi.samples.rest.TaskResource;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.Features;
-import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.osgi.service.component.annotations.Component;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+
+import io.swagger.annotations.Api;
 
 @Component//
 (//
@@ -89,17 +90,7 @@ public class TaskResourceImpl implements TaskResource, IntentsProvider {
 
     @Override
     public List<?> getIntents() {
-        return asList(createSwaggerFeature(), new JacksonJaxbJsonProvider());
-    }
-
-    private Swagger2Feature createSwaggerFeature() {
-        Swagger2Feature swagger = new Swagger2Feature();
-        //swagger2Feature.setBasePath("/cxf/");
-        swagger.setUsePathBasedConfig(true);
-        swagger.setPrettyPrint(true);
-        swagger.setSupportSwaggerUi(true);
-        swagger.setScan(false);
-        return swagger;
+        return asList(new JacksonJaxbJsonProvider());
     }
 
 }

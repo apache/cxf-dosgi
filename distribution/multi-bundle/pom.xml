@@ -65,6 +65,7 @@
                 <descriptor>mvn:org.apache.cxf.dosgi/cxf-dosgi/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
+              	<feature>cxf-rs-description-swagger2</feature>
                 <feature>cxf-dosgi-base</feature>
                 <feature>aries-rsa-discovery-zookeeper</feature>
                 <feature>cxf-dosgi-provider-ws</feature>

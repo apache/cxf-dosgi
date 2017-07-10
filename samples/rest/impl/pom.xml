@@ -37,7 +37,17 @@
         	<groupId>org.apache.aries.rsa</groupId>
         	<artifactId>org.apache.aries.rsa.spi</artifactId>
         	<version>1.9.0</version>
-        	<type>bundle</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.dosgi</groupId>
+            <artifactId>cxf-dosgi-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
+            <version>${cxf.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

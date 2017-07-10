@@ -19,6 +19,9 @@
     <feature name="cxf-dosgi-sample-rest-impl" version="${project.version}">
         <feature>cxf-dosgi-provider-rs</feature>
         <feature>aries-rsa-discovery-zookeeper-server</feature>
+        <feature>cxf-features-logging</feature>
+        <feature>cxf-rs-description-swagger2</feature>
+        <bundle>mvn:org.webjars/swagger-ui/2.2.10-1</bundle>
         <bundle>mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-rest-api/${project.version}</bundle>
         <bundle>mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-rest-impl/${project.version}</bundle>
     </feature>

@@ -40,13 +40,18 @@ task:add 4 Mytask
 task:list
 ```
 
+### Browse Swagger documentation
+
+The jaxrs sample also creates swagger documentation for the REST endpoint.
+
+[Get the swagger documentation for the jaxrs sample] (http://localhost:8181/cxf/tasks/api-docs?url=../swagger.json).
+
 ### Add logging intent
 
 Starting with CXF 3.1.9 the CXF logging feature is exported as an intent by
 default this makes it very easy to add logging to the rest example.
 
 ```
-feature:install cxf-features-logging
 config:property-set -p TaskResource service.exported.intents logging
 endpoint http://localhost:8181/cxf/tasks
 ```

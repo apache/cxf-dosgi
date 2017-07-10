@@ -18,11 +18,16 @@
  */
 package org.apache.cxf.dosgi.samples.rest.impl;
 
+import static java.util.Arrays.asList;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.dosgi.common.api.IntentsProvider;
 import org.apache.cxf.dosgi.samples.rest.Task;
 import org.apache.cxf.dosgi.samples.rest.TaskResource;
+import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.osgi.service.component.annotations.Component;
 
 @Component//
@@ -36,7 +41,7 @@ import org.osgi.service.component.annotations.Component;
       "org.apache.cxf.rs.address=/tasks" //
     } //
 )
-public class TaskResourceImpl implements TaskResource {
+public class TaskResourceImpl implements TaskResource, IntentsProvider {
     Map<Integer, Task> taskMap;
 
     public TaskResourceImpl() {
@@ -73,4 +78,19 @@ public class TaskResourceImpl implements TaskResource {
         taskMap.remove(id);
     }
 
+    @Override
+    public List<?> getIntents() {
+        return asList(createSwaggerFeature());
+    }
+
+    private Swagger2Feature createSwaggerFeature() {
+        Swagger2Feature swagger = new Swagger2Feature();
+        swagger.setDescription("Sample jaxrs application to organize taks");
+        swagger.setTitle("Tasks sample");
+        swagger.setUsePathBasedConfig(true); // Necessary for OSGi
+        swagger.setScan(false);
+        swagger.setPrettyPrint(true);
+        swagger.setSupportSwaggerUi(true);
+        return swagger;
+    }
 }
