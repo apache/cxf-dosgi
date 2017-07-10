@@ -44,7 +44,7 @@ task:list
 
 The jaxrs sample also creates swagger documentation for the REST endpoint.
 
-[Get the swagger documentation for the jaxrs sample] (http://localhost:8181/cxf/tasks/api-docs?url=../swagger.json).
+[Get the swagger documentation for the jaxrs sample](http://localhost:8181/cxf/tasks/api-docs?url=../swagger.json).
 
 ### Add logging intent
 
