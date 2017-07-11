@@ -54,6 +54,9 @@ public class ExceptionMapper {
         for (Method m : iType.getDeclaredMethods()) {
             addExceptions(m);
         }
+        for (Method m : iType.getMethods()) {
+            addExceptions(m);
+        }
     }
 
     private void addExceptions(Method m) {

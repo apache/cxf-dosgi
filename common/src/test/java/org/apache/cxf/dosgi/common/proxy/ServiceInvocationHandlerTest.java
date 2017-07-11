@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.osgi.framework.ServiceException;
 
 public class ServiceInvocationHandlerTest {
 
@@ -84,11 +83,7 @@ public class ServiceInvocationHandlerTest {
         proxy.throwException2();
     }
     
-    /**
-     * Shows issue https://issues.apache.org/jira/projects/DOSGI/issues/DOSGI-254
-     * We would expect an IOexcpetion here
-     */
-    @Test(expected = ServiceException.class)
+    @Test(expected = IOException.class)
     public void testInheritedException() throws IOException {
         MySubService proxy = ProxyFactory.create(new MyServiceImpl(), MySubService.class);
         proxy.throwException1();
