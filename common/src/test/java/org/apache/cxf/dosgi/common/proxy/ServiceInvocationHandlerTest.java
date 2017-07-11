@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.dosgi.common.proxy;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -26,9 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.osgi.framework.ServiceException;
 
-public class ServiceInvocationHandlerTest extends TestCase {
+public class ServiceInvocationHandlerTest {
 
     private static final Map<String, Method> OBJECT_METHODS = new HashMap<String, Method>(); {
         for (Method m : Object.class.getMethods()) {
@@ -36,6 +40,7 @@ public class ServiceInvocationHandlerTest extends TestCase {
         }
     }
 
+    @Test
     public void testInvoke() throws Throwable {
         ServiceInvocationHandler sih = new ServiceInvocationHandler("hello", String.class);
         Method m = String.class.getMethod("length", new Class[] {});
@@ -72,4 +77,21 @@ public class ServiceInvocationHandlerTest extends TestCase {
                 sih.invoke(null, OBJECT_METHODS.get("toString"), new Object[] {}));
         assertEquals(Arrays.asList("equals", "hashCode", "toString"), called);
     }
+
+    @Test(expected = IOException.class)
+    public void testException() throws IOException {
+        MySubService proxy = (MySubService)ProxyFactory.create(new MyServiceImpl(), MySubService.class);
+        proxy.throwException2();
+    }
+    
+    /**
+     * Shows issue https://issues.apache.org/jira/projects/DOSGI/issues/DOSGI-254
+     * We would expect an IOexcpetion here
+     */
+    @Test(expected = ServiceException.class)
+    public void testInheritedException() throws IOException {
+        MyBaseService proxy = (MyBaseService)ProxyFactory.create(new MyServiceImpl(), MySubService.class);
+        proxy.throwException1();
+    }
+    
 }
