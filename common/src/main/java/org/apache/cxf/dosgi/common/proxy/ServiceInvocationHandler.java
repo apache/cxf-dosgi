@@ -23,26 +23,18 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.osgi.framework.ServiceException;
 
 public class ServiceInvocationHandler implements InvocationHandler {
-
-    private static final String REMOTE_EXCEPTION_TYPE = "REMOTE";
     private static final Collection<Method> OBJECT_METHODS = Arrays.asList(Object.class.getMethods());
-
-    private Map<Method, List<Class<?>>> exceptionsMap = new HashMap<Method, List<Class<?>>>();
     private Object serviceObject;
+    private ExceptionMapper exceptionMapper;
 
     ServiceInvocationHandler(Object serviceObject, Class<?> iType) {
         this.serviceObject = serviceObject;
-        introspectType(iType);
+        this.exceptionMapper = new ExceptionMapper(iType);
+
     }
 
     public Object invoke(Object proxy, final Method m, Object[] params) throws Throwable {
@@ -64,37 +56,11 @@ public class ServiceInvocationHandler implements InvocationHandler {
             });
         } catch (Throwable ex) {
             Throwable theCause = ex.getCause() == null ? ex : ex.getCause();
-            Throwable theCauseCause = theCause.getCause() == null ? theCause : theCause.getCause();
-            List<Class<?>> excTypes = exceptionsMap.get(m);
-            if (excTypes != null) {
-                for (Class<?> type : excTypes) {
-                    if (type.isAssignableFrom(theCause.getClass())) {
-                        throw theCause;
-                    }
-                    if (type.isAssignableFrom(theCauseCause.getClass())) {
-                        throw theCauseCause;
-                    }
-                }
-            }
-
-            throw new ServiceException(REMOTE_EXCEPTION_TYPE, theCause);
+            throw exceptionMapper.mapException(m, theCause);
         } finally {
             Thread.currentThread().setContextClassLoader(oldCl);
         }
     }
 
-    private void introspectType(Class<?> iType) {
-        for (Method m : iType.getDeclaredMethods()) {
-            for (Class<?> excType : m.getExceptionTypes()) {
-                if (Exception.class.isAssignableFrom(excType)) {
-                    List<Class<?>> types = exceptionsMap.get(m);
-                    if (types == null) {
-                        types = new ArrayList<Class<?>>();
-                        exceptionsMap.put(m, types);
-                    }
-                    types.add(excType);
-                }
-            }
-        }
-    }
+
 }
