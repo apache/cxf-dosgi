@@ -80,7 +80,7 @@ public class ServiceInvocationHandlerTest {
 
     @Test(expected = IOException.class)
     public void testException() throws IOException {
-        MySubService proxy = (MySubService)ProxyFactory.create(new MyServiceImpl(), MySubService.class);
+        MySubService proxy = ProxyFactory.create(new MyServiceImpl(), MySubService.class);
         proxy.throwException2();
     }
     
@@ -90,7 +90,7 @@ public class ServiceInvocationHandlerTest {
      */
     @Test(expected = ServiceException.class)
     public void testInheritedException() throws IOException {
-        MyBaseService proxy = (MyBaseService)ProxyFactory.create(new MyServiceImpl(), MySubService.class);
+        MySubService proxy = ProxyFactory.create(new MyServiceImpl(), MySubService.class);
         proxy.throwException1();
     }
     

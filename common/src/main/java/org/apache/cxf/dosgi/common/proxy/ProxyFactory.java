@@ -23,10 +23,11 @@ import java.lang.reflect.Proxy;
 public final class ProxyFactory {
     private ProxyFactory() {
     }
-    
-    public static Object create(Object serviceProxy, Class<?> iType) {
-        return Proxy.newProxyInstance(iType.getClassLoader(), new Class[] {
-            iType
-        }, new ServiceInvocationHandler(serviceProxy, iType));
+
+    @SuppressWarnings("unchecked")
+    public static <T> T create(Object serviceProxy, Class<T> iType) {
+        Class<?>[] ifaces = new Class<?>[] {iType};
+        return (T)Proxy.newProxyInstance(iType.getClassLoader(), ifaces,
+                                         new ServiceInvocationHandler(serviceProxy, iType));
     }
 }
