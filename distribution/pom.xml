@@ -39,6 +39,5 @@
       <module>features</module>
       <module>multi-bundle</module>
       <module>repository</module>
-      <module>sources</module>
     </modules>
 </project>
