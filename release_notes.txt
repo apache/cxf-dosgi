@@ -1,4 +1,110 @@
+Release Notes - CXF Distributed OSGi - Version 2.2.0
+====================================================
 
+** Bug
+    * [DOSGI-253] - CXF DOSGI JAX-RS incompatible with Camel features
+    * [DOSGI-262] - Configure intent objects from service object (IntentsProvider, @Features)
+    * [DOSGI-264] - Add features to OSGi service using @Features annotation
+
+** Improvement
+    * [DOSGI-268] - Update CXF to 3.1.12
+    * [DOSGI-269] - Update Aries RSA to 1.11.0
+
+** New Feature
+    * [DOSGI-261] - Sample for rest with jackson provider
+    * [DOSGI-266] - Support for org.apache.cxf.jaxrs.ext.ContextProvider
+    * [DOSGI-270] - Create sample for swagger documentation 
+    
+
+Release Notes - CXF Distributed OSGi - Version 2.1.0
+====================================================
+
+** Bug
+    * [DOSGI-258] - itests fail when port 8080 is in use
+
+** Improvement
+    * [DOSGI-251] - Allow to export services with less service properties
+    * [DOSGI-256] - ContextResolver intents should be registered as providers
+    * [DOSGI-257] - Allow to set bus properties 
+
+
+Release Notes - CXF Distributed OSGi - Version 2.0.0
+====================================================
+
+** Bug
+    * [DOSGI-19] - Discovery Software doesn't notice changed Service Properties.
+    * [DOSGI-22] - It would benefit the RFC 119 TCK if multiple instances of DOSGi could be run in a single OSGi container.
+    * [DOSGI-52] - -Dorg.apache.cxf.spring.validation.mode=VALIDATION_NONE doesn't have an effect
+    * [DOSGI-73] - OSGi Declarative Service-based consumer does not register proxy service on demand
+    * [DOSGI-108] - service.exported.interfaces doesn't support comma-seperated String value
+    * [DOSGI-124] - ReceiveTimeout not configurable while using cxf-rest service in OSGI
+    * [DOSGI-159] - Endpoint description contains wrong org.apache.cxf.ws.address when using HTTPService style
+    * [DOSGI-171] - service objects are never released (using ungetService)
+    * [DOSGI-185] - Restarting of Jetty/PaxWeb makes exported services unavailable
+    * [DOSGI-186] - documentation incorrect
+    * [DOSGI-187] - service configuration for service-namespace, service-name and service-port only take affect if wsdl-location is also configured
+    * [DOSGI-196] - Greeter demo does not work in standalone Felix
+    * [DOSGI-199] - NoSuchMethodError in tests (Jetty version mismatch)
+    * [DOSGI-209] - when bundles registers two WS with different SoapBinding Style Document/RPC then one of the STYLE is not as expected
+    * [DOSGI-213] - ASM library not in Multibundle 1.6.0, so no naming of webservice parameters possible
+    * [DOSGI-219] - DOSGi Fails to Publish Service Under Apache Karaf 3.0.3
+    * [DOSGI-225] - Service publication with org.apache.cxf.ws.httpservice.context property does not work
+    * [DOSGI-226] - Cannot configure org.apache.cxf.dosgi.dsw.Activator via Felix fileinstall
+    * [DOSGI-227] - Build fails with JDK 8
+    * [DOSGI-236] - IllegalArgumentException: No SchemaFactory exception during build
+    * [DOSGI-240] - Fix checkstyle in eclipse
+    * [DOSGI-242] - Refactor provider to prepare for split
+
+** Improvement
+    * [DOSGI-101] - Update the guide on using DOSGI RI withing Eclipse
+    * [DOSGI-144] - can not deploy CXF 1.3.1 on Virgo Tomcat 3.5.RELEASE
+    * [DOSGI-152] - Update systests2 to use pax-exam 2.5
+    * [DOSGI-237] - Upgrade Distributed OSGI to OSGI 5.0
+    * [DOSGI-239] - Extract decorator xml support into separate bundle
+    * [DOSGI-241] - Simplify examples
+    * [DOSGI-243] - Update to OSGi spec 5.0.0
+    * [DOSGI-245] - Split cxf provider into rs and ws provider
+    * [DOSGI-246] - Upgrade to Aries RSA 1.9.0
+    * [DOSGI-247] - Support for Conduit configs and SSL example
+    * [DOSGI-248] - Update to CXF 3.1.7
+    * [DOSGI-249] - Redesign examples
+    * [DOSGI-250] - Support capabilities and requirements specified in RSA 1.1
+
+** New Feature
+    * [DOSGI-211] - Support SOAP over JMS in DOSGI
+
+** Task
+    * [DOSGI-194] - Decide how DOSGi needs to handle service.exported.interfaces with multiple values 
+
+
+Release Notes - CXF Distributed OSGi - Version 1.8.0
+====================================================
+
+** Bug
+    * [DOSGI-221] - HttpServiceManager.getHttpService sometimes return null
+
+** Improvement
+    * [DOSGI-235] - Switch to Aries RSA release 1.8.0
+    * [DOSGI-228] - Upgrade to CXF 3.1.5
+    * [DOSGI-229] - Refactor to make Remote Service Admin core independent of CXF
+    * [DOSGI-232] - Remove code that moved to aries-rsa
+
+** New Feature
+    * [DOSGI-230] - Create TCP provider
+    * [DOSGI-231] - Create ExportPolicy SPI    
+
+
+Release Notes - CXF Distributed OSGi - Version 1.7.0
+====================================================
+
+** Bug
+    * [DOSGI-214] - Endpoint publication to discovery does not always work
+    * [DOSGI-215] - ZooKeeperDiscovery restarts ZooKeeper-connection for no reason
+    * [DOSGI-216] - ZookeeperStarter restarts ZooKeeper too easily
+
+** Improvement
+    * [DOSGI-220] - Upgrade to cxf 3.1.1 
+    
 Release Notes - CXF Distributed OSGi - Version 1.6.0
 ====================================================
 
