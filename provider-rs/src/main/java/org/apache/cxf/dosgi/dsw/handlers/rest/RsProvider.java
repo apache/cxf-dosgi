@@ -32,6 +32,7 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.aries.rsa.spi.DistributionProvider;
 import org.apache.aries.rsa.spi.Endpoint;
@@ -173,7 +174,8 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
     }
     
     private boolean isProvider(Object intent) {
-        return (intent instanceof ExceptionMapper) // 
+        return intent.getClass().getAnnotation(Provider.class) != null //
+            || (intent instanceof ExceptionMapper) // 
             || (intent instanceof MessageBodyReader) //
             || (intent instanceof MessageBodyWriter) //
             || (intent instanceof ContextResolver) //
