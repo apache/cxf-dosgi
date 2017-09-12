@@ -1,37 +1,40 @@
-Release Notes - CXF Distributed OSGi - Version 2.2.0
-====================================================
+Release Notes - CXF Distributed OSGi
+====================================
 
-** Bug
+2.2.0
+=====
+
+* Bug
     * [DOSGI-253] - CXF DOSGI JAX-RS incompatible with Camel features
     * [DOSGI-262] - Configure intent objects from service object (IntentsProvider, @Features)
     * [DOSGI-264] - Add features to OSGi service using @Features annotation
 
-** Improvement
+* Improvement
     * [DOSGI-268] - Update CXF to 3.1.12
     * [DOSGI-269] - Update Aries RSA to 1.11.0
 
-** New Feature
+* New Feature
     * [DOSGI-261] - Sample for rest with jackson provider
     * [DOSGI-266] - Support for org.apache.cxf.jaxrs.ext.ContextProvider
     * [DOSGI-270] - Create sample for swagger documentation 
     
 
-Release Notes - CXF Distributed OSGi - Version 2.1.0
-====================================================
+2.1.0
+=====
 
-** Bug
+* Bug
     * [DOSGI-258] - itests fail when port 8080 is in use
 
-** Improvement
+* Improvement
     * [DOSGI-251] - Allow to export services with less service properties
     * [DOSGI-256] - ContextResolver intents should be registered as providers
     * [DOSGI-257] - Allow to set bus properties 
 
 
-Release Notes - CXF Distributed OSGi - Version 2.0.0
-====================================================
+2.0.0
+=====
 
-** Bug
+* Bug
     * [DOSGI-19] - Discovery Software doesn't notice changed Service Properties.
     * [DOSGI-22] - It would benefit the RFC 119 TCK if multiple instances of DOSGi could be run in a single OSGi container.
     * [DOSGI-52] - -Dorg.apache.cxf.spring.validation.mode=VALIDATION_NONE doesn't have an effect
@@ -55,7 +58,7 @@ Release Notes - CXF Distributed OSGi - Version 2.0.0
     * [DOSGI-240] - Fix checkstyle in eclipse
     * [DOSGI-242] - Refactor provider to prepare for split
 
-** Improvement
+* Improvement
     * [DOSGI-101] - Update the guide on using DOSGI RI withing Eclipse
     * [DOSGI-144] - can not deploy CXF 1.3.1 on Virgo Tomcat 3.5.RELEASE
     * [DOSGI-152] - Update systests2 to use pax-exam 2.5
@@ -70,45 +73,45 @@ Release Notes - CXF Distributed OSGi - Version 2.0.0
     * [DOSGI-249] - Redesign examples
     * [DOSGI-250] - Support capabilities and requirements specified in RSA 1.1
 
-** New Feature
+* New Feature
     * [DOSGI-211] - Support SOAP over JMS in DOSGI
 
-** Task
+* Task
     * [DOSGI-194] - Decide how DOSGi needs to handle service.exported.interfaces with multiple values 
 
 
-Release Notes - CXF Distributed OSGi - Version 1.8.0
-====================================================
+1.8.0
+=====
 
-** Bug
+* Bug
     * [DOSGI-221] - HttpServiceManager.getHttpService sometimes return null
 
-** Improvement
+* Improvement
     * [DOSGI-235] - Switch to Aries RSA release 1.8.0
     * [DOSGI-228] - Upgrade to CXF 3.1.5
     * [DOSGI-229] - Refactor to make Remote Service Admin core independent of CXF
     * [DOSGI-232] - Remove code that moved to aries-rsa
 
-** New Feature
+* New Feature
     * [DOSGI-230] - Create TCP provider
     * [DOSGI-231] - Create ExportPolicy SPI    
 
 
-Release Notes - CXF Distributed OSGi - Version 1.7.0
-====================================================
+1.7.0
+=====
 
-** Bug
+* Bug
     * [DOSGI-214] - Endpoint publication to discovery does not always work
     * [DOSGI-215] - ZooKeeperDiscovery restarts ZooKeeper-connection for no reason
     * [DOSGI-216] - ZookeeperStarter restarts ZooKeeper too easily
 
-** Improvement
+* Improvement
     * [DOSGI-220] - Upgrade to cxf 3.1.1 
     
-Release Notes - CXF Distributed OSGi - Version 1.6.0
-====================================================
+1.6.0
+=====
 
-** Bug
+* Bug
     * [DOSGI-11] - dOSGi creates new databinding instance instead of using a spring-loaded databinding if available
     * [DOSGI-196] - Greeter demo does not work in standalone Felix
     * [DOSGI-198] - Imported service is gone after client bundle is restarted
@@ -117,21 +120,21 @@ Release Notes - CXF Distributed OSGi - Version 1.6.0
     * [DOSGI-208] - OSGi compendium bundle installed by feature causes problems
     * [DOSGI-210] - Service registration and memory leaks
 
-** Improvement
+* Improvement
     * [DOSGI-201] - Create DSOGi distro from karaf feature file
     * [DOSGI-202] - Make DOSGi independent of jdom
     * [DOSGI-203] - Upgrade to cxf 2.7.6
     * [DOSGI-204] - Update osgi spec version to 4.3.1 and felix to 4.2.1
     * [DOSGI-205] - Upgrade to pax exam 3.2
 
-** Task
+* Task
     * [DOSGI-212] - Update CXF version to 2.7.8
 
 
 Release Notes - CXF Distributed OSGi - Version 1.5.0
 ====================================================
 
-** Bug
+* Bug
     * [DOSGI-158] - NPE on shutdown of DOSGi service
     * [DOSGI-160] - RemoteServiceAdmin shuts itself down during startup
     * [DOSGI-161] - services sometimes don't get exported
@@ -165,7 +168,7 @@ Release Notes - CXF Distributed OSGi - Version 1.5.0
     * [DOSGI-195] - Exceptions in tests: ClassCastException on
     * SpringBusFactory
 
-** Improvement
+* Improvement
     * [DOSGI-167] - Upgrade Aries to the 1.x version for distro
     * [DOSGI-170] - Remove single bundle distro
     * [DOSGI-181] - Reactivate or delete old systests
@@ -173,10 +176,10 @@ Release Notes - CXF Distributed OSGi - Version 1.5.0
     * [DOSGI-193] - Split discovery.zookeeper package into subpackages
 
 
-Release Notes - CXF Distributed OSGi - Version 1.4.0
-====================================================
+1.4.0
+=====
 
-** Bug
+* Bug
     * [DOSGI-10] - Spring schema handling (intents) doesn't work properly
     * for the single-bundle case
     * [DOSGI-18] - RESTful Proxies can not be created in multibundle DOSGI
@@ -218,7 +221,7 @@ Release Notes - CXF Distributed OSGi - Version 1.4.0
     * http://java.sun.com/jaxp/xpath/dom
     * [DOSGI-154] - Problems with api packages since update to cxf 2.7.2
 
-** Improvement
+* Improvement
     * [DOSGI-70] - Reconnect automatically to Zookeeper after a connection
     * loss / timeout
     * [DOSGI-86] - Decouple DOSGi DSW from Spring DM.
@@ -244,11 +247,11 @@ Release Notes - CXF Distributed OSGi - Version 1.4.0
     * [DOSGI-148] - Refactoring of dsw ConfigTypeHandlers
     * [DOSGI-149] - Optimize distributions and karaf feature
 
-** New Feature
+* New Feature
     * [DOSGI-115] - Use Spring DM and Eclipse Gemini Blueprint with DOSGi
 
-Apache CXF Distributed OSGi 1.3.1 Release Notes
-===============================================
+1.3.1
+=====
 
 Fixes needed in order to pass the OSGi 4.3 Remote Service Admin TCK.
 * Fixed exports from Single Bundle Distro
@@ -257,8 +260,8 @@ Fixes needed in order to pass the OSGi 4.3 Remote Service Admin TCK.
 * Fixed ExportReferenceImpl.equals() and hashCode()
 * Fixed RemoteServiceAdminCore.exportService()
 
-Apache CXF Distributed OSGi 1.3 Release Notes
-=============================================
+1.3
+===
 
 The following modules have been removed from the destribution:
 
@@ -274,24 +277,24 @@ Many dependencies have been updated, including the update to CXF 2.5.1. See also
 
 Additionally, a number of bugs has been fixed including:
 
-DOSGI-108   service.exported.interfaces doesn't support comma-seperated String value
-DOSGI-107   Support for a 'wsdl' configuration type
-DOSGI-105   Update greeter_rest demo to use OSGI HttpService
-DOSGI-103   Improve multi-bundle distro configuration for Felix
-DOSGI-102   DOSGI RI can not map invocation exceptions to custom exceptions on the client side
-DOSGI-97    Automatically unregister HTTP servlets/resources if exported service goes down
-DOSGI-94    Enhancement to deal with registered services that might have been proxied
-DOSGI-91    DOSGI RS Proxies ignore ResponseExceptionMapper providers
-DOSGI-85    Unable to export services started after Topology manager
-DOSGI-82    Populate custom servicename, portname and targetnamespace for jax-ws
-DOSGI-79    RemoteServiceAdmin.getImportedEndpoints() returns collection of incorrect type
-DOSGI-77    NullPointerException from Distributed OSGI when bundle with wanted properties is started.
-DOSGI-76    EndpointListener.endpointRemoved
-DOSGI-75    CXF Distributed OSGi isn't using org.apache.cxf.common.logging.LogUtils
+* DOSGI-108   service.exported.interfaces doesn't support comma-seperated String value
+* DOSGI-107   Support for a 'wsdl' configuration type
+* DOSGI-105   Update greeter_rest demo to use OSGI HttpService
+* DOSGI-103   Improve multi-bundle distro configuration for Felix
+* DOSGI-102   DOSGI RI can not map invocation exceptions to custom exceptions on the client side
+* DOSGI-97    Automatically unregister HTTP servlets/resources if exported service goes down
+* DOSGI-94    Enhancement to deal with registered services that might have been proxied
+* DOSGI-91    DOSGI RS Proxies ignore ResponseExceptionMapper providers
+* DOSGI-85    Unable to export services started after Topology manager
+* DOSGI-82    Populate custom servicename, portname and targetnamespace for jax-ws
+* DOSGI-79    RemoteServiceAdmin.getImportedEndpoints() returns collection of incorrect type
+* DOSGI-77    NullPointerException from Distributed OSGI when bundle with wanted properties is started.
+* DOSGI-76    EndpointListener.endpointRemoved
+* DOSGI-75    CXF Distributed OSGi isn't using org.apache.cxf.common.logging.LogUtils
 
 
-Apache CXF Distributed OSGi 1.2 Release Notes
-=============================================
+1.2
+===
 
 In addition to providing the Reference Implementation to the OSGi Remote
 Services Specification, the CXF Distributed OSGi 1.2 release now also
@@ -320,48 +323,43 @@ The following new features have been introduced:
 
 Additionally, a number of bugs has been fixed including:
 
-[DOSGI-13] - The CXF DOSGi implementation needs to be updated to support the
-             latest OSGi Remote Services Admin spec.
-[DOSGI-24] - org.apache.cxf.dosgi.dsw.ClassUtils#getInterfaceClass() method
-             should search through super class interfaces too
-[DOSGI-25] - FileNotFoundException when client-side proxy is being created
-             [META-INF/cxf/cxf.xml]
-[DOSGI-27] - Discovery problem when two dependent bundles export interfaces
-[DOSGI-28] - Consuming more than 1 service using Spring-DM doesn't work
-[DOSGI-29] - Exception when stopping DOSGi bundle
-[DOSGI-30] - ClassNotFoundException when exposing service.
-[DOSGI-31] - Distributed OSGi having a problem with a custom type method
-             argument
-[DOSGI-32] - The default amount of logging should be significantly reduced
-[DOSGI-33] - Exception when exposing remote service using DOSGi
-[DOSGI-34] - org.apache.servicemix.specs.locator-1.1.1.jar useless?
-[DOSGI-35] - ServicePublication.PROP_KEY_ENDPOINT_LOCATION is now a URI,
-             instead of a URL
-[DOSGI-37] - Fix the dependency on Equinox for the DOSGi system tests
-[DOSGI-38] - single-bundle distribution has incorrect Import-Package and
-             Export-Package declaration in the manifest
-[DOSGI-40] - Remoted service fails to register endpoint after framework is
-             restarted
-[DOSGI-41] - Remove simple-pojo demo (temporarily) as its currently not
-             supported
-[DOSGI-43] - ClassCastException with Declarative Services
-[DOSGI-44] - Existing OSGi Services are not remoted when CXF-DOSGi is started
-[DOSGI-50] - Need to automatically infer SOAP/HTTP transport intents if not
+* [DOSGI-13] - The CXF DOSGi implementation needs to be updated to support the
+               latest OSGi Remote Services Admin spec.
+* [DOSGI-24] - org.apache.cxf.dosgi.dsw.ClassUtils#getInterfaceClass() method
+               should search through super class interfaces too
+* [DOSGI-25] - FileNotFoundException when client-side proxy is being created
+               [META-INF/cxf/cxf.xml]
+* [DOSGI-27] - Discovery problem when two dependent bundles export interfaces
+* [DOSGI-28] - Consuming more than 1 service using Spring-DM doesn't work
+* [DOSGI-29] - Exception when stopping DOSGi bundle
+* [DOSGI-30] - ClassNotFoundException when exposing service.
+* [DOSGI-31] - Distributed OSGi having a problem with a custom type method
+               argument
+* [DOSGI-32] - The default amount of logging should be significantly reduced
+* [DOSGI-33] - Exception when exposing remote service using DOSGi
+* [DOSGI-34] - org.apache.servicemix.specs.locator-1.1.1.jar useless?
+* [DOSGI-35] - ServicePublication.PROP_KEY_ENDPOINT_LOCATION is now a URI,
+               instead of a URL
+* [DOSGI-37] - Fix the dependency on Equinox for the DOSGi system tests
+* [DOSGI-38] - single-bundle distribution has incorrect Import-Package and
+               Export-Package declaration in the manifest
+* [DOSGI-40] - Remoted service fails to register endpoint after framework is restarted
+* [DOSGI-41] - Remove simple-pojo demo (temporarily) as its currently not supported
+* [DOSGI-43] - ClassCastException with Declarative Services
+* [DOSGI-44] - Existing OSGi Services are not remoted when CXF-DOSGi is started
+* [DOSGI-50] - Need to automatically infer SOAP/HTTP transport intents if not
              explicily set via osgi.remote.requires.intents
-[DOSGI-54] - RemoteServiceAdmin interfaces/classes out of sync with official
-             version
-[DOSGI-61] - The Zookeeper Discovery only supports primitive types as service
-             properties
-[DOSGI-62] - The DSW creates endpoints with localhost URLs
-[DOSGI-66] - The DSW only loads the intent map when certain spring bundles
-             are loaded and started upfront
-[DOSGI-67] - Enable filters on DOSGi endpoints
-[DOSGI-72] - DOSGI not working with HTTP Service
-[DOSGI-74] - Update CXF version to 2.2.9
+* [DOSGI-54] - RemoteServiceAdmin interfaces/classes out of sync with official version
+* [DOSGI-61] - The Zookeeper Discovery only supports primitive types as service properties
+* [DOSGI-62] - The DSW creates endpoints with localhost URLs
+* [DOSGI-66] - The DSW only loads the intent map when certain spring bundles are loaded and started upfront
+* [DOSGI-67] - Enable filters on DOSGi endpoints
+* [DOSGI-72] - DOSGI not working with HTTP Service
+* [DOSGI-74] - Update CXF version to 2.2.9
 
 
-Apache CXF Distributed OSGi 1.1 Release Notes
-=============================================
+1.1
+===
 
 Specific issues, features, and improvements fixed in this version
 -----------------------------------------------------------------
@@ -384,15 +382,13 @@ New features in this release include:
 * Many user issues have been addressed. In addition the following bugs
   have been fixed:
 
-[CXF-2182] - Exceptions when remoting pre-existing service
-[CXF-2337] - org.apache.cxf.dosgi.dsw.ClassUtils#getInterfaceClass() method
-             should search through super class interfaces too
-[CXF-2435] - Distributed OSGi having a problem with a custom type method
-             argument
-[CXF-2288] - Bundle cannot be restarted
-[CXF-2385] - Discovery doesn't fully translate 'localhost' into a proper
-             machine name
-[CXF-2200] - Consuming more than 1 service using Spring-DM doesn't work
+* [CXF-2182] - Exceptions when remoting pre-existing service
+* [CXF-2337] - org.apache.cxf.dosgi.dsw.ClassUtils#getInterfaceClass() method
+               should search through super class interfaces too
+* [CXF-2435] - Distributed OSGi having a problem with a custom type method argument
+* [CXF-2288] - Bundle cannot be restarted
+* [CXF-2385] - Discovery doesn't fully translate 'localhost' into a proper machine name
+* [CXF-2200] - Consuming more than 1 service using Spring-DM doesn't work
 
 
 Known limitations :
