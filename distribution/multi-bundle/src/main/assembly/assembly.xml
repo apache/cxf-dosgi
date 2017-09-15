@@ -28,7 +28,11 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>target/distribution_bundles</directory>
+      <directory>target/distro-unzip/jar</directory>
+      <excludes>
+      	<exclude>org.apache.felix.framework*</exclude>
+      	<exclude>biz.aQute.launcher*</exclude>
+      </excludes>
       <outputDirectory>apache-cxf-dosgi-${dosgi.version}/dosgi_bundles</outputDirectory>
     </fileSet>
     <fileSet>

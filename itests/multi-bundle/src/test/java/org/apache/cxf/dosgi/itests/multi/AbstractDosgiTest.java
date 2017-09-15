@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.itests.multi;
 
 import static org.ops4j.pax.exam.CoreOptions.composite;
-import static org.ops4j.pax.exam.CoreOptions.frameworkStartLevel;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.cm.ConfigurationAdminOptions.newConfiguration;
@@ -287,25 +286,18 @@ public class AbstractDosgiTest {
 
 
     protected static Option basicTestOptions() throws Exception {
-        return composite(MultiBundleTools.getDistro(), //
-                         CoreOptions.junitBundles(), //
+        return composite(CoreOptions.junitBundles(), //
+                         MultiBundleTools.getDistro(), //
                          
-                         // Enable JAXB from JRE
-                         CoreOptions.bootDelegationPackages("com.sun.*"), 
-                         CoreOptions.systemPackages(
-                                                   "javax.xml.bind.annotation;version=2.2.1",
-                                                   "javax.xml.bind;version=2.2.1"), 
-
+                         systemProperty("org.osgi.service.http.port").value("" + HTTP_PORT),
                          systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"), //
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"), //
                          systemProperty("org.apache.cxf.stax.allowInsecureParser").value("true"), //
                          systemProperty("rsa.export.policy.filter").value("(name=cxf)"), //
                          configHttpService(HTTP_HOST, HTTP_PORT),
-                         configLogging(),
-                         frameworkStartLevel(100)
+                         configLogging()
         );
     }
-
 
     protected static VMOption debug() {
         return CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005");

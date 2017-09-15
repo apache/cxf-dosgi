@@ -92,7 +92,7 @@ public class TestImportService extends AbstractDosgiTest {
         System.out.println("Publishing service");
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceClass(TaskService.class);
-        factory.setAddress("http://localhost:9191/taskservice");
+        factory.setAddress("/taskservice");
         factory.setServiceBean(new DummyTaskServiceImpl());
         return factory.create();
 

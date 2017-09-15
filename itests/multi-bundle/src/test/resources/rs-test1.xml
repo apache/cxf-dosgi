@@ -21,7 +21,7 @@
         <value>org.apache.cxf.dosgi.samples.soap.TaskService</value>
       </array>
     </property>
-    <property name="endpoint.id">http://localhost:9191/taskservice</property>
+    <property name="endpoint.id">http://localhost:8989/cxf/taskservice</property>
     <property name="service.imported.configs">org.apache.cxf.ws</property>
   </endpoint-description>
 </endpoint-descriptions>

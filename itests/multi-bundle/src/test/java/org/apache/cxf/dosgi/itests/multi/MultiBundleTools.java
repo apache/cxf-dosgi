@@ -19,15 +19,11 @@
 package org.apache.cxf.dosgi.itests.multi;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.FilenameFilter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
 
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
@@ -36,33 +32,20 @@ public final class MultiBundleTools {
 
     private MultiBundleTools() {
     }
-    
-    private static Properties getProps(File distroDir) throws FileNotFoundException, IOException {
-        Properties p = new Properties();
-        File confFile = new File(distroDir, "conf/felix.config.properties.append");
-        p.load(new FileInputStream(confFile));
-        return p;
-    }
 
-    private static int getDistroBundles(File distroDir,
-                                        Properties props, 
-                                        Map<Integer, String> bundles) throws Exception {
-        int startLevel = Integer.parseInt(props.getProperty("org.osgi.framework.startlevel.beginning"));
-        for (int i = 0; i <= startLevel; i++) {
-            String val = props.getProperty("felix.auto.start." + i);
-            if (val != null) {
-                if (val.startsWith("file:")) {
-                    File fullDir = new File(distroDir, val.substring("file:".length()));
-                    bundles.put(i, fullDir.toURI().toASCIIString());
-                } else {
-                    if (!val.contains("org.osgi.compendium")) {
-                        // We're skipping that one as it's pulled in explicitly in the test
-                        bundles.put(i, val);
-                    }
+    private static Collection<String> getDistroBundles(File distroDir) throws Exception {
+        List<String> bundles = new ArrayList<>();
+        File bundlesDir = new File(distroDir, "dosgi_bundles");
+        File[] files = bundlesDir.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(".jar");
                 }
             }
+        );
+        for (File file : files) {
+            bundles.add(file.toURI().toASCIIString());
         }
-        return startLevel + 1; // Add 1 to start level to be on the safe side
+        return bundles;
     }
 
     private static File getRootDirectory() {
@@ -74,29 +57,16 @@ public final class MultiBundleTools {
         return curBase.getParentFile().getParentFile();
     }
 
-    private static Option[] getDistroBundleOptions() throws Exception {
-        Map<Integer, String> bundles = new TreeMap<Integer, String>();
+    public static Option getDistro() throws Exception {
         File root = getRootDirectory();
         File depRoot = new File(root, "target/dependency");
         File distroDir = depRoot.listFiles()[0];
-        Properties props = getProps(distroDir);
-        getDistroBundles(distroDir, props, bundles);
+        Collection<String> bundles = getDistroBundles(distroDir);
         List<Option> opts = new ArrayList<Option>();
-        
-        /*
-        String sysPackagesValue = props.getProperty("org.osgi.framework.system.packages");
-        opts.add(CoreOptions.frameworkProperty("org.osgi.framework.system.packages")
-                 .value(sysPackagesValue));
-        */
-
-        for (Map.Entry<Integer, String> entry : bundles.entrySet()) {
-            String bundleUri = entry.getValue();
+        for (String bundleUri : bundles) {
             opts.add(CoreOptions.bundle(bundleUri));
         }
-        return opts.toArray(new Option[opts.size()]);
+        return CoreOptions.composite(opts.toArray(new Option[opts.size()]));
     }
 
-    public static Option getDistro() throws Exception {
-        return CoreOptions.composite(getDistroBundleOptions());
-    }
 }

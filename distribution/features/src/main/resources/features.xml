@@ -3,22 +3,12 @@
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
     <repository>mvn:org.apache.aries.rsa/rsa-features/${aries.rsa.version}/xml/features</repository>
 
-    <feature name="cxf-dosgi-base" description="base libs needed outside karaf" version="${project.version}" resolver="(obr)">
-        <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-api/1.8.5</bundle>
-        <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-service/1.8.5</bundle>
-        <bundle start-level="10">mvn:org.apache.felix/org.apache.felix.configadmin/1.8.8</bundle>
-        <bundle start-level="11">mvn:org.apache.felix/org.apache.felix.fileinstall/3.5.0</bundle>
-        <bundle start-level="20">mvn:org.apache.aries/org.apache.aries.util/1.1.1</bundle>
-        <bundle start-level="20">mvn:org.apache.aries.proxy/org.apache.aries.proxy.api/1.0.1</bundle>
-    </feature>
-    
     <feature name="cxf-dosgi-common" version="${project.version}">
         <feature>aries-rsa-core</feature>
         <feature>cxf-specs</feature>
         <feature>cxf-http</feature>
         <feature>http</feature>
         <feature>cxf-http-jetty</feature>
-        <bundle dependency="true">mvn:org.apache.felix/org.apache.felix.scr/2.0.2</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-common/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-dosgi-decorator/${project.version}</bundle>
     </feature>

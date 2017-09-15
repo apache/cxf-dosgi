@@ -45,6 +45,10 @@
 
     <dependencies>
     	<dependency>
+    		<groupId>org.osgi</groupId>
+    		<artifactId>osgi.cmpn</artifactId>
+    	</dependency>
+    	<dependency>
     		<groupId>org.apache.cxf.dosgi</groupId>
     		<artifactId>cxf-dosgi-common</artifactId>
     		<version>${project.version}</version>
@@ -72,6 +76,7 @@
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-forked</artifactId>
+            <version>${exam.version}</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
@@ -85,18 +90,16 @@
             <version>2.4.5</version>
         </dependency>
 
-
+<!-- 
         <dependency>
             <groupId>org.eclipse.platform</groupId>
             <artifactId>org.eclipse.osgi</artifactId>
         </dependency>
-        <!-- 
+         --> 
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
-            <scope>test</scope>
         </dependency>
-         -->
 
         <!-- CXF -->
         <dependency>
@@ -176,12 +179,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -223,18 +220,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <!-- <org.apache.cxf.dosgi.test.debug.port>5005</org.apache.cxf.dosgi.test.debug.port> 
-                            <org.apache.cxf.dosgi.test.serviceWaitTimeout>180</org.apache.cxf.dosgi.test.serviceWaitTimeout> -->
-                        <java.util.logging.config.file>${project.build.directory}/test-classes/logging.properties</java.util.logging.config.file>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
             
         </plugins>

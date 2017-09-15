@@ -1,124 +1,272 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one
-  or more contributor license agreements. See the NOTICE file
-  distributed with this work for additional information
-  regarding copyright ownership. The ASF licenses this file
-  to you under the Apache License, Version 2.0 (the
-  "License"); you may not use this file except in compliance
-  with the License. You may obtain a copy of the License at
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	you under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  http://www.apache.org/licenses/LICENSE-2.0
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>cxf-dosgi-multibundle-distribution</artifactId>
+	<name>CXF DOSGi Multi-Bundle Distribution</name>
+	<url>http://cxf.apache.org</url>
 
-  Unless required by applicable law or agreed to in writing,
-  software distributed under the License is distributed on an
-  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  KIND, either express or implied. See the License for the
-  specific language governing permissions and limitations
-  under the License.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.apache.cxf.dosgi</groupId>
+		<artifactId>cxf-dosgi-distribution-parent</artifactId>
+		<version>2.3.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>cxf-dosgi-multibundle-distribution</artifactId>
-  <name>CXF DOSGi Multi-Bundle Distribution</name>
-  <url>http://cxf.apache.org</url>
+	<properties>
+		<dosgi.version>${project.version}</dosgi.version>
+		<topDirectoryLocation>../..</topDirectoryLocation>
+		<karaf.version>4.1.2</karaf.version>
+	</properties>
 
-  <parent>
-    <groupId>org.apache.cxf.dosgi</groupId>
-    <artifactId>cxf-dosgi-distribution-parent</artifactId>
-    <version>2.3.0-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
+	<dependencies>
+		<!-- Basic Felix bundles -->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.framework</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.eventadmin</artifactId>
+			<version>1.4.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.configadmin</artifactId>
+			<version>1.8.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.metatype</artifactId>
+			<version>1.1.2</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>kxml2</artifactId>
+					<groupId>net.sf.kxml</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.fileinstall</artifactId>
+			<version>3.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.gogo.command</artifactId>
+			<version>0.16.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>org.osgi.core</artifactId>
+					<groupId>org.osgi</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>org.osgi.compendium</artifactId>
+					<groupId>org.osgi</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>
+                        org.apache.felix.bundlerepository
+                    </artifactId>
+					<groupId>org.apache.felix</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.gogo.runtime</artifactId>
+			<version>0.10.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.gogo.shell</artifactId>
+			<version>0.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.scr</artifactId>
+			<version>2.0.12</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>animal-sniffer-annotations</artifactId>
+					<groupId>org.codehaus.mojo</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.http.jetty</artifactId>
+			<version>3.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-server</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty.websocket</groupId>
+					<artifactId>websocket-server</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>org.apache.felix.http.base</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
-  <properties>
-    <dosgi.version>${project.version}</dosgi.version>
-    <topDirectoryLocation>../..</topDirectoryLocation>
-    <karaf.version>4.0.5</karaf.version>
-  </properties>
+		<dependency>
+			<groupId>org.ops4j.pax.logging</groupId>
+			<artifactId>pax-logging-service</artifactId>
+			<version>1.8.5</version>
+		</dependency>
+		<dependency>
+			<groupId>jline</groupId>
+			<artifactId>jline</artifactId>
+			<version>3.0.0.M1</version>
+		</dependency>
 
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
+		<!-- rsa -->
+		<dependency>
+			<groupId>org.apache.cxf.dosgi</groupId>
+			<artifactId>cxf-dosgi-repository</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
-    <plugins>
-    <plugin>
-        <groupId>org.apache.karaf.tooling</groupId>
-        <artifactId>karaf-maven-plugin</artifactId>
-        <version>3.0.6</version>
+		<dependency>
+			<groupId>org.apache.cxf.dosgi.samples</groupId>
+			<artifactId>cxf-dosgi-samples-soap-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf.dosgi.samples</groupId>
+			<artifactId>cxf-dosgi-samples-soap-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf.dosgi.samples</groupId>
+			<artifactId>cxf-dosgi-samples-rest-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf.dosgi.samples</groupId>
+			<artifactId>cxf-dosgi-samples-rest-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-jaxrs</artifactId>
+			<version>1.5.16</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.reflections</groupId>
+					<artifactId>reflections</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.reflections</artifactId>
+			<version>0.9.10_3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>20.0</version>
+		</dependency>
+	</dependencies>
 
-        <executions>
-          <execution>
-            <id>features-add-to-repository</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>features-export-meta-data</goal>
-              <goal>features-add-to-repository</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
-                <descriptor>mvn:org.apache.cxf.dosgi/cxf-dosgi/${project.version}/xml/features</descriptor>
-              </descriptors>
-              <features>
-              	<feature>cxf-rs-description-swagger2</feature>
-                <feature>cxf-dosgi-base</feature>
-                <feature>aries-rsa-discovery-zookeeper</feature>
-                <feature>cxf-dosgi-provider-ws</feature>
-                <feature>cxf-dosgi-provider-rs</feature>
-              </features>
-              <repository>target/distribution_bundles</repository>
-              <resolveDefinedRepositoriesRecursively>true</resolveDefinedRepositoriesRecursively>
-              <flatRepoLayout>true</flatRepoLayout>
-              <mergedFeature>true</mergedFeature>
-              <karafVersion>${karaf.version}</karafVersion>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <configuration>
-              <target>
-                <xslt processor="trax" in="target/features.xml" out="target/filtered-features.xml" style="src/main/xsl/filter_features.xslt" />
-                <xslt processor="trax" in="target/filtered-features.xml" out="target/distribution_configs/felix.config.properties.append" style="src/main/xsl/felix_distro_config.xslt" />
-                <xslt processor="trax" in="target/filtered-features.xml" out="target/distribution_configs/config.ini" style="src/main/xsl/equinox_distro_config.xslt" />
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>./src/main/assembly/assembly.xml</descriptor>
-              </descriptors>
-            </configuration>
+		<plugins>
+			<plugin>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bnd-indexer-maven-plugin</artifactId>
+				<version>3.4.0</version>
+				<configuration>
+					<includeGzip>false</includeGzip>
+					<localURLs>REQUIRED</localURLs>
+					<addMvnURLs>
+					</addMvnURLs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>index</id>
+						<goals>
+							<goal>index</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bnd-export-maven-plugin</artifactId>
+				<version>3.4.0</version>
+				<configuration>
+					<resolve>true</resolve>
+					<failOnChanges>false</failOnChanges>
+					<bndruns>
+						<bndrun>distro.bndrun</bndrun>
+					</bndruns>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>export</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<unzip src="target/distro.jar" dest="target/distro-unzip" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-          </execution>
-        </executions>
-      </plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>./src/main/assembly/assembly.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-    </plugins>
-  </build>
+		</plugins>
+	</build>
 </project>
