@@ -88,7 +88,7 @@ public class TaskResourceImpl implements TaskResource, IntentsProvider {
         swagger.setDescription("Sample jaxrs application to organize taks");
         swagger.setTitle("Tasks sample");
         swagger.setUsePathBasedConfig(true); // Necessary for OSGi
-        swagger.setScan(false);
+        // swagger.setScan(false); // Must be set for cxf < 3.2.x
         swagger.setPrettyPrint(true);
         swagger.setSupportSwaggerUi(true);
         return swagger;

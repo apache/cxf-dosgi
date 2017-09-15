@@ -53,8 +53,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.specs</groupId>
-            <artifactId>org.apache.servicemix.specs.jsr339-api-2.0.1</artifactId>
-            <version>2.6.0</version>
+            <artifactId>org.apache.servicemix.specs.jaxrs-api-2.1</artifactId>
+            <version>2.9.1</version>
         </dependency>
     </dependencies>
 
