@@ -1,6 +1,6 @@
-<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/component-1.1.2.xsd">
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -26,18 +26,33 @@
     <format>dir</format>
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+  	<dependencySet>
+  		<includes>
+	  		<include>org.apache.cxf.dosgi.samples:cxf-dosgi-samples-soap-api</include>
+	  		<include>org.apache.cxf.dosgi.samples:cxf-dosgi-samples-soap-impl</include>
+	  		<include>org.apache.cxf.dosgi.samples:cxf-dosgi-samples-soap-client</include>
+	  		<include>org.apache.cxf.dosgi.samples:cxf-dosgi-samples-rest-api</include>
+	  		<include>org.apache.cxf.dosgi.samples:cxf-dosgi-samples-rest-impl</include>
+	  		<include>org.apache.cxf.dosgi.samples:cxf-dosgi-samples-rest-client</include>
+  		</includes>
+  		<outputDirectory>
+  			apache-cxf-dosgi-${dosgi.version}/samples
+  		</outputDirectory>
+  	</dependencySet>
+  </dependencySets>
   <fileSets>
+      <fileSet>
+      	<directory>target/bin</directory>
+      	<outputDirectory>apache-cxf-dosgi-${dosgi.version}/bin</outputDirectory>
+    </fileSet>
     <fileSet>
       <directory>target/distro-unzip/jar</directory>
       <excludes>
       	<exclude>org.apache.felix.framework*</exclude>
       	<exclude>biz.aQute.launcher*</exclude>
       </excludes>
-      <outputDirectory>apache-cxf-dosgi-${dosgi.version}/dosgi_bundles</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>target/distribution_configs</directory>
-      <outputDirectory>apache-cxf-dosgi-${dosgi.version}/conf</outputDirectory>
+      <outputDirectory>apache-cxf-dosgi-${dosgi.version}/bundle</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/maven-shared-archive-resources/META-INF</directory>
@@ -48,10 +63,6 @@
     </fileSet>
     <fileSet>
       <directory>src/main/release</directory>
-      <includes>
-        <include>README</include>
-        <include>release_notes.txt</include>
-      </includes>
       <outputDirectory>apache-cxf-dosgi-${dosgi.version}</outputDirectory>
     </fileSet>
   </fileSets>

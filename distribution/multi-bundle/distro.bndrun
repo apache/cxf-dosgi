@@ -12,7 +12,6 @@
 -runproperties: \
 	org.ops4j.pax.logging.DefaultServiceLog.level=INFO,\
 	rsa.export.policy.filter="(name=rest)",\
-	org.apache.felix.http.jettyEnabled=true,\
 	org.osgi.framework.bootdelegation=com.sun.*,\
 	org.osgi.framework.system.packages.extra='sun.misc,javax.xml.bind.annotation;version=2.2.1,javax.xml.bind;version=2.2.1'
 	
@@ -37,11 +36,11 @@
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.http.jetty)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.cxf.dosgi.cxf-dosgi-provider-ws)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.aries.rsa.topology-manager)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
 	osgi.identity;filter:='(&(osgi.identity=org.apache.aries.rsa.discovery.command)(version>=1.9.0))',\
 	osgi.identity;filter:='(osgi.identity=org.apache.cxf.dosgi.cxf-dosgi-provider-rs)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.cxf.cxf-rt-rs-service-description-swagger)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.aries.rsa.discovery.zookeeper)'
+	osgi.identity;filter:='(osgi.identity=org.apache.aries.rsa.discovery.zookeeper)',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.jline)'
 -runbundles: \
 	org.apache.felix.configadmin;version='[1.8.8,1.8.9)',\
 	org.apache.felix.fileinstall;version='[3.5.2,3.5.3)',\
@@ -53,27 +52,11 @@
 	org.apache.felix.http.api;version='[2.3.2,2.3.3)',\
 	org.apache.felix.http.jetty;version='[3.0.0,3.0.1)',\
 	org.apache.servicemix.bundles.wsdl4j;version='[1.6.3,1.6.4)',\
-	org.apache.felix.gogo.command;version='[0.16.0,0.16.1)',\
-	org.apache.felix.gogo.shell;version='[0.12.0,0.12.1)',\
-	org.apache.felix.gogo.runtime;version='[0.10.0,0.10.1)',\
 	org.fusesource.jansi;version='[1.13.0,1.13.1)',\
-	javax.annotation-api;version='[1.2.0,1.2.1)',\
-	org.apache.servicemix.specs.jsr339-api-2.0.1;version='[2.6.0,2.6.1)',\
 	org.apache.aries.rsa.core;version='[1.11.0,1.11.1)',\
 	org.apache.aries.rsa.discovery.command;version='[1.11.0,1.11.1)',\
 	org.apache.aries.rsa.spi;version='[1.11.0,1.11.1)',\
 	org.apache.aries.rsa.topology-manager;version='[1.11.0,1.11.1)',\
-	org.apache.cxf.cxf-core;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-bindings-soap;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-bindings-xml;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-databinding-aegis;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-databinding-jaxb;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-frontend-jaxrs;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-frontend-jaxws;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-frontend-simple;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-rs-client;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-transports-http;version='[3.1.12,3.1.13)',\
-	org.apache.cxf.cxf-rt-wsdl;version='[3.1.12,3.1.13)',\
 	org.apache.cxf.dosgi.cxf-dosgi-common;version='[2.3.0,2.3.1)',\
 	org.apache.cxf.dosgi.cxf-dosgi-provider-rs;version='[2.3.0,2.3.1)',\
 	org.apache.cxf.dosgi.cxf-dosgi-provider-ws;version='[2.3.0,2.3.1)',\
@@ -89,10 +72,28 @@
 	io.swagger.jaxrs;version='[1.5.16,1.5.17)',\
 	io.swagger.models;version='[1.5.16,1.5.17)',\
 	javax.validation.api;version='[1.1.0,1.1.1)',\
-	org.apache.commons.lang3;version='[3.2.1,3.2.2)',\
-	org.apache.cxf.cxf-rt-rs-service-description-swagger;version='[3.1.12,3.1.13)',\
 	org.apache.servicemix.bundles.reflections;version='[0.9.10,0.9.11)',\
 	org.yaml.snakeyaml;version='[1.17.0,1.17.1)',\
 	org.apache.aries.rsa.discovery.local;version='[1.11.0,1.11.1)',\
 	org.apache.aries.rsa.discovery.zookeeper;version='[1.11.0,1.11.1)',\
-	org.apache.hadoop.zookeeper;version='[3.4.10,3.4.11)'
+	org.apache.hadoop.zookeeper;version='[3.4.10,3.4.11)',\
+	javax.annotation-api;version='[1.3.0,1.3.1)',\
+	org.apache.commons.lang3;version='[3.6.0,3.6.1)',\
+	org.apache.cxf.cxf-core;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-bindings-soap;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-bindings-xml;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-databinding-aegis;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-databinding-jaxb;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-frontend-jaxrs;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-frontend-jaxws;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-frontend-simple;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-rs-client;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-rs-service-description-swagger;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-transports-http;version='[3.2.0,3.2.1)',\
+	org.apache.cxf.cxf-rt-wsdl;version='[3.2.0,3.2.1)',\
+	org.apache.felix.bundlerepository;version='[1.6.0,1.6.1)',\
+	org.apache.felix.gogo.command;version='[1.0.0,1.0.1)',\
+	org.apache.felix.gogo.jline;version='[1.0.6,1.0.7)',\
+	org.apache.felix.gogo.runtime;version='[1.0.0,1.0.1)',\
+	org.apache.servicemix.specs.jaxrs-api-2.1;version='[2.9.1,2.9.2)',\
+	org.jline;version='[3.3.1,3.3.2)'

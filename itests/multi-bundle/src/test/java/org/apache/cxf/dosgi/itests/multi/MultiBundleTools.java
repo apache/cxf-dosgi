@@ -35,7 +35,7 @@ public final class MultiBundleTools {
 
     private static Collection<String> getDistroBundles(File distroDir) throws Exception {
         List<String> bundles = new ArrayList<>();
-        File bundlesDir = new File(distroDir, "dosgi_bundles");
+        File bundlesDir = new File(distroDir, "bundle");
         File[] files = bundlesDir.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
                     return name.toLowerCase().endsWith(".jar");
