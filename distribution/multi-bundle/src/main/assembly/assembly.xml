@@ -63,6 +63,7 @@
     </fileSet>
     <fileSet>
       <directory>src/main/release</directory>
+      <outputDirectory>.</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
