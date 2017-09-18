@@ -300,6 +300,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
+							<finalName>cxf-dosgi</finalName>
 							<descriptors>
 								<descriptor>./src/main/assembly/assembly.xml</descriptor>
 							</descriptors>

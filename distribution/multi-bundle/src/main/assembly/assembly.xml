@@ -25,7 +25,8 @@
     <format>zip</format>
     <format>dir</format>
   </formats>
-  <includeBaseDirectory>false</includeBaseDirectory>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <baseDirectory>cxf-dosgi-${project.version}</baseDirectory>
   <dependencySets>
   	<dependencySet>
   		<includes>
@@ -37,14 +38,14 @@
 	  		<include>org.apache.cxf.dosgi.samples:cxf-dosgi-samples-rest-client</include>
   		</includes>
   		<outputDirectory>
-  			apache-cxf-dosgi-${dosgi.version}/samples
+  			samples
   		</outputDirectory>
   	</dependencySet>
   </dependencySets>
   <fileSets>
       <fileSet>
       	<directory>target/bin</directory>
-      	<outputDirectory>apache-cxf-dosgi-${dosgi.version}/bin</outputDirectory>
+      	<outputDirectory>bin</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/distro-unzip/jar</directory>
@@ -52,18 +53,16 @@
       	<exclude>org.apache.felix.framework*</exclude>
       	<exclude>biz.aQute.launcher*</exclude>
       </excludes>
-      <outputDirectory>apache-cxf-dosgi-${dosgi.version}/bundle</outputDirectory>
+      <outputDirectory>bundle</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/maven-shared-archive-resources/META-INF</directory>
       <excludes>
           <exclude>DEPENDENCIES</exclude>
       </excludes>
-      <outputDirectory>apache-cxf-dosgi-${dosgi.version}</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/release</directory>
-      <outputDirectory>apache-cxf-dosgi-${dosgi.version}</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
