@@ -43,6 +43,13 @@
   	</dependencySet>
   </dependencySets>
   <fileSets>
+  	  <fileSet>
+      	<directory>../..</directory>
+      	<includes>
+      		<include>release_notes.md</include>
+      	</includes>
+      	<outputDirectory>.</outputDirectory>
+      </fileSet>
       <fileSet>
       	<directory>target/bin</directory>
       	<outputDirectory>bin</outputDirectory>
