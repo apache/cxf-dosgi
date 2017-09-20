@@ -1,6 +1,18 @@
 Release Notes - CXF Distributed OSGi
 ====================================
 
+2.3.0
+=====
+
+* Bug
+    * [DOSGI-254] - ServiceInvocationHandler does not handle checked super-interface exceptions correctly
+    * [DOSGI-267] - ContainerRequestFilter intents do not get registered as providers
+    * [DOSGI-275] - Include felix and samples in multibundle distro
+
+* Improvement
+    * [DOSGI-273] - Use bnd resolver to create multibundle distro
+    * [DOSGI-274] - Upgrade to CXF 3.2.0
+
 2.2.0
 =====
 
