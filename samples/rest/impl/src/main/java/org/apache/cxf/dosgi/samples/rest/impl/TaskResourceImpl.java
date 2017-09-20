@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Component;
     name = "TaskResource", //
     property = //
     { //
-      "service.exported.interfaces=*", //
+      "service.exported.interfaces=org.apache.cxf.dosgi.samples.rest.TaskResource", //
       "service.exported.configs=org.apache.cxf.rs", //
       "org.apache.cxf.rs.address=/tasks" //
     } //
