@@ -59,12 +59,12 @@ public class TaskResourceImpl implements TaskResource, IntentsProvider {
         task.setId(1);
         task.setTitle("Buy some coffee");
         task.setDescription("Take the extra strong");
-        addOrUpdate(task);
+        add(task);
         task = new Task();
         task.setId(2);
         task.setTitle("Finish DOSGi example");
         task.setDescription("");
-        addOrUpdate(task);
+        add(task);
     }
     
     @Override
@@ -73,10 +73,14 @@ public class TaskResourceImpl implements TaskResource, IntentsProvider {
     }
 
     @Override
-    public void addOrUpdate(Task task) {
+    public void add(Task task) {
         taskMap.put(task.getId(), task);
     }
 
+    @Override
+    public void update(Integer id, Task task) {
+        taskMap.put(id, task);
+    }
 
     @Override
     public Task[] getAll() {

@@ -16,19 +16,29 @@ Unpack karaf 4 into a server and client directory.
 Start the server karaf
 
 ```
-feature:repo-add cxf-dosgi-samples 2.2.0-SNAPSHOT
+feature:repo-add cxf-dosgi-samples 2.3.0
 feature:install cxf-dosgi-sample-rest-impl
 rsa:endpoints
 ```
 
 The last command should show one endpoint with a URI as id. You should be able to open the url in the browser. The browser should show the predefined tasks as xml.
 
+```
+curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{task:{id: 3, title: "Another task"}}' 'http://localhost:8181/cxf/tasks/'
+```
+
+Check that task was added
+
+```
+curl --header "Accept:application/json" http://localhost:8181/cxf/tasks/3
+```
+
 ### Install client 
 
 Start the client karaf
 
 ```
-feature:repo-add cxf-dosgi-samples 2.0.0
+feature:repo-add cxf-dosgi-samples 2.3.0
 feature:install cxf-dosgi-sample-rest-client
 ```
 Use commands to test

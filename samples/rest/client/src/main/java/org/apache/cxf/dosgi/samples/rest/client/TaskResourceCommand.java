@@ -49,7 +49,7 @@ public class TaskResourceCommand {
     
     public void add(Integer id, String title) {
         Task task = new Task(id, title, "");
-        taskService.addOrUpdate(task);
+        taskService.add(task);
     }
     
     public void delete(Integer id) {
