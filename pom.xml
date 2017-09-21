@@ -34,8 +34,8 @@
     <name>CXF DOSGi main</name>
  
     <scm>
-        <connection>scm:git:http://git-wip-us.apache.org/repos/asf/cxf-dosgi.git</connection>
-        <developerConnection>scm:git:http://git-wip-us.apache.org/repos/asf/cxf-dosgi.git</developerConnection>
+        <connection>scm:git@github.com:apache/cxf-dosgi.git</connection>
+        <developerConnection>scm:git@github.com:apache/cxf-dosgi.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
