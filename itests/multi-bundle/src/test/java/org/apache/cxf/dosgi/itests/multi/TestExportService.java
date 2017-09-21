@@ -90,6 +90,10 @@ public class TestExportService extends AbstractDosgiTest {
         }
         );
         Assert.assertEquals("Buy some coffee", task.getTitle());
+        final WebClient swaggerClient = WebClient.create(REST_SERVICE_URI + "/swagger.json");
+        String swaggerJson = swaggerClient.get(String.class);
+        Assert.assertEquals("{\"swagger\":\"2.0\"", swaggerJson.substring(0, 16));
+        
     }
     
     @Test
