@@ -35,8 +35,7 @@
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.jline)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.metatype)',\
 	osgi.identity;filter:='(osgi.identity=com.fasterxml.woodstox.woodstox-core)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.aries.rsa.discovery.command)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.cxf.dosgi.samples.cxf-dosgi-samples-rest-impl)'
+	osgi.identity;filter:='(osgi.identity=org.apache.aries.rsa.discovery.command)'
 
 -runbundles: \
 	com.fasterxml.jackson.dataformat.jackson-dataformat-yaml;version='[2.8.9,2.8.10)',\
