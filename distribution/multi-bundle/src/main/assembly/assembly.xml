@@ -72,5 +72,9 @@
       <directory>src/main/release</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
+    <fileSet>
+    	<directory>target/maven-shared-archive-resources/META-INF</directory>
+    	<outputDirectory>.</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>
