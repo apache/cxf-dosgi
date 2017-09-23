@@ -182,6 +182,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- Swagger dependencies -->
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>swagger-ui</artifactId>
