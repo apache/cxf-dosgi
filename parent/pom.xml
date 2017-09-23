@@ -30,7 +30,7 @@
         <osgi.version>6.0.0</osgi.version>
         <osgi.compendium.version>5.0.0</osgi.compendium.version>
         <aries.rsa.version>1.11.0</aries.rsa.version>
-        <cxf.version>3.2.1-SNAPSHOT</cxf.version>
+        <cxf.version>3.2.0</cxf.version>
         <felix.version>5.6.8</felix.version>
         <zookeeper.version>3.4.8</zookeeper.version>
         <servlet.version>3.0</servlet.version>
