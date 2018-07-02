@@ -61,46 +61,25 @@
 			<artifactId>org.apache.felix.fileinstall</artifactId>
 			<version>3.5.2</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.gogo.command</artifactId>
-			<version>0.16.0</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>org.osgi.core</artifactId>
-					<groupId>org.osgi</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>org.osgi.compendium</artifactId>
-					<groupId>org.osgi</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>
-                        org.apache.felix.bundlerepository
-                    </artifactId>
-					<groupId>org.apache.felix</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.gogo.command</artifactId>
-            <version>1.0.0</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.gogo.command</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.runtime</artifactId>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.gogo.jline</artifactId>
-            <version>1.0.6</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline</artifactId>
-            <version>3.5.1</version>
+            <version>3.8.0</version>
         </dependency>
 		<dependency>
 			<groupId>org.apache.felix</groupId>
@@ -137,11 +116,6 @@
 			<groupId>org.ops4j.pax.logging</groupId>
 			<artifactId>pax-logging-service</artifactId>
 			<version>1.8.5</version>
-		</dependency>
-		<dependency>
-			<groupId>jline</groupId>
-			<artifactId>jline</artifactId>
-			<version>3.0.0.M1</version>
 		</dependency>
 
 		<!-- rsa -->
@@ -249,7 +223,7 @@
 			<plugin>
 				<groupId>biz.aQute.bnd</groupId>
 				<artifactId>bnd-indexer-maven-plugin</artifactId>
-				<version>3.4.0</version>
+				<version>4.0.0</version>
 				<configuration>
 					<includeGzip>false</includeGzip>
 					<localURLs>REQUIRED</localURLs>
@@ -284,6 +258,8 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<!-- Unzip the archive created by bnd export plugin. To then repackage it in the assembly phase -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>

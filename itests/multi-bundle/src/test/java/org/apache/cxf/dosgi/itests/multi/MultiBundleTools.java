@@ -63,8 +63,16 @@ public final class MultiBundleTools {
         File distroDir = depRoot.listFiles()[0];
         Collection<String> bundles = getDistroBundles(distroDir);
         List<Option> opts = new ArrayList<Option>();
+        // Make sure annotation bundle is loaded first to make sure it is used for resolution
         for (String bundleUri : bundles) {
-            opts.add(CoreOptions.bundle(bundleUri));
+            if (bundleUri.contains("javax.annotation")) {
+                opts.add(CoreOptions.bundle(bundleUri));
+            }
+        }
+        for (String bundleUri : bundles) {
+            if (!bundleUri.contains("javax.annotation")) {
+                opts.add(CoreOptions.bundle(bundleUri));
+            }
         }
         return CoreOptions.composite(opts.toArray(new Option[opts.size()]));
     }

@@ -288,6 +288,8 @@ public class AbstractDosgiTest {
     protected static Option basicTestOptions() throws Exception {
         return composite(CoreOptions.junitBundles(), //
                          MultiBundleTools.getDistro(), //
+                         mavenBundle("org.ops4j.pax.tinybundles", "tinybundles").versionAsInProject(),
+                         mavenBundle("biz.aQute.bnd", "biz.aQute.bndlib").versionAsInProject(),
                          
                          systemProperty("org.osgi.service.http.port").value("" + HTTP_PORT),
                          systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"), //

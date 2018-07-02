@@ -28,11 +28,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <osgi.version>6.0.0</osgi.version>
-        <osgi.compendium.version>5.0.0</osgi.compendium.version>
-        <aries.rsa.version>1.11.0</aries.rsa.version>
-        <cxf.version>3.2.2</cxf.version>
+        <osgi.compendium.version>6.0.0</osgi.compendium.version>
+        <aries.rsa.version>1.12.0</aries.rsa.version>
+        <cxf.version>3.2.5</cxf.version>
         <felix.version>5.6.8</felix.version>
-        <zookeeper.version>3.4.8</zookeeper.version>
+        <zookeeper.version>3.4.12</zookeeper.version>
         <servlet.version>3.0</servlet.version>
         <servicemix.specs.version>2.6.0</servicemix.specs.version>
         <slf4j.version>1.7.14</slf4j.version>
@@ -136,7 +136,7 @@
             <dependency>
                 <groupId>org.ops4j.pax.tinybundles</groupId>
                 <artifactId>tinybundles</artifactId>
-                <version>2.1.1</version>
+                <version>3.0.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -175,17 +175,8 @@
         <dependency>
         	<groupId>org.apache.aries.rsa</groupId>
         	<artifactId>org.apache.aries.rsa.core</artifactId>
-        	<version>1.11.0</version>
+        	<version>${aries.rsa.version}</version>
         </dependency>
-        
-
-        <!-- 
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <scope>provided</scope>
-        </dependency>
- -->
         <dependency>
             <groupId>org.apache.aries.rsa</groupId>
             <artifactId>org.apache.aries.rsa.spi</artifactId>
@@ -287,7 +278,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <obrRepository>NONE</obrRepository>

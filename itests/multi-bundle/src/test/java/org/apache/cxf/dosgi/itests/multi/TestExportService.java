@@ -52,7 +52,7 @@ public class TestExportService extends AbstractDosgiTest {
     private static final String REST_SERVICE_URI = HTTP_BASE_URI + "/cxf/tasks";
     
     private static final String GREETER_ZOOKEEPER_NODE = //
-        "/osgi/service_registry/org/apache/cxf/dosgi/samples/soap/TaskService/localhost#8181##cxf#taskservice";
+        "/osgi/service_registry/http:##localhost:8181#cxf#taskservice";
 
     @Configuration
     public static Option[] configure() throws Exception {
