@@ -48,6 +48,7 @@ class DecorationParser {
             jaxbContext = JAXBContext.newInstance(ServiceDecorationsType.class.getPackage().getName(),
                                                   this.getClass().getClassLoader());
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            schemaFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
             URL resource = getClass().getResource("/service-decoration.xsd");
             schema = schemaFactory.newSchema(resource);
         } catch (Exception e) {
