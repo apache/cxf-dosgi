@@ -35,7 +35,7 @@
         <zookeeper.version>3.4.12</zookeeper.version>
         <servlet.version>3.0</servlet.version>
         <servicemix.specs.version>2.6.0</servicemix.specs.version>
-        <slf4j.version>1.7.25</slf4j.version>
+        <slf4j.version>1.7.26</slf4j.version>
         <exam.version>4.11.0</exam.version>
 
         <baseline.skip>true</baseline.skip>
