@@ -36,7 +36,7 @@
         <dependency>
         	<groupId>org.apache.aries.rsa</groupId>
         	<artifactId>org.apache.aries.rsa.spi</artifactId>
-        	<version>1.9.0</version>
+        	<version>${aries.rsa.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>

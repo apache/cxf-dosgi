@@ -36,7 +36,7 @@
         <servlet.version>3.0</servlet.version>
         <servicemix.specs.version>2.6.0</servicemix.specs.version>
         <slf4j.version>1.7.26</slf4j.version>
-        <exam.version>4.11.0</exam.version>
+        <exam.version>4.13.1</exam.version>
 
         <baseline.skip>true</baseline.skip>
         <topDirectoryLocation>..</topDirectoryLocation>
@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>4.0.1</version>
+                <version>4.0.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -91,7 +91,7 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-atinject_1.0_spec</artifactId>
-                <version>1.0</version>
+                <version>1.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -124,7 +124,7 @@
             <dependency>
                 <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.osgi</artifactId>
-                <version>3.11.3</version>
+                <version>3.13.200</version>
             </dependency>
 
             <dependency>
