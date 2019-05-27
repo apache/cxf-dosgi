@@ -30,9 +30,9 @@
         <osgi.version>6.0.0</osgi.version>
         <osgi.compendium.version>6.0.0</osgi.compendium.version>
         <aries.rsa.version>1.13.0</aries.rsa.version>
-        <cxf.version>3.2.8</cxf.version>
+        <cxf.version>3.2.9</cxf.version>
         <felix.version>5.6.8</felix.version>
-        <zookeeper.version>3.4.13</zookeeper.version>
+        <zookeeper.version>3.4.14</zookeeper.version>
         <servlet.version>3.0</servlet.version>
         <servicemix.specs.version>2.9.0</servicemix.specs.version>
         <slf4j.version>1.7.26</slf4j.version>
