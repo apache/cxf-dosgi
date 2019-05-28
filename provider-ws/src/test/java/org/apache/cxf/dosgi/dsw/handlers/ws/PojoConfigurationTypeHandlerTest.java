@@ -213,7 +213,6 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         handler.setHttpServiceManager(dummyHttpServiceManager());
         handler.activate(dswContext);
         Runnable myService = new Runnable() {
-            
             @Override
             public void run() {
             }

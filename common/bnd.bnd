@@ -7,4 +7,3 @@ Export-Package: \
 	org.apache.cxf.dosgi.common.proxy,\
 	org.apache.cxf.dosgi.common.util,\
 	org.apache.cxf.dosgi.common.api
-

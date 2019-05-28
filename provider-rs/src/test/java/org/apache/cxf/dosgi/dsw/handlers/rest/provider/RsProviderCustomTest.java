@@ -84,7 +84,6 @@ public class RsProviderCustomTest {
 
     private Callable<List<Object>> intentProvider(final Object... intents) {
         return new Callable<List<Object>>() {
-            
             @Override
             public List<Object> call() throws Exception {
                 return Arrays.asList(intents);

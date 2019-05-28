@@ -36,4 +36,3 @@ start Apache Karaf using `bin/karaf`
 * [rest - Publish and Consume REST services] (rest) 
 * [security-filter - Custom HTTP filter] (security filter)
 * [ssl - SSL support and client cert based auth] (ssl)
-

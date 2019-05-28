@@ -1,6 +1,7 @@
 Release Notes - CXF Distributed OSGi
 ====================================
 
+
 2.3.0
 =====
 
@@ -12,6 +13,7 @@ Release Notes - CXF Distributed OSGi
 * Improvement
     * [DOSGI-273] - Use bnd resolver to create multibundle distro
     * [DOSGI-274] - Upgrade to CXF 3.2.0
+
 
 2.2.0
 =====
@@ -120,6 +122,7 @@ Release Notes - CXF Distributed OSGi
 * Improvement
     * [DOSGI-220] - Upgrade to cxf 3.1.1 
     
+
 1.6.0
 =====
 
@@ -262,6 +265,7 @@ Release Notes - CXF Distributed OSGi - Version 1.5.0
 * New Feature
     * [DOSGI-115] - Use Spring DM and Eclipse Gemini Blueprint with DOSGi
 
+
 1.3.1
 =====
 
@@ -271,6 +275,7 @@ Fixes needed in order to pass the OSGi 4.3 Remote Service Admin TCK.
 * Fixed cleanup
 * Fixed ExportReferenceImpl.equals() and hashCode()
 * Fixed RemoteServiceAdminCore.exportService()
+
 
 1.3
 ===
@@ -401,7 +406,6 @@ New features in this release include:
 * [CXF-2288] - Bundle cannot be restarted
 * [CXF-2385] - Discovery doesn't fully translate 'localhost' into a proper machine name
 * [CXF-2200] - Consuming more than 1 service using Spring-DM doesn't work
-
 
 Known limitations :
 

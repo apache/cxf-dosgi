@@ -25,7 +25,6 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.apache.cxf.dosgi.common.api.IntentsProvider;
 import org.osgi.service.component.annotations.Component;
 
-
 /**
  * Not needed in the current example config.
  * This shows how to export a custom intent.

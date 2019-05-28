@@ -58,7 +58,6 @@
 			<module name="JavadocStyle"/>
 		-->
 
-
 		<!-- Checks for Naming Conventions.                  -->
 		<!-- See http://checkstyle.sf.net/config_naming.html -->
 		<module name="ConstantName" />
@@ -70,7 +69,6 @@
 		<module name="ParameterName" />
 		<module name="StaticVariableName" />
 		<module name="TypeName" />
-
 
 		<!-- Checks for imports                              -->
 		<!-- See http://checkstyle.sf.net/config_import.html -->
@@ -86,7 +84,6 @@
 			<property name="file" value="etc/import-control.xml"/>
 			</module>
 		-->
-
 
 		<!-- Checks for Size Violations.                    -->
 		<!-- See http://checkstyle.sf.net/config_sizes.html -->
@@ -129,12 +126,10 @@
 				value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN, EQUAL, GE, GT, LAND, LCURLY, LE, LITERAL_ASSERT, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_RETURN, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION, RCURLY, SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN, STAR, STAR_ASSIGN,TYPE_EXTENSION_AND" />
 		</module>
 
-
 		<!-- Modifier Checks                                    -->
 		<!-- See http://checkstyle.sf.net/config_modifiers.html -->
 		<!-- <module name="ModifierOrder" />-->
 		<module name="RedundantModifier" />
-
 
 		<!-- Checks for blocks. You know, those {}'s         -->
 		<!-- See http://checkstyle.sf.net/config_blocks.html -->
@@ -147,7 +142,6 @@
 		<module name="LeftCurly" />
 		<module name="NeedBraces" />
 		<module name="RightCurly" />
-
 
 		<!-- Checks for common coding problems               -->
 		<!-- See http://checkstyle.sf.net/config_coding.html -->
@@ -203,8 +197,6 @@
 		<!--<module name="RequireThis"/>-->
 		<module name="UnnecessaryParentheses" />
 
-
-
 		<!-- Checks for class design                         -->
 		<!-- See http://checkstyle.sf.net/config_design.html -->
 		<!--<module name="DesignForExtension"/>-->
@@ -224,8 +216,6 @@
 			<property name="publicMemberPattern" value="resource[12].*" />
 		</module>
 
-
-
 		<!-- Metrics checks.                   -->
 		<!-- See http://checkstyle.sf.net/config_metrics.html -->
 		<module name="BooleanExpressionComplexity">
@@ -238,7 +228,6 @@
 		<module name="JavaNCSS">
 			<property name="methodMaximum" value="100" />
 		</module>
-
 
 		<!-- Miscellaneous other checks.                   -->
 		<!-- See http://checkstyle.sf.net/config_misc.html -->

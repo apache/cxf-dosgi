@@ -61,7 +61,6 @@ public class SslIntent implements Callable<List<Object>> {
         tls.setTrustManagers(trustManager(keystore(karafHome + "/etc/keystores/client.jks", CLIENT_PASSWORD)));
         //tls.setTrustManagers(new TrustManager[]{new DefaultTrustManager()});
         HostnameVerifier verifier = new HostnameVerifier() {
-            
             @Override
             public boolean verify(String hostname, SSLSession session) {
                 return true;
@@ -93,6 +92,5 @@ public class SslIntent implements Callable<List<Object>> {
         ks.load(new FileInputStream(keystorePath), storePassword.toCharArray());
         return ks;
     }
-
 
 }

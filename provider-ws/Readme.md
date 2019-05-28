@@ -29,4 +29,3 @@ the CXF JAX-WS frontend and the JAXB databinding. It can be customized using the
 # Samples
 
 See [sample soap](../samples/soap).
-

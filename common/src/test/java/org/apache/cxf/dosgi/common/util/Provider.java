@@ -18,6 +18,5 @@
  */
 package org.apache.cxf.dosgi.common.util;
 
-
 public class Provider {
 }

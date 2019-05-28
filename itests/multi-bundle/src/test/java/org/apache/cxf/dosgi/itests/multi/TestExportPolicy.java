@@ -56,6 +56,5 @@ public class TestExportPolicy extends AbstractDosgiTest {
     public void testPolicyPresent() throws Exception {
         Assert.assertNotNull(policy);
     }
-    
 
 }

@@ -97,7 +97,6 @@ public class AbstractDosgiTest {
         }
         throw ex;
     }
-    
 
     /**
      * Sleeps for a short interval, throwing an exception if timeout has been reached. Used to facilitate a
@@ -261,7 +260,6 @@ public class AbstractDosgiTest {
     protected static Option configLogging() {
         return ConfigurationAdminOptions.configurationFolder(new File("src/test/resources/cfg"));
     }
-    
 
     protected static MavenArtifactProvisionOption taskServiceAPI() {
         return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
@@ -273,18 +271,15 @@ public class AbstractDosgiTest {
             .artifactId("cxf-dosgi-samples-soap-impl").versionAsInProject();
     }
 
-
     protected static MavenArtifactProvisionOption taskRESTAPI() {
         return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
             .artifactId("cxf-dosgi-samples-rest-api").versionAsInProject();
     }
 
-
     protected static MavenArtifactProvisionOption taskRESTImpl() {
         return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
             .artifactId("cxf-dosgi-samples-rest-impl").versionAsInProject();
     }
-
 
     protected static Option basicTestOptions() throws Exception {
         return composite(CoreOptions.junitBundles(), //
