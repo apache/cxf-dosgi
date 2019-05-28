@@ -28,7 +28,7 @@ import org.osgi.framework.ServiceException;
 
 public class ExceptionMapper {
     private static final String REMOTE_EXCEPTION_TYPE = "REMOTE";
-    private Map<Method, Set<Class<?>>> exceptionsMap = new HashMap<Method, Set<Class<?>>>();
+    private Map<Method, Set<Class<?>>> exceptionsMap = new HashMap<>();
 
     public ExceptionMapper(Class<?> iType) {
         introspectTypeForExceptions(iType);
@@ -70,7 +70,7 @@ public class ExceptionMapper {
     private Set<Class<?>> getCurrentExTypes(Method m) {
         Set<Class<?>> types = exceptionsMap.get(m);
         if (types == null) {
-            types = new HashSet<Class<?>>();
+            types = new HashSet<>();
             exceptionsMap.put(m, types);
         }
         return types;

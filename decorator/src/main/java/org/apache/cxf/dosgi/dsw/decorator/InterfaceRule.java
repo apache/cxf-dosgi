@@ -36,8 +36,8 @@ public class InterfaceRule implements Rule {
 
     private final Bundle bundle;
     private final Pattern matchPattern;
-    private final Map<String, String> propMatches = new HashMap<String, String>();
-    private final Map<String, Object> addProps = new HashMap<String, Object>();
+    private final Map<String, String> propMatches = new HashMap<>();
+    private final Map<String, Object> addProps = new HashMap<>();
 
     public InterfaceRule(Bundle b, String im) {
         bundle = b;

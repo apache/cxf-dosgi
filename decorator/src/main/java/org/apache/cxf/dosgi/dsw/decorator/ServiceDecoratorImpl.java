@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public class ServiceDecoratorImpl implements ServiceDecorator {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceDecoratorImpl.class);
-    final List<Rule> decorations = new CopyOnWriteArrayList<Rule>();
+    final List<Rule> decorations = new CopyOnWriteArrayList<>();
 
     private DecorationParser parser;
 
@@ -77,7 +77,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         if (entries == null) {
             return Collections.emptyList();
         }
-        List<ServiceDecorationType> elements = new ArrayList<ServiceDecorationType>();
+        List<ServiceDecorationType> elements = new ArrayList<>();
         while (entries.hasMoreElements()) {
             try {
                 elements.addAll(parser.getDecorations((URL)entries.nextElement()));

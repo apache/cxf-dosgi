@@ -45,7 +45,7 @@ public class TaskResourceImpl implements TaskResource, IntentsProvider {
     Map<Integer, Task> taskMap;
 
     public TaskResourceImpl() {
-        taskMap = new HashMap<Integer, Task>();
+        taskMap = new HashMap<>();
         Task task = new Task();
         task.setId(1);
         task.setTitle("Buy some coffee");

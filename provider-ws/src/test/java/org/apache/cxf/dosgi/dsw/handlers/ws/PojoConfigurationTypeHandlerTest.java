@@ -64,7 +64,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         WsProvider handler = new WsProvider();
         handler.setIntentManager(intentManager);
         handler.setHttpServiceManager(dummyHttpServiceManager());
-        Map<String, Object> sd = new HashMap<String, Object>();
+        Map<String, Object> sd = new HashMap<>();
         String url = "http://somewhere:1234/blah";
         sd.put(RemoteConstants.ENDPOINT_ID, url);
         assertEquals(url, handler.getServerAddress(sd, String.class));
@@ -79,7 +79,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         WsProvider handler = new WsProvider();
         handler.setIntentManager(intentManager);
         handler.setHttpServiceManager(dummyHttpServiceManager());
-        Map<String, Object> sd = new HashMap<String, Object>();
+        Map<String, Object> sd = new HashMap<>();
         String url = "http://somewhere:29/boo";
         sd.put("org.apache.cxf.ws.address", url);
         assertEquals(url, handler.getServerAddress(sd, String.class));
@@ -90,7 +90,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         WsProvider handler = new WsProvider();
         handler.setIntentManager(intentManager);
         handler.setHttpServiceManager(dummyHttpServiceManager());
-        Map<String, Object> sd = new HashMap<String, Object>();
+        Map<String, Object> sd = new HashMap<>();
         assertEquals("/java/lang/String", handler.getServerAddress(sd, String.class));
     }
 
@@ -120,7 +120,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         Class<?>[] exportedInterfaces = new Class[] {Runnable.class};
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(RemoteConstants.ENDPOINT_ID, "http://google.de/");
         EndpointHelper.addObjectClass(props, exportedInterfaces);
         props.put(RemoteConstants.SERVICE_IMPORTED_CONFIGS, new String[] {"my.config"});
@@ -162,7 +162,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         Class<?>[] exportedInterface = new Class[] {String.class
         };
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         EndpointHelper.addObjectClass(props, exportedInterface);
         props.put(WsConstants.WS_ADDRESS_PROPERTY, "http://alternate_host:80/myString");
 
@@ -179,15 +179,15 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     public void testAddressing() {
         runAddressingTest(new HashMap<String, Object>(), "http://localhost:9000/java/lang/Runnable");
 
-        Map<String, Object> p1 = new HashMap<String, Object>();
+        Map<String, Object> p1 = new HashMap<>();
         p1.put("org.apache.cxf.ws.address", "http://somewhere");
         runAddressingTest(p1, "http://somewhere");
 
-        Map<String, Object> p3 = new HashMap<String, Object>();
+        Map<String, Object> p3 = new HashMap<>();
         p3.put("org.apache.cxf.ws.port", 65535);
         runAddressingTest(p3, "http://localhost:65535/java/lang/Runnable");
 
-        Map<String, Object> p4 = new HashMap<String, Object>();
+        Map<String, Object> p4 = new HashMap<>();
         p4.put("org.apache.cxf.ws.port", "8181");
         runAddressingTest(p4, "http://localhost:8181/java/lang/Runnable");
     }
@@ -247,7 +247,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         handler.activate(dswContext);
 
         Class[] exportedInterfaces = {Runnable.class};
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         EndpointHelper.addObjectClass(props, exportedInterfaces);
 
         Runnable myService = EasyMock.createMock(Runnable.class);
@@ -329,7 +329,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         pch.setHttpServiceManager(dummyHttpServiceManager());
         pch.activate(bc);
         Class<?>[] exportedInterfaces = new Class[] {String.class};
-        Map<String, Object> sd = new HashMap<String, Object>();
+        Map<String, Object> sd = new HashMap<>();
         sd.put(org.osgi.framework.Constants.SERVICE_ID, 42);
         EndpointHelper.addObjectClass(sd, exportedInterfaces);
         List<String> intents = Arrays.asList("my_intent", "your_intent");
@@ -356,7 +356,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         handler.activate(dswBC);
 
         Class<?>[] exportedInterfaces = new Class[] {MyJaxWsEchoService.class};
-        Map<String, Object> sd = new HashMap<String, Object>();
+        Map<String, Object> sd = new HashMap<>();
         sd.put(WsConstants.WS_ADDRESS_PROPERTY, "/somewhere");
         EndpointHelper.addObjectClass(sd, exportedInterfaces);
         BundleContext serviceBC = c.createMock(BundleContext.class);
@@ -384,7 +384,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         handler.setIntentManager(intentManager);
         handler.setHttpServiceManager(dummyHttpServiceManager());
         handler.activate(dswBC);
-        Map<String, Object> sd = new HashMap<String, Object>();
+        Map<String, Object> sd = new HashMap<>();
         sd.put(Constants.OBJECTCLASS, new String[]{MySimpleEchoService.class.getName()});
         sd.put(WsConstants.WS_ADDRESS_PROPERTY, "/somewhere_else");
         BundleContext serviceBC = c.createMock(BundleContext.class);

@@ -51,7 +51,7 @@ public class IntentManagerImpl implements IntentManager {
     static final Logger LOG = LoggerFactory.getLogger(IntentManagerImpl.class);
     private static final int DEFAULT_INTENT_TIMEOUT = 30000;
 
-    private final Map<String, Object> intentMap = new HashMap<String, Object>();
+    private final Map<String, Object> intentMap = new HashMap<>();
     private final long maxIntentWaitTime = DEFAULT_INTENT_TIMEOUT;
     private ServiceTracker<Object, Object> tracker;
 
@@ -100,7 +100,7 @@ public class IntentManagerImpl implements IntentManager {
     @SuppressWarnings("unchecked")
     public synchronized List<Object> getRequiredIntents(Set<String> requiredIntents) {
         String[] intentNames = assertAllIntentsSupported(requiredIntents);
-        List<Object> intents = new ArrayList<Object>();
+        List<Object> intents = new ArrayList<>();
         for (String intentName : intentNames) {
             Object intent = intentMap.get(intentName);
             if (intent instanceof Callable<?>) {
@@ -139,7 +139,7 @@ public class IntentManagerImpl implements IntentManager {
 
     @Override
     public <T> List<T> getIntents(Class<? extends T> type, List<Object> intents) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (Object intent : intents) {
             if (type.isInstance(intent)) {
                 result.add(type.cast(intent));
@@ -182,7 +182,7 @@ public class IntentManagerImpl implements IntentManager {
     }
 
     private synchronized Set<String> getMissingIntents(Collection<String> requiredIntents) {
-        Set<String> unsupportedIntents = new HashSet<String>();
+        Set<String> unsupportedIntents = new HashSet<>();
         unsupportedIntents.clear();
         for (String ri : requiredIntents) {
             if (!intentMap.containsKey(ri)) {
@@ -194,7 +194,7 @@ public class IntentManagerImpl implements IntentManager {
 
     @Override
     public Set<String> getExported(Map<String, Object> sd) {
-        Set<String> allIntents = new HashSet<String>();
+        Set<String> allIntents = new HashSet<>();
         Collection<String> intents = PropertyHelper
             .getMultiValueProperty(sd.get(RemoteConstants.SERVICE_EXPORTED_INTENTS));
         allIntents.addAll(parseIntents(intents));
@@ -226,11 +226,11 @@ public class IntentManagerImpl implements IntentManager {
     @Override
     public Set<String> getImported(Map<String, Object> sd) {
         Collection<String> intents = PropertyHelper.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_INTENTS));
-        return new HashSet<String>(intents);
+        return new HashSet<>(intents);
     }
 
     private static Collection<String> parseIntents(Collection<String> intents) {
-        List<String> parsed = new ArrayList<String>();
+        List<String> parsed = new ArrayList<>();
         for (String intent : intents) {
             parsed.addAll(Arrays.asList(intent.split("[ ]")));
         }

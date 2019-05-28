@@ -43,7 +43,7 @@ public class PropertyHelperTest extends TestCase {
     }
 
     public void testMultiValuePropertyAsCollection() {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("1");
         list.add("2");
         list.add("3");
@@ -55,7 +55,7 @@ public class PropertyHelperTest extends TestCase {
     }
 
     public void testGetProperty() {
-        Map<String, Object> p = new HashMap<String, Object>();
+        Map<String, Object> p = new HashMap<>();
         p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
         p.put("notAString", new Object());
         p.put(org.osgi.framework.Constants.OBJECTCLASS, new String[]{"my.class"});

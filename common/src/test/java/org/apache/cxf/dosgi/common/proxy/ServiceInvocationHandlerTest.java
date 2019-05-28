@@ -33,7 +33,7 @@ import org.junit.Test;
 
 public class ServiceInvocationHandlerTest {
 
-    private static final Map<String, Method> OBJECT_METHODS = new HashMap<String, Method>(); {
+    private static final Map<String, Method> OBJECT_METHODS = new HashMap<>(); {
         for (Method m : Object.class.getMethods()) {
             OBJECT_METHODS.put(m.getName(), m);
         }
@@ -48,7 +48,7 @@ public class ServiceInvocationHandlerTest {
 
     @Test
     public void testInvokeObjectMethod() throws Throwable {
-        final List<String> called = new ArrayList<String>();
+        final List<String> called = new ArrayList<>();
         ServiceInvocationHandler sih = new ServiceInvocationHandler("hi", String.class) {
             @Override
             public boolean equals(Object obj) {

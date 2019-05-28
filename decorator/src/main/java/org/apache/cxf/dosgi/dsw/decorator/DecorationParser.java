@@ -59,7 +59,7 @@ class DecorationParser {
 
     List<ServiceDecorationType> getDecorations(URL resourceURL) throws JAXBException, IOException {
         if (resourceURL == null || !decorationType(resourceURL)) {
-            return new ArrayList<ServiceDecorationType>();
+            return new ArrayList<>();
         }
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(schema);

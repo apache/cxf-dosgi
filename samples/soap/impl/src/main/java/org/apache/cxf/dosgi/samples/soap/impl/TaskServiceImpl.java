@@ -42,7 +42,7 @@ public class TaskServiceImpl implements TaskService {
     Map<Integer, Task> taskMap;
 
     public TaskServiceImpl() {
-        taskMap = new HashMap<Integer, Task>();
+        taskMap = new HashMap<>();
         Task task = new Task();
         task.setId(1);
         task.setTitle("Buy some coffee");
@@ -68,7 +68,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Collection<Task> getAll() {
         // taskMap.values is not serializable
-        return new ArrayList<Task>(taskMap.values());
+        return new ArrayList<>(taskMap.values());
     }
 
     @Override

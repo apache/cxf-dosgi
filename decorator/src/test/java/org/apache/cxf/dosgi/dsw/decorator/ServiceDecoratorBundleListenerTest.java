@@ -37,7 +37,7 @@ public class ServiceDecoratorBundleListenerTest {
         BundleContext bc = EasyMock.createMock(BundleContext.class);
         EasyMock.replay(bc);
 
-        final List<String> called = new ArrayList<String>();
+        final List<String> called = new ArrayList<>();
         ServiceDecoratorImpl serviceDecorator = new ServiceDecoratorImpl() {
             @Override
             void addDecorations(Bundle bundle) {

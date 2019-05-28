@@ -31,11 +31,11 @@ public class CustomIntentActivator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) {
-        Dictionary<String, String> props = new Hashtable<String, String>();
+        Dictionary<String, String> props = new Hashtable<>();
         props.put("org.apache.cxf.dosgi.IntentName", "myIntent");
         context.registerService(CustomFeatureProvider.class, new CustomFeatureProvider(), props);
 
-        Dictionary<String, String> props2 = new Hashtable<String, String>();
+        Dictionary<String, String> props2 = new Hashtable<>();
         props2.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, "org.apache.cxf.ws");
         props2.put("org.apache.cxf.ws.address", "/taskservice");
         props2.put(RemoteConstants.SERVICE_EXPORTED_INTERFACES, "*");

@@ -74,7 +74,7 @@ public class HttpServiceManager {
 
     public void initFromConfig(Dictionary<String, Object> config) {
         if (config == null) {
-            config = new Hashtable<String, Object>();
+            config = new Hashtable<>();
         }
         this.httpBase = getWithDefault(config.get(KEY_HTTP_BASE), "http://localhost:8181");
         this.cxfServletAlias = getWithDefault(config.get(KEY_CXF_SERVLET_ALIAS), "/cxf");

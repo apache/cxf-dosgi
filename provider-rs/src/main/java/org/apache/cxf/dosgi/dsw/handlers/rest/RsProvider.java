@@ -167,7 +167,7 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
             factory.setBindingConfig(binding);
         }
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         for (Object intent : intents) {
             if (isProvider(intent)) {
                 providers.add(intent);
