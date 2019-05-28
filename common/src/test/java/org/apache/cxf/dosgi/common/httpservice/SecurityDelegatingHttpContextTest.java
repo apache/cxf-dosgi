@@ -68,7 +68,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
 
     public void testFilterRequired() throws Exception {
         // Mock up the service references
-        ServiceReference[] serviceReferences = new ServiceReference[] {};
+        ServiceReference[] serviceReferences = {};
 
         // Mock up the bundle context
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
@@ -100,9 +100,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
         // Mock up the service references
         ServiceReference filterReference = EasyMock.createNiceMock(ServiceReference.class);
         EasyMock.replay(filterReference);
-        ServiceReference[] serviceReferences = new ServiceReference[] {
-            filterReference
-        };
+        ServiceReference[] serviceReferences = {filterReference};
 
         // Mock up the bundle context
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
@@ -136,9 +134,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
         // Mock up the service references
         ServiceReference filterReference = EasyMock.createNiceMock(ServiceReference.class);
         EasyMock.replay(filterReference);
-        ServiceReference[] serviceReferences = new ServiceReference[] {
-            filterReference, filterReference
-        };
+        ServiceReference[] serviceReferences = {filterReference, filterReference};
 
         // Mock up the bundle context
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
@@ -173,9 +169,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
         // Mock up the service references
         ServiceReference filterReference = EasyMock.createNiceMock(ServiceReference.class);
         EasyMock.replay(filterReference);
-        ServiceReference[] serviceReferences = new ServiceReference[] {
-            filterReference
-        };
+        ServiceReference[] serviceReferences = {filterReference};
 
         // Mock up the bundle context
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
