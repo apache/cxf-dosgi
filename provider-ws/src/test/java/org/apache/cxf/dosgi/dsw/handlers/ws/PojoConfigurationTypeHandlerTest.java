@@ -344,9 +344,9 @@ public class PojoConfigurationTypeHandlerTest {
         sd.put(org.osgi.framework.Constants.SERVICE_ID, 42);
         EndpointHelper.addObjectClass(sd, exportedInterfaces);
         List<String> intents = Arrays.asList("my_intent", "your_intent");
-        EndpointDescription epd = pch.createEndpointDesc(sd, 
-                                                         new String[] {"org.apache.cxf.ws"}, 
-                                                         "http://localhost:12345", 
+        EndpointDescription epd = pch.createEndpointDesc(sd,
+                                                         new String[] {"org.apache.cxf.ws"},
+                                                         "http://localhost:12345",
                                                          intents);
 
         assertEquals("http://localhost:12345", epd.getId());

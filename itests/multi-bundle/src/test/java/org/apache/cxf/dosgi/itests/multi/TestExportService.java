@@ -82,7 +82,7 @@ public class TestExportService extends AbstractDosgiTest {
         waitWebPage(REST_SERVICE_URI);
         final WebClient client = WebClient.create(REST_SERVICE_URI + "/1");
         client.accept(MediaType.APPLICATION_XML_TYPE);
-        org.apache.cxf.dosgi.samples.rest.Task task = tryTo("Call REST Resource", 
+        org.apache.cxf.dosgi.samples.rest.Task task = tryTo("Call REST Resource",
                                                             new Callable<org.apache.cxf.dosgi.samples.rest.Task>() {
             @Override
             public org.apache.cxf.dosgi.samples.rest.Task call() {

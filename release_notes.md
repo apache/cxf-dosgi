@@ -30,7 +30,7 @@ Release Notes - CXF Distributed OSGi
 * New Feature
     * [DOSGI-261] - Sample for rest with jackson provider
     * [DOSGI-266] - Support for org.apache.cxf.jaxrs.ext.ContextProvider
-    * [DOSGI-270] - Create sample for swagger documentation 
+    * [DOSGI-270] - Create sample for swagger documentation
 
 
 2.1.0
@@ -42,7 +42,7 @@ Release Notes - CXF Distributed OSGi
 * Improvement
     * [DOSGI-251] - Allow to export services with less service properties
     * [DOSGI-256] - ContextResolver intents should be registered as providers
-    * [DOSGI-257] - Allow to set bus properties 
+    * [DOSGI-257] - Allow to set bus properties
 
 
 2.0.0
@@ -91,7 +91,7 @@ Release Notes - CXF Distributed OSGi
     * [DOSGI-211] - Support SOAP over JMS in DOSGI
 
 * Task
-    * [DOSGI-194] - Decide how DOSGi needs to handle service.exported.interfaces with multiple values 
+    * [DOSGI-194] - Decide how DOSGi needs to handle service.exported.interfaces with multiple values
 
 
 1.8.0
@@ -108,7 +108,7 @@ Release Notes - CXF Distributed OSGi
 
 * New Feature
     * [DOSGI-230] - Create TCP provider
-    * [DOSGI-231] - Create ExportPolicy SPI    
+    * [DOSGI-231] - Create ExportPolicy SPI
 
 
 1.7.0
@@ -120,7 +120,7 @@ Release Notes - CXF Distributed OSGi
     * [DOSGI-216] - ZookeeperStarter restarts ZooKeeper too easily
 
 * Improvement
-    * [DOSGI-220] - Upgrade to cxf 3.1.1 
+    * [DOSGI-220] - Upgrade to cxf 3.1.1
 
 
 1.6.0
@@ -198,7 +198,7 @@ Release Notes - CXF Distributed OSGi - Version 1.5.0
     * [DOSGI-10] - Spring schema handling (intents) doesn't work properly
     * for the single-bundle case
     * [DOSGI-18] - RESTful Proxies can not be created in multibundle DOSGI
-    * distributions 
+    * distributions
     * [DOSGI-63] - The discovery can be used be used before the connection
     * to the server is completely established
     * [DOSGI-69] - CXF-DOSGi requires internet access when reading XML
@@ -208,7 +208,7 @@ Release Notes - CXF Distributed OSGi - Version 1.5.0
     * stop
     * [DOSGI-110] - Unable to export multiple services
     * [DOSGI-111] - DOSGi bundle attempts to load WSDL using wrong bundle in
-    * WSDL-first configuration 
+    * WSDL-first configuration
     * [DOSGI-113] - Integration with pax-logging not possible
     * [DOSGI-114] - RemoteServiceAdmin is not available warnings in DOSGi
     * 1.3
@@ -228,7 +228,7 @@ Release Notes - CXF Distributed OSGi - Version 1.5.0
     * an Endpoint is already imported
     * [DOSGI-142] - Upgrade CXF to 2.7.0
     * [DOSGI-145] - Multiple services using HTTP Service and published from
-    * the same bundle do not work 
+    * the same bundle do not work
     * [DOSGI-150] - Update to Java 1.6
     * [DOSGI-153] - Error starting greeter sample in karaf 2.3.0 in aegis
     * setup: ExceptionInInitializerError ... failed to create an

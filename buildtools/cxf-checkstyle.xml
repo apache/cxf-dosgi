@@ -22,7 +22,7 @@
 	"http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 
 <!--
-	Checks to make sure the code meets the CXF coding guidelines which 
+	Checks to make sure the code meets the CXF coding guidelines which
 	are similar to the Sun guidelines at:
 	http://java.sun.com/docs/codeconv/index.html
 
@@ -210,7 +210,7 @@
 		<module name="VisibilityModifier">
 			<property name="protectedAllowed" value="true" />
 			<property name="packageAllowed" value="true" />
-			<!-- this is needed for the resource injection unit tests.  It will removed 
+			<!-- this is needed for the resource injection unit tests.  It will removed
 				when private member inject is supported.
 			-->
 			<property name="publicMemberPattern" value="resource[12].*" />
@@ -231,7 +231,7 @@
 
 		<!-- Miscellaneous other checks.                   -->
 		<!-- See http://checkstyle.sf.net/config_misc.html -->
-		<!-- 
+		<!--
 			<module name="ArrayTypeStyle"/>
 			<module name="FinalParameters"/>
 		-->

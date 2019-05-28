@@ -37,7 +37,7 @@
         <topDirectoryLocation>../..</topDirectoryLocation>
     </properties>
 
-    <!-- 
+    <!--
         When changing code make sure to run the distro before testing
         or you will be testing the old code.
      -->
@@ -89,12 +89,12 @@
             <version>2.6.1</version>
         </dependency>
 
-<!-- 
+        <!--
         <dependency>
             <groupId>org.eclipse.platform</groupId>
             <artifactId>org.eclipse.osgi</artifactId>
         </dependency>
-         --> 
+         -->
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>

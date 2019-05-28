@@ -23,7 +23,7 @@ import org.osgi.framework.BundleListener;
 
 public class ServiceDecoratorBundleListener implements BundleListener {
     /**
-     * 
+     *
      */
     private final ServiceDecoratorImpl serviceDecorator;
 

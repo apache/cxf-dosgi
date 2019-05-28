@@ -7,7 +7,7 @@ The features module provides Apache Karaf features for the examples. So using ka
 
 The SOAP example also provides a bndrun file for bndtools that allows to directly start/debug the service from Eclipse and export it into a runnable jar.
 
-## Checkout and Build 
+## Checkout and Build
 
 ```
 git clone git@github.com:apache/cxf-dosgi.git
@@ -28,11 +28,11 @@ To use the bndrun files you need the [bndtools](http://bndtools.org/) eclipse ex
 ## Preparing Apache Karaf
 
 [Download Apache karaf 4.x](http://karaf.apache.org/download.html). Extract the archive and
-start Apache Karaf using `bin/karaf`  
+start Apache Karaf using `bin/karaf`
 
 ## Examples
 
 * [soap - Publish and Consume JAXWS SOAP services](soap)
-* [rest - Publish and Consume REST services] (rest) 
+* [rest - Publish and Consume REST services] (rest)
 * [security-filter - Custom HTTP filter] (security filter)
 * [ssl - SSL support and client cert based auth] (ssl)

@@ -34,7 +34,7 @@ public final class WsdlSupport {
     }
 
     public static void setWsdlProperties(AbstractWSDLBasedEndpointFactory factory, //
-                                         BundleContext context, // 
+                                         BundleContext context, //
                                          Map<String, Object> sd) {
         String location = PropertyHelper.getProperty(sd, WsConstants.WS_WSDL_LOCATION);
         if (location != null) {
@@ -42,7 +42,7 @@ public final class WsdlSupport {
             if (wsdlURL != null) {
                 factory.setWsdlURL(wsdlURL.toString());
             }
-            QName serviceName = getServiceQName(null, sd, 
+            QName serviceName = getServiceQName(null, sd,
                                                 WsConstants.WS_WSDL_SERVICE_NAMESPACE,
                                                 WsConstants.WS_WSDL_SERVICE_NAME);
             if (serviceName != null) {

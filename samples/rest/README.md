@@ -6,12 +6,12 @@ The API module defines the TaskResource interface which is annotated using JAXRS
 
 The impl module implements the TaskService using a simple HashMap internally. It allows to manage Task objects which represent items of a to do list.
 
- 
+
 ## Installation
 
 Unpack karaf 4 into a server and client directory.
 
-### Install server 
+### Install server
 
 Start the server karaf
 
@@ -33,7 +33,7 @@ Check that task was added
 curl --header "Accept:application/json" http://localhost:8181/cxf/tasks/3
 ```
 
-### Install client 
+### Install client
 
 Start the client karaf
 
@@ -68,7 +68,7 @@ endpoint http://localhost:8181/cxf/tasks
 
 This installs the CXF logging feature and adds the logging intent to the
 rest sample component. The command endpoint should then show that the intent
-logging is applied. 
+logging is applied.
 
 Any http requests to the service should now show as a logging message in the
 karaf log.

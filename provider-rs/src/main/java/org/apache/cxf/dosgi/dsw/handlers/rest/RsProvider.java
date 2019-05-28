@@ -108,7 +108,7 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
     private Object createJaxrsProxy(String address,
                                       Class<?> iClass,
                                       ClassLoader loader,
-                                      EndpointDescription endpoint, 
+                                      EndpointDescription endpoint,
                                       List<Object> intents) {
         JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
         factory.setAddress(address);
@@ -144,7 +144,7 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
         Bus bus = createBus(sid, callingContext, contextRoot, endpointProps);
         LOG.info("Creating JAXRS endpoint for " + iClass.getName() + " with address " + address);
 
-        JAXRSServerFactoryBean factory = createServerFactory(callingContext, endpointProps, 
+        JAXRSServerFactoryBean factory = createServerFactory(callingContext, endpointProps,
                                                              iClass, serviceBean, address, bus);
         applyIntents(intents, factory);
         String completeEndpointAddress = httpServiceManager.getAbsoluteAddress(contextRoot, address);
@@ -178,11 +178,11 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
 
     private boolean isProvider(Object intent) {
         return intent.getClass().getAnnotation(Provider.class) != null //
-            || (intent instanceof ExceptionMapper) // 
+            || (intent instanceof ExceptionMapper) //
             || (intent instanceof MessageBodyReader) //
             || (intent instanceof MessageBodyWriter) //
             || (intent instanceof ContextResolver) //
-            || (intent instanceof ContextProvider); 
+            || (intent instanceof ContextProvider);
     }
 
     private Endpoint createServerFromFactory(JAXRSServerFactoryBean factory,

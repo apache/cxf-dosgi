@@ -7,7 +7,7 @@ CXF DOSGi allows to easily publish and consume SOAP and REST services without us
 ## Modules
 
 * [common - Common services like intents and HTTPService support](common).
-* [provider-ws - SOAP transport](provider-ws) 
+* [provider-ws - SOAP transport](provider-ws)
 * [provider-rs - REST transport](provider-rs)
 * [decorator - Support for exporting existing services](decorator)
 
@@ -16,7 +16,7 @@ CXF DOSGi allows to easily publish and consume SOAP and REST services without us
 
 ## Intents
 
-Intents allow a service to leverage CXF extensions like features. A service can list the named intents it requires. 
+Intents allow a service to leverage CXF extensions like features. A service can list the named intents it requires.
 It will then only be exported / imported once all the intents are available. This allows for example security restrictions or logging.
 For more information see [common module](common).
 

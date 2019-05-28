@@ -13,7 +13,7 @@ We want the karaf HttpService to be secured by https and require a client certif
 # Keystore generation
 
 * Create client and server keys.
-* Add client certificate to server 
+* Add client certificate to server
 
 ```
 mkdir -p etc/keystores
@@ -35,11 +35,11 @@ keytool -importcert -storepass password -keystore etc/keystores/client.jks -alia
 
 ## Installation
 
-- Copy the server side ssl config org.apache.cxf.http.jetty-ssl.cfg into etc 
+- Copy the server side ssl config org.apache.cxf.http.jetty-ssl.cfg into etc
 - Install the CXF DOSGi features
 - Install the example
 
-``` 
+```
 feature:repo-add cxf-dosgi-samples 2.0.0
 feature:install cxf-dosgi-sample-soap-impl cxf-dosgi-sample-soap-client
 install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-ssl-intent/2.0.0

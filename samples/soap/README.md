@@ -7,12 +7,12 @@ we want to create a JAXWS based SOAP service.
 
 The impl module implements the TaskService using a simple HashMap internally. It allows to manage Task objects which represent items of a to do list.
 
- 
+
 ## Installation
 
 Unpack karaf 4 into a server and client directory.
 
-### Install server 
+### Install server
 
 Start the server karaf
 
@@ -24,7 +24,7 @@ rsa:endpoints
 
 The last command should show one endpoint with a URI as id. You should be able to open the url in the browser.
 
-### Install client 
+### Install client
 
 Start the client karaf
 

@@ -65,7 +65,7 @@ public class RsProviderTest {
             Task task1 = WebClient.create(serviceAddress).path("/task").get(Task.class);
             Assert.assertEquals("test", task1.getName());
 
-            TaskService proxy = (TaskService)rsProvider.importEndpoint(TaskService.class.getClassLoader(), 
+            TaskService proxy = (TaskService)rsProvider.importEndpoint(TaskService.class.getClassLoader(),
                                                                        callingContext, ifaces, endpoint.description());
             Task task = proxy.getTask();
             Assert.assertEquals("test", task.getName());

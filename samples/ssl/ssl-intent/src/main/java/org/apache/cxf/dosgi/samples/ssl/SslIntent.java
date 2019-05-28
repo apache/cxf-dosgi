@@ -56,7 +56,7 @@ public class SslIntent implements Callable<List<Object>> {
         HttpConduitConfig conduitConfig = new HttpConduitConfig();
         TLSClientParameters tls = new TLSClientParameters();
         String karafHome = System.getProperty("karaf.home");
-        tls.setKeyManagers(keyManager(keystore(karafHome + "/etc/keystores/client.jks", CLIENT_PASSWORD), 
+        tls.setKeyManagers(keyManager(keystore(karafHome + "/etc/keystores/client.jks", CLIENT_PASSWORD),
                                       CLIENT_PASSWORD));
         tls.setTrustManagers(trustManager(keystore(karafHome + "/etc/keystores/client.jks", CLIENT_PASSWORD)));
         //tls.setTrustManagers(new TrustManager[]{new DefaultTrustManager()});

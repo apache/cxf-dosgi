@@ -2,7 +2,7 @@
 
 ## Apache karaf features
 
-Installing CXF DOSGi in apache karaf is very easy. 
+Installing CXF DOSGi in apache karaf is very easy.
 
 ```
 feature:repo-add cxf-dosgi 2.0.0
@@ -19,13 +19,13 @@ In CXF-DOSGi we provide all necessary bundles in the [repository](repository) mo
 
 Any example for this is the [samples/repository](../samples/repository) module. This pom refers to the Aries RSA and CXF DOSGi repository poms and adds other bundles needed to create a complete OSGi deployment.
 
-The [SOAP sample](../samples/soap) contains a bndrun file to describe the setup of the SOAP sample. 
+The [SOAP sample](../samples/soap) contains a bndrun file to describe the setup of the SOAP sample.
 
 ## Multi-Bundle
 
 Provides an archive of the dependencies of CXF DOSGi as well as configs for felix and equinox to start the bundles.
 
-This distribution is deprecated as it is quite tedious to create an automated build for your own application based on the archive. 
+This distribution is deprecated as it is quite tedious to create an automated build for your own application based on the archive.
 
 ## Source
 

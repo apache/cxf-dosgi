@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
 @Component(configurationPid = "cxf-dsw", property = //
 {//
  REMOTE_CONFIGS_SUPPORTED + "=" + WsConstants.WS_CONFIG_TYPE,
- REMOTE_INTENTS_SUPPORTED + "=" 
+ REMOTE_INTENTS_SUPPORTED + "="
 })
 public class WsProvider extends BaseDistributionProvider implements DistributionProvider {
 
@@ -137,7 +137,7 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
     }
 
     private BindingConfiguration copy(BindingConfiguration bindingCfg) {
-        return bindingCfg instanceof SoapBindingConfiguration 
+        return bindingCfg instanceof SoapBindingConfiguration
             ? copy((SoapBindingConfiguration)bindingCfg) : bindingCfg;
     }
 

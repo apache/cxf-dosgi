@@ -108,7 +108,7 @@ public class IntentManagerImpl implements IntentManager {
                     List<Object> curIntents = ((Callable<List<Object>>)intent).call();
                     intents.addAll(curIntents);
                 } catch (Exception e) {
-                    throw new RuntimeException(e); 
+                    throw new RuntimeException(e);
                 }
             } else if (intent instanceof IntentsProvider) {
                 try {
@@ -116,7 +116,7 @@ public class IntentManagerImpl implements IntentManager {
                     List<?> curIntents = provider.getIntents();
                     intents.addAll(curIntents);
                 } catch (Exception e) {
-                    throw new RuntimeException(e); 
+                    throw new RuntimeException(e);
                 }
             } else {
                 intents.add(intent);

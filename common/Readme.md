@@ -7,7 +7,7 @@ Handles communication with the HttpService and Intents.
 In case a custom http context is used the providers will register a custom servlet.
 Besides this the HttpServiceManager also handles the creation of a default address if none is given and the conversion from the relative address specified on the service property to a fully qualified address.
 
-Config pid `org.apache.cxf.dosgi.http` 
+Config pid `org.apache.cxf.dosgi.http`
 
 Key             | Default | Description
 ----------------|---------|------------
