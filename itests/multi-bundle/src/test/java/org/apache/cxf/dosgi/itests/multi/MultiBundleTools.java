@@ -19,7 +19,6 @@
 package org.apache.cxf.dosgi.itests.multi;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,42 +35,33 @@ public final class MultiBundleTools {
     private static Collection<String> getDistroBundles(File distroDir) {
         List<String> bundles = new ArrayList<>();
         File bundlesDir = new File(distroDir, "bundle");
-        File[] files = bundlesDir.listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(".jar");
-                }
+        for (File file : bundlesDir.listFiles()) {
+            if (file.getName().toLowerCase().endsWith(".jar")) {
+                bundles.add(file.toURI().toASCIIString());
             }
-        );
-        for (File file : files) {
-            bundles.add(file.toURI().toASCIIString());
         }
         return bundles;
     }
 
     private static File getRootDirectory() {
-        String resourceName = "/" + MultiBundleTools.class.getName().replace('.', '/') + ".class";
-        URL curURL = MultiBundleTools.class.getResource(resourceName);
-        File curFile = new File(curURL.getFile());
-        String curString = curFile.getAbsolutePath();
-        File curBase = new File(curString.substring(0, curString.length() - resourceName.length()));
-        return curBase.getParentFile().getParentFile();
+        URL url = MultiBundleTools.class.getResource("/"); // get ${root}/target/test-classes
+        File dir = new File(url.getFile()).getAbsoluteFile();
+        return dir.getParentFile().getParentFile();
     }
 
     public static Option getDistro() {
-        File root = getRootDirectory();
-        File depRoot = new File(root, "target/dependency");
-        File distroDir = depRoot.listFiles()[0];
-        Collection<String> bundles = getDistroBundles(distroDir);
-        List<Option> opts = new ArrayList<Option>();
-        // Make sure annotation bundle is loaded first to make sure it is used for resolution
-        for (String bundleUri : bundles) {
-            if (bundleUri.contains("javax.annotation")) {
-                opts.add(CoreOptions.bundle(bundleUri));
-            }
-        }
-        for (String bundleUri : bundles) {
-            if (!bundleUri.contains("javax.annotation")) {
-                opts.add(CoreOptions.bundle(bundleUri));
+        File rootDir = getRootDirectory();
+        File depsDir = new File(rootDir, "target/dependency");
+        File distroDir = depsDir.listFiles()[0];
+        Collection<String> bundleUris = getDistroBundles(distroDir);
+        List<Option> opts = new ArrayList<>();
+        for (String uri : bundleUris) {
+            Option opt = CoreOptions.bundle(uri);
+            // Make sure annotation bundle is loaded first to make sure it is used for resolution
+            if (uri.contains("javax.annotation")) {
+                opts.add(0, opt);
+            } else {
+                opts.add(opt);
             }
         }
         return CoreOptions.composite(opts.toArray(new Option[opts.size()]));
