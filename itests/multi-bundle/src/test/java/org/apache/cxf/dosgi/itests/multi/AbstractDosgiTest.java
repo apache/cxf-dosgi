@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.itests.multi;
 
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemPackage;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.cm.ConfigurationAdminOptions.newConfiguration;
 
@@ -288,6 +289,16 @@ public class AbstractDosgiTest {
     protected static Option basicTestOptions() throws Exception {
         return composite(CoreOptions.junitBundles(), //
                          MultiBundleTools.getDistro(), //
+                         // javax.xml.soap is imported since CXF 3.3.0 (CXF-7872, commit a95593cf),
+                         // so we must add it to mutli-bundle distro, but then we get a
+                         // conflict with the one exported by framework system bundle (version $JDK)
+                         // in this test, and removing a system bundle is a mess, so instead we export
+                         // it again with our desired version number so everyone is happy
+                         systemPackage("javax.xml.soap;version=1.4.0"),
+                         // avoids "ClassNotFoundException: org.glassfish.jersey.internal.RuntimeDelegateImpl"
+                         systemProperty("javax.ws.rs.ext.RuntimeDelegate")
+                             .value("org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl"),
+
                          mavenBundle("org.ops4j.pax.tinybundles", "tinybundles").versionAsInProject(),
                          mavenBundle("biz.aQute.bnd", "biz.aQute.bndlib").versionAsInProject(),
                          
