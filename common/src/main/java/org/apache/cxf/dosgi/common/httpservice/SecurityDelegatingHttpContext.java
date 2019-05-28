@@ -64,14 +64,17 @@ class SecurityDelegatingHttpContext implements HttpContext {
         requireFilter = Boolean.TRUE.toString().equalsIgnoreCase(bundleContext.getProperty(FILTER_REQUIRED_PROP));
     }
 
+    @Override
     public String getMimeType(String name) {
         return delegate.getMimeType(name);
     }
 
+    @Override
     public URL getResource(String name) {
         return delegate.getResource(name);
     }
 
+    @Override
     @SuppressWarnings({
      "unchecked", "rawtypes"
     })
@@ -123,6 +126,7 @@ class Chain implements FilterChain {
         this.filters = filters;
     }
 
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
         if (current < filters.length && !response.isCommitted()) {
             Filter filter = filters[current++];

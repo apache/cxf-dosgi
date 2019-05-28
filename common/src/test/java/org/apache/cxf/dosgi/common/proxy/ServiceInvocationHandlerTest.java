@@ -50,16 +50,19 @@ public class ServiceInvocationHandlerTest {
     public void testInvokeObjectMethod() throws Throwable {
         final List<String> called = new ArrayList<String>();
         ServiceInvocationHandler sih = new ServiceInvocationHandler("hi", String.class) {
+            @Override
             public boolean equals(Object obj) {
                 called.add("equals");
                 return super.equals(obj);
             }
 
+            @Override
             public int hashCode() {
                 called.add("hashCode");
                 return super.hashCode();
             }
 
+            @Override
             public String toString() {
                 called.add("toString");
                 return "somestring";

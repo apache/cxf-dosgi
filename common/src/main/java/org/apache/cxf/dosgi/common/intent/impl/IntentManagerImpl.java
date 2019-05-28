@@ -96,6 +96,7 @@ public class IntentManagerImpl implements IntentManager {
         intentMap.remove(intentName);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public synchronized List<Object> getRequiredIntents(Set<String> requiredIntents) {
         String[] intentNames = assertAllIntentsSupported(requiredIntents);
@@ -124,6 +125,7 @@ public class IntentManagerImpl implements IntentManager {
         return intents;
     }
 
+    @Override
     public <T> T getIntent(Class<? extends T> type, List<Object> intents) {
         List<T> selectedIntents = getIntents(type, intents);
         if (selectedIntents.isEmpty()) {
@@ -135,6 +137,7 @@ public class IntentManagerImpl implements IntentManager {
         return (T)selectedIntents.iterator().next();
     }
 
+    @Override
     public <T> List<T> getIntents(Class<? extends T> type, List<Object> intents) {
         List<T> result = new ArrayList<T>();
         for (Object intent : intents) {
@@ -189,6 +192,7 @@ public class IntentManagerImpl implements IntentManager {
         return unsupportedIntents;
     }
 
+    @Override
     public Set<String> getExported(Map<String, Object> sd) {
         Set<String> allIntents = new HashSet<String>();
         Collection<String> intents = PropertyHelper
@@ -200,6 +204,7 @@ public class IntentManagerImpl implements IntentManager {
         return allIntents;
     }
 
+    @Override
     public List<Object> getIntentsFromService(Object serviceBean) {
         List<Object> intents = new ArrayList<>();
         if (serviceBean instanceof IntentsProvider) {
@@ -218,6 +223,7 @@ public class IntentManagerImpl implements IntentManager {
         return intents;
     }
 
+    @Override
     public Set<String> getImported(Map<String, Object> sd) {
         Collection<String> intents = PropertyHelper.getMultiValueProperty(sd.get(RemoteConstants.SERVICE_INTENTS));
         return new HashSet<String>(intents);

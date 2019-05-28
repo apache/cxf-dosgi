@@ -37,6 +37,7 @@ public class ServiceInvocationHandler implements InvocationHandler {
 
     }
 
+    @Override
     public Object invoke(Object proxy, final Method m, Object[] params) throws Throwable {
         if (OBJECT_METHODS.contains(m)) {
             if (m.getName().equals("equals")) {
@@ -50,6 +51,7 @@ public class ServiceInvocationHandler implements InvocationHandler {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             final Object[] paramsFinal = params;
             return AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                @Override
                 public Object run() throws Exception {
                     return m.invoke(serviceObject, paramsFinal);
                 }

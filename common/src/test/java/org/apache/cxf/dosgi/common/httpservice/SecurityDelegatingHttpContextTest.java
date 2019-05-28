@@ -50,6 +50,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
     protected String mimeType;
     protected URL url; // does not need to exist
 
+    @Override
     public void setUp() throws Exception {
         mimeType = "text/xml";
         url = new URL("file:test.xml"); // does not need to exist
@@ -212,12 +213,15 @@ class CommitResponseFilter implements Filter {
 
     boolean called;
 
+    @Override
     public void init(FilterConfig filterConfig) {
     }
 
+    @Override
     public void destroy() {
     }
 
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws java.io.IOException {
         called = true;
@@ -229,12 +233,15 @@ class DoNothingFilter implements Filter {
 
     boolean called;
 
+    @Override
     public void init(FilterConfig filterConfig) {
     }
 
+    @Override
     public void destroy() {
     }
 
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws java.io.IOException, javax.servlet.ServletException {
         called = true;
@@ -246,12 +253,15 @@ class AccessDeniedFilter implements Filter {
 
     boolean called;
 
+    @Override
     public void init(FilterConfig filterConfig) {
     }
 
+    @Override
     public void destroy() {
     }
 
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws java.io.IOException {
         called = true;

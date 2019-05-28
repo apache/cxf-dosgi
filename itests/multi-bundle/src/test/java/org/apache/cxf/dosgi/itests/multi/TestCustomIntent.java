@@ -57,6 +57,7 @@ public class TestCustomIntent extends AbstractDosgiTest {
         String serviceUri = HTTP_BASE_URI + "/cxf/taskservice";
         final TaskService taskService = TaskServiceProxyFactory.create(serviceUri);
         Task task = tryTo("Call TaskService", new Callable<Task>() {
+            @Override
             public Task call() {
                 return taskService.get(1);
             }

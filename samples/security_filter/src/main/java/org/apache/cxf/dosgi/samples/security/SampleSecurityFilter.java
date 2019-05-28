@@ -50,10 +50,12 @@ public class SampleSecurityFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleSecurityFilter.class);
 
+    @Override
     public void destroy() {
         LOG.info("destroy()");
     }
 
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
         if ("secure".equals(((HttpServletRequest)request).getQueryString())) {
@@ -65,6 +67,7 @@ public class SampleSecurityFilter implements Filter {
         }
     }
 
+    @Override
     public void init(FilterConfig config) {
         LOG.info("init()");
     }

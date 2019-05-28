@@ -66,6 +66,7 @@ public class InterfaceRule implements Rule {
         addProps.put(name, obj);
     }
 
+    @Override
     public synchronized void apply(ServiceReference<?> sref, Map<String, Object> target) {
         String[] objectClass = (String[]) sref.getProperty(Constants.OBJECTCLASS);
         boolean matches = false;
@@ -90,6 +91,7 @@ public class InterfaceRule implements Rule {
         target.putAll(addProps);
     }
 
+    @Override
     public Bundle getBundle() {
         return bundle;
     }

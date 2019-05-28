@@ -143,6 +143,7 @@ public class HttpServiceManager {
 
     private final class UnregisterListener implements ServiceListener {
 
+        @Override
         public void serviceChanged(ServiceEvent event) {
             if (!(event.getType() == ServiceEvent.UNREGISTERING)) {
                 return;

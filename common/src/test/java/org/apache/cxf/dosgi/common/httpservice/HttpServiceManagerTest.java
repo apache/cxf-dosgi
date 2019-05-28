@@ -95,6 +95,7 @@ public class HttpServiceManagerTest extends TestCase {
             this.config = config;
         }
 
+        @Override
         @SuppressWarnings("rawtypes")
         public void registerServlet(String alias, Servlet servlet, Dictionary initparams, HttpContext context)
             throws ServletException {
@@ -102,13 +103,16 @@ public class HttpServiceManagerTest extends TestCase {
             servlet.init(config);
         }
 
+        @Override
         public void registerResources(String alias, String name, HttpContext context) {
             throw new RuntimeException("This method should not be called");
         }
 
+        @Override
         public void unregister(String alias) {
         }
 
+        @Override
         public HttpContext createDefaultHttpContext() {
             return EasyMock.createNiceMock(HttpContext.class);
         }

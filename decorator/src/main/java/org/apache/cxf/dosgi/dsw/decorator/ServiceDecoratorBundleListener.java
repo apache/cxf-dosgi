@@ -34,6 +34,7 @@ public class ServiceDecoratorBundleListener implements BundleListener {
         this.serviceDecorator = serviceDecorator;
     }
 
+    @Override
     public void bundleChanged(BundleEvent be) {
         switch(be.getType()) {
         case BundleEvent.STARTED:

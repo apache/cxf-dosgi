@@ -85,10 +85,12 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
         this.bundleContext = context;
     }
 
+    @Override
     public String[] getSupportedTypes() {
         return new String[] {WsConstants.WS_CONFIG_TYPE};
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Object importEndpoint(ClassLoader consumerLoader,
                                  BundleContext consumerContext,
@@ -153,6 +155,7 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
         return bindingCfg;
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Endpoint exportService(Object serviceO,
                                   BundleContext serviceContext,

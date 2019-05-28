@@ -80,10 +80,12 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
         this.intentManager = intentManager;
     }
 
+    @Override
     public String[] getSupportedTypes() {
         return new String[] {RsConstants.RS_CONFIG_TYPE};
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Object importEndpoint(ClassLoader consumerLoader,
                                  BundleContext consumerContext,
@@ -119,6 +121,7 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
         return ProxyFactory.create(factory.create(), iClass);
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Endpoint exportService(Object serviceBean,
                                   BundleContext callingContext,

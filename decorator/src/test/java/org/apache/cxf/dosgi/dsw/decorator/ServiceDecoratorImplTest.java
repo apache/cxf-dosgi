@@ -56,6 +56,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         Map<String, Object> target = new HashMap<String, Object>();
         ServiceReference sref = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sref.getProperty((String) EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
+            @Override
             public Object answer() {
                 return serviceProps.get(EasyMock.getCurrentArguments()[0]);
             }
@@ -160,6 +161,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         Map<String, Object> target = new HashMap<String, Object>();
         ServiceReference sref = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sref.getProperty((String) EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
+            @Override
             public Object answer() {
                 return serviceProps.get(EasyMock.getCurrentArguments()[0]);
             }

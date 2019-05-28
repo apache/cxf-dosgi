@@ -84,6 +84,7 @@ public class TestExportService extends AbstractDosgiTest {
         client.accept(MediaType.APPLICATION_XML_TYPE);
         org.apache.cxf.dosgi.samples.rest.Task task = tryTo("Call REST Resource", 
                                                             new Callable<org.apache.cxf.dosgi.samples.rest.Task>() {
+            @Override
             public org.apache.cxf.dosgi.samples.rest.Task call() {
                 return client.get(org.apache.cxf.dosgi.samples.rest.Task.class);
             }
@@ -108,6 +109,7 @@ public class TestExportService extends AbstractDosgiTest {
         dbf.setValidating(false);
         final DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = tryTo("Parse WSDL", new Callable<Document>() {
+            @Override
             public Document call() throws Exception {
                 return db.parse(wsdlURL.openStream());
             }

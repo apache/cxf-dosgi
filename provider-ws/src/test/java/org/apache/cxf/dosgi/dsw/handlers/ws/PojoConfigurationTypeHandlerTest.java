@@ -277,6 +277,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.expect(sfb.create()).andReturn(server);
         sfb.setAddress((String)EasyMock.anyObject());
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+            @Override
             public Object answer() {
                 serverURI.setLength(0);
                 serverURI.append(EasyMock.getCurrentArguments()[0]);
@@ -284,6 +285,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
             }
         });
         EasyMock.expect(sfb.getAddress()).andAnswer(new IAnswer<String>() {
+            @Override
             public String answer() {
                 return serverURI.toString();
             }
@@ -295,6 +297,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     private Server createMockServer(final ServerFactoryBean sfb) {
         AttributedURIType addr = EasyMock.createMock(AttributedURIType.class);
         EasyMock.expect(addr.getValue()).andAnswer(new IAnswer<String>() {
+            @Override
             public String answer() {
                 return sfb.getAddress();
             }

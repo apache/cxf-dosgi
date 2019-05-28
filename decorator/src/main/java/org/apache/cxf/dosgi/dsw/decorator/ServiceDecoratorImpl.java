@@ -45,6 +45,7 @@ public class ServiceDecoratorImpl implements ServiceDecorator {
         parser = new DecorationParser();
     }
 
+    @Override
     public void decorate(ServiceReference<?> sref, Map<String, Object> target) {
         for (Rule matcher : decorations) {
             matcher.apply(sref, target);

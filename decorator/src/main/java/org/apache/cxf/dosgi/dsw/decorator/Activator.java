@@ -27,6 +27,7 @@ public class Activator implements BundleActivator {
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
     private ServiceDecoratorBundleListener bundleListener;
 
+    @Override
     public void start(BundleContext context) {
         ServiceDecoratorImpl serviceDecorator = new ServiceDecoratorImpl();
         bundleListener = new ServiceDecoratorBundleListener(serviceDecorator);
@@ -34,6 +35,7 @@ public class Activator implements BundleActivator {
         context.registerService(ServiceDecorator.class.getName(), serviceDecorator, null);
     }
 
+    @Override
     public void stop(BundleContext context) {
         LOG.debug("RemoteServiceAdmin Implementation is shutting down now");
         if (bundleListener != null) {

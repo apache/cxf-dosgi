@@ -36,6 +36,7 @@ public final class ChangeTitleInterceptor extends AbstractPhaseInterceptor<Messa
         super(Phase.USER_LOGICAL);
     }
 
+    @Override
     public void handleMessage(Message message) throws Fault {
         try {
             MessageContentsList contents = MessageContentsList.getContentsList(message);

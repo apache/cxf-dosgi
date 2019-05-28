@@ -150,6 +150,7 @@ public class InterfaceRuleTest extends TestCase {
     private ServiceReference mockServiceReference(final Map<String, Object> serviceProps) {
         ServiceReference sref = EasyMock.createMock(ServiceReference.class);
         EasyMock.expect(sref.getProperty((String) EasyMock.anyObject())).andAnswer(new IAnswer<Object>() {
+            @Override
             public Object answer() {
                 return serviceProps.get(EasyMock.getCurrentArguments()[0]);
             }
