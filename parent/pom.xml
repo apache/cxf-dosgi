@@ -165,17 +165,17 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-        	<groupId>org.osgi</groupId>
-        	<artifactId>org.osgi.service.http</artifactId>
-        	<version>1.2.1</version>
-        	<scope>provided</scope>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.http</artifactId>
+            <version>1.2.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Just for the remote service admin spec -->
         <dependency>
-        	<groupId>org.apache.aries.rsa</groupId>
-        	<artifactId>org.apache.aries.rsa.core</artifactId>
-        	<version>${aries.rsa.version}</version>
+            <groupId>org.apache.aries.rsa</groupId>
+            <artifactId>org.apache.aries.rsa.core</artifactId>
+            <version>${aries.rsa.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.aries.rsa</groupId>

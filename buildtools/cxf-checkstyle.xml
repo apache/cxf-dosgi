@@ -18,8 +18,8 @@
 	under the License.
 -->
 <!DOCTYPE module PUBLIC
-    "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
-    "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+	"-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+	"http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 
 <!--
 	Checks to make sure the code meets the CXF coding guidelines which 
@@ -31,7 +31,7 @@
 -->
 
 <module name="Checker">
-    <property name="severity" value="error"/>
+	<property name="severity" value="error"/>
 
 	<!-- Checks whether files end with a new line.                        -->
 	<!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
@@ -102,7 +102,7 @@
 		</module>
 		<module name="ParameterNumber">
 			<property name="max" value="7" />
-            <property name="ignoreOverriddenMethods" value="true"/>
+			<property name="ignoreOverriddenMethods" value="true"/>
 		</module>
 
 		<!-- Checks for whitespace                               -->
@@ -258,35 +258,35 @@
 		<!--<module name="UncommentedMain"/>-->
 		<!--module name="TrailingComment"/-->
 		<module name="Indentation">
-            <property name="caseIndent" value="0" />
-            <property name="lineWrappingIndentation" value="0"/>
+			<property name="caseIndent" value="0" />
+			<property name="lineWrappingIndentation" value="0"/>
 		</module>
 		<!--<module name="RequiredRegexp">-->
-        <module name="SuppressWarningsHolder" />
+		<module name="SuppressWarningsHolder" />
 	</module>
-    <module name="SuppressionCommentFilter">
-        <property name="offCommentFormat" value="CHECKSTYLE\:OFF"/>
-        <property name="onCommentFormat" value="CHECKSTYLE\:ON"/>
-    </module>
-    <module name="SuppressionCommentFilter">
-        <property name="offCommentFormat" value="CHECKSTYLE.OFF\:([\w\|]+)"/>
-        <property name="onCommentFormat" value="CHECKSTYLE.ON\:([\w\|]+)"/>
-        <property name="checkFormat" value="$1"/>
-    </module>
-    <module name="SuppressWarningsFilter"/>
-    <module name="SuppressionFilter">
-        <property name="file" value="${checkstyle.suppressions.file}" />
-    </module>
-    <!-- Header checks -->
-    <module name="Header">
-      <property name="header"
-                value="/**\n * Licensed to the Apache Software Foundation (ASF) under one\n * or more contributor license agreements. See the NOTICE file\n * distributed with this work for additional information\n * regarding copyright ownership. The ASF licenses this file\n * to you under the Apache License, Version 2.0 (the\n * &quot;License&quot;); you may not use this file except in compliance\n * with the License. You may obtain a copy of the License at\n *\n * http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing,\n * software distributed under the License is distributed on an\n * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n * KIND, either express or implied. See the License for the\n * specific language governing permissions and limitations\n * under the License.\n */\n" />
-    </module>
-    <!-- <module name="RegexpHeader"/> -->
-    <module name="FileLength">
-      <property name="max" value="3000" />
-    </module>
-    <module name="FileTabCharacter">
-      <property name="eachLine" value="true"/>
-    </module>
+	<module name="SuppressionCommentFilter">
+		<property name="offCommentFormat" value="CHECKSTYLE\:OFF"/>
+		<property name="onCommentFormat" value="CHECKSTYLE\:ON"/>
+	</module>
+	<module name="SuppressionCommentFilter">
+		<property name="offCommentFormat" value="CHECKSTYLE.OFF\:([\w\|]+)"/>
+		<property name="onCommentFormat" value="CHECKSTYLE.ON\:([\w\|]+)"/>
+		<property name="checkFormat" value="$1"/>
+	</module>
+	<module name="SuppressWarningsFilter"/>
+	<module name="SuppressionFilter">
+		<property name="file" value="${checkstyle.suppressions.file}" />
+	</module>
+	<!-- Header checks -->
+	<module name="Header">
+		<property name="header"
+			value="/**\n * Licensed to the Apache Software Foundation (ASF) under one\n * or more contributor license agreements. See the NOTICE file\n * distributed with this work for additional information\n * regarding copyright ownership. The ASF licenses this file\n * to you under the Apache License, Version 2.0 (the\n * &quot;License&quot;); you may not use this file except in compliance\n * with the License. You may obtain a copy of the License at\n *\n * http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing,\n * software distributed under the License is distributed on an\n * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n * KIND, either express or implied. See the License for the\n * specific language governing permissions and limitations\n * under the License.\n */\n" />
+	</module>
+	<!-- <module name="RegexpHeader"/> -->
+	<module name="FileLength">
+		<property name="max" value="3000" />
+	</module>
+	<module name="FileTabCharacter">
+		<property name="eachLine" value="true"/>
+	</module>
 </module>

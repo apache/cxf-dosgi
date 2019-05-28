@@ -47,12 +47,12 @@
             <artifactId>cxf-core</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
             <version>${cxf.version}</version>
@@ -70,12 +70,12 @@
             <version>${cxf.version}</version>
             <scope>test</scope>
         </dependency>
-         <dependency>
-      		<groupId>org.apache.cxf</groupId>
-      		<artifactId>cxf-rt-rs-extension-search</artifactId>
-      		<version>${cxf.version}</version>
-      		<scope>test</scope>
-   		</dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-search</artifactId>
+            <version>${cxf.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>

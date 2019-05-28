@@ -34,9 +34,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-        	<groupId>org.apache.aries.rsa</groupId>
-        	<artifactId>org.apache.aries.rsa.spi</artifactId>
-        	<version>${aries.rsa.version}</version>
+            <groupId>org.apache.aries.rsa</groupId>
+            <artifactId>org.apache.aries.rsa.spi</artifactId>
+            <version>${aries.rsa.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.dosgi</groupId>
