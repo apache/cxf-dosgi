@@ -15,21 +15,20 @@ We want the karaf HttpService to be secured by https and require a client certif
 * Create client and server keys.
 * Add client certificate to server 
 
+```
+mkdir -p etc/keystores
+# Create server key
+keytool -genkey -dname CN=localhost -keyalg RSA -validity 100000 -alias serverkey -keypass password -storepass password -keystore etc/keystores/keystore.jks
+# Create client key and add to keystore as trusted
+keytool -genkey -dname CN=chris -keyalg RSA -validity 100000 -alias clientkey -keypass password -storepass password -keystore etc/keystores/client.jks
+keytool -export -rfc -keystore etc/keystores/client.jks -storepass password -alias clientkey -file client.cer
+keytool -import -trustcacerts -keystore etc/keystores/keystore.jks -storepass password -alias clientkey -file client.cer
 
-	mkdir -p etc/keystores
-	# Create server key
-	keytool -genkey -dname CN=localhost -keyalg RSA -validity 100000 -alias serverkey -keypass password -storepass password -keystore etc/keystores/keystore.jks
-	# Create client key and add to keystore as trusted
-	keytool -genkey -dname CN=chris -keyalg RSA -validity 100000 -alias clientkey -keypass password -storepass password -keystore etc/keystores/client.jks
-	keytool -export -rfc -keystore etc/keystores/client.jks -storepass password -alias clientkey -file client.cer
-	keytool -import -trustcacerts -keystore etc/keystores/keystore.jks -storepass password -alias clientkey -file client.cer
-
-
-	# Export server cert
-	keytool -exportcert -storepass password -keystore etc/keystores/keystore.jks -alias serverKey -file server.cert
-	# Import server cert into client store
-	keytool -importcert -storepass password -keystore etc/keystores/client.jks -alias serverKey -file server.cert
-
+# Export server cert
+keytool -exportcert -storepass password -keystore etc/keystores/keystore.jks -alias serverKey -file server.cert
+# Import server cert into client store
+keytool -importcert -storepass password -keystore etc/keystores/client.jks -alias serverKey -file server.cert
+```
 
 - Copy thes files in etc to the karaf etc dir
 - Copy the keystores (*.jks) into the karaf etc directory.
@@ -50,8 +49,10 @@ install -s mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-ssl-intent/2.0.0
 
 If you want to access the service using your browser then you have to export it in pkcs12 format and import it into your browser.
 
-	# Export client cert as pkcs12 for browser
-	keytool -importkeystore -srckeystore etc/keystores/client.jks -destkeystore etc/keystores/client.p12 -deststoretype PKCS12
+```
+# Export client cert as pkcs12 for browser
+keytool -importkeystore -srckeystore etc/keystores/client.jks -destkeystore etc/keystores/client.p12 -deststoretype PKCS12
+```
 
 Access the service as [](https://localhost:8443/cxf/echo "echo service").
 Add a security exemption to accept the server certificate.
