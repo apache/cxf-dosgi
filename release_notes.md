@@ -204,7 +204,7 @@ Release Notes - CXF Distributed OSGi - Version 1.5.0
     * [DOSGI-69] - CXF-DOSGi requires internet access when reading XML
     * [DOSGI-90] - Do not use/assume that endpoint.id is an address
     * [DOSGI-92] - Exception : Applying intent: SOAP via binding config
-    * [DOSGI-109] - NullPointerException in ToloplogyManager during bundle
+    * [DOSGI-109] - NullPointerException in TopologyManager during bundle
     * stop
     * [DOSGI-110] - Unable to export multiple services
     * [DOSGI-111] - DOSGi bundle attempts to load WSDL using wrong bundle in
@@ -280,7 +280,7 @@ Fixes needed in order to pass the OSGi 4.3 Remote Service Admin TCK.
 1.3
 ===
 
-The following modules have been removed from the destribution:
+The following modules have been removed from the distribution:
 
 * org.apache.cxf.dosgi:cxf-dosgi-ri-discovery-distributed-zookeeper-wrapper
 
@@ -288,7 +288,7 @@ The following modules have been removed from the destribution:
 
 * org.apache.cxf.dosgi:cxf-dosgi-remote-service-admin-interfaces
 
-  org.osgi:org.osgi.enterprize:4.2.0 artifact is now available. See DOSGI-104 for more information.
+  org.osgi:org.osgi.enterprise:4.2.0 artifact is now available. See DOSGI-104 for more information.
 
 Many dependencies have been updated, including the update to CXF 2.5.1. See also DOSGI-96.
 
@@ -365,7 +365,7 @@ Additionally, a number of bugs has been fixed including:
 * [DOSGI-43] - ClassCastException with Declarative Services
 * [DOSGI-44] - Existing OSGi Services are not remoted when CXF-DOSGi is started
 * [DOSGI-50] - Need to automatically infer SOAP/HTTP transport intents if not
-             explicily set via osgi.remote.requires.intents
+               explicitly set via osgi.remote.requires.intents
 * [DOSGI-54] - RemoteServiceAdmin interfaces/classes out of sync with official version
 * [DOSGI-61] - The Zookeeper Discovery only supports primitive types as service properties
 * [DOSGI-62] - The DSW creates endpoints with localhost URLs

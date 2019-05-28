@@ -191,7 +191,7 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
                                                          completeEndpointAddress, intentNames);
             return createServerFromFactory(factory, epd);
         } catch (Exception e) {
-            throw new RuntimeException("Error exporting service with adress " + completeEndpointAddress, e);
+            throw new RuntimeException("Error exporting service with address " + completeEndpointAddress, e);
         }
     }
 

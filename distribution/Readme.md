@@ -1,4 +1,4 @@
-# CXF DOSGi Distribtions
+# CXF DOSGi Distributions
 
 ## Apache karaf features
 

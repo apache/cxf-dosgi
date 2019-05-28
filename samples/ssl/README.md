@@ -30,7 +30,7 @@ keytool -exportcert -storepass password -keystore etc/keystores/keystore.jks -al
 keytool -importcert -storepass password -keystore etc/keystores/client.jks -alias serverKey -file server.cert
 ```
 
-- Copy thes files in etc to the karaf etc dir
+- Copy these files in etc to the karaf etc dir
 - Copy the keystores (*.jks) into the karaf etc directory.
 
 ## Installation

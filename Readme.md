@@ -18,7 +18,7 @@ CXF DOSGi allows to easily publish and consume SOAP and REST services without us
 
 Intents allow a service to leverage CXF extensions like features. A service can list the named intents it requires. 
 It will then only be exported / imported once all the intents are available. This allows for example security restrictions or logging.
-For more informations see [common module](common).
+For more information see [common module](common).
 
 ## Build
 
