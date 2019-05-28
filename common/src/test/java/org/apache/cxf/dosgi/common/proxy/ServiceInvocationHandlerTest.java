@@ -46,6 +46,7 @@ public class ServiceInvocationHandlerTest {
         assertEquals(5, sih.invoke(null, m, new Object[] {}));
     }
 
+    @Test
     public void testInvokeObjectMethod() throws Throwable {
         final List<String> called = new ArrayList<String>();
         ServiceInvocationHandler sih = new ServiceInvocationHandler("hi", String.class) {

@@ -230,12 +230,11 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
                                  (String[])props.get(org.osgi.framework.Constants.OBJECTCLASS));
     }
 
-    public void t2estCreateServerException() {
+    public void testCreateServerException() {
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(dswContext);
 
-        IntentManager intentManager = EasyMock.createNiceMock(IntentManager.class);
-        EasyMock.replay(intentManager);
+        IntentManager intentManager = new IntentManagerImpl();
 
         WsProvider handler = new WsProvider() {
             @Override
@@ -247,15 +246,21 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         handler.setHttpServiceManager(dummyHttpServiceManager());
         handler.activate(dswContext);
 
+        Class[] exportedInterfaces = {Runnable.class};
         Map<String, Object> props = new HashMap<String, Object>();
+        EndpointHelper.addObjectClass(props, exportedInterfaces);
 
         Runnable myService = EasyMock.createMock(Runnable.class);
         EasyMock.replay(myService);
         try {
-            handler.exportService(myService, null, props, new Class[] {Runnable.class});
+            handler.exportService(myService, null, props, exportedInterfaces);
             fail("Expected TestException");
         } catch (TestException e) {
             // Expected
+        } catch (RuntimeException re) {
+            if (!(re.getCause() instanceof TestException)) {
+                fail("Expected TestException");
+            }
         }
     }
 
@@ -337,7 +342,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         assertEquals(new Version("0.0.0"), epd.getPackageVersion("java.lang"));
     }
 
-    public void t2estCreateJaxWsEndpointWithoutIntents() {
+    public void testCreateJaxWsEndpointWithoutIntents() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext dswBC = c.createMock(BundleContext.class);
 
@@ -347,15 +352,16 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         handler.setHttpServiceManager(dummyHttpServiceManager());
         handler.activate(dswBC);
 
+        Class<?>[] exportedInterfaces = new Class[] {MyJaxWsEchoService.class};
         Map<String, Object> sd = new HashMap<String, Object>();
         sd.put(WsConstants.WS_ADDRESS_PROPERTY, "/somewhere");
+        EndpointHelper.addObjectClass(sd, exportedInterfaces);
         BundleContext serviceBC = c.createMock(BundleContext.class);
-        Object myService = null;
+        Object myService = c.createMock(MyJaxWsEchoService.class);
         c.replay();
 
-        Class<?>[] ifaces = new Class[] {MyJaxWsEchoService.class};
         ServerEndpoint serverWrapper = (ServerEndpoint)handler.exportService(myService, serviceBC, sd,
-                                                                             ifaces);
+                exportedInterfaces);
         c.verify();
 
         org.apache.cxf.endpoint.Endpoint ep = serverWrapper.getServer().getEndpoint();
