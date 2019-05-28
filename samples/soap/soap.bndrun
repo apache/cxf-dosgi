@@ -56,10 +56,10 @@
 	org.fusesource.jansi;version='[1.13.0,1.13.1)',\
 	javax.annotation-api;version='[1.2.0,1.2.1)',\
 	org.apache.servicemix.specs.jsr339-api-2.0.1;version='[2.6.0,2.6.1)',\
-	org.apache.aries.rsa.core;version='[1.11.0,1.11.1)',\
-	org.apache.aries.rsa.discovery.command;version='[1.11.0,1.11.1)',\
-	org.apache.aries.rsa.spi;version='[1.11.0,1.11.1)',\
-	org.apache.aries.rsa.topology-manager;version='[1.11.0,1.11.1)',\
+	org.apache.aries.rsa.core;version='[1.14.0,1.15.0)',\
+	org.apache.aries.rsa.discovery.command;version='[1.14.0,1.15.0)',\
+	org.apache.aries.rsa.spi;version='[1.14.0,1.15.0)',\
+	org.apache.aries.rsa.topology-manager;version='[1.14.0,1.15.0)',\
 	org.apache.cxf.cxf-core;version='[3.1.12,3.1.13)',\
 	org.apache.cxf.cxf-rt-bindings-soap;version='[3.1.12,3.1.13)',\
 	org.apache.cxf.cxf-rt-bindings-xml;version='[3.1.12,3.1.13)',\
