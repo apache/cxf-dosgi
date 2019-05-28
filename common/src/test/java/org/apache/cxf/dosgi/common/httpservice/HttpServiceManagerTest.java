@@ -41,7 +41,6 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.osgi.service.http.NamespaceException;
 
 import junit.framework.TestCase;
 
@@ -98,12 +97,12 @@ public class HttpServiceManagerTest extends TestCase {
 
         @SuppressWarnings("rawtypes")
         public void registerServlet(String alias, Servlet servlet, Dictionary initparams, HttpContext context)
-            throws ServletException, NamespaceException {
+            throws ServletException {
             Assert.assertEquals("/myService", alias);
             servlet.init(config);
         }
 
-        public void registerResources(String alias, String name, HttpContext context) throws NamespaceException {
+        public void registerResources(String alias, String name, HttpContext context) {
             throw new RuntimeException("This method should not be called");
         }
 

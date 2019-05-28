@@ -55,7 +55,7 @@ public class TestExportService extends AbstractDosgiTest {
         "/osgi/service_registry/http:##localhost:8181#cxf#taskservice";
 
     @Configuration
-    public static Option[] configure() throws Exception {
+    public static Option[] configure() {
         return new Option[] //
         {//
          basicTestOptions(), //
@@ -84,7 +84,7 @@ public class TestExportService extends AbstractDosgiTest {
         client.accept(MediaType.APPLICATION_XML_TYPE);
         org.apache.cxf.dosgi.samples.rest.Task task = tryTo("Call REST Resource", 
                                                             new Callable<org.apache.cxf.dosgi.samples.rest.Task>() {
-            public org.apache.cxf.dosgi.samples.rest.Task call() throws Exception {
+            public org.apache.cxf.dosgi.samples.rest.Task call() {
                 return client.get(org.apache.cxf.dosgi.samples.rest.Task.class);
             }
         }

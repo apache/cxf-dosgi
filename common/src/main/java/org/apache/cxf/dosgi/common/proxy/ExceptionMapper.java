@@ -34,7 +34,7 @@ public class ExceptionMapper {
         introspectTypeForExceptions(iType);
     }
 
-    public Throwable mapException(Method m, Throwable ex) throws Throwable {
+    public Throwable mapException(Method m, Throwable ex) {
         Throwable cause = ex.getCause() == null ? ex : ex.getCause();
         Set<Class<?>> excTypes = exceptionsMap.get(m);
         if (excTypes != null) {

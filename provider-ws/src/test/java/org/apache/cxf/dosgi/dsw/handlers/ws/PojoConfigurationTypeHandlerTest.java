@@ -140,7 +140,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         c.verify();
     }
 
-    public void testCreateServerWithAddressProperty() throws Exception {
+    public void testCreateServerWithAddressProperty() {
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(dswContext);
 
@@ -176,7 +176,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         assertEquals("http://alternate_host:80/myString", edProps.get(RemoteConstants.ENDPOINT_ID));
     }
 
-    public void testAddressing() throws Exception {
+    public void testAddressing() {
         runAddressingTest(new HashMap<String, Object>(), "http://localhost:9000/java/lang/Runnable");
 
         Map<String, Object> p1 = new HashMap<String, Object>();
@@ -192,7 +192,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         runAddressingTest(p4, "http://localhost:8181/java/lang/Runnable");
     }
 
-    private void runAddressingTest(Map<String, Object> properties, String expectedAddress) throws Exception {
+    private void runAddressingTest(Map<String, Object> properties, String expectedAddress) {
         Class<?>[] exportedInterface = new Class[] {Runnable.class};
         EndpointHelper.addObjectClass(properties, exportedInterface);
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
@@ -272,14 +272,14 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         EasyMock.expect(sfb.create()).andReturn(server);
         sfb.setAddress((String)EasyMock.anyObject());
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-            public Object answer() throws Throwable {
+            public Object answer() {
                 serverURI.setLength(0);
                 serverURI.append(EasyMock.getCurrentArguments()[0]);
                 return null;
             }
         });
         EasyMock.expect(sfb.getAddress()).andAnswer(new IAnswer<String>() {
-            public String answer() throws Throwable {
+            public String answer() {
                 return serverURI.toString();
             }
         });
@@ -290,7 +290,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     private Server createMockServer(final ServerFactoryBean sfb) {
         AttributedURIType addr = EasyMock.createMock(AttributedURIType.class);
         EasyMock.expect(addr.getValue()).andAnswer(new IAnswer<String>() {
-            public String answer() throws Throwable {
+            public String answer() {
                 return sfb.getAddress();
             }
         });

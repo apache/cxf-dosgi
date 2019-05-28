@@ -281,7 +281,7 @@ public class AbstractDosgiTest {
             .artifactId("cxf-dosgi-samples-rest-impl").versionAsInProject();
     }
 
-    protected static Option basicTestOptions() throws Exception {
+    protected static Option basicTestOptions() {
         return composite(CoreOptions.junitBundles(), //
                          MultiBundleTools.getDistro(), //
                          // javax.xml.soap is imported since CXF 3.3.0 (CXF-7872, commit a95593cf),

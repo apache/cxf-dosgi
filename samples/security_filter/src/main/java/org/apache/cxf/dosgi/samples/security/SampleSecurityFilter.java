@@ -65,7 +65,7 @@ public class SampleSecurityFilter implements Filter {
         }
     }
 
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config) {
         LOG.info("init()");
     }
 }

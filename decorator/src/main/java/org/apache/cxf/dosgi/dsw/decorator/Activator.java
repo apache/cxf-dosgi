@@ -27,14 +27,14 @@ public class Activator implements BundleActivator {
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
     private ServiceDecoratorBundleListener bundleListener;
 
-    public void start(BundleContext context) throws Exception {
+    public void start(BundleContext context) {
         ServiceDecoratorImpl serviceDecorator = new ServiceDecoratorImpl();
         bundleListener = new ServiceDecoratorBundleListener(serviceDecorator);
         context.addBundleListener(bundleListener);
         context.registerService(ServiceDecorator.class.getName(), serviceDecorator, null);
     }
 
-    public void stop(BundleContext context) throws Exception {
+    public void stop(BundleContext context) {
         LOG.debug("RemoteServiceAdmin Implementation is shutting down now");
         if (bundleListener != null) {
             context.removeBundleListener(bundleListener);

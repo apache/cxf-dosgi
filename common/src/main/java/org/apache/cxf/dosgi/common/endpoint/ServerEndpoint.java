@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.dosgi.common.endpoint;
 
-import java.io.IOException;
-
 import org.apache.aries.rsa.spi.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
@@ -38,7 +36,7 @@ public class ServerEndpoint implements Endpoint {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         this.server.destroy();
     }
 

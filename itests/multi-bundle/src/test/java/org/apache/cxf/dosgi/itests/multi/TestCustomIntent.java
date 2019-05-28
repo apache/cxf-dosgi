@@ -42,7 +42,7 @@ import org.osgi.framework.Constants;
 public class TestCustomIntent extends AbstractDosgiTest {
 
     @Configuration
-    public static Option[] configure() throws Exception {
+    public static Option[] configure() {
         return new Option[] //
         {
          basicTestOptions(), //
@@ -57,7 +57,7 @@ public class TestCustomIntent extends AbstractDosgiTest {
         String serviceUri = HTTP_BASE_URI + "/cxf/taskservice";
         final TaskService taskService = TaskServiceProxyFactory.create(serviceUri);
         Task task = tryTo("Call TaskService", new Callable<Task>() {
-            public Task call() throws Exception {
+            public Task call() {
                 return taskService.get(1);
             }
         });

@@ -29,7 +29,7 @@ import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
 public class CustomIntentActivator implements BundleActivator {
 
-    public void start(BundleContext context) throws Exception {
+    public void start(BundleContext context) {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put("org.apache.cxf.dosgi.IntentName", "myIntent");
         context.registerService(CustomFeatureProvider.class, new CustomFeatureProvider(), props);
@@ -42,6 +42,6 @@ public class CustomIntentActivator implements BundleActivator {
         context.registerService(TaskService.class, new DummyTaskServiceImpl(), props2);
     }
 
-    public void stop(BundleContext context) throws Exception {
+    public void stop(BundleContext context) {
     }
 }

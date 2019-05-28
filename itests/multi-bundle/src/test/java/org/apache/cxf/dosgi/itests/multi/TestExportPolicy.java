@@ -44,7 +44,7 @@ public class TestExportPolicy extends AbstractDosgiTest {
     ExportPolicy policy;
 
     @Configuration
-    public static Option[] configure() throws Exception {
+    public static Option[] configure() {
         return new Option[] //
         {//
          basicTestOptions(), //
@@ -53,7 +53,7 @@ public class TestExportPolicy extends AbstractDosgiTest {
     }
 
     @Test
-    public void testPolicyPresent() throws Exception {
+    public void testPolicyPresent() {
         Assert.assertNotNull(policy);
     }
 

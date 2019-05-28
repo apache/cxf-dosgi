@@ -24,7 +24,6 @@ import java.net.URL;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -202,7 +201,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
         Assert.assertFalse(accessDeniedFilter.called);
     }
 
-    public void testDelegation() throws Exception {
+    public void testDelegation() {
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bundleContext);
 
@@ -219,14 +218,14 @@ class CommitResponseFilter implements Filter {
 
     boolean called;
 
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
     }
 
     public void destroy() {
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-        throws java.io.IOException, javax.servlet.ServletException {
+        throws java.io.IOException {
         called = true;
         response.getWriter().write("committing the response");
     }
@@ -236,7 +235,7 @@ class DoNothingFilter implements Filter {
 
     boolean called;
 
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
     }
 
     public void destroy() {
@@ -253,14 +252,14 @@ class AccessDeniedFilter implements Filter {
 
     boolean called;
 
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
     }
 
     public void destroy() {
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-        throws java.io.IOException, javax.servlet.ServletException {
+        throws java.io.IOException {
         called = true;
         ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
     }

@@ -52,7 +52,7 @@ public class TestImportService extends AbstractDosgiTest {
     private Server server;
 
     @Configuration
-    public static Option[] configure() throws Exception {
+    public static Option[] configure() {
         return new Option[] //
         {//
          basicTestOptions(), //
@@ -78,7 +78,7 @@ public class TestImportService extends AbstractDosgiTest {
     }
 
     @Test
-    public void testClientConsumer() throws Exception {
+    public void testClientConsumer() {
         Task task = taskService.get(1);
         Assert.assertEquals("test", task.getTitle());
     }

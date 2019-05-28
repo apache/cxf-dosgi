@@ -33,7 +33,7 @@ public final class MultiBundleTools {
     private MultiBundleTools() {
     }
 
-    private static Collection<String> getDistroBundles(File distroDir) throws Exception {
+    private static Collection<String> getDistroBundles(File distroDir) {
         List<String> bundles = new ArrayList<>();
         File bundlesDir = new File(distroDir, "bundle");
         File[] files = bundlesDir.listFiles(new FilenameFilter() {
@@ -57,7 +57,7 @@ public final class MultiBundleTools {
         return curBase.getParentFile().getParentFile();
     }
 
-    public static Option getDistro() throws Exception {
+    public static Option getDistro() {
         File root = getRootDirectory();
         File depRoot = new File(root, "target/dependency");
         File distroDir = depRoot.listFiles()[0];
