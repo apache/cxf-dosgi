@@ -134,7 +134,7 @@ public class IntentManagerImpl implements IntentManager {
         if (selectedIntents.size() > 1) {
             LOG.warn("More than one intent of type " + type + " present. Using only the first one.");
         }
-        return (T)selectedIntents.iterator().next();
+        return selectedIntents.iterator().next();
     }
 
     @Override

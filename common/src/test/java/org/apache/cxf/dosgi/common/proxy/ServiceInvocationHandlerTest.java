@@ -33,7 +33,9 @@ import org.junit.Test;
 
 public class ServiceInvocationHandlerTest {
 
-    private static final Map<String, Method> OBJECT_METHODS = new HashMap<>(); {
+    private static final Map<String, Method> OBJECT_METHODS = new HashMap<>();
+
+    {
         for (Method m : Object.class.getMethods()) {
             OBJECT_METHODS.put(m.getName(), m);
         }
@@ -42,7 +44,7 @@ public class ServiceInvocationHandlerTest {
     @Test
     public void testInvoke() throws Throwable {
         ServiceInvocationHandler sih = new ServiceInvocationHandler("hello", String.class);
-        Method m = String.class.getMethod("length", new Class[] {});
+        Method m = String.class.getMethod("length");
         assertEquals(5, sih.invoke(null, m, new Object[] {}));
     }
 

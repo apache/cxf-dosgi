@@ -41,7 +41,7 @@ public final class ChangeTitleInterceptor extends AbstractPhaseInterceptor<Messa
         try {
             MessageContentsList contents = MessageContentsList.getContentsList(message);
             Object response = contents.get(0);
-            Method method = response.getClass().getMethod("getReturn", new Class[]{});
+            Method method = response.getClass().getMethod("getReturn");
             Task task = (Task)method.invoke(response);
             task.setTitle("changed");
         } catch (Exception e) {

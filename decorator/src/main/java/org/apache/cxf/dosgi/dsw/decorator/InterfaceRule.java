@@ -54,7 +54,7 @@ public class InterfaceRule implements Rule {
         if (type != null && !String.class.getName().equals(type)) {
             try {
                 Class<?> cls = getClass().getClassLoader().loadClass(type);
-                Constructor<?> ctor = cls.getConstructor(new Class[] {String.class});
+                Constructor<?> ctor = cls.getConstructor(String.class);
                 obj = ctor.newInstance(value);
             } catch (Throwable th) {
                 LOG.warn("Could not handle property '" + name

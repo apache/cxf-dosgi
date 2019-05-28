@@ -45,7 +45,7 @@ public class Task {
     }
 
     public void setId(Integer id) {
-        this.id = new Integer(id);
+        this.id = id;
     }
 
     public String getTitle() {
