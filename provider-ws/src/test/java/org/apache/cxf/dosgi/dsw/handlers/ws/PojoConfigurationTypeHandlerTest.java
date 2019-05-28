@@ -48,17 +48,22 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class PojoConfigurationTypeHandlerTest extends TestCase {
+public class PojoConfigurationTypeHandlerTest {
 
+    @Test
     public void testGetPojoAddressEndpointURI() {
         IntentManager intentManager = new IntentManagerImpl();
         WsProvider handler = new WsProvider();
@@ -74,6 +79,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         return new HttpServiceManager();
     }
 
+    @Test
     public void testGetPojoAddressEndpointCxf() {
         IntentManager intentManager = new IntentManagerImpl();
         WsProvider handler = new WsProvider();
@@ -85,6 +91,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         assertEquals(url, handler.getServerAddress(sd, String.class));
     }
 
+    @Test
     public void testGetDefaultPojoAddress() {
         IntentManager intentManager = new IntentManagerImpl();
         WsProvider handler = new WsProvider();
@@ -95,6 +102,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
     }
 
     // todo: add test for data bindings
+    @Test
     public void testCreateProxy() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext bc1 = c.createMock(BundleContext.class);
@@ -139,6 +147,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         c.verify();
     }
 
+    @Test
     public void testCreateServerWithAddressProperty() {
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(dswContext);
@@ -175,6 +184,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         assertEquals("http://alternate_host:80/myString", edProps.get(RemoteConstants.ENDPOINT_ID));
     }
 
+    @Test
     public void testAddressing() {
         runAddressingTest(new HashMap<String, Object>(), "http://localhost:9000/java/lang/Runnable");
 
@@ -223,12 +233,13 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         Endpoint result = handler.exportService(myService, bundleContext, properties, exportedInterface);
         Map<String, Object> props = result.description().getProperties();
         assertEquals(expectedAddress, props.get("org.apache.cxf.ws.address"));
-        Assert.assertArrayEquals(new String[] {"org.apache.cxf.ws"}, 
+        assertArrayEquals(new String[] {"org.apache.cxf.ws"},
                                  (String[])props.get(RemoteConstants.SERVICE_IMPORTED_CONFIGS));
-        Assert.assertArrayEquals(new String[] {"java.lang.Runnable"}, 
+        assertArrayEquals(new String[] {"java.lang.Runnable"},
                                  (String[])props.get(org.osgi.framework.Constants.OBJECTCLASS));
     }
 
+    @Test
     public void testCreateServerException() {
         BundleContext dswContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(dswContext);
@@ -317,6 +328,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         return server;
     }
 
+    @Test
     public void testCreateEndpointProps() {
         BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.expect(bc.getProperty("org.osgi.framework.uuid")).andReturn("some_uuid1");
@@ -344,6 +356,7 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
         assertEquals(new Version("0.0.0"), epd.getPackageVersion("java.lang"));
     }
 
+    @Test
     public void testCreateJaxWsEndpointWithoutIntents() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext dswBC = c.createMock(BundleContext.class);
@@ -368,12 +381,13 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         org.apache.cxf.endpoint.Endpoint ep = serverWrapper.getServer().getEndpoint();
         QName bindingName = ep.getEndpointInfo().getBinding().getName();
-        Assert.assertEquals(JaxWsEndpointImpl.class, ep.getClass());
-        Assert.assertEquals(new QName("http://jaxws.handlers.dsw.dosgi.cxf.apache.org/",
+        assertEquals(JaxWsEndpointImpl.class, ep.getClass());
+        assertEquals(new QName("http://jaxws.handlers.dsw.dosgi.cxf.apache.org/",
                                       "MyJaxWsEchoServiceServiceSoapBinding"),
                             bindingName);
     }
 
+    @Test
     public void testCreateSimpleEndpointWithoutIntents() {
         IMocksControl c = EasyMock.createNiceControl();
         BundleContext dswBC = c.createMock(BundleContext.class);
@@ -395,8 +409,8 @@ public class PojoConfigurationTypeHandlerTest extends TestCase {
 
         org.apache.cxf.endpoint.Endpoint ep = serverWrapper.getServer().getEndpoint();
         QName bindingName = ep.getEndpointInfo().getBinding().getName();
-        Assert.assertEquals(EndpointImpl.class, ep.getClass());
-        Assert.assertEquals(new QName("http://simple.handlers.dsw.dosgi.cxf.apache.org/",
+        assertEquals(EndpointImpl.class, ep.getClass());
+        assertEquals(new QName("http://simple.handlers.dsw.dosgi.cxf.apache.org/",
                                       "MySimpleEchoServiceSoapBinding"),
                             bindingName);
     }

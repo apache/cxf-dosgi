@@ -21,21 +21,26 @@ package org.apache.cxf.dosgi.dsw.decorator;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
-@SuppressWarnings("rawtypes")
-public class InterfaceRuleTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings("rawtypes")
+public class InterfaceRuleTest {
+
+    @Test
     public void testDUMMY() {
         assertTrue(true);
     }
 
+    @Test
     public void testInterfaceRuleGetBundle() {
         Bundle b = EasyMock.createMock(Bundle.class);
         EasyMock.replay(b);
@@ -43,6 +48,7 @@ public class InterfaceRuleTest extends TestCase {
         assertSame(b, ir.getBundle());
     }
 
+    @Test
     public void testInterfaceRule1() {
         InterfaceRule ir = new InterfaceRule(null, "org.apache.Foo");
         ir.addProperty("x", "y", String.class.getName());
@@ -60,6 +66,7 @@ public class InterfaceRuleTest extends TestCase {
         assertEquals(expected, m);
     }
 
+    @Test
     public void testInterfaceRule2() {
         InterfaceRule ir = new InterfaceRule(null, "org.apache.F(.*)");
         ir.addPropMatch("boo", "baah");
@@ -79,6 +86,7 @@ public class InterfaceRuleTest extends TestCase {
         assertEquals(expected, m);
     }
 
+    @Test
     public void testInterfaceRule3() {
         InterfaceRule ir = new InterfaceRule(null, "org.apache.F(.*)");
         ir.addProperty("x", "y", String.class.getName());
@@ -93,6 +101,7 @@ public class InterfaceRuleTest extends TestCase {
         assertEquals(0, m.size());
     }
 
+    @Test
     public void testInterfaceRule4() {
         InterfaceRule ir = new InterfaceRule(null, "org.apache.F(.*)");
         ir.addPropMatch("boo", "baah");
@@ -107,6 +116,7 @@ public class InterfaceRuleTest extends TestCase {
         assertEquals(0, m.size());
     }
 
+    @Test
     public void testInterfaceRule5() {
         InterfaceRule ir = new InterfaceRule(null, "org.apache.Foo");
         ir.addPropMatch("test.int", "42");
@@ -127,6 +137,7 @@ public class InterfaceRuleTest extends TestCase {
         assertEquals(expected, m);
     }
 
+    @Test
     public void testInterfaceRule6() {
         InterfaceRule ir = new InterfaceRule(null, "org.apache.Foo");
         ir.addPropMatch("test.int", "42");

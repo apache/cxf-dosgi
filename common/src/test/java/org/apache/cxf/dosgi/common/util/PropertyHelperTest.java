@@ -25,23 +25,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
 import org.osgi.service.remoteserviceadmin.EndpointDescription;
 import org.osgi.service.remoteserviceadmin.RemoteConstants;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class PropertyHelperTest extends TestCase {
+public class PropertyHelperTest {
 
+    @Test
     public void testMultiValuePropertyAsString() {
         assertEquals(Collections.singleton("hi"),
-            PropertyHelper.getMultiValueProperty("hi"));
+                PropertyHelper.getMultiValueProperty("hi"));
     }
 
+    @Test
     public void testMultiValuePropertyAsArray() {
         assertEquals(Arrays.asList("a", "b"),
-                PropertyHelper.getMultiValueProperty(new String[] {"a", "b"}));
+                PropertyHelper.getMultiValueProperty(new String[]{"a", "b"}));
     }
 
+    @Test
     public void testMultiValuePropertyAsCollection() {
         List<String> list = new ArrayList<>();
         list.add("1");
@@ -50,10 +56,12 @@ public class PropertyHelperTest extends TestCase {
         assertEquals(list, PropertyHelper.getMultiValueProperty(list));
     }
 
+    @Test
     public void testMultiValuePropertyNull() {
         assertTrue(PropertyHelper.getMultiValueProperty(null).isEmpty());
     }
 
+    @Test
     public void testGetProperty() {
         Map<String, Object> p = new HashMap<>();
         p.put(RemoteConstants.ENDPOINT_ID, "http://google.de");
@@ -64,8 +72,8 @@ public class PropertyHelperTest extends TestCase {
         EndpointDescription endpoint = new EndpointDescription(p);
 
         assertNull(PropertyHelper.getProperty(endpoint.getProperties(), "unknownProp"));
-        assertEquals(p.get(RemoteConstants.ENDPOINT_ID), 
+        assertEquals(p.get(RemoteConstants.ENDPOINT_ID),
                      PropertyHelper.getProperty(endpoint.getProperties(), RemoteConstants.ENDPOINT_ID));
-        assertEquals(null, PropertyHelper.getProperty(endpoint.getProperties(), "notAString"));
+        assertNull(PropertyHelper.getProperty(endpoint.getProperties(), "notAString"));
     }
 }

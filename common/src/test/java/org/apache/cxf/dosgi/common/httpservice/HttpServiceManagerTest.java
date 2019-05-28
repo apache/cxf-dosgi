@@ -20,6 +20,7 @@ package org.apache.cxf.dosgi.common.httpservice;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Dictionary;
 
@@ -33,7 +34,7 @@ import org.apache.cxf.BusFactory;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
@@ -42,10 +43,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 
-import junit.framework.TestCase;
+public class HttpServiceManagerTest {
 
-public class HttpServiceManagerTest extends TestCase {
-
+    @Test
     public void testGetAbsoluteAddress() {
         HttpServiceManager manager = new HttpServiceManager();
         manager.initFromConfig(null);
@@ -57,6 +57,7 @@ public class HttpServiceManagerTest extends TestCase {
         assertEquals("http://localhost:8181/mycontext/myservice", address2);
     }
 
+    @Test
     public void testRegisterAndUnregisterServlet() throws Exception {
         IMocksControl c = EasyMock.createControl();
         BundleContext dswContext = c.createMock(BundleContext.class);
@@ -99,7 +100,7 @@ public class HttpServiceManagerTest extends TestCase {
         @SuppressWarnings("rawtypes")
         public void registerServlet(String alias, Servlet servlet, Dictionary initparams, HttpContext context)
             throws ServletException {
-            Assert.assertEquals("/myService", alias);
+            assertEquals("/myService", alias);
             servlet.init(config);
         }
 

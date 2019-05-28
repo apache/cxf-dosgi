@@ -30,17 +30,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({
     "unchecked", "rawtypes"
    })
-public class SecurityDelegatingHttpContextTest extends TestCase {
+public class SecurityDelegatingHttpContextTest {
 
     protected HttpContext defaultHttpContext;
     protected SecurityDelegatingHttpContext httpContext;
@@ -50,7 +53,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
     protected String mimeType;
     protected URL url; // does not need to exist
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         mimeType = "text/xml";
         url = new URL("file:test.xml"); // does not need to exist
@@ -67,6 +70,7 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
         EasyMock.replay(defaultHttpContext);
     }
 
+    @Test
     public void testFilterRequired() throws Exception {
         // Mock up the service references
         ServiceReference[] serviceReferences = {};
@@ -89,14 +93,15 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
         HttpServletResponse response = EasyMock.createNiceMock(HttpServletResponse.class);
         EasyMock.replay(response);
         boolean requestAllowed = httpContext.handleSecurity(request, response);
-        Assert.assertFalse(requestAllowed);
+        assertFalse(requestAllowed);
 
         // Ensure that the httpContext returns true if there is no requirement for registered servlet filters
         httpContext.requireFilter = false;
         requestAllowed = httpContext.handleSecurity(request, response);
-        Assert.assertTrue(requestAllowed);
+        assertTrue(requestAllowed);
     }
 
+    @Test
     public void testSingleCommitFilter() throws Exception {
         // Mock up the service references
         ServiceReference filterReference = EasyMock.createNiceMock(ServiceReference.class);
@@ -123,14 +128,15 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
                                                                  // return value
         EasyMock.expect(response.getWriter()).andReturn(new PrintWriter(System.out));
         EasyMock.replay(response);
-        Assert.assertFalse(httpContext.handleSecurity(request, response));
+        assertFalse(httpContext.handleSecurity(request, response));
 
         // Ensure that the appropriate filters were called
-        Assert.assertTrue(commitFilter.called);
-        Assert.assertFalse(doNothingFilter.called);
-        Assert.assertFalse(accessDeniedFilter.called);
+        assertTrue(commitFilter.called);
+        assertFalse(doNothingFilter.called);
+        assertFalse(accessDeniedFilter.called);
     }
 
+    @Test
     public void testFilterChain() throws Exception {
         // Mock up the service references
         ServiceReference filterReference = EasyMock.createNiceMock(ServiceReference.class);
@@ -158,14 +164,15 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
         EasyMock.expect(response.isCommitted()).andReturn(true); // the commit filter indicating that it committed the
                                                                  // response
         EasyMock.replay(response);
-        Assert.assertFalse(httpContext.handleSecurity(request, response));
+        assertFalse(httpContext.handleSecurity(request, response));
 
         // Ensure that the appropriate filters were called
-        Assert.assertTrue(doNothingFilter.called);
-        Assert.assertTrue(commitFilter.called);
-        Assert.assertFalse(accessDeniedFilter.called);
+        assertTrue(doNothingFilter.called);
+        assertTrue(commitFilter.called);
+        assertFalse(accessDeniedFilter.called);
     }
 
+    @Test
     public void testAllowRequest() throws Exception {
         // Mock up the service references
         ServiceReference filterReference = EasyMock.createNiceMock(ServiceReference.class);
@@ -188,14 +195,15 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
         HttpServletResponse response = EasyMock.createNiceMock(HttpServletResponse.class);
         EasyMock.expect(response.isCommitted()).andReturn(false);
         EasyMock.replay(response);
-        Assert.assertTrue(httpContext.handleSecurity(request, response));
+        assertTrue(httpContext.handleSecurity(request, response));
 
         // Ensure that the appropriate filters were called
-        Assert.assertTrue(doNothingFilter.called);
-        Assert.assertFalse(commitFilter.called);
-        Assert.assertFalse(accessDeniedFilter.called);
+        assertTrue(doNothingFilter.called);
+        assertFalse(commitFilter.called);
+        assertFalse(accessDeniedFilter.called);
     }
 
+    @Test
     public void testDelegation() {
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
         EasyMock.replay(bundleContext);
@@ -204,8 +212,8 @@ public class SecurityDelegatingHttpContextTest extends TestCase {
         httpContext = new SecurityDelegatingHttpContext(bundleContext, defaultHttpContext);
 
         // Ensure that it delegates non-security calls to the wrapped implementation (in this case, the mock)
-        Assert.assertEquals(mimeType, httpContext.getMimeType(""));
-        Assert.assertEquals(url, httpContext.getResource(""));
+        assertEquals(mimeType, httpContext.getMimeType(""));
+        assertEquals(url, httpContext.getResource(""));
     }
 }
 

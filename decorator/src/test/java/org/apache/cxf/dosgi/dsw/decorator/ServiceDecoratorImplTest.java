@@ -24,16 +24,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Assert;
+import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 
-public class ServiceDecoratorImplTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class ServiceDecoratorImplTest {
     private static final Map<String, Object> EMPTY = new HashMap<>();
     private static final URL RES_SD = getResource("/test-resources/sd.xml");
     private static final URL RES_SD1 = getResource("/test-resources/sd1.xml");
@@ -41,6 +42,7 @@ public class ServiceDecoratorImplTest extends TestCase {
     private static final URL RES_SD0 = getResource("/test-resources/sd0.xml");
     private static final URL RES_SD_1 = getResource("/test-resources/sd-1.xml");
 
+    @Test
     @SuppressWarnings("rawtypes")
     public void testAddRemoveDecorations() {
         final Map<String, Object> serviceProps = new HashMap<>();
@@ -76,6 +78,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertEquals(EMPTY, target2);
     }
 
+    @Test
     public void testAddDecorations() {
         final Map<String, Object> serviceProps = new HashMap<>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.acme.foo.Bar"});
@@ -86,6 +89,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertDecorate(serviceProps, expected, RES_SD);
     }
 
+    @Test
     public void testAddDecorations1() {
         Map<String, Object> serviceProps = new HashMap<>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.A"});
@@ -96,6 +100,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertDecorate(serviceProps, expected, RES_SD1, RES_SD2);
     }
 
+    @Test
     public void testAddDecorations2() {
         Map<String, Object> serviceProps = new HashMap<>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.D"});
@@ -103,6 +108,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertDecorate(serviceProps, EMPTY, RES_SD1, RES_SD2);
     }
 
+    @Test
     public void testAddDecorations3() {
         Map<String, Object> serviceProps = new HashMap<>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.B"});
@@ -113,6 +119,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertDecorate(serviceProps, expected, RES_SD1, RES_SD2);
     }
 
+    @Test
     public void testAddDecorations4() {
         Map<String, Object> serviceProps = new HashMap<>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.C"});
@@ -123,6 +130,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertDecorate(serviceProps, expected, RES_SD1, RES_SD2);
     }
 
+    @Test
     public void testAddDecorations5() {
         Map<String, Object> serviceProps = new HashMap<>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.C"});
@@ -131,6 +139,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertDecorate(serviceProps, EMPTY, RES_SD1, RES_SD2);
     }
 
+    @Test
     public void testAddDecorations6() {
         Map<String, Object> serviceProps = new HashMap<>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.D"});
@@ -138,6 +147,7 @@ public class ServiceDecoratorImplTest extends TestCase {
         assertDecorate(serviceProps, EMPTY, RES_SD0);
     }
 
+    @Test
     public void testAddDecorations7() {
         Map<String, Object> serviceProps = new HashMap<>();
         serviceProps.put(Constants.OBJECTCLASS, new String[] {"org.test.D"});
@@ -182,7 +192,7 @@ public class ServiceDecoratorImplTest extends TestCase {
 
     private static URL getResource(String path) {
         URL resource = ServiceDecoratorImplTest.class.getResource(path);
-        Assert.assertNotNull("Resource " + path + " not found!", resource);
+        assertNotNull("Resource " + path + " not found!", resource);
         return resource;
     }
 
