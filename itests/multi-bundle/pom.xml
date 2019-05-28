@@ -32,11 +32,11 @@
     <artifactId>cxf-dosgi-itests-multibundle</artifactId>
     <packaging>jar</packaging>
     <name>CXF DOSGi Integration Tests Multi-Bundle</name>
-    
+
     <properties>
         <topDirectoryLocation>../..</topDirectoryLocation>
     </properties>
-    
+
     <!-- 
         When changing code make sure to run the distro before testing
         or you will be testing the old code.
@@ -82,7 +82,7 @@
             <artifactId>pax-exam-link-mvn</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
@@ -152,7 +152,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <!-- Samples -->
         <dependency>
             <groupId>org.apache.cxf.dosgi.samples</groupId>
@@ -206,7 +206,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
@@ -220,7 +220,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
         </plugins>
     </build>
 </project>

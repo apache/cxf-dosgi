@@ -74,12 +74,12 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
     public void setHttpServiceManager(HttpServiceManager httpServiceManager) {
         this.httpServiceManager = httpServiceManager;
     }
-    
+
     @Reference
     public void setIntentManager(IntentManager intentManager) {
         this.intentManager = intentManager;
     }
-    
+
     public String[] getSupportedTypes() {
         return new String[] {RsConstants.RS_CONFIG_TYPE};
     }
@@ -163,7 +163,7 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
         if (binding != null) {
             factory.setBindingConfig(binding);
         }
-        
+
         List<Object> providers = new ArrayList<Object>();
         for (Object intent : intents) {
             if (isProvider(intent)) {
@@ -172,7 +172,7 @@ public class RsProvider extends BaseDistributionProvider implements Distribution
         }
         factory.setProviders(providers);
     }
-    
+
     private boolean isProvider(Object intent) {
         return intent.getClass().getAnnotation(Provider.class) != null //
             || (intent instanceof ExceptionMapper) // 

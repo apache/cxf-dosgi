@@ -50,7 +50,7 @@ public class TestExportService extends AbstractDosgiTest {
 
     private static final String SERVICE_URI = HTTP_BASE_URI + "/cxf/taskservice";
     private static final String REST_SERVICE_URI = HTTP_BASE_URI + "/cxf/tasks";
-    
+
     private static final String GREETER_ZOOKEEPER_NODE = //
         "/osgi/service_registry/http:##localhost:8181#cxf#taskservice";
 
@@ -76,7 +76,7 @@ public class TestExportService extends AbstractDosgiTest {
         Task task = taskService.get(1);
         Assert.assertEquals("Buy some coffee", task.getTitle());
     }
-    
+
     @Test
     public void testRESTCall() throws Exception {
         waitWebPage(REST_SERVICE_URI);
@@ -94,7 +94,7 @@ public class TestExportService extends AbstractDosgiTest {
         String swaggerJson = swaggerClient.get(String.class);
         Assert.assertEquals("{\"swagger\":\"2.0\"", swaggerJson.substring(0, 16));
     }
-    
+
     @Test
     public void testDiscoveryExport() throws Exception {
         ZooKeeper zk = createZookeeperClient();
@@ -112,7 +112,7 @@ public class TestExportService extends AbstractDosgiTest {
                 return db.parse(wsdlURL.openStream());
             }
         });
-            
+
         Element el = doc.getDocumentElement();
         Assert.assertEquals("definitions", el.getLocalName());
         Assert.assertEquals("http://schemas.xmlsoap.org/wsdl/", el.getNamespaceURI());

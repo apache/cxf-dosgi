@@ -31,7 +31,7 @@ Release Notes - CXF Distributed OSGi
     * [DOSGI-261] - Sample for rest with jackson provider
     * [DOSGI-266] - Support for org.apache.cxf.jaxrs.ext.ContextProvider
     * [DOSGI-270] - Create sample for swagger documentation 
-    
+
 
 2.1.0
 =====
@@ -121,7 +121,7 @@ Release Notes - CXF Distributed OSGi
 
 * Improvement
     * [DOSGI-220] - Upgrade to cxf 3.1.1 
-    
+
 
 1.6.0
 =====

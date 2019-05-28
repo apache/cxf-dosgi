@@ -82,11 +82,11 @@ public class ServiceInvocationHandlerTest {
         MySubService proxy = ProxyFactory.create(new MyServiceImpl(), MySubService.class);
         proxy.throwException2();
     }
-    
+
     @Test(expected = IOException.class)
     public void testInheritedException() throws IOException {
         MySubService proxy = ProxyFactory.create(new MyServiceImpl(), MySubService.class);
         proxy.throwException1();
     }
-    
+
 }

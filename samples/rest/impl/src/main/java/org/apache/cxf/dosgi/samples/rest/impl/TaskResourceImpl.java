@@ -67,7 +67,7 @@ public class TaskResourceImpl implements TaskResource, IntentsProvider {
     public void add(Task task) {
         taskMap.put(task.getId(), task);
     }
-    
+
     @Override
     public void update(Integer id, Task task) {
         taskMap.put(id, task);

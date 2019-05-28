@@ -49,7 +49,7 @@ public interface TaskResource {
     @ApiOperation(value = "Add task")
     @POST
     void add(Task task);
-    
+
     @ApiOperation(value = "Update existing task")
     @PUT
     @Path("/{id}")

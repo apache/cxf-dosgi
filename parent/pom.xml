@@ -140,7 +140,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -157,7 +157,7 @@
             <version>1.3.0</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.component.annotations</artifactId>
@@ -170,7 +170,7 @@
         	<version>1.2.1</version>
         	<scope>provided</scope>
         </dependency>
-        
+
         <!-- Just for the remote service admin spec -->
         <dependency>
         	<groupId>org.apache.aries.rsa</groupId>

@@ -29,11 +29,11 @@ import org.osgi.framework.ServiceException;
 public class ExceptionMapper {
     private static final String REMOTE_EXCEPTION_TYPE = "REMOTE";
     private Map<Method, Set<Class<?>>> exceptionsMap = new HashMap<Method, Set<Class<?>>>();
-    
+
     public ExceptionMapper(Class<?> iType) {
         introspectTypeForExceptions(iType);
     }
-    
+
     public Throwable mapException(Method m, Throwable ex) throws Throwable {
         Throwable cause = ex.getCause() == null ? ex : ex.getCause();
         Set<Class<?>> excTypes = exceptionsMap.get(m);
@@ -49,7 +49,7 @@ public class ExceptionMapper {
         }
         return new ServiceException(REMOTE_EXCEPTION_TYPE, ex);
     }
-    
+
     private void introspectTypeForExceptions(Class<?> iType) {
         for (Method m : iType.getDeclaredMethods()) {
             addExceptions(m);

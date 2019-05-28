@@ -59,19 +59,19 @@ public class AbstractDosgiTest {
     static final String HTTP_HOST = "localhost"; // can specify specific bound IP
     static final String HTTP_BASE_URI = "http://" + HTTP_HOST + ":" + HTTP_PORT;
     private static final int TIMEOUT = 20;
-    
+
     @Inject
     BundleContext bundleContext;
-    
+
     @BeforeClass
     public static void log() {
         System.out.println("-----------------------------------------------------------------");
     }
-    
+
     public <T> T tryTo(String message, Callable<T> func) throws TimeoutException {
         return tryTo(message, func, 5000);
     }
-    
+
     public <T> T tryTo(String message, Callable<T> func, long timeout) throws TimeoutException {
         Throwable lastException = null;
         long startTime = System.currentTimeMillis();
@@ -256,7 +256,7 @@ public class AbstractDosgiTest {
             .put("clientPort", "" + ZK_PORT) //
             .asOption();
     }
-    
+
     protected static Option configLogging() {
         return ConfigurationAdminOptions.configurationFolder(new File("src/test/resources/cfg"));
     }
@@ -265,7 +265,7 @@ public class AbstractDosgiTest {
         return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
             .artifactId("cxf-dosgi-samples-soap-api").versionAsInProject();
     }
-    
+
     protected static MavenArtifactProvisionOption taskServiceImpl() {
         return mavenBundle().groupId("org.apache.cxf.dosgi.samples")
             .artifactId("cxf-dosgi-samples-soap-impl").versionAsInProject();
@@ -296,7 +296,7 @@ public class AbstractDosgiTest {
 
                          mavenBundle("org.ops4j.pax.tinybundles", "tinybundles").versionAsInProject(),
                          mavenBundle("biz.aQute.bnd", "biz.aQute.bndlib").versionAsInProject(),
-                         
+
                          systemProperty("org.osgi.service.http.port").value("" + HTTP_PORT),
                          systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"), //
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"), //

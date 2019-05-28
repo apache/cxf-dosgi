@@ -143,7 +143,7 @@ public class ServiceDecoratorImplTest extends TestCase {
 
         assertDecorate(serviceProps, EMPTY, RES_SD_1);
     }
-    
+
     private void assertDecorate(final Map<String, Object> serviceProps, 
                                 Map<String, Object> expected, URL... resources) {
         Map<String, Object> actual = testDecorate(serviceProps, resources);

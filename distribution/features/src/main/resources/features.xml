@@ -19,7 +19,7 @@
         <feature>cxf-databinding-aegis</feature>
         <bundle>mvn:${project.groupId}/cxf-dosgi-provider-ws/${project.version}</bundle>
     </feature>
-    
+
     <feature name="cxf-dosgi-provider-rs" version="${project.version}">
         <feature>cxf-dosgi-common</feature>
         <feature>cxf-jaxrs</feature>

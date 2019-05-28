@@ -32,7 +32,7 @@ public class ServerEndpoint implements Endpoint {
         this.desc = desc;
         this.server = server;
     }
-    
+
     public Server getServer() {
         return this.server;
     }

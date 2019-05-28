@@ -29,7 +29,7 @@ public class Task {
     String description;
     Date dueDate;
     boolean finished;
-    
+
     public Task() {
     }
 

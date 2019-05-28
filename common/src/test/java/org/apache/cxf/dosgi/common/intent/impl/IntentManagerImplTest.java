@@ -34,7 +34,7 @@ public class IntentManagerImplTest {
         Object feature = intents.iterator().next();
         Assert.assertEquals(GZIPFeature.class, feature.getClass());
     }
-    
+
     @Test
     public void testIntentsFromIntentsProvider() {
         IntentManagerImpl im = new IntentManagerImpl();

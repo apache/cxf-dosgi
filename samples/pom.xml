@@ -33,7 +33,7 @@
       <relativePath>../parent/pom.xml</relativePath>
 
     </parent>
-    
+
     <properties>
         <topDirectoryLocation>..</topDirectoryLocation>
     </properties>

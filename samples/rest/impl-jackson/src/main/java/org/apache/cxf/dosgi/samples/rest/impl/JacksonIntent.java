@@ -39,5 +39,5 @@ public class JacksonIntent implements IntentsProvider {
     public List<?> getIntents() {
         return Arrays.asList((Object)new JacksonJaxbJsonProvider());
     }
-    
+
 }

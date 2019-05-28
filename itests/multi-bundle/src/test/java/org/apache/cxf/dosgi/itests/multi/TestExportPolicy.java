@@ -38,11 +38,11 @@ import org.ops4j.pax.exam.util.Filter;
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class TestExportPolicy extends AbstractDosgiTest {
-    
+
     @Inject
     @Filter("(name=cxf)")
     ExportPolicy policy;
-    
+
     @Configuration
     public static Option[] configure() throws Exception {
         return new Option[] //

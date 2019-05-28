@@ -32,7 +32,7 @@ public final class WsdlSupport {
 
     private WsdlSupport() {
     }
-    
+
     public static void setWsdlProperties(AbstractWSDLBasedEndpointFactory factory, //
                                          BundleContext context, // 
                                          Map<String, Object> sd) {

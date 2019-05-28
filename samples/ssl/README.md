@@ -24,12 +24,12 @@ We want the karaf HttpService to be secured by https and require a client certif
 	keytool -export -rfc -keystore etc/keystores/client.jks -storepass password -alias clientkey -file client.cer
 	keytool -import -trustcacerts -keystore etc/keystores/keystore.jks -storepass password -alias clientkey -file client.cer
 
-	
+
 	# Export server cert
 	keytool -exportcert -storepass password -keystore etc/keystores/keystore.jks -alias serverKey -file server.cert
 	# Import server cert into client store
 	keytool -importcert -storepass password -keystore etc/keystores/client.jks -alias serverKey -file server.cert
-	
+
 
 - Copy thes files in etc to the karaf etc dir
 - Copy the keystores (*.jks) into the karaf etc directory.

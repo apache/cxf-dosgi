@@ -52,7 +52,7 @@ public class ServiceDecoratorBundleListenerTest {
 
         Bundle b = EasyMock.createMock(Bundle.class);
         EasyMock.replay(b);
-        
+
         ServiceDecoratorBundleListener listener = new ServiceDecoratorBundleListener(serviceDecorator);
 
         assertEquals("Precondition failed", 0, called.size());

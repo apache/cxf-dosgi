@@ -49,22 +49,22 @@ public class RsProviderTest {
         rsProvider.setIntentManager(intentManager);
         TaskServiceImpl taskService = new TaskServiceImpl();
         BundleContext callingContext = EasyMock.createMock(BundleContext.class);
-        
+
         Map<String, Object> props = new HashMap<>();
         props.put(Constants.OBJECTCLASS, new String[]{TaskService.class.getName()});
         String serviceAddress = "http://localhost:9181/";
         props.put(RsConstants.RS_ADDRESS_PROPERTY, serviceAddress);
         Class<?>[] ifaces = new Class[]{TaskService.class};
-        
+
         try (Endpoint endpoint = rsProvider.exportService(taskService,
                                                           callingContext,
                                                           props,
                                                           ifaces)) {
             Assert.assertEquals(serviceAddress, endpoint.description().getId());
-            
+
             Task task1 = WebClient.create(serviceAddress).path("/task").get(Task.class);
             Assert.assertEquals("test", task1.getName());
-            
+
             TaskService proxy = (TaskService)rsProvider.importEndpoint(TaskService.class.getClassLoader(), 
                                                                        callingContext, ifaces, endpoint.description());
             Task task = proxy.getTask();

@@ -13,7 +13,7 @@
 	org.apache.felix.http.jettyEnabled=true,\
 	org.osgi.framework.bootdelegation=com.sun.*,\
 	org.osgi.framework.system.packages.extra='sun.misc,javax.xml.bind.annotation;version=2.2.1,javax.xml.bind;version=2.2.1'
-	
+
 # felix.cm.loglevel=4,\
 #	felix.fileinstall.dir=./etc,\
 #	felix.fileinstall.noInitialDelay=true,\

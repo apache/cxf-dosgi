@@ -33,7 +33,7 @@ public class CustomIntentActivator implements BundleActivator {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put("org.apache.cxf.dosgi.IntentName", "myIntent");
         context.registerService(CustomFeatureProvider.class, new CustomFeatureProvider(), props);
-        
+
         Dictionary<String, String> props2 = new Hashtable<String, String>();
         props2.put(RemoteConstants.SERVICE_EXPORTED_CONFIGS, "org.apache.cxf.ws");
         props2.put("org.apache.cxf.ws.address", "/taskservice");

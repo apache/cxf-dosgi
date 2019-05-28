@@ -61,7 +61,7 @@ public class TestCustomIntent extends AbstractDosgiTest {
                 return taskService.get(1);
             }
         });
-        
+
         Assert.assertEquals("changed", task.getTitle());
     }
 

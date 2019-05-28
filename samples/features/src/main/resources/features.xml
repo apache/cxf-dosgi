@@ -8,14 +8,14 @@
         <bundle>mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-api/${project.version}</bundle>
         <bundle>mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-impl/${project.version}</bundle>
     </feature>
-    
+
     <feature name="cxf-dosgi-sample-soap-client" version="${project.version}">
         <feature>cxf-dosgi-provider-ws</feature>
         <feature>aries-rsa-discovery-zookeeper</feature>
         <bundle>mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-api/${project.version}</bundle>
         <bundle>mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-soap-client/${project.version}</bundle>
     </feature>
-    
+
     <feature name="cxf-dosgi-sample-rest-impl" version="${project.version}">
         <feature>cxf-dosgi-provider-rs</feature>
         <feature>aries-rsa-discovery-zookeeper-server</feature>
@@ -25,7 +25,7 @@
         <bundle>mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-rest-api/${project.version}</bundle>
         <bundle>mvn:org.apache.cxf.dosgi.samples/cxf-dosgi-samples-rest-impl/${project.version}</bundle>
     </feature>
-    
+
     <feature name="cxf-dosgi-sample-rest-client" version="${project.version}">
         <feature>cxf-dosgi-provider-rs</feature>
         <feature>aries-rsa-discovery-zookeeper</feature>

@@ -29,6 +29,6 @@ public interface TaskService {
     void addOrUpdate(Task task);
 
     void delete(Integer id);
-    
+
     Collection<Task> getAll();
 }

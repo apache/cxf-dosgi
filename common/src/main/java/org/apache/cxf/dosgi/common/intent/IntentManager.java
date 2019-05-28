@@ -29,7 +29,7 @@ public interface IntentManager {
     Set<String> getExported(Map<String, Object> sd);
 
     Set<String> getImported(Map<String, Object> sd);
-    
+
     List<Object> getRequiredIntents(Set<String> requiredIntents);
 
     <T> List<T> getIntents(Class<? extends T> type, List<Object> intents);

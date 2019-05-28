@@ -74,12 +74,12 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
     public void setHttpServiceManager(HttpServiceManager httpServiceManager) {
         this.httpServiceManager = httpServiceManager;
     }
-    
+
     @Reference
     public void setIntentManager(IntentManager intentManager) {
         this.intentManager = intentManager;
     }
-    
+
     @Activate
     public void activate(BundleContext context) {
         this.bundleContext = context;
@@ -128,7 +128,7 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
             factory.setDataBinding(dataBinding);
         }
         BindingConfiguration binding = copy(intentManager.getIntent(BindingConfiguration.class, intents));
-        
+
         if (binding != null) {
             factory.setBindingConfig(binding);
         }
@@ -194,7 +194,7 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
             throw new RuntimeException("Error exporting service with adress " + completeEndpointAddress, e);
         }
     }
-    
+
     private void applyIntents(List<Object> intents, AbstractEndpointFactory factory) {
         List<Feature> features = intentManager.getIntents(Feature.class, intents);
         factory.setFeatures(features);
@@ -207,7 +207,7 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
             factory.setBindingConfig(binding);
         }
     }
-    
+
     protected EndpointDescription createEndpointDesc(Map<String, Object> props, String[] importedConfigs,
                                                      String address, Collection<String> intents) {
         return super.createEndpointDesc(props, importedConfigs, WsConstants.WS_ADDRESS_PROPERTY, address, intents);
@@ -230,7 +230,7 @@ public class WsProvider extends BaseDistributionProvider implements Distribution
         LOG.info("Using a default address: " + address);
         return address;
     }
-    
+
     protected String getClientAddress(Map<String, Object> sd) {
         return PropertyHelper.getFirstNonEmptyStringProperty(sd, WsConstants.WS_ADDRESS_PROPERTY,
                                                         RemoteConstants.ENDPOINT_ID);

@@ -264,7 +264,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- Unzip the archive created by bnd export plugin. To then repackage it in the assembly phase -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>

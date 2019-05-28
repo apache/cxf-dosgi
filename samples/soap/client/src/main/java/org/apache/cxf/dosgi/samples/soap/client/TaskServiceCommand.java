@@ -48,12 +48,12 @@ public class TaskServiceCommand {
             System.out.println(line);
         }
     }
-    
+
     public void add(Integer id, String title) {
         Task task = new Task(id, title, "");
         taskService.addOrUpdate(task);
     }
-    
+
     public void delete(Integer id) {
         taskService.delete(id);
     }

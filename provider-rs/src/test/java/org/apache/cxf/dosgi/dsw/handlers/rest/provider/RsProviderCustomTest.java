@@ -54,7 +54,7 @@ public class RsProviderCustomTest {
         rsProvider.setIntentManager(intentManager);
         TaskServiceImpl taskService = new TaskServiceImpl();
         BundleContext callingContext = EasyMock.createMock(BundleContext.class);
-        
+
         Map<String, Object> props = new HashMap<>();
         props.put(Constants.OBJECTCLASS, new String[]{TaskService.class.getName()});
         String serviceAddress = "http://localhost:9181/";
