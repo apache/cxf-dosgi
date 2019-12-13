@@ -105,7 +105,7 @@ public class HttpServiceManager {
     /**
      * This listens for service removal events and "un-exports" the service from the HttpService.
      *
-     * @param sref the service reference to track
+     * @param sid the service id to track
      * @param alias the HTTP servlet context alias
      */
     private void registerUnexportHook(Long sid, String alias) {
