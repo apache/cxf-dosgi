@@ -338,7 +338,7 @@
         <repository>
             <id>apache.snapshots</id>
             <name>Apache Maven Snapshot Repository</name>
-            <url>http://repository.apache.org/content/groups/snapshots/</url>
+            <url>https://repository.apache.org/content/groups/snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -352,7 +352,7 @@
         <pluginRepository>
             <id>apache.snapshots</id>
             <name>Apache Maven Snapshot Repository</name>
-            <url>http://repository.apache.org/content/groups/snapshots/</url>
+            <url>https://repository.apache.org/content/groups/snapshots/</url>
             <layout>default</layout>
             <snapshots>
                 <enabled>true</enabled>
