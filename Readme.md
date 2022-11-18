@@ -1,5 +1,7 @@
 # CXF DOSGi
 
+# NOTE This project is now archived
+
 Provides CXF based Distribution providers for [Aries Remote Service Admin (RSA)](http://aries.apache.org/modules/rsa.html).
 
 CXF DOSGi allows to easily publish and consume SOAP and REST services without using the CXF blueprint extensions or publishing the services using java code. So this is the recommended way to use CXF in OSGi with declarative services. Check the examples to see how simple it is to use.
